@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T17:26:09Z",
+  "updated_at": "2026-08-01T17:58:17Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -3186,6 +3186,68 @@
           "docs/parity/observations/OBS-0058-hermes-empty-platform-confirmation-2026-08-02.md",
           ".hades/runtime/hermes-empty-platform-confirmation-probe.json",
           ".hades/runtime/had062-pre-completion-verify-final.log"
+        ]
+      }
+    },
+    {
+      "id": "HAD-063",
+      "title": "Capture Hermes fresh unconfigured startup boundary",
+      "status": "complete",
+      "priority": 20,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-062"
+      ],
+      "risk": "high",
+      "oracle": [
+        "reference_observation",
+        "direct_pty_startup",
+        "synthetic_home_without_config",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Observe the pinned Hermes reference at 120x40 in a fresh synthetic HOME/HERMES_HOME with no config, credentials, or provider endpoint; do not submit a prompt or enter setup values that could invoke external services.",
+        "Record the first stable startup and ready surfaces, displayed model/provider/status markers, bounded startup timing phases if visible, created artifact classes, process cleanup, and whether a fresh process repeats the same unconfigured boundary.",
+        "Add a provenance-bearing observation, sanitized fixture, and repeatable direct-PTY probe with explicit stop conditions and unknowns; omit raw paths, secrets, session IDs, and dynamic redraw noise.",
+        "Wire the deterministic probe and fixture validation into the complete no-skip just verify gate and leave Hades unconfigured-startup behavior unimplemented until the reference contract is captured."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_unconfigured_startup.py",
+        "tests/fixtures/parity/OBS-0059-hermes-unconfigured-startup.json",
+        "docs/parity/observations/OBS-0059-hermes-unconfigured-startup-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "justfile",
+        "scripts/verify.sh",
+        "scripts/probe_hermes_setup_wizard.py",
+        "scripts/probe_hermes_terminal_palette.py",
+        ".hades/runtime/hermes-unconfigured-startup-probe.json",
+        ".hades/runtime/had063-pre-completion-verify-final3.log",
+        ".hades/runtime/had063-palette-after-redraw-fix.json",
+        ".hades/runtime/had063-setup-wizard-encoding-1.json"
+      ],
+      "ready_at": "2026-08-01T17:28:50Z",
+      "claimed_by": "hermes-unconfigured-startup",
+      "claimed_at": "2026-08-01T17:29:12Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Captured the pinned Hermes fresh unconfigured startup boundary with two direct-PTY processes and a synthetic home: the stable shell shows glm-5.2 / Nous Research but remains on starting agent without a ready footer during the bounded eight-second window, creates no config.yaml, exits cleanly, and repeats the same boundary. Added the sanitized observation, fixture, deterministic gate probe, and hardened PTY wait/navigation assertions; just verify passes.",
+        "completed_at": "2026-08-01T17:58:17Z",
+        "evidence": [
+          "scripts/probe_hermes_unconfigured_startup.py",
+          "tests/fixtures/parity/OBS-0059-hermes-unconfigured-startup.json",
+          "docs/parity/observations/OBS-0059-hermes-unconfigured-startup-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "justfile",
+          "scripts/verify.sh",
+          "scripts/probe_hermes_setup_wizard.py",
+          "scripts/probe_hermes_terminal_palette.py",
+          ".hades/runtime/hermes-unconfigured-startup-probe.json",
+          ".hades/runtime/had063-pre-completion-verify-final3.log",
+          ".hades/runtime/had063-palette-after-redraw-fix.json",
+          ".hades/runtime/had063-setup-wizard-encoding-1.json"
         ]
       }
     }

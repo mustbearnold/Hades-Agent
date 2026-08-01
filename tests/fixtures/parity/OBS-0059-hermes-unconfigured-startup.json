@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0059",
+  "surface": "hermes-unconfigured-startup",
+  "reference": {
+    "product": "Hermes Agent",
+    "version": "0.19.1 (2026.7.30)",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "direct PTY with redacted ANSI screen model"
+    },
+    "capture": "fresh synthetic home without config, prompt submission, provider endpoint, credential, OAuth, or setup input"
+  },
+  "normalization": [
+    "Reference checkout, synthetic HOME/HERMES_HOME paths, provider endpoints, credentials, session identifiers, timestamps, raw config values, and animated redraw bytes are omitted or replaced by placeholders.",
+    "The process starts with no config and no Hades/OpenAI provider environment; no prompt is submitted and no setup value, external provider, or OAuth flow is exercised.",
+    "Startup timing is retained only as a bounded diagnostic; it is not generalized into a universal Hermes timeout or readiness contract.",
+    "Filesystem evidence is reduced to normalized artifact classes and config existence/shape metadata; the generated files are not treated as a complete persistence contract."
+  ],
+  "steps": [
+    {
+      "id": "fresh-home-startup",
+      "precondition": "Fresh Hermes process at 120x40 with an empty synthetic HOME/HERMES_HOME and no provider-related environment variables.",
+      "input_sequence": [
+        {
+          "kind": "wait",
+          "value": "fresh synthetic HOME/HERMES_HOME with no config or provider endpoint"
+        },
+        {
+          "kind": "wait",
+          "value": "wait for the first stable startup surface without submitting a prompt"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+C",
+          "bytes_hex": "03",
+          "meaning": "bounded cleanup"
+        }
+      ],
+      "output": {
+        "status": "passed",
+        "startup_markers": [
+          "Hermes Agent",
+          "Nous Research",
+          "Available Tools",
+          "Available Skills"
+        ],
+        "startup_phases_observed": [
+          "summoning hermes",
+          "forging session",
+          "starting agent"
+        ],
+        "model_provider": "glm-5.2 · Nous Research",
+        "first_stable_status": "starting agent",
+        "prompt_marker_at_first_surface": null,
+        "ready_footer_observed_during_8_second_window": false,
+        "config_exists_after_startup": false,
+        "config_bytes_after_startup": 0,
+        "first_process_artifact_classes": [
+          ".cache/uv/<artifact>",
+          "SOUL.md",
+          "logs/<artifact>",
+          "projects.db",
+          "skills/<artifact>",
+          "state.db<suffix>",
+          "tui-theme-boot.json"
+        ],
+        "artifact_classes_during_cleanup": [
+          "<other-file>",
+          "cache/<artifact>"
+        ],
+        "clean_exit": true,
+        "fresh_process_repeats_model_provider": true,
+        "fresh_process_repeats_status": true,
+        "fresh_process_clean_exit": true,
+        "outcome": "A blank Hermes home reaches a stable startup surface with a displayed model/provider marker but remains on starting agent without a ready footer during the bounded window; a fresh process repeats the same boundary."
+      }
+    }
+  ],
+  "unknowns": [
+    "The cause and eventual resolution of the starting-agent state were not investigated because the probe did not submit a prompt or enter setup/provider configuration.",
+    "Whether the startup state eventually reaches ready under a different network, tool-cache, or environment condition remains unknown.",
+    "The generated artifact classes are observed side effects of this pinned run, not a complete Hermes filesystem or persistence contract.",
+    "Hades behavior with no configured provider remains outside this reference-only observation."
+  ],
+  "passed": true
+}

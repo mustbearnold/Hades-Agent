@@ -7,6 +7,7 @@ import argparse
 import json
 import shutil
 import tempfile
+import time
 from pathlib import Path
 from typing import Any
 
@@ -24,7 +25,7 @@ from probe_hermes_slash_commands import (
     wait_for,
     write_bytes,
 )
-from probe_hermes_terminal_palette import Screen, drain
+from probe_hermes_terminal_palette import Screen, child_status, drain, read_available
 
 
 SETUP_MARKERS = (
@@ -133,6 +134,45 @@ def wait_for_setup(pid: int, fd: int, buffer: bytes, case: str, timeout: float) 
     )
 
 
+def wait_for_stable_menu(
+    pid: int, fd: int, buffer: bytes, case: str, timeout: float
+) -> tuple[bytes, dict[str, Any]]:
+    """Wait for the setup child to hold the rendered radiolist before input."""
+    deadline = time.monotonic() + timeout
+    previous: tuple[tuple[str, Any], ...] | None = None
+    stable_samples = 0
+    while time.monotonic() < deadline:
+        try:
+            state = menu_state(buffer)
+        except ProbeFailure:
+            state = None
+        if state is not None:
+            signature = tuple(sorted(state.items()))
+            if signature == previous:
+                stable_samples += 1
+            else:
+                previous = signature
+                stable_samples = 1
+            if stable_samples >= 3:
+                return buffer, state
+        exited, status = child_status(pid)
+        if exited:
+            buffer += read_available(fd)
+            raise ProbeFailure(
+                case,
+                "stable-menu",
+                "Hermes exited before the setup radiolist stabilized",
+                {"exit_status": status, "screen_lines": screen_lines(buffer)},
+            )
+        buffer = drain(pid, fd, buffer, 0.05)
+    raise ProbeFailure(
+        case,
+        "stable-menu",
+        f"timed out after {timeout:.1f}s waiting for a stable setup radiolist",
+        {"screen_lines": screen_lines(buffer)},
+    )
+
+
 def open_setup(reference: Path, home: Path, case: str, timeout: float) -> tuple[int, int, bytes]:
     pid, fd, buffer = start_ready(reference, home, case, timeout)
     write_bytes(fd, b"/setup\r")
@@ -151,8 +191,7 @@ def run_escape(reference: Path, timeout: float) -> dict[str, Any]:
     buffer = b""
     try:
         pid, fd, buffer = open_setup(reference, home, case, timeout)
-        buffer = drain(pid, fd, buffer, 0.25)
-        initial = menu_state(buffer)
+        buffer, initial = wait_for_stable_menu(pid, fd, buffer, case, timeout)
         write_bytes(fd, b"\x1b")
         buffer = wait_for(
             pid,
@@ -203,9 +242,16 @@ def run_navigation(reference: Path, timeout: float) -> dict[str, Any]:
     buffer = b""
     try:
         pid, fd, buffer = open_setup(reference, home, case, timeout)
-        buffer = drain(pid, fd, buffer, 0.25)
-        initial = menu_state(buffer)
+        buffer, initial = wait_for_stable_menu(pid, fd, buffer, case, timeout)
         write_bytes(fd, b"\x1b[B")
+        buffer = drain(pid, fd, buffer, 0.8)
+        down_encoding_fallback = False
+        if not _has_full_setup_cursor(buffer):
+            # The reference switches to application-cursor mode on some PTY
+            # paths. Treat the equivalent Down encoding as the same key only
+            # when the first encoding left the stable menu unchanged.
+            write_bytes(fd, b"\x1bOB")
+            down_encoding_fallback = True
         buffer = wait_for(
             pid,
             fd,
@@ -227,11 +273,17 @@ def run_navigation(reference: Path, timeout: float) -> dict[str, Any]:
                 {"kind": "text", "value": "/setup"},
                 {"kind": "key", "value": "Enter"},
                 {"kind": "key", "value": "Enter"},
-                {"kind": "key", "value": "Down", "bytes_hex": "1b 5b 42"},
+                {
+                    "kind": "key",
+                    "value": "Down",
+                    "bytes_hex": "1b 5b 42",
+                    "fallback_bytes_hex": "1b 4f 42",
+                },
                 {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03"},
             ],
             "initial_cursor": initial["cursor"],
             "after_down": moved,
+            "down_encoding_fallback": down_encoding_fallback,
             "setup_option_submitted": False,
             "cleanup": "Ctrl+C exited cleanly without selecting a setup option",
             "clean_exit": exited,

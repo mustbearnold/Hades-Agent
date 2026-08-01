@@ -284,6 +284,12 @@ progress from August 1, 2026 through 2027.
   without a ready/error surface, config change, or new artifact class. Ctrl+C
   exits cleanly and a fresh process remains ready. Hades empty-platform
   confirmation remains unimplemented.
+- HAD-063 captures Hermes with a fresh synthetic home and no config: the normal
+  startup shell displays `glm-5.2 · Nous Research` but remains on `starting
+  agent` without a ready footer during the bounded eight-second window. No
+  config file is created, normalized runtime artifact classes are recorded,
+  Ctrl+C cleanup is clean, and a fresh process repeats the same boundary.
+  Hades unconfigured-startup behavior remains unimplemented.
 
 ## Unknown until observed
 

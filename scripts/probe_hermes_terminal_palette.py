@@ -373,7 +373,10 @@ def contains_marker(raw: bytes, marker: str) -> bool:
 
 def contains_busy_interrupt(raw: bytes) -> bool:
     compact_text = "".join(normalized(raw).lower().split())
-    return re.search(r"ctrl\+c.*interr?upt", compact_text) is not None
+    # Hermes redraws the footer while the provider retries. A direct PTY can
+    # capture that redraw with the ``in`` bytes omitted, so accept both the
+    # complete and observed split form without accepting a generic busy label.
+    return re.search(r"ctrl\+cto(?:in)?terrupt", compact_text) is not None
 
 
 def wait_for(pid: int, fd: int, buffer: bytes, case: str, step: str, predicate: Predicate, timeout: float) -> bytes:
@@ -393,6 +396,10 @@ def wait_for(pid: int, fd: int, buffer: bytes, case: str, step: str, predicate: 
         readable, _, _ = select.select([fd], [], [], min(0.05, max(0.0, deadline - time.monotonic())))
         if readable:
             buffer += read_available(fd)
+            if predicate(buffer):
+                return buffer
+    if predicate(buffer):
+        return buffer
     raise ProbeFailure(case, step, f"timed out after {timeout:.1f}s", {"screen_tail": normalized(buffer)[-2000:]})
 
 
