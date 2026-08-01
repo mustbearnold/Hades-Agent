@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T10:50:38Z",
+  "updated_at": "2026-08-01T11:49:17Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -2082,6 +2082,113 @@
           "docs/parity/observations/OBS-0041-hades-setup-wizard-cancel-2026-08-01.md",
           "justfile",
           "scripts/verify.sh"
+        ]
+      }
+    },
+    {
+      "id": "HAD-043",
+      "title": "Capture Hermes Full setup continuation boundary",
+      "status": "complete",
+      "priority": 40,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-041",
+        "HAD-042"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "reference_observation",
+        "provenance_record",
+        "fixture_validator",
+        "direct_pty_probe"
+      ],
+      "acceptance": [
+        "Observe the pinned Hermes reference in a fresh 120x40 direct PTY with the sanitized loopback custom provider configuration and no credentials or private runtime state.",
+        "Open /setup through the observed completion/submission sequence, move to Full setup with the observed reversible navigation key, and submit only that initial choice to reach the first continuation surface.",
+        "Capture stable Configuration Location and Inference Provider landmarks, normalize all paths, URLs, runtime values, and provider inventory details, and stop before selecting a provider, entering a secret, OAuth, persistence, or network behavior.",
+        "Verify bounded Ctrl+C cleanup from the first Full setup continuation surface and record whether any setup option or configuration was persisted in the synthetic home.",
+        "Add sanitized OBS-0042 fixture, provenance observation, and repeatable direct-PTY probe; wire validation and the probe through just verify without changing Hades runtime behavior."
+      ],
+      "evidence": [
+        "tests/fixtures/parity/OBS-0042-hermes-full-setup-continuation.json",
+        "docs/parity/observations/OBS-0042-hermes-full-setup-continuation-2026-08-01.md",
+        "scripts/probe_hermes_full_setup.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "ready_at": "2026-08-01T10:59:01Z",
+      "attempts": 1,
+      "claimed_by": "hermes-research",
+      "claimed_at": "2026-08-01T10:59:23Z",
+      "result": {
+        "summary": "Captured the reversible Hermes Full setup continuation through the first Inference Provider boundary; normalized the unchanged config, absent secrets file, observed backup artifact, and clean Ctrl+C exit in OBS-0042.",
+        "completed_at": "2026-08-01T11:25:47Z",
+        "evidence": [
+          "tests/fixtures/parity/OBS-0042-hermes-full-setup-continuation.json",
+          "docs/parity/observations/OBS-0042-hermes-full-setup-continuation-2026-08-01.md",
+          "scripts/probe_hermes_full_setup.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-044",
+      "title": "Make the Hades TUI launch path explicit",
+      "status": "complete",
+      "priority": 39,
+      "lane": "packaging",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-036"
+      ],
+      "risk": "low",
+      "oracle": [
+        "cli_dispatch_test",
+        "direct_pty_launch_replay",
+        "help_contract",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Keep the existing no-argument `hades` and `Hades` launchers on the TUI path and accept `hades tui` and `Hades tui` as explicit aliases without changing the TUI startup surface or terminal cleanup behavior.",
+        "Document the supported launch forms and make --help identify the explicit tui command while preserving deterministic --snapshot, --version, and unknown-argument behavior.",
+        "Add a pure CLI dispatch oracle plus a fresh direct-PTY launch replay that proves both no-argument and explicit-tui forms reach the startup landmark and exit cleanly with Ctrl+C.",
+        "Run the complete no-skip just verify gate and record that refreshing the user-local release launcher requires just install-user; do not mutate shell configuration or credentials."
+      ],
+      "evidence": [
+        "crates/hades-cli/src/main.rs",
+        "scripts/replay_cli_launch.py",
+        "docs/parity/observations/OBS-0043-hades-cli-launch-2026-08-01.md",
+        "justfile",
+        "scripts/verify.sh",
+        "README.md",
+        "CONTEXT.md"
+      ],
+      "ready_at": "2026-08-01T11:35:43Z",
+      "attempts": 2,
+      "claimed_by": "hades-launcher-resumed",
+      "claimed_at": "2026-08-01T11:46:26Z",
+      "blocked_history": [
+        {
+          "reason": "The implementation, direct-PTY replay, user-local release refresh, Bash/Fish command lookup, and focused tests passed, but the mandatory just verify gate could not start its existing tmux-backed replay because every socket path returned Operation not permitted in the prior execution environment. The gate was not skipped or weakened.",
+          "blocked_at": "2026-08-01T11:43:53Z",
+          "next_action": "Resume in an execution environment that permits tmux Unix-domain sockets, rerun literal just verify, then complete HAD-044 and run post-commit verification."
+        }
+      ],
+      "result": {
+        "summary": "Added explicit tui CLI dispatch while preserving the default launch path and existing non-TUI modes; documented both launcher forms, refreshed the user-local release artifact, and verified lowercase/capitalized launchers plus no-argument and explicit-tui direct-PTY cleanup.",
+        "completed_at": "2026-08-01T11:49:17Z",
+        "evidence": [
+          "crates/hades-cli/src/main.rs",
+          "scripts/replay_cli_launch.py",
+          "docs/parity/observations/OBS-0043-hades-cli-launch-2026-08-01.md",
+          "justfile",
+          "scripts/verify.sh",
+          "README.md",
+          "CONTEXT.md"
         ]
       }
     }

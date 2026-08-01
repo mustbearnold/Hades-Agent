@@ -19,6 +19,10 @@ probe-lifecycle:
     cargo build --locked --package hades-cli
     python3 scripts/probe_tui_lifecycle.py --binary target/debug/hades
 
+replay-cli-launch:
+    cargo build --locked --package hades-cli
+    python3 scripts/replay_cli_launch.py --binary target/debug/hades --report .hades/runtime/cli-launch-replay.json
+
 replay-differential:
     cargo build --locked --package hades-cli
     python3 scripts/differential_replay.py --binary target/debug/hades --report .hades/runtime/differential-replay.json
@@ -96,6 +100,9 @@ probe-model-picker:
 probe-setup-wizard:
     python3 scripts/probe_hermes_setup_wizard.py --report .hades/runtime/hermes-setup-wizard-probe.json --timeout 30
 
+probe-full-setup:
+    python3 scripts/probe_hermes_full_setup.py --report .hades/runtime/hermes-full-setup-probe.json --timeout 30
+
 replay-terminal-palette:
     cargo build --locked --package hades-cli
     python3 scripts/replay_terminal_palette.py --binary target/debug/hades --report .hades/runtime/hades-terminal-palette-replay.json
@@ -140,6 +147,7 @@ validate-reference:
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0039-hades-model-picker-model-stage.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0040-hermes-setup-wizard-cancel.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0041-hades-setup-wizard-cancel.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0042-hermes-full-setup-continuation.json
 
 agent command *args:
     python3 scripts/agent/control_plane.py {{command}} {{args}}

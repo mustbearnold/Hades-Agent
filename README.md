@@ -13,7 +13,9 @@ just snapshot
 ```
 
 `just snapshot` renders the normalized Hermes startup surface at 120x40
-without requiring an interactive terminal. `just run` launches the TUI.
+without requiring an interactive terminal. `just run` launches the TUI. The
+installed `hades` or `Hades` command launches the TUI with no arguments, and
+`hades tui` / `Hades tui` are explicit aliases for the same path.
 `just probe-lifecycle` runs the actual binary in a PTY and verifies startup,
 resize, exit, and terminal restoration. `just replay-differential` compares
 the normalized startup frame and replays the checked-in submit/interrupt,
@@ -87,6 +89,7 @@ contracts are in [`.agents/`](.agents/). Product requirements live in
 ```bash
 just check                    # complete local gate
 just run                      # interactive TUI
+just replay-cli-launch        # no-argument and explicit-tui PTY launch replay
 just install-user             # build and install hades/Hades on user PATH
 just snapshot                 # deterministic terminal snapshot
 just probe-lifecycle          # PTY lifecycle and cleanup oracle

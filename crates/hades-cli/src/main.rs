@@ -27,21 +27,39 @@ use hades_tui::{draw, snapshot};
 use ratatui::{Terminal, backend::CrosstermBackend};
 
 fn main() -> Result<(), Box<dyn Error>> {
-    match env::args().nth(1).as_deref() {
-        Some("--help") | Some("-h") => {
-            println!("{PRODUCT_NAME}\n\nUsage: hades [--snapshot|--help|--version]");
+    match cli_command(env::args().nth(1).as_deref()) {
+        Ok(CliCommand::Help) => {
+            println!("{PRODUCT_NAME}\n\nUsage: hades [tui|--snapshot|--help|--version]");
             Ok(())
         }
-        Some("--version") | Some("-V") => {
+        Ok(CliCommand::Version) => {
             println!("{PRODUCT_NAME} 0.1.0");
             Ok(())
         }
-        Some("--snapshot") => {
+        Ok(CliCommand::Snapshot) => {
             println!("{}", snapshot(&App::new(), 120, 40));
             Ok(())
         }
-        Some(argument) => Err(format!("unknown argument: {argument}").into()),
-        None => run_tui(),
+        Ok(CliCommand::Tui) => run_tui(),
+        Err(argument) => Err(format!("unknown argument: {argument}").into()),
+    }
+}
+
+#[derive(Debug, Eq, PartialEq)]
+enum CliCommand {
+    Tui,
+    Snapshot,
+    Help,
+    Version,
+}
+
+fn cli_command(argument: Option<&str>) -> Result<CliCommand, &str> {
+    match argument {
+        None | Some("tui") => Ok(CliCommand::Tui),
+        Some("--help") | Some("-h") => Ok(CliCommand::Help),
+        Some("--version") | Some("-V") => Ok(CliCommand::Version),
+        Some("--snapshot") => Ok(CliCommand::Snapshot),
+        Some(argument) => Err(argument),
     }
 }
 
@@ -266,6 +284,20 @@ fn map_key(key: KeyEvent) -> Option<Key> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn cli_dispatch_keeps_default_and_explicit_tui_on_the_same_path() {
+        assert_eq!(cli_command(None), Ok(CliCommand::Tui));
+        assert_eq!(cli_command(Some("tui")), Ok(CliCommand::Tui));
+    }
+
+    #[test]
+    fn cli_dispatch_preserves_non_tui_modes_and_unknown_arguments() {
+        assert_eq!(cli_command(Some("--help")), Ok(CliCommand::Help));
+        assert_eq!(cli_command(Some("--version")), Ok(CliCommand::Version));
+        assert_eq!(cli_command(Some("--snapshot")), Ok(CliCommand::Snapshot));
+        assert_eq!(cli_command(Some("wat")), Err("wat"));
+    }
 
     #[test]
     fn control_key_mapping_is_explicit() {

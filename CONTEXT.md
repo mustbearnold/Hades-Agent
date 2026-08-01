@@ -170,6 +170,17 @@ progress from August 1, 2026 through 2027.
   Escape-to-numbered-fallback result, and clean Ctrl+C exit. A fresh 120x40
   replay verifies the stable landmarks without Busy, provider, OAuth, or
   network behavior; later pages and choice submission remain unknown.
+- HAD-043 captures the first reversible Hermes Full setup continuation: after
+  the observed `j` + Enter branch, Configuration Location and Inference
+  Provider landmarks appear, Ctrl+C exits cleanly, config.yaml content remains
+  unchanged, no secrets file is created, and a normalized config-backup
+  artifact is created. Provider selection, credentials, and later sections
+  remain unknown.
+- HAD-044 makes the CLI launch intent explicit: no arguments and the `tui`
+  subcommand enter the same TUI path, with direct-PTY coverage for startup and
+  terminal restoration. The user-local release artifact still requires an
+  explicit `just install-user` refresh, and an existing shell must have
+  `~/.local/bin` on `PATH`.
 
 ## Unknown until observed
 
@@ -183,7 +194,8 @@ progress from August 1, 2026 through 2027.
   terminal-dependent surfaces beyond the captured observations.
 - The complete slash-command catalog and argument semantics, provider/model
   discovery details, setup wizard continuation, numbered-fallback choices,
-  cancellation after deeper navigation, and persistence, configured command
+  cancellation after deeper navigation, provider configuration, backup
+  semantics, and persistence, configured command
   behavior with a reachable provider, and model-picker behavior beyond the
   bounded deterministic provider/model seam.
 - OSC52 behavior outside the OBS-0032 timing controls and bounded payload
