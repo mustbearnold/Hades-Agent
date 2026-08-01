@@ -20,18 +20,21 @@ URL is validated by `hades-provider`, which currently permits only
 and an owned channel. The worker translates transport events into
 `ProviderEvent`s; the main loop drains them between redraws.
 
-Missing configuration and transport construction failures become visible
-reducer errors. Ctrl+C drops the active receiver, and a new request replaces
-the old receiver, so late worker sends cannot be delivered to a later turn.
-The API key is passed only to the transport and is never logged or included in
-replay evidence.
+Transport construction failures become visible reducer errors. Ctrl+C drops
+the active receiver, and a new request replaces the old receiver, so late
+worker sends cannot be delivered to a later turn. The API key is passed only to
+the transport and is never logged or included in replay evidence. A later
+unconfigured-startup boundary selects a typed startup state before dispatch,
+so a fresh no-endpoint launch currently remains on `starting agent…` rather
+than reaching this provider error guard.
 
 ## Consequences
 
 `hades tui` is no longer a silent submission shell when a local endpoint is
-configured, and no-endpoint launches fail visibly and cleanly. The initial
-HAD-055 transport buffered the complete HTTP response before returning its
-parsed event vector; ADR-0007 supersedes that implementation limitation with
-incremental parsing and cooperative socket cancellation. This decision does
-not add HTTPS, cloud providers, credentials discovery, persistence, retries,
-or tool execution.
+configured. A fresh no-endpoint launch follows the separately captured
+Hermes starting-agent boundary and is intentionally not yet a setup or queued
+input flow. The initial HAD-055 transport buffered the complete HTTP response
+before returning its parsed event vector; ADR-0007 supersedes that
+implementation limitation with incremental parsing and cooperative socket
+cancellation. This decision does not add HTTPS, cloud providers, credentials
+discovery, persistence, retries, or tool execution.

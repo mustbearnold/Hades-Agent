@@ -376,7 +376,7 @@ def contains_busy_interrupt(raw: bytes) -> bool:
     # Hermes redraws the footer while the provider retries. A direct PTY can
     # capture that redraw with the ``in`` bytes omitted, so accept both the
     # complete and observed split form without accepting a generic busy label.
-    return re.search(r"ctrl\+cto(?:in)?terrupt", compact_text) is not None
+    return re.search(r"ctrl\+cto(?:interrupt|interupt|terrupt)", compact_text) is not None
 
 
 def wait_for(pid: int, fd: int, buffer: bytes, case: str, step: str, predicate: Predicate, timeout: float) -> bytes:

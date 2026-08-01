@@ -132,6 +132,8 @@ hades tui
 ```
 
 The CLI worker translates the local SSE response into typed reducer events and
-renders the assistant response. Without `HADES_PROVIDER_BASE_URL`, a submitted
-prompt now produces a visible configuration error instead of remaining busy.
-No external provider service is required for the deterministic bootstrap path.
+renders the assistant response. Without `HADES_PROVIDER_BASE_URL`, a fresh
+launch stays on the reference-backed `starting agent…` boundary and does not
+start a provider worker or submit prompts yet; configure the loopback endpoint
+before expecting a usable composer. No external provider service is required
+for the deterministic bootstrap path.

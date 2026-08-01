@@ -296,6 +296,12 @@ progress from August 1, 2026 through 2027.
   prompt, and exits/restores the terminal cleanly on Ctrl+C. Both `hades` and
   `hades tui` direct-PTY replays pass; provider setup, persistence, credentials,
   and eventual startup resolution remain unimplemented.
+- HAD-065 captures the next Hermes boundary: in two fresh no-config processes,
+  sanitized input becomes visible in the composer while `starting agent…`
+  remains active, with no ready/provider-error/assistant transition or config
+  change. The first Ctrl+C clears the draft and the second exits cleanly.
+  Whether the draft is queued, how startup eventually resolves, and Hades input
+  queue behavior remain unimplemented or unknown.
 
 ## Unknown until observed
 

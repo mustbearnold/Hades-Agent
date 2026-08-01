@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T18:24:34Z",
+  "updated_at": "2026-08-01T18:46:16Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -3335,6 +3335,71 @@
           ".hades/runtime/had064-differential-check-2.json",
           ".hades/runtime/had064-local-provider-check.json",
           ".hades/runtime/had064-pre-completion-verify-4.log"
+        ]
+      }
+    },
+    {
+      "id": "HAD-065",
+      "title": "Capture Hermes input queue during unconfigured startup",
+      "status": "complete",
+      "priority": 18,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-064"
+      ],
+      "risk": "high",
+      "oracle": [
+        "reference_observation",
+        "direct_pty_input_queue",
+        "synthetic_home_without_config",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Observe the pinned Hermes reference at 120x40 in a fresh synthetic HOME/HERMES_HOME with no config, credentials, or provider endpoint, and wait for the stable starting-agent surface captured by OBS-0059.",
+        "Send only sanitized text plus Enter after the starting-agent surface is visible, record whether the draft, queued message, status, or provider request becomes observable during a bounded window, and never invoke setup, credentials, OAuth, external network, or a real provider.",
+        "Repeat the input at a second bounded timing if the first result is timing-sensitive; record clean Ctrl+C cleanup, terminal restoration, config/artifact changes, and any stable transition without treating a transient redraw as completion.",
+        "Add a provenance-bearing observation, sanitized fixture, and repeatable direct-PTY probe with explicit unknowns; use the result to decide whether Hades should queue input, expose a setup route, or preserve the current blocked unconfigured boundary, without implementing behavior from documentation alone.",
+        "Wire the deterministic probe and fixture validation into the complete no-skip just verify gate and leave Hades behavior unchanged until the reference contract is captured."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_unconfigured_input_queue.py",
+        "tests/fixtures/parity/OBS-0061-hermes-unconfigured-input-queue.json",
+        "docs/parity/observations/OBS-0061-hermes-unconfigured-input-queue-2026-08-02.md",
+        "docs/parity/observations/OBS-0059-hermes-unconfigured-startup-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "docs/decisions/ADR-0006-live-loopback-provider-worker.md",
+        "justfile",
+        "scripts/verify.sh",
+        "scripts/probe_hermes_terminal_palette.py",
+        ".hades/runtime/hermes-unconfigured-input-queue-probe.json",
+        ".hades/runtime/had065-terminal-palette-focused.json",
+        ".hades/runtime/had065-pre-completion-verify-3.log"
+      ],
+      "ready_at": "2026-08-01T18:26:32Z",
+      "claimed_by": "hermes-unconfigured-input-queue",
+      "claimed_at": "2026-08-01T18:27:10Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Captured Hermes input semantics during the fresh no-provider starting-agent boundary. In two 120x40 direct-PTY cases, sanitized queued hello plus Enter became visible while starting agent remained active, with no ready footer, provider error, assistant output, or config change; the first Ctrl+C cleared the draft and the second exited cleanly with terminal restoration. Added OBS-0061 probe/fixture/observation, wired validation and full verify, reconciled runtime docs, and hardened an observed Hermes palette interrupt redraw matcher. Complete no-skip just verify passed.",
+        "completed_at": "2026-08-01T18:46:16Z",
+        "evidence": [
+          "scripts/probe_hermes_unconfigured_input_queue.py",
+          "tests/fixtures/parity/OBS-0061-hermes-unconfigured-input-queue.json",
+          "docs/parity/observations/OBS-0061-hermes-unconfigured-input-queue-2026-08-02.md",
+          "docs/parity/observations/OBS-0059-hermes-unconfigured-startup-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "docs/decisions/ADR-0006-live-loopback-provider-worker.md",
+          "justfile",
+          "scripts/verify.sh",
+          "scripts/probe_hermes_terminal_palette.py",
+          ".hades/runtime/hermes-unconfigured-input-queue-probe.json",
+          ".hades/runtime/had065-terminal-palette-focused.json",
+          ".hades/runtime/had065-pre-completion-verify-3.log"
         ]
       }
     }
