@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T02:03:02Z",
+  "updated_at": "2026-08-01T02:11:23Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -206,7 +206,7 @@
     {
       "id": "HAD-006",
       "title": "Build the differential replay verification command",
-      "status": "in_progress",
+      "status": "complete",
       "priority": 70,
       "lane": "verification",
       "owner_role": "verifier",
@@ -223,11 +223,30 @@
         "Fail on behavioral or visual divergence with the first useful diff.",
         "Keep reference artifacts and generated reports separate."
       ],
-      "evidence": [],
+      "evidence": [
+        "scripts/differential_replay.py",
+        "justfile",
+        "scripts/verify.sh",
+        "tests/fixtures/parity/OBS-0003-submit-interrupt.json",
+        "tests/fixtures/parity/OBS-0001-startup-120x40.txt",
+        "docs/parity/observations/OBS-0005-differential-replay-2026-08-01.md"
+      ],
       "ready_at": "2026-08-01T01:03:48Z",
       "claimed_by": "hermes-verifier",
       "claimed_at": "2026-08-01T02:03:02Z",
-      "attempts": 1
+      "attempts": 1,
+      "result": {
+        "summary": "Added a machine-readable differential replay command that compares the normalized 120x40 Hermes golden frame, replays the sanitized submit/interrupt trace in a PTY, reports first-cell visual diffs, and verifies terminal cleanup; wired it into just replay-differential and the full verification gate.",
+        "completed_at": "2026-08-01T02:11:23Z",
+        "evidence": [
+          "scripts/differential_replay.py",
+          "justfile",
+          "scripts/verify.sh",
+          "tests/fixtures/parity/OBS-0003-submit-interrupt.json",
+          "tests/fixtures/parity/OBS-0001-startup-120x40.txt",
+          "docs/parity/observations/OBS-0005-differential-replay-2026-08-01.md"
+        ]
+      }
     }
   ]
 }
