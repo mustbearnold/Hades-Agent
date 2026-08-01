@@ -354,6 +354,17 @@ mod tests {
     }
 
     #[test]
+    fn hermes_startup_surface_renders_bracketed_paste_as_multiline_draft() {
+        let mut app = App::new();
+        app.handle(hades_core::InputEvent::Paste("paste-one\npaste-two".to_owned()));
+
+        let rendered = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        assert!(rendered.contains("paste-one"));
+        assert!(rendered.contains("paste-two"));
+        assert!(!rendered.contains("musing…"));
+    }
+
+    #[test]
     fn hermes_startup_surface_renders_and_applies_slash_completion() {
         let mut app = App::new();
         for character in "/he".chars() {

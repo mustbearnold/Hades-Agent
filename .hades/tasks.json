@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T03:36:11Z",
+  "updated_at": "2026-08-01T03:44:11Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -537,6 +537,62 @@
           "tests/fixtures/parity/OBS-0012-hades-slash-completion.json",
           "docs/parity/observations/OBS-0012-hades-slash-completion-2026-08-01.md",
           "scripts/replay_completion.py",
+          "scripts/replay_composer.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-013",
+      "title": "Implement the observed bracketed paste path",
+      "status": "complete",
+      "priority": 70,
+      "lane": "interaction",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-012"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "unit_test",
+        "snapshot_test",
+        "replay_trace"
+      ],
+      "acceptance": [
+        "Accept a bracketed paste event in the ready composer, preserve embedded newlines at the cursor, and never submit the pasted draft as a side effect.",
+        "Wire the terminal paste event into the reducer and render the preserved multiline draft without claiming clipboard-provider or busy-state behavior.",
+        "Prove the path with deterministic core/app tests, a 120x40 snapshot, and isolated PTY replay integrated into the full verification gate."
+      ],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-app/src/lib.rs",
+        "crates/hades-cli/src/main.rs",
+        "crates/hades-tui/src/lib.rs",
+        "tests/fixtures/parity/OBS-0013-hades-bracketed-paste.json",
+        "docs/parity/observations/OBS-0013-hades-bracketed-paste-2026-08-01.md",
+        "scripts/replay_paste.py",
+        "scripts/replay_composer.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "ready_at": "2026-08-01T03:40:10Z",
+      "attempts": 1,
+      "claimed_by": "hermes-implementer",
+      "claimed_at": "2026-08-01T03:40:53Z",
+      "result": {
+        "summary": "Implemented the observed bracketed-paste path with typed crossterm paste events, cursor insertion preserving embedded newlines without submission, TUI rendering, focused tests, and isolated tmux replay integrated into verification.",
+        "completed_at": "2026-08-01T03:44:11Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-app/src/lib.rs",
+          "crates/hades-cli/src/main.rs",
+          "crates/hades-tui/src/lib.rs",
+          "tests/fixtures/parity/OBS-0013-hades-bracketed-paste.json",
+          "docs/parity/observations/OBS-0013-hades-bracketed-paste-2026-08-01.md",
+          "scripts/replay_paste.py",
           "scripts/replay_composer.py",
           "justfile",
           "scripts/verify.sh",

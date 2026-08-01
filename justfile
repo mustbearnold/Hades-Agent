@@ -27,6 +27,10 @@ replay-completion:
     cargo build --locked --package hades-cli
     python3 scripts/replay_completion.py --binary target/debug/hades --report .hades/runtime/completion-replay.json
 
+replay-paste:
+    cargo build --locked --package hades-cli
+    python3 scripts/replay_paste.py --binary target/debug/hades --report .hades/runtime/paste-replay.json
+
 validate-reference:
     python3 scripts/validate_reference_fixture.py
 

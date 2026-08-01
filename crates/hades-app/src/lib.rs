@@ -37,6 +37,7 @@ impl App {
                 DispatchOutcome::Continue
             }
             InputEvent::Key(key) => self.handle_key(key),
+            InputEvent::Paste(text) => self.handle_paste(text),
         }
     }
 
@@ -182,6 +183,17 @@ impl App {
     fn quit(&mut self) -> DispatchOutcome {
         self.state.should_quit = true;
         DispatchOutcome::Quit
+    }
+
+    fn handle_paste(&mut self, text: String) -> DispatchOutcome {
+        if self.state.turn != TurnState::Ready || self.state.overlay.is_some() {
+            return DispatchOutcome::Continue;
+        }
+
+        self.state.composer.insert_text(&text);
+        self.clear_completion();
+        self.state.status = "Pasted input.".to_owned();
+        DispatchOutcome::Continue
     }
 
     fn refresh_completion(&mut self) {
@@ -368,5 +380,23 @@ mod tests {
         assert_eq!(app.state().composer.text(), "line-one\nx");
         assert_eq!(app.state().turn, TurnState::Ready);
         assert!(app.state().messages.iter().all(|message| message.content != "line-one\nx"));
+    }
+
+    #[test]
+    fn bracketed_paste_preserves_newlines_without_submitting() {
+        let mut app = App::new();
+
+        assert_eq!(
+            app.handle(InputEvent::Paste("paste-one\npaste-two".to_owned())),
+            DispatchOutcome::Continue
+        );
+        assert_eq!(app.state().composer.text(), "paste-one\npaste-two");
+        assert_eq!(app.state().turn, TurnState::Ready);
+        assert!(
+            app.state()
+                .messages
+                .iter()
+                .all(|message| { message.content != "paste-one\npaste-two" })
+        );
     }
 }

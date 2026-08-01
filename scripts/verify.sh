@@ -16,6 +16,7 @@ python3 scripts/probe_tui_lifecycle.py --binary target/debug/hades
 python3 scripts/differential_replay.py --binary target/debug/hades --report .hades/runtime/differential-replay.json
 python3 scripts/replay_composer.py --binary target/debug/hades --report .hades/runtime/composer-replay.json
 python3 scripts/replay_completion.py --binary target/debug/hades --report .hades/runtime/completion-replay.json
+python3 scripts/replay_paste.py --binary target/debug/hades --report .hades/runtime/paste-replay.json
 git diff --check
 
 echo "verification: PASS"

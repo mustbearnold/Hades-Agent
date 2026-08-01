@@ -70,8 +70,12 @@ def load_contract(path: Path) -> dict[str, Any]:
                 raise ComposerReplayFailure("contract", step["id"], "duplicate step id")
             step_ids.add(step["id"])
             input_value = step.get("input")
-            if not isinstance(input_value, dict) or input_value.get("kind") not in {"text", "key"}:
-                raise ComposerReplayFailure("contract", step["id"], "step input must be text or key")
+            if not isinstance(input_value, dict) or input_value.get("kind") not in {
+                "text",
+                "key",
+                "paste",
+            }:
+                raise ComposerReplayFailure("contract", step["id"], "step input must be text, key, or paste")
             if not isinstance(input_value.get("value"), str):
                 raise ComposerReplayFailure("contract", step["id"], "step input needs a string value")
             output = step.get("output")
@@ -162,8 +166,11 @@ def key_payload(value: str) -> str:
 
 
 def send_input(session: str, input_value: dict[str, str]) -> None:
-    if input_value["kind"] == "text":
-        result = tmux_run("send-keys", "-t", session, "-l", input_value["value"])
+    if input_value["kind"] in {"text", "paste"}:
+        value = input_value["value"]
+        if input_value["kind"] == "paste":
+            value = f"\x1b[200~{value}\x1b[201~"
+        result = tmux_run("send-keys", "-t", session, "-l", value)
     else:
         result = tmux_run("send-keys", "-t", session, key_payload(input_value["value"]))
     if result.returncode != 0:

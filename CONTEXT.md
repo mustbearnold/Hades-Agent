@@ -46,6 +46,10 @@ progress from August 1, 2026 through 2027.
   deterministic rendering, and Tab application of `/help` before the fallback
   surface cycle. Completion gateway timing, other prefixes, multiline/busy
   behavior, and selection semantics remain unknown.
+- HAD-013 implements the observed bracketed-paste path with crossterm paste
+  events, cursor insertion, preserved newlines, and no implicit submission.
+  Clipboard-provider reads, image/path paste, overlay/busy behavior, and mouse
+  selection remain unknown.
 
 ## Unknown until observed
 

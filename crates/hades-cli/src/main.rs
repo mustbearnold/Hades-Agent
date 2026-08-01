@@ -71,6 +71,9 @@ fn event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> Result<(
                 Event::Resize(width, height) => {
                     app.handle(InputEvent::Resize { width, height });
                 }
+                Event::Paste(text) => {
+                    app.handle(InputEvent::Paste(text));
+                }
                 _ => {}
             }
         }

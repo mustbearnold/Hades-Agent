@@ -145,6 +145,12 @@ impl Composer {
         self.reset_history_navigation();
     }
 
+    pub fn insert_text(&mut self, text: &str) {
+        for character in text.chars() {
+            self.insert(character);
+        }
+    }
+
     pub const fn move_left(&mut self) {
         self.cursor = self.cursor.saturating_sub(1);
     }
@@ -315,9 +321,10 @@ pub enum Key {
     Ctrl(char),
 }
 
-#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum InputEvent {
     Key(Key),
+    Paste(String),
     Resize { width: u16, height: u16 },
 }
 
@@ -428,6 +435,18 @@ mod tests {
 
         assert_eq!(composer.text(), "/help");
         assert_eq!(composer.cursor(), 5);
+    }
+
+    #[test]
+    fn composer_paste_preserves_newlines_at_the_cursor() {
+        let mut composer = Composer::default();
+        composer.insert_text("left-right");
+        composer.move_left();
+
+        composer.insert_text("paste-one\npaste-two");
+
+        assert_eq!(composer.text(), "left-righpaste-one\npaste-twot");
+        assert_eq!(composer.cursor(), 28);
     }
 
     #[test]

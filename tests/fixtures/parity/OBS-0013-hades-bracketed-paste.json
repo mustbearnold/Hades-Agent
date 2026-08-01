@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0013",
+  "reference_observation": "OBS-0010",
+  "surface": "hades-tui",
+  "reference_contract": {
+    "input_bytes_hex": "1b 5b 32 30 30 7e 70 61 73 74 65 2d 6f 6e 65 0a 70 61 73 74 65 2d 74 77 6f 1b 5b 32 30 31 7e",
+    "pasted_value": "paste-one\npaste-two",
+    "newline_behavior": "preserved inline and not submitted"
+  },
+  "terminal": {
+    "columns": 120,
+    "rows": 40,
+    "emulator": "tmux-backed PTY"
+  },
+  "normalization": [
+    "Capture stable screen text with tmux capture-pane -p after each redraw.",
+    "Ignore ANSI sequences, cursor placement, colors, and trailing spaces.",
+    "Each case runs in a fresh Hades process with the same 120x40 terminal size.",
+    "The replay sends bracketed-paste start and end markers around the pasted value; crossterm must decode this into one paste event.",
+    "The contract asserts the pasted lines and the absence of busy/submission markers."
+  ],
+  "cases": [
+    {
+      "id": "preserve-bracketed-paste",
+      "steps": [
+        {
+          "id": "paste-multiline-text",
+          "input": {
+            "kind": "paste",
+            "value": "paste-one\npaste-two"
+          },
+          "output": {
+            "pty_markers": [
+              "paste-one",
+              "paste-two"
+            ],
+            "pty_absent_markers": [
+              "musing",
+              "Ctrl+C to interrupt"
+            ]
+          }
+        },
+        {
+          "id": "exit",
+          "input": {
+            "kind": "key",
+            "value": "Ctrl+C"
+          },
+          "output": {
+            "pty_markers": [
+              "process exit"
+            ],
+            "process_exit": true
+          }
+        }
+      ]
+    }
+  ]
+}
