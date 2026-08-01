@@ -120,6 +120,7 @@ fn event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> Result<(
             app.handle(InputEvent::Resize { width: current_size.0, height: current_size.1 });
             last_size = current_size;
         }
+        app.handle(InputEvent::Tick);
         terminal.draw(|frame| draw(frame, &app))?;
         if app.state().should_quit {
             cancel_provider(&mut provider_runtime);

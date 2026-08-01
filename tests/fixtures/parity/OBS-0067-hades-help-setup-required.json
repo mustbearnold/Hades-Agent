@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0067",
+  "reference_observation": "OBS-0066",
+  "surface": "hades-unconfigured-help-setup-required",
+  "reference": {
+    "product": "Hades Agent",
+    "version": "workspace",
+    "source_commit": "64ed3ee5fbb140078e1a3bad5cac339a77fe4938",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "direct PTY with focused app/TUI and terminal restoration oracles"
+    },
+    "capture": "fresh Hades processes without a provider endpoint replayed against OBS-0066"
+  },
+  "normalization": [
+    "The Hades binary path, synthetic HOME/HERMES_HOME, PTY path, session identifiers, timestamps, and dynamic redraw bytes are omitted or represented by placeholders.",
+    "Both launch forms remove HADES and OpenAI provider environment variables and use a fresh synthetic home; no provider request, credential, OAuth, persistence, or external network is exercised.",
+    "The replay asserts /help visibility before the reference-backed 8000 ms deadline, the Setup Required markers after the deadline, absence of a ready/provider-error boundary and config creation, raw mode, alternate-screen cleanup, and terminal restoration. Focused app/TUI tests provide the exact retained-draft-clear oracle.",
+    "Observed direct-PTY transition samples are recorded as bounded timing evidence rather than a universal scheduler or timeout guarantee."
+  ],
+  "steps": [
+    {
+      "id": "default-help-delayed-setup-required",
+      "precondition": "Fresh Hades process launched without arguments in a 120x40 direct PTY and without a provider endpoint.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "/help",
+          "bytes_hex": "2f 68 65 6c 70"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "wait",
+          "value": "500 ms pre-deadline sample, then wait for the bounded 8000 ms transition"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+C",
+          "bytes_hex": "03",
+          "meaning": "clear retained /help while Setup Required remains visible"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+C",
+          "bytes_hex": "03",
+          "meaning": "exit cleanly"
+        }
+      ],
+      "output": {
+        "starting_agent_before_deadline": true,
+        "help_visible_before_deadline": true,
+        "setup_required_after_deadline": true,
+        "setup_required_markers": [
+          "Setup Required",
+          "/model",
+          "/setup",
+          "Ctrl+C"
+        ],
+        "configured_ready_surface": false,
+        "provider_error": false,
+        "provider_request_started": false,
+        "config_created": false,
+        "observed_transition_ms": [
+          8125,
+          8129
+        ],
+        "first_ctrl_c_kept_process_alive": true,
+        "first_ctrl_c_cleared_draft": "focused app/TUI oracle",
+        "exit": {
+          "kind": "exit",
+          "code": 0
+        },
+        "alternate_screen_left": true,
+        "terminal_restored": true
+      }
+    },
+    {
+      "id": "explicit-tui-help-delayed-setup-required",
+      "precondition": "Fresh Hades process launched with the explicit tui argument under the same empty provider environment.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "/help",
+          "bytes_hex": "2f 68 65 6c 70"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "wait",
+          "value": "500 ms pre-deadline sample, then wait for the bounded 8000 ms transition"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+C",
+          "bytes_hex": "03",
+          "meaning": "clear retained /help while Setup Required remains visible"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+C",
+          "bytes_hex": "03",
+          "meaning": "exit cleanly"
+        }
+      ],
+      "output": {
+        "same_boundary_as_default_launch": true,
+        "starting_agent_before_deadline": true,
+        "setup_required_after_deadline": true,
+        "provider_request_started": false,
+        "config_created": false,
+        "first_ctrl_c_kept_process_alive": true,
+        "first_ctrl_c_cleared_draft": "focused app/TUI oracle",
+        "exit": {
+          "kind": "exit",
+          "code": 0
+        },
+        "alternate_screen_left": true,
+        "terminal_restored": true
+      }
+    }
+  ],
+  "unknowns": [
+    "The setup-required route does not configure a provider, persist credentials, or start a model request; configured setup and subsequent provider behavior remain outside this slice.",
+    "The 8000 ms deadline is a bounded reference-backed route contract with observed scheduler jitter, not a claim about exact redraw timing on every terminal or host.",
+    "Full ANSI byte equivalence, setup-required behavior after configuration, and interactions beyond the two Ctrl+C cleanup presses remain unknown."
+  ],
+  "passed": true
+}

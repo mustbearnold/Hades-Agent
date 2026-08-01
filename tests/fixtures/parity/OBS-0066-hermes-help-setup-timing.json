@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0066",
+  "surface": "hermes-unconfigured-help-setup-required-timing",
+  "reference": {
+    "product": "Hermes Agent",
+    "version": "0.19.1 (2026.7.30)",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "direct PTY with timed normalized surface samples"
+    },
+    "capture": "two fresh synthetic homes with no provider endpoint and a bounded 15-second post-submit observation"
+  },
+  "normalization": [
+    "Reference checkout, synthetic HOME/HERMES_HOME paths, provider endpoints, credentials, session identifiers, timestamps, and raw redraw bytes are omitted or replaced by placeholders.",
+    "Both cases start with no config and no Hades/OpenAI provider environment; only /help plus Enter is sent, followed by two Ctrl+C cleanup presses. No /model, /setup, credentials, OAuth, external network, provider value, or model request is entered.",
+    "The startup timeout environment is retained as 8000 ms because it was present in the observed runtime. Timings are recorded as run samples and are not generalized into a universal timeout contract.",
+    "Config evidence is reduced to normalized existence/change status and artifact evidence to normalized classes; behavior outside the bounded observation remains unknown."
+  ],
+  "steps": [
+    {
+      "id": "help-timing-repeat-1",
+      "precondition": "Fresh pinned Hermes direct PTY at 120x40 with no config/provider; wait for repeated stable starting-agent samples before /help.",
+      "input_sequence": [
+        {"kind": "text", "value": "/help", "bytes_hex": "2f 68 65 6c 70"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "wait", "value": "15-second bounded observation with timed surface samples"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "clear setup-required input"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "exit cleanly"}
+      ],
+      "output": {
+        "startup_status": "starting agent",
+        "status_sequence": ["starting agent", "setup required"],
+        "transition_trace": [
+          {"surface": "starting-agent", "elapsed_ms": 2188},
+          {"surface": "setup-required", "elapsed_ms": 10550}
+        ],
+        "timing_ms": {
+          "process_start_to_stable": 2188,
+          "stable_to_submit": 18,
+          "submit_to_setup_required": 8344,
+          "process_start_to_setup_required": 10550
+        },
+        "startup_timeout_ms": 8000,
+        "setup_required_visible": true,
+        "actions_visible": ["/model", "/setup", "Ctrl+C"],
+        "retained_starting_agent_marker": true,
+        "config_changed": false,
+        "ctrl_c_presses": 2,
+        "exit": {"kind": "exit", "code": 0},
+        "terminal_restored": true
+      }
+    },
+    {
+      "id": "help-timing-repeat-2",
+      "precondition": "Fresh pinned Hermes direct PTY at 120x40 with no config/provider; wait for repeated stable starting-agent samples before /help.",
+      "input_sequence": [
+        {"kind": "text", "value": "/help", "bytes_hex": "2f 68 65 6c 70"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "wait", "value": "15-second bounded observation with timed surface samples"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "clear setup-required input"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "exit cleanly"}
+      ],
+      "output": {
+        "startup_status": "starting agent",
+        "status_sequence": ["starting agent", "setup required"],
+        "transition_trace": [
+          {"surface": "starting-agent", "elapsed_ms": 2084},
+          {"surface": "setup-required", "elapsed_ms": 10336}
+        ],
+        "timing_ms": {
+          "process_start_to_stable": 2084,
+          "stable_to_submit": 16,
+          "submit_to_setup_required": 8236,
+          "process_start_to_setup_required": 10336
+        },
+        "startup_timeout_ms": 8000,
+        "setup_required_visible": true,
+        "actions_visible": ["/model", "/setup", "Ctrl+C"],
+        "retained_starting_agent_marker": true,
+        "config_changed": false,
+        "ctrl_c_presses": 2,
+        "exit": {"kind": "exit", "code": 0},
+        "terminal_restored": true
+      }
+    }
+  ],
+  "unknowns": [
+    "The timing samples vary by run and do not establish a universal startup timeout, scheduler guarantee, or exact transition deadline.",
+    "The setup-required follow-up actions, provider/model configuration, credentials, OAuth, and eventual queued-input behavior were not entered.",
+    "The separate /setup and /model startup cases remain bounded starting-agent input as recorded by OBS-0063 and OBS-0064; this fixture covers only /help."
+  ],
+  "passed": true
+}

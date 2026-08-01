@@ -177,6 +177,14 @@ replay-unconfigured-input:
     cargo build --locked --package hades-cli
     python3 scripts/replay_unconfigured_input.py --binary target/debug/hades --report .hades/runtime/had066-unconfigured-input-replay.json --timeout 5
 
+replay-unconfigured-help:
+    cargo build --locked --package hades-cli
+    python3 scripts/replay_unconfigured_help.py --binary target/debug/hades --report .hades/runtime/hades-help-setup-required-replay.json --timeout 12
+
+replay-installed-help:
+    python3 scripts/replay_unconfigured_help.py --binary "$HOME/.local/bin/hades" --report .hades/runtime/installed-help-setup-required-hades.json --timeout 12
+    python3 scripts/replay_unconfigured_help.py --binary "$HOME/.local/bin/Hades" --report .hades/runtime/installed-help-setup-required-Hades.json --timeout 12
+
 probe-hermes-unconfigured-input-queue:
     python3 scripts/probe_hermes_unconfigured_input_queue.py --report .hades/runtime/hermes-unconfigured-input-queue-probe.json --timeout 30
 
@@ -188,6 +196,12 @@ probe-hermes-unconfigured-resolution:
 
 probe-hermes-setup-required-reconciliation:
     python3 scripts/probe_hermes_setup_required_reconciliation.py --report .hades/runtime/hermes-setup-required-reconciliation-probe.json --timeout 30 --observation-window 15
+
+probe-hermes-help-setup-timing:
+    python3 scripts/probe_hermes_help_setup_timing.py --report .hades/runtime/hermes-help-setup-timing-probe.json --timeout 30 --observation-window 15
+
+probe-hermes-setup-required-actions:
+    python3 scripts/probe_hermes_setup_required_actions.py --report .hades/runtime/hermes-setup-required-actions-probe.json --timeout 30 --observation-window 3
 
 replay-local-provider:
     cargo build --locked --package hades-cli
@@ -242,6 +256,9 @@ validate-reference:
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0063-hermes-unconfigured-setup-escape.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0064-hermes-unconfigured-resolution.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0065-hermes-setup-required-reconciliation.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0066-hermes-help-setup-timing.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0067-hades-help-setup-required.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0068-hermes-setup-required-actions.json
 
 agent command *args:
     python3 scripts/agent/control_plane.py {{command}} {{args}}

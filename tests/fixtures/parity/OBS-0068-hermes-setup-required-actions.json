@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0068",
+  "reference_observation": "OBS-0066",
+  "surface": "hermes-post-delay-setup-required-actions",
+  "reference": {
+    "product": "Hermes Agent",
+    "version": "0.19.1 (2026.7.30)",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "fresh direct PTY with normalized ANSI screen model"
+    },
+    "capture": "fresh no-config/no-provider cases after delayed /help Setup Required transition"
+  },
+  "normalization": [
+    "Reference checkout, synthetic HOME/HERMES_HOME paths, PTY paths, session identifiers, timestamps, config values, credentials, and raw redraw bytes are omitted or represented by placeholders.",
+    "Each action case submits /help, waits for the delayed Setup Required surface, then probes only one visible follow-up command with two Enter presses; no credentials, OAuth, external network, provider value, model choice, or setup selection is entered.",
+    "The direct PTY screen model separates the initial Setup Required surface from subsequent redraws so the overlay's retained /model and /setup copy is not mistaken for a newly opened picker or wizard.",
+    "The control case sends Ctrl+C once and verifies the process remains alive with Setup Required visible before the second cleanup press."
+  ],
+  "steps": [
+    {
+      "id": "post-delay-model-action",
+      "precondition": "Fresh Hermes 120x40 direct PTY without config or provider endpoint; /help has reached Setup Required.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "/help",
+          "bytes_hex": "2f 68 65 6c 70"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "wait",
+          "value": "wait for the bounded delayed Setup Required surface"
+        },
+        {
+          "kind": "text",
+          "value": "/model",
+          "bytes_hex": "2f 6d 6f 64 65 6c"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d",
+          "meaning": "first post-delay Enter"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d",
+          "meaning": "second post-delay Enter"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+C",
+          "bytes_hex": "03",
+          "meaning": "bounded cleanup after the follow-up remains on the overlay"
+        }
+      ],
+      "output": {
+        "setup_required_remains_visible": true,
+        "model_picker_visible": false,
+        "setup_wizard_visible": false,
+        "provider_request_started": false,
+        "config_changed": false,
+        "post_enter_ready_marker": true,
+        "cleanup_ctrl_c_presses": 1,
+        "exit": {
+          "kind": "exit",
+          "code": 0
+        },
+        "alternate_screen_left": true,
+        "terminal_restored": true
+      }
+    },
+    {
+      "id": "post-delay-setup-action",
+      "precondition": "Fresh Hermes 120x40 direct PTY without config or provider endpoint; /help has reached Setup Required.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "/help",
+          "bytes_hex": "2f 68 65 6c 70"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "wait",
+          "value": "wait for the bounded delayed Setup Required surface"
+        },
+        {
+          "kind": "text",
+          "value": "/setup",
+          "bytes_hex": "2f 73 65 74 75 70"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d",
+          "meaning": "first post-delay Enter"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d",
+          "meaning": "second post-delay Enter"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+C",
+          "bytes_hex": "03",
+          "meaning": "bounded cleanup after the follow-up remains on the overlay"
+        }
+      ],
+      "output": {
+        "setup_required_remains_visible": true,
+        "model_picker_visible": false,
+        "setup_wizard_visible": false,
+        "provider_request_started": false,
+        "config_changed": false,
+        "post_enter_ready_marker": true,
+        "cleanup_ctrl_c_presses": 1,
+        "exit": {
+          "kind": "exit",
+          "code": 0
+        },
+        "alternate_screen_left": true,
+        "terminal_restored": true
+      }
+    },
+    {
+      "id": "post-delay-ctrl-c-control",
+      "precondition": "Fresh Hermes 120x40 direct PTY without config or provider endpoint; /help has reached Setup Required and no follow-up command is entered.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "/help",
+          "bytes_hex": "2f 68 65 6c 70"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "wait",
+          "value": "wait for the bounded delayed Setup Required surface"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+C",
+          "bytes_hex": "03",
+          "meaning": "clear retained /help while the overlay remains"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+C",
+          "bytes_hex": "03",
+          "meaning": "exit cleanly"
+        }
+      ],
+      "output": {
+        "first_ctrl_c_kept_process_alive": true,
+        "first_ctrl_c_overlay_remained": true,
+        "second_ctrl_c_exited": true,
+        "config_changed": false,
+        "exit": {
+          "kind": "exit",
+          "code": 0
+        },
+        "alternate_screen_left": true,
+        "terminal_restored": true
+      }
+    }
+  ],
+  "unknowns": [
+    "The post-delay /model and /setup strings did not open a picker or wizard in this bounded no-provider interaction; it remains unknown whether they are only explanatory overlay copy, require a different focus/key path, or become actionable after another startup state.",
+    "The normalized screen model reported a ready-marker redraw after the two follow-up Enter presses while Setup Required remained visible; this is not interpreted as a resolved provider session or successful setup.",
+    "Provider setup, credentials, OAuth, model selection, persistence, external network behavior, and exact ANSI equivalence remain outside this observation."
+  ],
+  "passed": true
+}

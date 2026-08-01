@@ -694,6 +694,8 @@ pub fn normalize_cells(frame: &str, width: u16, height: u16) -> String {
 
 #[cfg(test)]
 mod tests {
+    use std::time::{Duration, Instant};
+
     use super::*;
 
     fn hermes_cell_style(app: &App, column: u16, row: u16) -> (Color, Color, Modifier) {
@@ -757,6 +759,35 @@ mod tests {
         let after_clear = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
         assert!(!after_clear.contains("❯ queued hello"));
         assert!(after_clear.contains("starting agent…"));
+    }
+
+    #[test]
+    fn hermes_startup_surface_renders_delayed_setup_required_help_route() {
+        let start = Instant::now();
+        let mut app = App::with_startup_state(StartupState::Unconfigured);
+        for character in "/help".chars() {
+            app.handle_at(hades_core::InputEvent::Key(hades_core::Key::Char(character)), start);
+        }
+        app.handle_at(hades_core::InputEvent::Key(hades_core::Key::Enter), start);
+
+        let waiting = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        assert!(waiting.contains("❯ /help"));
+        assert!(waiting.contains("starting agent…"));
+        assert!(!waiting.contains("Setup Required"));
+
+        app.handle_at(
+            hades_core::InputEvent::Tick,
+            start + Duration::from_millis(hades_core::HELP_SETUP_REQUIRED_DELAY_MS),
+        );
+        let setup_required = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        assert!(setup_required.contains("Setup Required"));
+        assert!(setup_required.contains("/model"));
+        assert!(setup_required.contains("/setup"));
+        assert!(setup_required.contains("Ctrl+C"));
+
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Ctrl('c')));
+        assert_eq!(app.state().overlay, Some(Overlay::SetupRequired));
+        assert_eq!(app.state().composer.text(), "");
     }
 
     #[test]

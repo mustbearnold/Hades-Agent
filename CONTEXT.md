@@ -325,6 +325,27 @@ progress from August 1, 2026 through 2027.
   the 15-second window, exposing `/model`, `/setup`, and Ctrl+C without changing
   config. Direct `/setup` and `/model` remain bounded startup input under
   OBS-0063/0064; Hades' delayed `/help` setup-required route is not yet wired.
+- HAD-071 times that Hermes `/help` transition in two fresh direct PTYs. The
+  starting-agent surface became stable at 2188 ms and 2084 ms after process
+  start; Setup Required appeared at 10550 ms and 10336 ms, or 8344 ms and
+  8236 ms after submission. The runs retained `/model`, `/setup`, and Ctrl+C,
+  changed no config, and restored the terminal after two Ctrl+C presses. These
+  are bounded samples, not a universal timeout contract.
+- HAD-072 implements the delayed Hades `/help` route with a typed tick and
+  injected deadline: the draft remains on `starting agent` for 8000 ms after
+  submission, then opens the existing Setup Required overlay with `/model`,
+  `/setup`, and Ctrl+C. Focused tests advance time without sleeping, and the
+  direct PTY replay covers both launch forms, first-Ctrl+C draft clearing,
+  second-Ctrl+C exit, no config/provider activity, and terminal restoration.
+  The refreshed user-local `hades` and `Hades` release launchers pass the same
+  replay; configured setup and provider behavior remain outside this slice.
+- HAD-073 probes what Hermes does after that delayed overlay is visible. In
+  separate fresh no-provider PTYs, typing `/model` or `/setup` and pressing
+  Enter twice leaves Setup Required visible, opens neither picker nor wizard,
+  changes no config, and starts no provider request. The first Ctrl+C keeps the
+  overlay alive and the second exits cleanly. A ready-marker redraw appeared
+  beneath the retained overlay after the follow-up Enter presses; its meaning
+  remains unknown and no Hades action route is inferred from it.
 
 ## Unknown until observed
 

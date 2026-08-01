@@ -41,6 +41,11 @@ python3 scripts/probe_tui_lifecycle.py --binary target/debug/hades
 python3 scripts/replay_cli_launch.py --binary target/debug/hades --report .hades/runtime/cli-launch-replay.json
 python3 scripts/replay_unconfigured_startup.py --binary target/debug/hades --report .hades/runtime/had064-unconfigured-startup-replay.json
 python3 scripts/replay_unconfigured_input.py --binary target/debug/hades --report .hades/runtime/had066-unconfigured-input-replay.json --timeout 5
+python3 scripts/replay_unconfigured_help.py --binary target/debug/hades --report .hades/runtime/hades-help-setup-required-replay.json --timeout 12
+cargo build --locked --release --package hades-cli
+bash scripts/install_user_launcher.sh
+python3 scripts/replay_unconfigured_help.py --binary "$HOME/.local/bin/hades" --report .hades/runtime/installed-help-setup-required-hades.json --timeout 12
+python3 scripts/replay_unconfigured_help.py --binary "$HOME/.local/bin/Hades" --report .hades/runtime/installed-help-setup-required-Hades.json --timeout 12
 python3 scripts/differential_replay.py --binary target/debug/hades --report .hades/runtime/differential-replay.json
 python3 scripts/replay_composer.py --binary target/debug/hades --report .hades/runtime/composer-replay.json
 python3 scripts/replay_completion.py --binary target/debug/hades --report .hades/runtime/completion-replay.json
@@ -88,6 +93,8 @@ python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0062-had
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0063-hermes-unconfigured-setup-escape.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0064-hermes-unconfigured-resolution.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0065-hermes-setup-required-reconciliation.json
+python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0066-hermes-help-setup-timing.json
+python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0067-hades-help-setup-required.json
 python3 scripts/probe_hermes_full_setup_provider_selection.py --report .hades/runtime/hermes-full-setup-provider-selection-probe.json --timeout 30
 python3 scripts/probe_hermes_full_setup_model_default.py --report .hades/runtime/hermes-full-setup-model-default-probe.json --timeout 30
 python3 scripts/probe_hermes_local_provider_stream.py --report .hades/runtime/hermes-local-provider-stream-probe.json --timeout 30
@@ -101,6 +108,8 @@ python3 scripts/probe_hermes_unconfigured_input_queue.py --report .hades/runtime
 python3 scripts/probe_hermes_unconfigured_setup_escape.py --report .hades/runtime/hermes-unconfigured-setup-escape-probe.json --timeout 30
 python3 scripts/probe_hermes_unconfigured_resolution.py --report .hades/runtime/hermes-unconfigured-resolution-probe.json --timeout 30 --observation-window 15
 python3 scripts/probe_hermes_setup_required_reconciliation.py --report .hades/runtime/hermes-setup-required-reconciliation-probe.json --timeout 30 --observation-window 15
+python3 scripts/probe_hermes_help_setup_timing.py --report .hades/runtime/hermes-help-setup-timing-probe.json --timeout 30 --observation-window 15
+python3 scripts/probe_hermes_setup_required_actions.py --report .hades/runtime/hermes-setup-required-actions-probe.json --timeout 30 --observation-window 3
 python3 scripts/replay_terminal_palette.py --binary target/debug/hades --report .hades/runtime/hades-terminal-palette-replay.json
 python3 scripts/replay_osc52_timing_limits.py --binary target/debug/hades --report .hades/runtime/hades-osc52-timing-limits-replay.json
 python3 scripts/replay_osc52_clipboard.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0029-hades-osc52-st-termination.json --report .hades/runtime/hades-osc52-st-termination-replay.json

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T20:11:03Z",
+  "updated_at": "2026-08-01T21:13:32Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -3682,6 +3682,184 @@
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/hermes-setup-required-reconciliation-probe.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-071",
+      "title": "Measure Hermes delayed /help setup-required timing",
+      "status": "complete",
+      "priority": 14,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-070"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "hermes_direct_pty",
+        "sanitized_fixture",
+        "timed_transition",
+        "full_verify"
+      ],
+      "acceptance": [
+        "In fresh pinned Hermes 120x40 direct PTYs with no config/provider, submit /help after a stable starting-agent surface and record the first visible Setup Required transition relative to process start, stable surface, and command submission.",
+        "Record bounded samples before and after the transition, retained input/actions, config/artifact changes, cleanup presses, exit status, and terminal restoration; keep the observed startup timeout environment explicit without treating it as a universal contract.",
+        "Do not enter /model, /setup, credentials, OAuth, external network, provider values, or later setup choices; preserve behavior outside the measured window as unknown.",
+        "Add provenance, a sanitized OBS-0066 fixture, a repeatable timed reference probe, and an observation document; update the parity matrix/context and wire fixture validation and the probe into just verify.",
+        "Run the complete no-skip just verify gate and record reference, timing, fixture, and verification evidence before completion."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_help_setup_timing.py",
+        "tests/fixtures/parity/OBS-0066-hermes-help-setup-timing.json",
+        "docs/parity/observations/OBS-0066-hermes-help-setup-timing-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hermes-help-setup-timing-probe.json"
+      ],
+      "ready_at": "2026-08-02T00:00:00Z",
+      "claimed_by": "hermes-help-setup-timing",
+      "claimed_at": "2026-08-01T20:11:55Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Measured Hermes delayed /help setup-required transition in two fresh direct PTYs: stable starting-agent at 2186/2077 ms, Setup Required at 10449/10430 ms, or 8244/8337 ms after submission; retained actions, no config change, clean two-Ctrl+C terminal restoration, timed probe and full no-skip verify pass.",
+        "completed_at": "2026-08-01T20:26:25Z",
+        "evidence": [
+          "scripts/probe_hermes_help_setup_timing.py",
+          "tests/fixtures/parity/OBS-0066-hermes-help-setup-timing.json",
+          "docs/parity/observations/OBS-0066-hermes-help-setup-timing-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hermes-help-setup-timing-probe.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-072",
+      "title": "Implement delayed unconfigured /help setup-required route",
+      "status": "complete",
+      "priority": 13,
+      "lane": "interaction",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-071"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "typed_state_transition",
+        "focused_tests",
+        "direct_pty_replay",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "In a fresh unconfigured Hades 120x40 PTY, preserve /help and the starting-agent surface after submission, then transition to the existing Setup Required overlay after the reference-backed bounded delay of approximately 8000 ms after submission.",
+        "Keep /model, /setup, ordinary startup drafts, and provider-request behavior unchanged; the delayed route must not create config, start a provider worker, or add a user/assistant message.",
+        "Use a typed deterministic tick/deadline seam with focused core/app tests that advance time without sleeping; first Ctrl+C clears retained /help while the setup-required overlay remains, and the second exits with clean terminal restoration.",
+        "Add a sanitized Hades replay fixture, direct-PTY replay, observation document, and parity-matrix/context/readme updates; wire fixture validation, replay, and the current installed launcher check into just verify.",
+        "Run the complete no-skip just verify gate, refresh the user-local release launcher, replay the installed hades and Hades commands, and record all implementation and runtime evidence before completion."
+      ],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-app/src/lib.rs",
+        "crates/hades-tui/src/lib.rs",
+        "crates/hades-cli/src/main.rs",
+        "scripts/replay_unconfigured_help.py",
+        "tests/fixtures/parity/OBS-0067-hades-help-setup-required.json",
+        "docs/parity/observations/OBS-0067-hades-help-setup-required-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hades-help-setup-required-replay.json",
+        ".hades/runtime/installed-help-setup-required-hades.json",
+        ".hades/runtime/installed-help-setup-required-Hades.json"
+      ],
+      "ready_at": "2026-08-01T20:26:36Z",
+      "attempts": 1,
+      "claimed_by": "hades-help-route",
+      "claimed_at": "2026-08-01T20:28:27Z",
+      "result": {
+        "summary": "Implemented the reference-backed delayed unconfigured /help route with a typed Tick plus injected Instant deadline at 8000 ms. Focused app/TUI tests, sanitized OBS-0067 fixture, direct PTY replay for default and explicit tui, refreshed release install, and both installed hades/Hades launcher replays passed; just verify completed with verification: PASS and no skips.",
+        "completed_at": "2026-08-01T20:51:21Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-app/src/lib.rs",
+          "crates/hades-tui/src/lib.rs",
+          "crates/hades-cli/src/main.rs",
+          "scripts/replay_unconfigured_help.py",
+          "tests/fixtures/parity/OBS-0067-hades-help-setup-required.json",
+          "docs/parity/observations/OBS-0067-hades-help-setup-required-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hades-help-setup-required-replay.json",
+          ".hades/runtime/installed-help-setup-required-hades.json",
+          ".hades/runtime/installed-help-setup-required-Hades.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-073",
+      "title": "Capture Hermes post-delay Setup Required action semantics",
+      "status": "complete",
+      "priority": 12,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-072"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "hermes_direct_pty",
+        "sanitized_fixture",
+        "replayable_follow_up",
+        "full_verify"
+      ],
+      "acceptance": [
+        "In fresh pinned Hermes 120x40 direct PTYs with no config/provider, submit /help, wait for the delayed Setup Required surface, and capture the exact follow-up semantics of the visible /model, /setup, and Ctrl+C actions.",
+        "Record the post-delay input sequence, visible transitions, retained or cleared composer state, config/artifact changes, provider activity, exit status, and terminal restoration without entering credentials, OAuth, external network, provider values, or model choices.",
+        "Preserve unknowns explicitly: if /model or /setup remains inert, behaves as a key hint, or opens a previously captured surface, record that result instead of inferring an action from the overlay copy.",
+        "Add provenance, a sanitized Hermes reference fixture, a repeatable direct-PTY probe, an observation document, and parity-matrix/context updates; wire fixture validation and the probe into just verify.",
+        "Run the complete no-skip just verify gate and record the follow-up observation, fixture, probe, cleanup, and verification evidence before completion."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_setup_required_actions.py",
+        "tests/fixtures/parity/OBS-0068-hermes-setup-required-actions.json",
+        "docs/parity/observations/OBS-0068-hermes-setup-required-actions-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hermes-setup-required-actions-probe.json"
+      ],
+      "ready_at": "2026-08-01T20:52:12Z",
+      "attempts": 1,
+      "claimed_by": "hermes-setup-required-actions",
+      "claimed_at": "2026-08-01T20:52:40Z",
+      "result": {
+        "summary": "Observed Hermes post-delay Setup Required action behavior for /model, /setup, and Ctrl+C; preserved the unresolved ready-marker/redraw detail as unknown and kept Hades action semantics unspecified.",
+        "completed_at": "2026-08-01T21:13:32Z",
+        "evidence": [
+          "scripts/probe_hermes_setup_required_actions.py",
+          "tests/fixtures/parity/OBS-0068-hermes-setup-required-actions.json",
+          "docs/parity/observations/OBS-0068-hermes-setup-required-actions-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hermes-setup-required-actions-probe.json"
         ]
       }
     }

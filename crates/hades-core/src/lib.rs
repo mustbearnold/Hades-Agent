@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 
 pub const PRODUCT_NAME: &str = "Hades Agent";
 pub const MAX_INPUT_HISTORY: usize = 1000;
+pub const HELP_SETUP_REQUIRED_DELAY_MS: u64 = 8_000;
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub enum Surface {
@@ -686,6 +687,7 @@ pub enum InputEvent {
     Key(Key),
     Paste(String),
     Resize { width: u16, height: u16 },
+    Tick,
     Provider(ProviderEvent),
 }
 

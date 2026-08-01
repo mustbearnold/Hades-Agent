@@ -4,13 +4,13 @@ use std::{
     fs::{self, OpenOptions},
     io::Write,
     path::{Path, PathBuf},
-    time::{SystemTime, UNIX_EPOCH},
+    time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
 
 use hades_core::{
-    CompletionState, Composer, EnterAction, InputEvent, Key, MAX_INPUT_HISTORY, Message,
-    ModelPickerAction, ModelPickerStage, Notice, Overlay, ProviderEvent, SessionState,
-    SetupWizardAction, SetupWizardState, StartupState, TurnState,
+    CompletionState, Composer, EnterAction, HELP_SETUP_REQUIRED_DELAY_MS, InputEvent, Key,
+    MAX_INPUT_HISTORY, Message, ModelPickerAction, ModelPickerStage, Notice, Overlay,
+    ProviderEvent, SessionState, SetupWizardAction, SetupWizardState, StartupState, TurnState,
 };
 
 #[derive(Clone, Debug)]
@@ -123,6 +123,7 @@ pub enum DispatchOutcome {
 pub struct App {
     state: SessionState,
     history_store: Option<HistoryStore>,
+    help_setup_deadline: Option<Instant>,
 }
 
 impl App {
@@ -138,7 +139,7 @@ impl App {
         state.messages.push(Message::system(
             "Hades Agent bootstrap shell. Reference-backed behavior is not implemented yet.",
         ));
-        Self { state, history_store: None }
+        Self { state, history_store: None, help_setup_deadline: None }
     }
 
     pub fn with_history_path(path: impl Into<PathBuf>) -> Self {
@@ -163,19 +164,39 @@ impl App {
             return DispatchOutcome::Continue;
         }
 
-        self.submit_content(content)
+        self.submit_content(content, Instant::now())
     }
 
     pub fn handle(&mut self, event: InputEvent) -> DispatchOutcome {
+        self.handle_at(event, Instant::now())
+    }
+
+    pub fn handle_at(&mut self, event: InputEvent, now: Instant) -> DispatchOutcome {
         match event {
             InputEvent::Resize { width, height } => {
                 self.state.status = format!("Terminal size: {width}x{height}.");
                 DispatchOutcome::Continue
             }
-            InputEvent::Key(key) => self.handle_key(key),
+            InputEvent::Tick => self.handle_tick(now),
+            InputEvent::Key(key) => self.handle_key(key, now),
             InputEvent::Paste(text) => self.handle_paste(text),
             InputEvent::Provider(event) => self.handle_provider_event(event),
         }
+    }
+
+    fn handle_tick(&mut self, now: Instant) -> DispatchOutcome {
+        let help_is_pending = self.help_setup_deadline.is_some_and(|deadline| now >= deadline);
+        if self.state.startup == StartupState::Unconfigured
+            && self.state.overlay.is_none()
+            && self.state.composer.text() == "/help"
+            && help_is_pending
+        {
+            self.help_setup_deadline = None;
+            self.clear_notice();
+            self.state.overlay = Some(Overlay::SetupRequired);
+            self.state.status = "Setup required.".to_owned();
+        }
+        DispatchOutcome::Continue
     }
 
     fn handle_provider_event(&mut self, event: ProviderEvent) -> DispatchOutcome {
@@ -227,13 +248,14 @@ impl App {
         DispatchOutcome::Continue
     }
 
-    fn handle_key(&mut self, key: Key) -> DispatchOutcome {
+    fn handle_key(&mut self, key: Key, now: Instant) -> DispatchOutcome {
         if self.state.startup == StartupState::Unconfigured
             && matches!(key, Key::Ctrl('c'))
             && !self.state.composer.text().is_empty()
         {
             self.state.composer.clear();
             self.clear_completion();
+            self.help_setup_deadline = None;
             self.state.status = "starting agent".to_owned();
             return DispatchOutcome::Continue;
         }
@@ -305,7 +327,7 @@ impl App {
                     self.state.status = "Editing input.".to_owned();
                     DispatchOutcome::Continue
                 }
-                EnterAction::Submit(content) => self.submit(content),
+                EnterAction::Submit(content) => self.submit(content, now),
             },
             Key::ModifiedEnter if self.state.turn == TurnState::Ready => {
                 self.clear_notice();
@@ -397,14 +419,21 @@ impl App {
         }
     }
 
-    fn submit(&mut self, draft: String) -> DispatchOutcome {
+    fn submit(&mut self, draft: String, now: Instant) -> DispatchOutcome {
         self.clear_completion();
         let content = draft.trim().to_owned();
-        self.submit_content(content)
+        self.submit_content(content, now)
     }
 
-    fn submit_content(&mut self, content: String) -> DispatchOutcome {
+    fn submit_content(&mut self, content: String, now: Instant) -> DispatchOutcome {
         if self.state.startup == StartupState::Unconfigured {
+            self.help_setup_deadline = None;
+            if content == "/help" {
+                self.clear_notice();
+                self.help_setup_deadline =
+                    Some(now + Duration::from_millis(HELP_SETUP_REQUIRED_DELAY_MS));
+            }
+            self.state.status = "starting agent".to_owned();
             return DispatchOutcome::Continue;
         }
 
@@ -660,6 +689,81 @@ mod tests {
         assert!(!app.state().should_quit);
         assert_eq!(app.handle(InputEvent::Key(Key::Ctrl('c'))), DispatchOutcome::Quit);
         assert!(app.state().should_quit);
+    }
+
+    #[test]
+    fn unconfigured_help_waits_then_opens_setup_required_without_sleeping() {
+        let start = Instant::now();
+        let mut app = App::with_startup_state(StartupState::Unconfigured);
+        for character in "/help".chars() {
+            app.handle_at(InputEvent::Key(Key::Char(character)), start);
+        }
+
+        assert_eq!(app.handle_at(InputEvent::Key(Key::Enter), start), DispatchOutcome::Continue);
+        assert_eq!(app.state().overlay, None);
+        assert_eq!(app.state().composer.text(), "/help");
+        assert_eq!(app.state().status, "starting agent");
+        app.handle_at(
+            InputEvent::Tick,
+            start + Duration::from_millis(HELP_SETUP_REQUIRED_DELAY_MS - 1),
+        );
+        assert_eq!(app.state().overlay, None);
+
+        app.handle_at(
+            InputEvent::Tick,
+            start + Duration::from_millis(HELP_SETUP_REQUIRED_DELAY_MS),
+        );
+        assert_eq!(app.state().overlay, Some(Overlay::SetupRequired));
+        assert_eq!(app.state().composer.text(), "/help");
+        assert!(app.state().messages.iter().all(|message| message.role != hades_core::Role::User));
+
+        assert_eq!(
+            app.handle_at(InputEvent::Key(Key::Ctrl('c')), start),
+            DispatchOutcome::Continue
+        );
+        assert_eq!(app.state().overlay, Some(Overlay::SetupRequired));
+        assert_eq!(app.state().composer.text(), "");
+        assert_eq!(app.handle_at(InputEvent::Key(Key::Ctrl('c')), start), DispatchOutcome::Quit);
+    }
+
+    #[test]
+    fn unconfigured_help_cancels_if_startup_input_is_cleared_before_deadline() {
+        let start = Instant::now();
+        let mut app = App::with_startup_state(StartupState::Unconfigured);
+        for character in "/help".chars() {
+            app.handle_at(InputEvent::Key(Key::Char(character)), start);
+        }
+        app.handle_at(InputEvent::Key(Key::Enter), start);
+        app.handle_at(InputEvent::Key(Key::Ctrl('c')), start);
+        app.handle_at(
+            InputEvent::Tick,
+            start + Duration::from_millis(HELP_SETUP_REQUIRED_DELAY_MS),
+        );
+
+        assert_eq!(app.state().overlay, None);
+        assert_eq!(app.state().composer.text(), "");
+        assert!(!app.state().should_quit);
+    }
+
+    #[test]
+    fn unconfigured_setup_and_model_remain_starting_input_after_help_delay() {
+        for command in ["/setup", "/model"] {
+            let start = Instant::now();
+            let mut app = App::with_startup_state(StartupState::Unconfigured);
+            for character in command.chars() {
+                app.handle_at(InputEvent::Key(Key::Char(character)), start);
+            }
+            app.handle_at(InputEvent::Key(Key::Enter), start);
+            app.handle_at(InputEvent::Key(Key::Enter), start);
+            app.handle_at(
+                InputEvent::Tick,
+                start + Duration::from_millis(HELP_SETUP_REQUIRED_DELAY_MS),
+            );
+
+            assert_eq!(app.state().overlay, None, "command: {command}");
+            assert_eq!(app.state().status, "starting agent", "command: {command}");
+            assert_eq!(app.state().composer.text(), command, "command: {command}");
+        }
     }
 
     #[test]

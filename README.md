@@ -92,6 +92,7 @@ contracts are in [`.agents/`](.agents/). Product requirements live in
 just check                    # complete local gate
 just run                      # interactive TUI
 just replay-cli-launch        # no-argument and explicit-tui PTY launch replay
+just replay-unconfigured-help # delayed /help setup-required PTY replay
 just install-user             # build and install hades/Hades on user PATH
 just snapshot                 # deterministic terminal snapshot
 just probe-lifecycle          # PTY lifecycle and cleanup oracle
@@ -109,6 +110,8 @@ just probe-osc52-st-termination # Hermes ST-terminated OSC52 reference probe
 just probe-osc52-multiplexer # Hermes TMUX/STY OSC52 wrapper reference probe
 just probe-osc52-timing-limits # Hermes OSC52 timing and bounded-size reference probe
 just probe-terminal-palette    # Hermes SGR palette and cell-style reference probe
+just probe-hermes-help-setup-timing # timed /help setup-required reference probe
+just probe-hermes-setup-required-actions # post-delay /model /setup action probe
 just replay-terminal-palette   # Hades SGR palette and cell-style parity replay
 just replay-osc52-timing-limits # Hades OSC52 timing and bounded-size parity replay
 just replay-osc52-st-termination # Hades ST-terminated OSC52 parity replay
@@ -139,7 +142,11 @@ launch stays on the reference-backed `starting agent…` boundary and does not
 start a provider worker or deliver prompts; the bounded clone still accepts a
 visible draft during startup. Hermes also remains on that boundary for a
 bounded 15-second window after `/setup` or `/model`, so those commands are not
-yet a configuration escape in Hades. The reference's separate `/help` to
-`Setup Required` transition is captured but not yet wired into Hades. Configure
-the loopback endpoint before expecting a model response. No external provider
-service is required for the deterministic bootstrap path.
+yet a configuration escape in Hades. `/help` is the observed exception: after
+submission it remains visible for the bounded 8000 ms route deadline, then
+opens Setup Required with `/model`, `/setup`, and Ctrl+C.
+`just replay-unconfigured-help` proves that transition against both launch
+forms, and `just verify` also refreshes and replays the installed `hades` and
+`Hades` launchers. Configure the loopback endpoint before expecting a model
+response. No external provider service is required for the deterministic
+bootstrap path.
