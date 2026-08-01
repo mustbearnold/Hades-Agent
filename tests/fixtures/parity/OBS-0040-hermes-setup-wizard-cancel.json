@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0040",
+  "surface": "hermes-tui-initial-setup-wizard-cancellation",
+  "reference": {
+    "product": "Hermes TUI",
+    "version": "0.19.1 (2026.7.30)",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "direct PTY with ANSI screen model"
+    },
+    "capture": "fresh configured direct-PTY sessions with normalized wizard landmarks and rendered radio rows"
+  },
+  "normalization": [
+    "Reference checkout, synthetic HOME/HERMES_HOME paths, loopback URL, credentials, session IDs, timestamps, and animated redraw bytes are omitted or replaced by placeholders.",
+    "The configured provider points at an intentionally absent loopback endpoint; no external provider, OAuth flow, credential, model response, or network side effect is exercised.",
+    "The setup title and explanation come from normalized PTY landmarks; radio rows, selection markers, and cursor position come from the 120x40 ANSI screen model.",
+    "Escape is sent before any setup option is submitted. Hermes leaves the curses radiolist and returns to a numbered fallback prompt; Ctrl+C then interrupts that fallback cleanly.",
+    "Down navigation is recorded without submitting an option; the committed radio selection remains Quick Setup while the cursor moves to Full setup."
+  ],
+  "steps": [
+    {
+      "id": "setup-wizard-initial-escape",
+      "precondition": "Fresh synthetic home with a configured custom provider and a 120x40 direct PTY.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "/setup",
+          "bytes_hex": "2f 73 65 74 75 70"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "key",
+          "value": "Escape",
+          "bytes_hex": "1b"
+        }
+      ],
+      "output": {
+        "status": "numbered-fallback-after-escape",
+        "initial_wizard_markers": [
+          "Hermes Agent Setup Wizard",
+          "Let's configure your Hermes Agent installation.",
+          "Press Ctrl+C at any time to exit.",
+          "How would you like to set up Hermes?",
+          "Quick Setup (Nous Portal)",
+          "Full setup",
+          "Blank Slate",
+          "ESC cancel"
+        ],
+        "initial_selection": "Quick Setup (Nous Portal)",
+        "initial_cursor": "Quick Setup (Nous Portal)",
+        "fallback_markers": [
+          "Enter for default (1)  Ctrl+C to exit",
+          "Select [1-3] (1):"
+        ],
+        "setup_option_submitted": false,
+        "cleanup": "Ctrl+C interrupted the fallback prompt and exited cleanly"
+      }
+    },
+    {
+      "id": "setup-wizard-down-navigation",
+      "precondition": "Fresh synthetic home with a configured custom provider and a 120x40 direct PTY.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "/setup",
+          "bytes_hex": "2f 73 65 74 75 70"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "key",
+          "value": "Down",
+          "bytes_hex": "1b 5b 42"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+C",
+          "bytes_hex": "03"
+        }
+      ],
+      "output": {
+        "status": "initial-wizard-navigation",
+        "cursor_after_down": "Full setup",
+        "selection_after_down": "Quick Setup (Nous Portal)",
+        "setup_option_submitted": false,
+        "cleanup": "Ctrl+C exited cleanly without selecting a setup option"
+      }
+    }
+  ],
+  "unknowns": [
+    "The numbered fallback's numbered-choice submission and invalid-input behavior were not exercised.",
+    "The wizard's later pages, provider/API configuration, OAuth flow, persistence, successful setup, and deeper cancellation behavior remain unknown.",
+    "Exact redraw bytes, terminal-specific cursor handling, animation timing, and behavior at other terminal geometries remain unknown.",
+    "The complete /setup argument surface and behavior with existing configuration remain unknown."
+  ],
+  "passed": true
+}

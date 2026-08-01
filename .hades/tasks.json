@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T10:10:33Z",
+  "updated_at": "2026-08-01T10:34:14Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -1980,6 +1980,54 @@
           "docs/parity/observations/OBS-0039-hades-model-picker-model-stage-2026-08-01.md",
           "docs/parity/MATRIX.md",
           "CONTEXT.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-041",
+      "title": "Capture Hermes setup wizard cancellation semantics",
+      "status": "complete",
+      "priority": 42,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-037",
+        "HAD-040"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "reference_observation",
+        "provenance_record",
+        "fixture_validator",
+        "direct_pty_probe"
+      ],
+      "acceptance": [
+        "Observe the pinned Hermes reference in fresh 120x40 direct PTYs with the sanitized loopback custom provider configuration and no credentials or private runtime state.",
+        "Open /setup through the observed completion/submission sequence and capture the initial wizard title, explanation, prompt, option labels, selection marker, and ESC cancel hint.",
+        "Exercise only reversible initial-wizard navigation and cancellation, including Escape before selecting Quick Setup, Full setup, or Blank Slate; capture the returned surface and clean interrupt cleanup without triggering credentials, OAuth, setup persistence, or network side effects.",
+        "Add sanitized OBS-0040 fixture, provenance observation, and a repeatable direct-PTY probe with dynamic wizard/runtime values normalized and deeper setup behavior explicit as unknown.",
+        "Wire fixture validation and the research probe through just verify without changing Hades runtime behavior."
+      ],
+      "evidence": [
+        "tests/fixtures/parity/OBS-0040-hermes-setup-wizard-cancel.json",
+        "docs/parity/observations/OBS-0040-hermes-setup-wizard-cancel-2026-08-01.md",
+        "scripts/probe_hermes_setup_wizard.py",
+        "justfile",
+        "scripts/verify.sh"
+      ],
+      "ready_at": "2026-08-01T10:15:47Z",
+      "attempts": 1,
+      "claimed_by": "hermes-research",
+      "claimed_at": "2026-08-01T10:16:09Z",
+      "result": {
+        "summary": "Captured the initial Hermes setup wizard and verified Escape fallback plus reversible Down navigation in fresh direct PTYs; added sanitized OBS-0040 evidence and wired validation/probe into just verify.",
+        "completed_at": "2026-08-01T10:34:14Z",
+        "evidence": [
+          "tests/fixtures/parity/OBS-0040-hermes-setup-wizard-cancel.json",
+          "docs/parity/observations/OBS-0040-hermes-setup-wizard-cancel-2026-08-01.md",
+          "scripts/probe_hermes_setup_wizard.py",
+          "justfile",
+          "scripts/verify.sh"
         ]
       }
     }

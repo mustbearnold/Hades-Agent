@@ -159,6 +159,12 @@ progress from August 1, 2026 through 2027.
   120x40 replay verifies the stable landmarks, ready-state close, and absence
   of Busy/network behavior; provider discovery and model switching remain
   unknown.
+- HAD-041 captures the initial Hermes setup wizard in fresh direct PTYs: the
+  title, explanation, Quick Setup/Full setup/Blank Slate radio list, initial
+  Quick Setup selection, Down navigation to Full setup, and the observed
+  Escape-to-numbered-fallback boundary. Ctrl+C cleanup is verified without
+  submitting an option; later setup pages, OAuth/API configuration, persistence,
+  and Hades setup-wizard behavior remain unknown.
 
 ## Unknown until observed
 
@@ -171,9 +177,10 @@ progress from August 1, 2026 through 2027.
 - Successful provider/model streaming, tool calls, and the exact behavior of
   terminal-dependent surfaces beyond the captured observations.
 - The complete slash-command catalog and argument semantics, provider/model
-  discovery details, setup wizard continuation and persistence, configured
-  command behavior with a reachable provider, and model-picker behavior beyond
-  the bounded deterministic provider/model seam.
+  discovery details, setup wizard continuation, numbered-fallback choices,
+  cancellation after deeper navigation, and persistence, configured command
+  behavior with a reachable provider, and model-picker behavior beyond the
+  bounded deterministic provider/model seam.
 - OSC52 behavior outside the OBS-0032 timing controls and bounded payload
   sizes, including a universal timeout or maximum-size contract.
 
