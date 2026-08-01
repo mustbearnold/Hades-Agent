@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T03:05:19Z",
+  "updated_at": "2026-08-01T03:21:30Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -428,6 +428,60 @@
           "tests/fixtures/parity/OBS-0010-input-editing-keymap.json",
           "docs/parity/observations/OBS-0010-hermes-input-editing-keymap-2026-08-01.md",
           "scripts/validate_reference_fixture.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-011",
+      "title": "Implement the reference-backed composer editing core",
+      "status": "complete",
+      "priority": 72,
+      "lane": "interaction",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-010"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "unit_test",
+        "replay_trace",
+        "snapshot_test"
+      ],
+      "acceptance": [
+        "Add a dedicated cursor-aware composer model covering the observed Left, Backspace, Home, End, Ctrl+A, and Ctrl+K editing behavior without relying on byte-invalid String slicing.",
+        "Record successful submitted drafts in session-local history and implement Up/Down recall with the observed newest-entry-to-empty-draft behavior; do not claim restart persistence.",
+        "Implement the observed backslash-plus-Enter multiline fallback without submitting, render the resulting draft, and prove the slice with deterministic reducer, snapshot, and PTY replay evidence."
+      ],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-app/src/lib.rs",
+        "crates/hades-cli/src/main.rs",
+        "crates/hades-tui/src/lib.rs",
+        "tests/fixtures/parity/OBS-0011-hades-composer-editing.json",
+        "docs/parity/observations/OBS-0011-hades-composer-editing-2026-08-01.md",
+        "scripts/replay_composer.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "ready_at": "2026-08-01T03:12:00Z",
+      "attempts": 1,
+      "claimed_by": "hermes-implementer",
+      "claimed_at": "2026-08-01T03:07:55Z",
+      "result": {
+        "summary": "Implemented the reference-backed Unicode-safe composer editing core with cursor movement, history recall, multiline fallback, terminal key translation, TUI rendering, and isolated tmux screen replay evidence.",
+        "completed_at": "2026-08-01T03:21:30Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-app/src/lib.rs",
+          "crates/hades-cli/src/main.rs",
+          "crates/hades-tui/src/lib.rs",
+          "tests/fixtures/parity/OBS-0011-hades-composer-editing.json",
+          "docs/parity/observations/OBS-0011-hades-composer-editing-2026-08-01.md",
+          "scripts/replay_composer.py",
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md"

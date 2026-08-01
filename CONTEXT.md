@@ -37,11 +37,16 @@ progress from August 1, 2026 through 2027.
   editor return, bracketed paste, and the empty-clipboard miss path. Native
   modified Enter, mouse input, successful clipboard flows, and persistence
   across process restart remain explicit unknowns.
+- HAD-011 implements the reference-backed composer subset with a dedicated
+  Unicode-safe cursor model, session-local history recall, backslash-plus-Enter
+  multiline input, terminal Home/End mapping, focused tests, and isolated PTY
+  replay. Disk history, completion, paste, editor handoff, mouse, and other
+  unobserved keymap behavior remain outside the claim.
 
 ## Unknown until observed
 
 - Hermes TUI color palette, typography, the unobserved keymap/focus surfaces,
-  copy, error states, timing, persistence, and the remaining interaction
+  copy, error states, timing, persistent history, and the remaining interaction
   surfaces.
 - Which Hermes behaviors are stable contracts versus implementation details.
 - Successful provider/model streaming, tool calls, and the exact behavior of

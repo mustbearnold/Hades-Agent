@@ -19,6 +19,10 @@ replay-differential:
     cargo build --locked --package hades-cli
     python3 scripts/differential_replay.py --binary target/debug/hades --report .hades/runtime/differential-replay.json
 
+replay-composer:
+    cargo build --locked --package hades-cli
+    python3 scripts/replay_composer.py --binary target/debug/hades --report .hades/runtime/composer-replay.json
+
 validate-reference:
     python3 scripts/validate_reference_fixture.py
 

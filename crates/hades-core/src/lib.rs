@@ -82,12 +82,165 @@ impl Message {
     }
 }
 
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub struct Composer {
+    text: String,
+    cursor: usize,
+    history: Vec<String>,
+    history_index: Option<usize>,
+    history_draft: String,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum EnterAction {
+    Submit(String),
+    InsertedNewline,
+}
+
+impl Composer {
+    pub fn text(&self) -> &str {
+        &self.text
+    }
+
+    pub const fn cursor(&self) -> usize {
+        self.cursor
+    }
+
+    pub fn insert(&mut self, character: char) {
+        let byte = self.byte_index_at(self.cursor);
+        self.text.insert(byte, character);
+        self.cursor += 1;
+        self.reset_history_navigation();
+    }
+
+    pub const fn move_left(&mut self) {
+        self.cursor = self.cursor.saturating_sub(1);
+    }
+
+    pub fn move_right(&mut self) {
+        self.cursor = (self.cursor + 1).min(self.text.chars().count());
+    }
+
+    pub const fn move_home(&mut self) {
+        self.cursor = 0;
+    }
+
+    pub fn move_end(&mut self) {
+        self.cursor = self.text.chars().count();
+    }
+
+    pub fn backspace(&mut self) {
+        if self.cursor == 0 {
+            return;
+        }
+
+        self.remove_before_cursor();
+        self.reset_history_navigation();
+    }
+
+    pub const fn kill_to_start(&mut self) {
+        self.cursor = 0;
+    }
+
+    pub fn kill_to_end(&mut self) {
+        self.text.truncate(self.byte_index_at(self.cursor));
+        self.reset_history_navigation();
+    }
+
+    pub fn enter(&mut self) -> EnterAction {
+        if self.character_before_cursor() == Some('\\') {
+            self.remove_before_cursor();
+            self.insert('\n');
+            return EnterAction::InsertedNewline;
+        }
+
+        EnterAction::Submit(self.text.clone())
+    }
+
+    pub fn record_submission(&mut self, text: impl Into<String>) {
+        let text = text.into();
+        if !text.trim().is_empty() {
+            self.history.push(text);
+        }
+        self.reset_history_navigation();
+    }
+
+    pub fn clear(&mut self) {
+        self.text.clear();
+        self.cursor = 0;
+        self.reset_history_navigation();
+    }
+
+    pub fn history_up(&mut self) -> bool {
+        if self.history.is_empty() {
+            return false;
+        }
+
+        let index = match self.history_index {
+            Some(index) if index > 0 => index - 1,
+            Some(_) => return false,
+            None => {
+                self.history_draft = self.text.clone();
+                self.history.len() - 1
+            }
+        };
+        self.history_index = Some(index);
+        self.replace_with_history(index);
+        true
+    }
+
+    pub fn history_down(&mut self) -> bool {
+        let Some(index) = self.history_index else {
+            return false;
+        };
+
+        if index + 1 < self.history.len() {
+            self.history_index = Some(index + 1);
+            self.replace_with_history(index + 1);
+        } else {
+            let draft = std::mem::take(&mut self.history_draft);
+            self.history_index = None;
+            self.replace_text(draft);
+        }
+        true
+    }
+
+    fn replace_with_history(&mut self, index: usize) {
+        self.replace_text(self.history[index].clone());
+    }
+
+    fn replace_text(&mut self, text: String) {
+        self.text = text;
+        self.cursor = self.text.chars().count();
+    }
+
+    fn reset_history_navigation(&mut self) {
+        self.history_index = None;
+        self.history_draft.clear();
+    }
+
+    fn character_before_cursor(&self) -> Option<char> {
+        (self.cursor > 0).then(|| self.text.chars().nth(self.cursor - 1)).flatten()
+    }
+
+    fn remove_before_cursor(&mut self) {
+        let start = self.byte_index_at(self.cursor - 1);
+        let end = self.byte_index_at(self.cursor);
+        self.text.replace_range(start..end, "");
+        self.cursor -= 1;
+    }
+
+    fn byte_index_at(&self, character_index: usize) -> usize {
+        self.text.char_indices().nth(character_index).map_or(self.text.len(), |(byte, _)| byte)
+    }
+}
+
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct SessionState {
     pub surface: Surface,
     pub turn: TurnState,
     pub overlay: Option<Overlay>,
-    pub input: String,
+    pub composer: Composer,
     pub messages: Vec<Message>,
     pub status: String,
     pub should_quit: bool,
@@ -99,7 +252,7 @@ impl Default for SessionState {
             surface: Surface::Home,
             turn: TurnState::Ready,
             overlay: None,
-            input: String::new(),
+            composer: Composer::default(),
             messages: Vec::new(),
             status: "Reference behavior pending capture.".to_owned(),
             should_quit: false,
@@ -118,6 +271,8 @@ pub enum Key {
     Down,
     Left,
     Right,
+    Home,
+    End,
     Ctrl(char),
 }
 
@@ -145,6 +300,67 @@ pub struct InteractionTrace {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn composer_edits_at_character_boundaries() {
+        let mut composer = Composer::default();
+        for character in "abc".chars() {
+            composer.insert(character);
+        }
+
+        composer.move_left();
+        composer.insert('X');
+        assert_eq!(composer.text(), "abXc");
+
+        composer.backspace();
+        assert_eq!(composer.text(), "abc");
+
+        composer.move_home();
+        composer.insert('z');
+        composer.move_end();
+        composer.insert('!');
+        assert_eq!(composer.text(), "zabc!");
+        assert_eq!(composer.cursor(), 5);
+    }
+
+    #[test]
+    fn composer_handles_unicode_without_slicing_inside_a_character() {
+        let mut composer = Composer::default();
+        for character in "é猫".chars() {
+            composer.insert(character);
+        }
+
+        composer.move_left();
+        composer.insert('X');
+        assert_eq!(composer.text(), "éX猫");
+        composer.backspace();
+        assert_eq!(composer.text(), "é猫");
+    }
+
+    #[test]
+    fn composer_history_returns_to_the_draft_after_the_newest_entry() {
+        let mut composer = Composer::default();
+        composer.insert('d');
+        composer.record_submission("alpha");
+        composer.clear();
+
+        assert!(composer.history_up());
+        assert_eq!(composer.text(), "alpha");
+        assert!(composer.history_down());
+        assert_eq!(composer.text(), "");
+    }
+
+    #[test]
+    fn composer_backslash_enter_inserts_a_newline_instead_of_submitting() {
+        let mut composer = Composer::default();
+        for character in "line-one\\".chars() {
+            composer.insert(character);
+        }
+
+        assert_eq!(composer.enter(), EnterAction::InsertedNewline);
+        composer.insert('x');
+        assert_eq!(composer.text(), "line-one\nx");
+    }
 
     #[test]
     fn surface_cycle_is_closed_and_deterministic() {

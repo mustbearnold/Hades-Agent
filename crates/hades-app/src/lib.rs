@@ -1,6 +1,6 @@
 #![forbid(unsafe_code)]
 
-use hades_core::{InputEvent, Key, Message, Overlay, SessionState, TurnState};
+use hades_core::{EnterAction, InputEvent, Key, Message, Overlay, SessionState, TurnState};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum DispatchOutcome {
@@ -50,8 +50,8 @@ impl App {
                     _ => DispatchOutcome::Continue,
                 },
                 Overlay::SetupRequired => match key {
-                    Key::Ctrl('c') if !self.state.input.is_empty() => {
-                        self.state.input.clear();
+                    Key::Ctrl('c') if !self.state.composer.text().is_empty() => {
+                        self.state.composer.clear();
                         self.state.status = "Setup required.".to_owned();
                         DispatchOutcome::Continue
                     }
@@ -69,19 +69,25 @@ impl App {
                 self.state.status = "Sessions.".to_owned();
                 DispatchOutcome::Continue
             }
-            Key::Char('q') if self.state.input.is_empty() => self.quit(),
+            Key::Char('q') if self.state.composer.text().is_empty() => self.quit(),
             Key::Char(character) => {
-                self.state.input.push(character);
+                self.state.composer.insert(character);
                 self.state.status = "Editing input.".to_owned();
                 DispatchOutcome::Continue
             }
             Key::Backspace => {
-                self.state.input.pop();
+                self.state.composer.backspace();
                 DispatchOutcome::Continue
             }
-            Key::Enter => self.submit(),
+            Key::Enter => match self.state.composer.enter() {
+                EnterAction::InsertedNewline => {
+                    self.state.status = "Editing input.".to_owned();
+                    DispatchOutcome::Continue
+                }
+                EnterAction::Submit(content) => self.submit(content),
+            },
             Key::Escape => {
-                self.state.input.clear();
+                self.state.composer.clear();
                 self.state.status = "Input cleared.".to_owned();
                 DispatchOutcome::Continue
             }
@@ -90,13 +96,44 @@ impl App {
                 self.state.status = format!("Surface: {}.", self.state.surface.label());
                 DispatchOutcome::Continue
             }
-            Key::Up | Key::Down | Key::Left | Key::Right => DispatchOutcome::Continue,
+            Key::Up => {
+                self.state.composer.history_up();
+                DispatchOutcome::Continue
+            }
+            Key::Down => {
+                self.state.composer.history_down();
+                DispatchOutcome::Continue
+            }
+            Key::Left => {
+                self.state.composer.move_left();
+                DispatchOutcome::Continue
+            }
+            Key::Right => {
+                self.state.composer.move_right();
+                DispatchOutcome::Continue
+            }
+            Key::Home => {
+                self.state.composer.move_home();
+                DispatchOutcome::Continue
+            }
+            Key::End => {
+                self.state.composer.move_end();
+                DispatchOutcome::Continue
+            }
+            Key::Ctrl('a') => {
+                self.state.composer.move_home();
+                DispatchOutcome::Continue
+            }
+            Key::Ctrl('k') => {
+                self.state.composer.kill_to_end();
+                DispatchOutcome::Continue
+            }
             Key::Ctrl(_) => DispatchOutcome::Continue,
         }
     }
 
-    fn submit(&mut self) -> DispatchOutcome {
-        let content = self.state.input.trim().to_owned();
+    fn submit(&mut self, draft: String) -> DispatchOutcome {
+        let content = draft.trim().to_owned();
         if content.is_empty() {
             self.state.status = "Nothing to submit.".to_owned();
             return DispatchOutcome::Continue;
@@ -108,8 +145,9 @@ impl App {
             return DispatchOutcome::Continue;
         }
 
+        self.state.composer.record_submission(content.clone());
         self.state.messages.push(Message::user(&content));
-        self.state.input.clear();
+        self.state.composer.clear();
         self.state.turn = TurnState::Busy;
         self.state.status = "Busy; response adapter not connected.".to_owned();
         DispatchOutcome::Submitted(content)
@@ -149,7 +187,7 @@ mod tests {
             app.handle(InputEvent::Key(Key::Enter)),
             DispatchOutcome::Submitted("hello".to_owned())
         );
-        assert_eq!(app.state().input, "");
+        assert_eq!(app.state().composer.text(), "");
         assert_eq!(app.state().turn, TurnState::Busy);
         assert_eq!(app.state().status, "Busy; response adapter not connected.");
         assert_eq!(app.state().messages.last().unwrap().content, "hello");
@@ -191,12 +229,12 @@ mod tests {
         assert_eq!(app.state().overlay, Some(Overlay::Sessions));
 
         app.handle(InputEvent::Key(Key::Char('h')));
-        assert_eq!(app.state().input, "");
+        assert_eq!(app.state().composer.text(), "");
 
         assert_eq!(app.handle(InputEvent::Key(Key::Escape)), DispatchOutcome::Continue);
         assert_eq!(app.state().overlay, None);
         app.handle(InputEvent::Key(Key::Char('h')));
-        assert_eq!(app.state().input, "h");
+        assert_eq!(app.state().composer.text(), "h");
     }
 
     #[test]
@@ -208,14 +246,68 @@ mod tests {
 
         assert_eq!(app.handle(InputEvent::Key(Key::Enter)), DispatchOutcome::Continue);
         assert_eq!(app.state().overlay, Some(Overlay::SetupRequired));
-        assert_eq!(app.state().input, "/help");
+        assert_eq!(app.state().composer.text(), "/help");
 
         assert_eq!(app.handle(InputEvent::Key(Key::Ctrl('c'))), DispatchOutcome::Continue);
         assert_eq!(app.state().overlay, Some(Overlay::SetupRequired));
-        assert_eq!(app.state().input, "");
+        assert_eq!(app.state().composer.text(), "");
         assert!(!app.state().should_quit);
 
         assert_eq!(app.handle(InputEvent::Key(Key::Ctrl('c'))), DispatchOutcome::Quit);
         assert!(app.state().should_quit);
+    }
+
+    #[test]
+    fn composer_replays_observed_editing_sequence() {
+        let mut app = App::new();
+        for character in "abc".chars() {
+            app.handle(InputEvent::Key(Key::Char(character)));
+        }
+        app.handle(InputEvent::Key(Key::Left));
+        app.handle(InputEvent::Key(Key::Char('X')));
+        assert_eq!(app.state().composer.text(), "abXc");
+
+        app.handle(InputEvent::Key(Key::Backspace));
+        app.handle(InputEvent::Key(Key::Home));
+        app.handle(InputEvent::Key(Key::Char('z')));
+        app.handle(InputEvent::Key(Key::End));
+        app.handle(InputEvent::Key(Key::Char('!')));
+        assert_eq!(app.state().composer.text(), "zabc!");
+
+        app.handle(InputEvent::Key(Key::Ctrl('a')));
+        app.handle(InputEvent::Key(Key::Ctrl('k')));
+        assert_eq!(app.state().composer.text(), "");
+    }
+
+    #[test]
+    fn interrupted_submission_is_recallable_and_down_restores_empty_draft() {
+        let mut app = App::new();
+        for character in "alpha".chars() {
+            app.handle(InputEvent::Key(Key::Char(character)));
+        }
+        assert_eq!(
+            app.handle(InputEvent::Key(Key::Enter)),
+            DispatchOutcome::Submitted("alpha".to_owned())
+        );
+        assert_eq!(app.handle(InputEvent::Key(Key::Ctrl('c'))), DispatchOutcome::Interrupted);
+
+        app.handle(InputEvent::Key(Key::Up));
+        assert_eq!(app.state().composer.text(), "alpha");
+        app.handle(InputEvent::Key(Key::Down));
+        assert_eq!(app.state().composer.text(), "");
+    }
+
+    #[test]
+    fn backslash_enter_inserts_multiline_draft_without_submitting() {
+        let mut app = App::new();
+        for character in "line-one\\".chars() {
+            app.handle(InputEvent::Key(Key::Char(character)));
+        }
+
+        assert_eq!(app.handle(InputEvent::Key(Key::Enter)), DispatchOutcome::Continue);
+        app.handle(InputEvent::Key(Key::Char('x')));
+        assert_eq!(app.state().composer.text(), "line-one\nx");
+        assert_eq!(app.state().turn, TurnState::Ready);
+        assert!(app.state().messages.iter().all(|message| message.content != "line-one\nx"));
     }
 }

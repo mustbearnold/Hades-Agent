@@ -90,6 +90,8 @@ fn map_key(key: KeyEvent) -> Option<Key> {
         KeyCode::Down => Some(Key::Down),
         KeyCode::Left => Some(Key::Left),
         KeyCode::Right => Some(Key::Right),
+        KeyCode::Home => Some(Key::Home),
+        KeyCode::End => Some(Key::End),
         _ => None,
     }
 }
@@ -102,5 +104,11 @@ mod tests {
     fn control_key_mapping_is_explicit() {
         let key = KeyEvent::new(KeyCode::Char('c'), KeyModifiers::CONTROL);
         assert_eq!(map_key(key), Some(Key::Ctrl('c')));
+    }
+
+    #[test]
+    fn cursor_key_mapping_is_explicit() {
+        assert_eq!(map_key(KeyEvent::new(KeyCode::Home, KeyModifiers::NONE)), Some(Key::Home));
+        assert_eq!(map_key(KeyEvent::new(KeyCode::End, KeyModifiers::NONE)), Some(Key::End));
     }
 }

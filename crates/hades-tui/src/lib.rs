@@ -40,8 +40,8 @@ fn draw_hermes_startup(frame: &mut Frame<'_>, app: &App) {
     if app.state().turn == TurnState::Busy {
         rows[38] = Line::raw(HERMES_BUSY_FOOTER);
         rows[39] = Line::raw(HERMES_INTERRUPT_PROMPT);
-    } else if !app.state().input.is_empty() {
-        rows[39] = Line::raw(format!(" ❯ {}", app.state().input));
+    } else if !app.state().composer.text().is_empty() {
+        draw_hermes_composer(&mut rows, app.state().composer.text());
     } else if app.state().status == "Interrupted." {
         rows[37] = Line::raw(HERMES_INTERRUPTED_MARKER);
         rows[38] = Line::raw(HERMES_INTERRUPTED_FOOTER);
@@ -49,6 +49,21 @@ fn draw_hermes_startup(frame: &mut Frame<'_>, app: &App) {
     }
 
     frame.render_widget(Paragraph::new(Text::from(rows)), frame.area());
+}
+
+fn draw_hermes_composer(rows: &mut [Line<'static>], input: &str) {
+    let lines: Vec<&str> = input.split('\n').collect();
+    let start = 39usize.saturating_sub(lines.len().saturating_sub(1));
+    if start >= rows.len() {
+        return;
+    }
+
+    for (offset, line) in lines.iter().enumerate() {
+        let row = start + offset;
+        if row < rows.len() {
+            rows[row] = Line::raw(format!(" {}{}", if offset == 0 { "❯ " } else { "  " }, line));
+        }
+    }
 }
 
 fn draw_sessions_overlay(frame: &mut Frame<'_>) {
@@ -79,7 +94,7 @@ fn draw_setup_required_overlay(frame: &mut Frame<'_>, app: &App) {
         Line::raw(""),
         Line::raw(" Ctrl+C"),
         Line::raw(""),
-        Line::raw(format!(" ❯ {}", app.state().input)),
+        Line::raw(format!(" ❯ {}", app.state().composer.text())),
     ]);
     let panel = Paragraph::new(content)
         .block(Block::default().borders(Borders::ALL).title(" Setup Required "));
@@ -139,7 +154,7 @@ fn draw_bootstrap(frame: &mut Frame<'_>, app: &App) {
         .wrap(Wrap { trim: false });
     frame.render_widget(transcript, sections[1]);
 
-    let input = Paragraph::new(app.state().input.as_str())
+    let input = Paragraph::new(app.state().composer.text())
         .block(Block::default().borders(Borders::ALL).title("input"));
     frame.render_widget(input, sections[2]);
 
@@ -276,5 +291,21 @@ mod tests {
         let cleared = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
         assert!(cleared.contains("Setup Required"));
         assert!(!cleared.contains("/help"));
+    }
+
+    #[test]
+    fn hermes_startup_surface_renders_multiline_composer() {
+        let mut app = App::new();
+        for character in "line-one\\".chars() {
+            app.handle(hades_core::InputEvent::Key(hades_core::Key::Char(character)));
+        }
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
+        for character in "line-two".chars() {
+            app.handle(hades_core::InputEvent::Key(hades_core::Key::Char(character)));
+        }
+
+        let rendered = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        assert!(rendered.contains("line-one"));
+        assert!(rendered.contains("line-two"));
     }
 }

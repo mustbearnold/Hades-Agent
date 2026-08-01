@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0011",
+  "reference_observation": "OBS-0010",
+  "surface": "hades-tui",
+  "terminal": {
+    "columns": 120,
+    "rows": 40
+  },
+  "normalization": [
+    "The PTY oracle checks stable composer/status markers and process cleanup, not cursor placement, colors, or terminal-cell styling.",
+    "Each case starts a fresh Hades process so history behavior is session-local and no restart persistence is implied.",
+    "A marker must appear in the output emitted after its input step; earlier redraws cannot satisfy a later editing assertion.",
+    "The rotating ready prompt is represented by <prompt-placeholder>."
+  ],
+  "cases": [
+    {
+      "id": "editing",
+      "steps": [
+        {
+          "id": "type-abc",
+          "input": {"kind": "text", "value": "abc"},
+          "output": {"pty_markers": ["abc"]}
+        },
+        {
+          "id": "move-left",
+          "input": {"kind": "key", "value": "Left"},
+          "output": {"pty_markers": []}
+        },
+        {
+          "id": "insert-x",
+          "input": {"kind": "text", "value": "X"},
+          "output": {"pty_markers": ["abXc"]}
+        },
+        {
+          "id": "backspace",
+          "input": {"kind": "key", "value": "Backspace"},
+          "output": {"pty_markers": ["abc"]}
+        },
+        {
+          "id": "home",
+          "input": {"kind": "key", "value": "Home"},
+          "output": {"pty_markers": []}
+        },
+        {
+          "id": "insert-z",
+          "input": {"kind": "text", "value": "z"},
+          "output": {"pty_markers": ["zabc"]}
+        },
+        {
+          "id": "end",
+          "input": {"kind": "key", "value": "End"},
+          "output": {"pty_markers": []}
+        },
+        {
+          "id": "insert-bang",
+          "input": {"kind": "text", "value": "!"},
+          "output": {"pty_markers": ["zabc!"]}
+        },
+        {
+          "id": "ctrl-a",
+          "input": {"kind": "key", "value": "Ctrl+A"},
+          "output": {"pty_markers": []}
+        },
+        {
+          "id": "ctrl-k",
+          "input": {"kind": "key", "value": "Ctrl+K"},
+          "output": {"pty_markers": ["<prompt-placeholder>"]}
+        },
+        {
+          "id": "exit",
+          "input": {"kind": "key", "value": "Ctrl+C"},
+          "output": {"pty_markers": [], "process_exit": true}
+        }
+      ]
+    },
+    {
+      "id": "history",
+      "steps": [
+        {
+          "id": "type-alpha",
+          "input": {"kind": "text", "value": "alpha"},
+          "output": {"pty_markers": ["alpha"]}
+        },
+        {
+          "id": "submit",
+          "input": {"kind": "key", "value": "Enter"},
+          "output": {"pty_markers": ["musing", "mulling", "interrupt"]}
+        },
+        {
+          "id": "interrupt",
+          "input": {"kind": "key", "value": "Ctrl+C"},
+          "output": {"pty_markers": ["interrupted"]}
+        },
+        {
+          "id": "history-up",
+          "input": {"kind": "key", "value": "Up"},
+          "output": {"pty_markers": ["alpha"]}
+        },
+        {
+          "id": "history-down",
+          "input": {"kind": "key", "value": "Down"},
+          "output": {"pty_markers": ["<prompt-placeholder>"]}
+        },
+        {
+          "id": "exit",
+          "input": {"kind": "key", "value": "Ctrl+C"},
+          "output": {"pty_markers": [], "process_exit": true}
+        }
+      ]
+    },
+    {
+      "id": "multiline",
+      "steps": [
+        {
+          "id": "type-line-one",
+          "input": {"kind": "text", "value": "line-one"},
+          "output": {"pty_markers": ["line-one"]}
+        },
+        {
+          "id": "escape-enter-with-backslash",
+          "input": {"kind": "text", "value": "\\"},
+          "output": {"pty_markers": []}
+        },
+        {
+          "id": "insert-newline",
+          "input": {"kind": "key", "value": "Enter"},
+          "output": {"pty_markers": []}
+        },
+        {
+          "id": "type-line-two",
+          "input": {"kind": "text", "value": "line-two"},
+          "output": {"pty_markers": ["line-two"]}
+        },
+        {
+          "id": "exit",
+          "input": {"kind": "key", "value": "Ctrl+C"},
+          "output": {"pty_markers": [], "process_exit": true}
+        }
+      ]
+    }
+  ]
+}
