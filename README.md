@@ -91,8 +91,10 @@ contracts are in [`.agents/`](.agents/). Product requirements live in
 ```bash
 just check                    # complete local gate
 just run                      # interactive TUI
+just run setup                # standalone first-run setup entry
 just replay-cli-launch        # no-argument and explicit-tui PTY launch replay
 just replay-unconfigured-help # delayed /help setup-required PTY replay
+just replay-standalone-setup  # standalone hades setup PTY replay
 just install-user             # build and install hades/Hades on user PATH
 just snapshot                 # deterministic terminal snapshot
 just probe-lifecycle          # PTY lifecycle and cleanup oracle
@@ -148,6 +150,7 @@ submission it remains visible for the bounded 8000 ms route deadline, then
 opens Setup Required with `/model`, `/setup`, and Ctrl+C.
 `just replay-unconfigured-help` proves that transition against both launch
 forms, and `just verify` also refreshes and replays the installed `hades` and
-`Hades` launchers. Configure the loopback endpoint before expecting a model
-response. No external provider service is required for the deterministic
-bootstrap path.
+`Hades` launchers. Use `hades setup` for the separate first-run entry; its
+current bounded slice stops at the reference-backed choice/fallback boundary.
+Configure the loopback endpoint before expecting a model response. No
+external provider service is required for the deterministic bootstrap path.

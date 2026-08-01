@@ -351,6 +351,12 @@ progress from August 1, 2026 through 2027.
   to the numbered fallback prompt, and Ctrl+C exits with status 1 while
   restoring the terminal and leaving config absent. Selected setup paths,
   persistence, and the Hades standalone setup command remain unimplemented.
+- HAD-075 adds the standalone `hades setup` route at that bounded boundary:
+  the observed banner and choices render on the alternate screen, Escape
+  leaves it for the numbered fallback, and Ctrl+C exits with status 1 after
+  terminal restoration without config or provider activity. Selected setup
+  paths, persistence, credentials, OAuth, and direct initial-surface Ctrl+C
+  remain outside the implementation claim.
 
 ## Unknown until observed
 

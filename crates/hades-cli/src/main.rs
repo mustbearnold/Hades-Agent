@@ -9,8 +9,12 @@ use std::{
     fs::{self, OpenOptions},
     io::{self, Write},
     path::PathBuf,
-    process::Command,
+    process::{self, Command},
     sync::mpsc::{self, Receiver, Sender, TryRecvError},
+    sync::{
+        Arc,
+        atomic::{AtomicBool, Ordering},
+    },
     thread,
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
@@ -24,12 +28,16 @@ use crossterm::{
     },
 };
 use hades_app::{App, DispatchOutcome};
-use hades_core::{InputEvent, Key, PRODUCT_NAME, ProviderEvent, Role, StartupState, TurnState};
+use hades_core::{
+    InputEvent, Key, PRODUCT_NAME, ProviderEvent, Role, SETUP_STANDALONE_BANNER,
+    SETUP_STANDALONE_PROMPT, SETUP_WIZARD_CHOICES, SetupWizardState, StartupState, TurnState,
+};
 use hades_provider::{
     CancellationToken, ChatMessage, ChatRequest, LocalOpenAiTransport, StreamEvent, TransportError,
 };
-use hades_tui::{draw, snapshot};
+use hades_tui::{draw, draw_standalone_setup, snapshot};
 use ratatui::{Terminal, backend::CrosstermBackend};
+use signal_hook::{consts::SIGINT, flag};
 
 const DEFAULT_PROVIDER_MODEL: &str = "palette-model";
 const PROVIDER_BASE_URL_ENV: &str = "HADES_PROVIDER_BASE_URL";
@@ -51,7 +59,7 @@ struct ProviderRuntime {
 fn main() -> Result<(), Box<dyn Error>> {
     match cli_command(env::args().nth(1).as_deref()) {
         Ok(CliCommand::Help) => {
-            println!("{PRODUCT_NAME}\n\nUsage: hades [tui|--snapshot|--help|--version]");
+            println!("{PRODUCT_NAME}\n\nUsage: hades [tui|setup|--snapshot|--help|--version]");
             Ok(())
         }
         Ok(CliCommand::Version) => {
@@ -63,6 +71,12 @@ fn main() -> Result<(), Box<dyn Error>> {
             Ok(())
         }
         Ok(CliCommand::Tui) => run_tui(),
+        Ok(CliCommand::Setup) => {
+            if matches!(run_setup()?, SetupOutcome::Cancelled) {
+                process::exit(1);
+            }
+            Ok(())
+        }
         Err(argument) => Err(format!("unknown argument: {argument}").into()),
     }
 }
@@ -70,6 +84,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 #[derive(Debug, Eq, PartialEq)]
 enum CliCommand {
     Tui,
+    Setup,
     Snapshot,
     Help,
     Version,
@@ -78,6 +93,7 @@ enum CliCommand {
 fn cli_command(argument: Option<&str>) -> Result<CliCommand, &str> {
     match argument {
         None | Some("tui") => Ok(CliCommand::Tui),
+        Some("setup") => Ok(CliCommand::Setup),
         Some("--help") | Some("-h") => Ok(CliCommand::Help),
         Some("--version") | Some("-V") => Ok(CliCommand::Version),
         Some("--snapshot") => Ok(CliCommand::Snapshot),
@@ -98,6 +114,86 @@ fn run_tui() -> Result<(), Box<dyn Error>> {
     let cleanup = restore_terminal(&mut terminal);
 
     result.and(cleanup)
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum SetupOutcome {
+    Cancelled,
+}
+
+#[derive(Debug)]
+enum SetupTransition {
+    NumberedFallback(SetupWizardState),
+}
+
+fn run_setup() -> Result<SetupOutcome, Box<dyn Error>> {
+    force_color_output(true);
+    let mut stdout = io::stdout();
+    for line in SETUP_STANDALONE_BANNER {
+        writeln!(stdout, "{line}")?;
+    }
+    stdout.flush()?;
+
+    let cancelled = Arc::new(AtomicBool::new(false));
+    let _sigint = flag::register(SIGINT, Arc::clone(&cancelled))?;
+    enable_raw_mode()?;
+    execute!(stdout, EnterAlternateScreen)?;
+
+    let backend = CrosstermBackend::new(stdout);
+    let mut terminal = Terminal::new(backend)?;
+    let transition = setup_choice_loop(&mut terminal);
+    let cleanup = restore_terminal(&mut terminal);
+    let transition = transition?;
+    cleanup?;
+
+    match transition {
+        SetupTransition::NumberedFallback(wizard) => {
+            print_setup_fallback(&wizard)?;
+            while !cancelled.load(Ordering::Relaxed) {
+                thread::sleep(Duration::from_millis(25));
+            }
+            Ok(SetupOutcome::Cancelled)
+        }
+    }
+}
+
+fn setup_choice_loop(
+    terminal: &mut Terminal<CrosstermBackend<io::Stdout>>,
+) -> Result<SetupTransition, Box<dyn Error>> {
+    let mut wizard = SetupWizardState::default();
+    loop {
+        terminal.draw(|frame| draw_standalone_setup(frame, &wizard))?;
+        if !event::poll(Duration::from_millis(250))? {
+            continue;
+        }
+        let Event::Key(key) = event::read()? else {
+            continue;
+        };
+        if key.kind != KeyEventKind::Press {
+            continue;
+        }
+        let Some(mapped) = map_key(key) else {
+            continue;
+        };
+        if mapped == Key::Escape {
+            wizard.handle_key(mapped);
+            return Ok(SetupTransition::NumberedFallback(wizard));
+        }
+        wizard.handle_key(mapped);
+    }
+}
+
+fn print_setup_fallback(wizard: &SetupWizardState) -> io::Result<()> {
+    let mut stdout = io::stdout();
+    writeln!(stdout, "{SETUP_STANDALONE_PROMPT}")?;
+    for (index, choice) in SETUP_WIZARD_CHOICES.iter().enumerate() {
+        let cursor = if index == wizard.cursor() { "→" } else { " " };
+        let selected = if index == wizard.selected() { "●" } else { "○" };
+        writeln!(stdout, " {cursor} ({selected}) {choice}")?;
+    }
+    writeln!(stdout, "    Enter for default (1)  Ctrl+C to exit")?;
+    write!(stdout, "  Select [1-3] (1): ")?;
+    stdout.flush()
 }
 
 fn restore_terminal(
@@ -510,6 +606,7 @@ mod tests {
         assert_eq!(cli_command(Some("--help")), Ok(CliCommand::Help));
         assert_eq!(cli_command(Some("--version")), Ok(CliCommand::Version));
         assert_eq!(cli_command(Some("--snapshot")), Ok(CliCommand::Snapshot));
+        assert_eq!(cli_command(Some("setup")), Ok(CliCommand::Setup));
         assert_eq!(cli_command(Some("wat")), Err("wat"));
     }
 

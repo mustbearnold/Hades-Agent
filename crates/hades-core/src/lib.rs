@@ -5,6 +5,16 @@ use serde::{Deserialize, Serialize};
 pub const PRODUCT_NAME: &str = "Hades Agent";
 pub const MAX_INPUT_HISTORY: usize = 1000;
 pub const HELP_SETUP_REQUIRED_DELAY_MS: u64 = 8_000;
+pub const SETUP_STANDALONE_BANNER: [&str; 6] = [
+    "┌─────────────────────────────────────────────────────────┐",
+    "│             ⚕ Hermes Agent Setup Wizard                │",
+    "├─────────────────────────────────────────────────────────┤",
+    "│  Let's configure your Hermes Agent installation.       │",
+    "│  Press Ctrl+C at any time to exit.                     │",
+    "└─────────────────────────────────────────────────────────┘",
+];
+pub const SETUP_STANDALONE_PROMPT: &str = "How would you like to set up Hermes?";
+pub const SETUP_STANDALONE_CONTROLS: &str = "↑↓ navigate  ENTER/SPACE select  ESC cancel";
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub enum Surface {

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T21:32:18Z",
+  "updated_at": "2026-08-01T21:54:41Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -3915,6 +3915,68 @@
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/hermes-standalone-setup-probe.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-075",
+      "title": "Implement the standalone Hades setup entry boundary",
+      "status": "complete",
+      "priority": 10,
+      "lane": "interaction",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-074"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "typed_cli_route",
+        "focused_tests",
+        "direct_pty_replay",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Add a standalone `hades setup` command while preserving default and explicit `hades tui` behavior; the help and usage surfaces must name the new command without claiming provider setup is complete.",
+        "Reproduce the observed OBS-0069 first surface at the bounded 120x40 seam with the Hermes setup banner, Quick Setup/Full setup/Blank Slate choices, controls, alternate-screen lifecycle, and raw terminal flags.",
+        "On Escape, leave the alternate screen and render the observed numbered fallback surface; Ctrl+C from that fallback exits with the reference cancellation status and restores canonical input and echo without writing config or starting a provider.",
+        "Keep Quick Setup, Full setup, Blank Slate submission, credentials, OAuth, provider/model values, persistence, and direct initial-surface Ctrl+C outside the implementation claim; add focused CLI/core/TUI tests for the typed route and cleanup boundary.",
+        "Add a sanitized Hades OBS-0070 fixture and direct-PTY replay, update the parity matrix/context/readme, wire replay and fixture validation into just verify, and run the complete no-skip gate before completion."
+      ],
+      "evidence": [
+        "crates/hades-cli/src/main.rs",
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-tui/src/lib.rs",
+        "scripts/replay_standalone_setup.py",
+        "tests/fixtures/parity/OBS-0070-hades-standalone-setup.json",
+        "docs/parity/observations/OBS-0070-hades-standalone-setup-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hades-standalone-setup-replay.json"
+      ],
+      "ready_at": "2026-08-02T00:00:00Z",
+      "attempts": 1,
+      "claimed_by": "standalone-setup-route",
+      "claimed_at": "2026-08-01T21:32:58Z",
+      "result": {
+        "summary": "Implemented the bounded standalone hades setup entry with Hermes-matched initial surface, Escape fallback, SIGINT cancellation, terminal restoration, sanitized replay evidence, and full no-skip verification.",
+        "completed_at": "2026-08-01T21:54:41Z",
+        "evidence": [
+          "crates/hades-cli/src/main.rs",
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-tui/src/lib.rs",
+          "scripts/replay_standalone_setup.py",
+          "tests/fixtures/parity/OBS-0070-hades-standalone-setup.json",
+          "docs/parity/observations/OBS-0070-hades-standalone-setup-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hades-standalone-setup-replay.json"
         ]
       }
     }

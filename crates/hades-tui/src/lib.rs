@@ -5,9 +5,9 @@ use hades_core::{
     MODEL_PICKER_MODEL, MODEL_PICKER_PROVIDER, ModelPickerStage, Notice, Overlay, Role,
     SETUP_PLATFORM_PICKER_CONTROLS, SETUP_PLATFORM_PICKER_TITLE, SETUP_PLATFORM_ROWS,
     SETUP_PROVIDER_ACTIVE_PROVIDER, SETUP_PROVIDER_CURRENT_MODEL, SETUP_PROVIDER_MENU_ROWS,
-    SETUP_PROVIDER_MODEL_NAME, SETUP_TERMINAL_BACKEND_CONTROLS, SETUP_TERMINAL_BACKEND_ROWS,
-    SETUP_TERMINAL_BACKEND_TITLE, SETUP_WIZARD_CHOICES, SetupWizardSurface, StartupState,
-    TurnState,
+    SETUP_PROVIDER_MODEL_NAME, SETUP_STANDALONE_CONTROLS, SETUP_STANDALONE_PROMPT,
+    SETUP_TERMINAL_BACKEND_CONTROLS, SETUP_TERMINAL_BACKEND_ROWS, SETUP_TERMINAL_BACKEND_TITLE,
+    SETUP_WIZARD_CHOICES, SetupWizardState, SetupWizardSurface, StartupState, TurnState,
 };
 use ratatui::{
     Frame, Terminal,
@@ -71,6 +71,27 @@ pub fn draw(frame: &mut Frame<'_>, app: &App) {
         Some(Overlay::SetupRequired) => draw_setup_required_overlay(frame, app),
         None => {}
     }
+}
+
+pub fn draw_standalone_setup(frame: &mut Frame<'_>, wizard: &SetupWizardState) {
+    let mut lines = vec![Line::from(vec![
+        Span::styled(SETUP_STANDALONE_PROMPT, HERMES_PALETTE.brand()),
+        Span::raw("  "),
+        Span::styled(SETUP_STANDALONE_CONTROLS, HERMES_PALETTE.secondary()),
+    ])];
+
+    for (index, choice) in SETUP_WIZARD_CHOICES.iter().enumerate() {
+        let cursor = if index == wizard.cursor() { "→" } else { " " };
+        let selected = if index == wizard.selected() { "●" } else { "○" };
+        let style = if index == wizard.cursor() {
+            HERMES_PALETTE.ready()
+        } else {
+            HERMES_PALETTE.secondary()
+        };
+        lines.push(Line::styled(format!(" {cursor} ({selected}) {choice}"), style));
+    }
+
+    frame.render_widget(Paragraph::new(Text::from(lines)), frame.area());
 }
 
 fn draw_hermes_startup(frame: &mut Frame<'_>, app: &App) {
@@ -718,6 +739,39 @@ mod tests {
         assert!(rendered.contains("HADES AGENT"));
         assert!(rendered.contains("transcript"));
         assert!(rendered.contains("Reference behavior pending capture."));
+    }
+
+    #[test]
+    fn standalone_setup_surface_renders_the_reference_choice_landmarks() {
+        let backend = TestBackend::new(HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let mut terminal = Terminal::new(backend).expect("TestBackend construction is infallible");
+        let wizard = SetupWizardState::default();
+        terminal
+            .draw(|frame| draw_standalone_setup(frame, &wizard))
+            .expect("rendering is infallible");
+
+        let rendered = (0..HERMES_STARTUP_HEIGHT)
+            .map(|row| {
+                (0..HERMES_STARTUP_WIDTH)
+                    .map(|column| {
+                        terminal
+                            .backend()
+                            .buffer()
+                            .cell((column, row))
+                            .expect("cell is inside the test surface")
+                            .symbol()
+                            .to_owned()
+                    })
+                    .collect::<String>()
+            })
+            .collect::<Vec<_>>()
+            .join("\n");
+
+        assert!(rendered.contains("How would you like to set up Hermes?"));
+        assert!(rendered.contains("Quick Setup (Nous Portal)"));
+        assert!(rendered.contains("Full setup"));
+        assert!(rendered.contains("Blank Slate"));
+        assert!(rendered.contains("ESC cancel"));
     }
 
     #[test]
