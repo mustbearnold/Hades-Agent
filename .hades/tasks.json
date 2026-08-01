@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T02:11:23Z",
+  "updated_at": "2026-08-01T02:17:06Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -247,6 +247,33 @@
           "docs/parity/observations/OBS-0005-differential-replay-2026-08-01.md"
         ]
       }
+    },
+    {
+      "id": "HAD-007",
+      "title": "Match the observed busy and interrupted visual states",
+      "status": "in_progress",
+      "priority": 80,
+      "lane": "visual",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-005",
+        "HAD-006"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "snapshot_test",
+        "differential_report"
+      ],
+      "acceptance": [
+        "Render the observed musing/mulling busy markers and interrupt affordance at 120x40.",
+        "Render an interrupted ready state with the observed completion marker without changing the core transition contract.",
+        "Add executable visual/replay assertions and document normalization boundaries and intentional differences."
+      ],
+      "evidence": [],
+      "ready_at": "2026-08-01T02:16:51Z",
+      "claimed_by": "hermes-visual",
+      "claimed_at": "2026-08-01T02:17:06Z",
+      "attempts": 1
     }
   ]
 }

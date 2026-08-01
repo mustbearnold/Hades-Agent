@@ -14,6 +14,7 @@ observation, contract, implementation, and oracle are all linked from a task.
 | Focus and navigation | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [lifecycle trace](../../tests/fixtures/parity/OBS-0001-lifecycle.json) | HAD-001 / HAD-004 |
 | Input editing | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) (text entry only) | [lifecycle trace](../../tests/fixtures/parity/OBS-0001-lifecycle.json) | HAD-001 / HAD-004 |
 | Submission behavior | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [submit/interrupt trace](../../tests/fixtures/parity/OBS-0003-submit-interrupt.json) | HAD-001 / HAD-004 |
+| Busy/interrupt visual state | Verified | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [visual contract + differential replay](../../tests/fixtures/parity/OBS-0006-busy-interrupt-visual.json) | HAD-007 |
 | Streaming behavior | Unknown | — | — | Future task |
 | Errors and retries | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) (setup-required path only) | [lifecycle trace](../../tests/fixtures/parity/OBS-0001-lifecycle.json) | Future task |
 | Resize behavior | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [lifecycle probe](../../scripts/probe_tui_lifecycle.py) | HAD-003 / Future task |

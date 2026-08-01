@@ -14,6 +14,10 @@ use ratatui::{
 const HERMES_STARTUP_WIDTH: u16 = 120;
 const HERMES_STARTUP_HEIGHT: u16 = 40;
 const HERMES_STARTUP_FRAME: &str = include_str!("../assets/hermes-startup-120x40.txt");
+const HERMES_BUSY_FOOTER: &str = " ─ musing… │ mulling… │ mock model │ <seconds>s │ voice off │ 1 session                                      ─ <reference-cwd> (main)";
+const HERMES_INTERRUPT_PROMPT: &str = " ❯ Ctrl+C to interrupt…";
+const HERMES_INTERRUPTED_MARKER: &str = " │ interrupted";
+const HERMES_INTERRUPTED_FOOTER: &str = " ─ ready │ mock model │ ✓ <seconds>s │ voice off │ 1 session                                      ─ <reference-cwd> (main)";
 
 pub fn draw(frame: &mut Frame<'_>, app: &App) {
     if frame.area().width == HERMES_STARTUP_WIDTH && frame.area().height == HERMES_STARTUP_HEIGHT {
@@ -29,14 +33,14 @@ fn draw_hermes_startup(frame: &mut Frame<'_>, app: &App) {
         HERMES_STARTUP_FRAME.lines().map(|line| Line::raw(line.to_owned())).collect();
 
     if app.state().turn == TurnState::Busy {
-        rows[38] = Line::raw(
-            " ─ busy │ mock model │ <seconds>s │ voice off │ 1 session                                      ─ <reference-cwd> (main)",
-        );
-        rows[39] = Line::raw(" ❯ Ctrl+C to interrupt…");
+        rows[38] = Line::raw(HERMES_BUSY_FOOTER);
+        rows[39] = Line::raw(HERMES_INTERRUPT_PROMPT);
     } else if !app.state().input.is_empty() {
         rows[39] = Line::raw(format!(" ❯ {}", app.state().input));
     } else if app.state().status == "Interrupted." {
-        rows[38] = Line::raw(" ─ interrupted");
+        rows[37] = Line::raw(HERMES_INTERRUPTED_MARKER);
+        rows[38] = Line::raw(HERMES_INTERRUPTED_FOOTER);
+        rows[39] = Line::raw(" ❯ <prompt-placeholder>");
     }
 
     frame.render_widget(Paragraph::new(Text::from(rows)), frame.area());
@@ -159,13 +163,13 @@ mod tests {
         assert!(snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT).contains("hello"));
 
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
-        assert!(
-            snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT)
-                .contains("Ctrl+C to interrupt")
-        );
+        let busy = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        assert!(busy.contains("musing…"));
+        assert!(busy.contains("mulling…"));
+        assert!(busy.contains("Ctrl+C to interrupt…"));
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Ctrl('c')));
-        assert!(
-            snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT).contains("interrupted")
-        );
+        let interrupted = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        assert!(interrupted.contains("interrupted"));
+        assert!(interrupted.contains("✓ <seconds>s"));
     }
 }

@@ -28,6 +28,7 @@ from probe_tui_lifecycle import (
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_TRACE = ROOT / "tests/fixtures/parity/OBS-0003-submit-interrupt.json"
 DEFAULT_GOLDEN = ROOT / "tests/fixtures/parity/OBS-0001-startup-120x40.txt"
+DEFAULT_VISUAL_CONTRACT = ROOT / "tests/fixtures/parity/OBS-0006-busy-interrupt-visual.json"
 DEFAULT_BINARY = ROOT / "target/debug/hades"
 DEFAULT_REPORT = ROOT / ".hades/runtime/differential-replay.json"
 SNAPSHOT_COLUMNS = 120
@@ -136,6 +137,26 @@ def load_trace(path: Path) -> dict[str, Any]:
     return trace
 
 
+def load_visual_contract(path: Path) -> dict[str, Any]:
+    contract = load_json(path, "visual-contract")
+    if contract.get("schema_version") != 1:
+        raise ReplayFailure("input", "visual-contract", f"unsupported contract schema in {path}")
+    steps = contract.get("steps")
+    if not isinstance(steps, list) or not steps:
+        raise ReplayFailure("input", "visual-contract", f"contract has no steps: {path}")
+    for index, step in enumerate(steps):
+        if not isinstance(step, dict) or not isinstance(step.get("id"), str):
+            raise ReplayFailure("input", f"visual-contract[{index}]", "each contract step needs an id")
+        output = step.get("output")
+        if not isinstance(output, dict):
+            raise ReplayFailure("input", step["id"], "each contract step needs an output object")
+        for marker_key in ("snapshot_markers", "pty_markers"):
+            markers = output.get(marker_key)
+            if not isinstance(markers, list) or not all(isinstance(marker, str) for marker in markers):
+                raise ReplayFailure("input", step["id"], f"{marker_key} must be a string array")
+    return contract
+
+
 def run_snapshot(binary: Path, golden_path: Path, timeout: float) -> dict[str, Any]:
     try:
         completed = subprocess.run(
@@ -202,7 +223,16 @@ def key_payload(value: str) -> bytes:
         raise ReplayFailure("input", "trace", f"unsupported key in trace: {value}") from error
 
 
-def run_behavior(binary: Path, trace: dict[str, Any], timeout: float) -> dict[str, Any]:
+def contract_step(contract: dict[str, Any], step_id: str) -> dict[str, Any]:
+    for step in contract["steps"]:
+        if step["id"] == step_id:
+            return step
+    raise ReplayFailure("input", step_id, "visual contract is missing the replay step")
+
+
+def run_behavior(
+    binary: Path, trace: dict[str, Any], visual_contract: dict[str, Any], timeout: float
+) -> dict[str, Any]:
     pid, master, slave_path = spawn(binary, SNAPSHOT_COLUMNS, SNAPSHOT_ROWS)
     output = bytearray()
     reaped = False
@@ -253,27 +283,35 @@ def run_behavior(binary: Path, trace: dict[str, Any], timeout: float) -> dict[st
             else:
                 send(master, key_payload(value))
                 if value == "Enter":
+                    busy_contract = contract_step(visual_contract, "busy")
+                    busy_markers = tuple(busy_contract["output"]["pty_markers"])
                     wait_for(
                         pid,
                         master,
                         output,
                         f"{step_id}: busy transition",
-                        lambda text: contains_all_markers(text, ("busy", "interrupt")),
+                        lambda text, markers=busy_markers: contains_all_markers(text, markers),
                         timeout,
                     )
-                    observed = ["busy", "interrupt"]
+                    observed = list(busy_markers)
                 else:
                     interrupt_count += 1
                     if interrupt_count == 1:
+                        interrupted_contract = contract_step(visual_contract, "interrupted")
+                        interrupted_markers = tuple(
+                            interrupted_contract["output"]["pty_markers"]
+                        )
                         wait_for(
                             pid,
                             master,
                             output,
                             f"{step_id}: interrupt transition",
-                            lambda text: "interrupted" in text.lower(),
+                            lambda text, markers=interrupted_markers: contains_all_markers(
+                                text, markers
+                            ),
                             timeout,
                         )
-                        observed = ["interrupted"]
+                        observed = list(interrupted_markers)
                     elif interrupt_count == 2:
                         status = wait_for_exit(pid, master, output, timeout)
                         reaped = True
@@ -386,6 +424,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--binary", type=Path, default=DEFAULT_BINARY)
     parser.add_argument("--trace", type=Path, default=DEFAULT_TRACE)
     parser.add_argument("--golden", type=Path, default=DEFAULT_GOLDEN)
+    parser.add_argument("--visual-contract", type=Path, default=DEFAULT_VISUAL_CONTRACT)
     parser.add_argument("--report", type=Path, default=None)
     parser.add_argument(
         "--timeout",
@@ -401,6 +440,7 @@ def main() -> int:
     binary = arguments.binary.resolve()
     trace_path = arguments.trace.resolve()
     golden_path = arguments.golden.resolve()
+    visual_contract_path = arguments.visual_contract.resolve()
     report_path = arguments.report.resolve() if arguments.report is not None else None
     report: dict[str, Any] = {
         "schema_version": 1,
@@ -409,6 +449,7 @@ def main() -> int:
         "binary": str(binary),
         "trace": str(trace_path),
         "golden_frame": str(golden_path),
+        "visual_contract": str(visual_contract_path),
         "checks": [],
     }
 
@@ -423,9 +464,13 @@ def main() -> int:
 
     try:
         trace = load_trace(trace_path)
+        visual_contract = load_visual_contract(visual_contract_path)
         report["trace_observation"] = trace.get("observation_id")
+        report["visual_contract_observation"] = visual_contract.get("observation_id")
         report["checks"].append(run_snapshot(binary, golden_path, arguments.timeout))
-        report["checks"].append(run_behavior(binary, trace, arguments.timeout))
+        report["checks"].append(
+            run_behavior(binary, trace, visual_contract, arguments.timeout)
+        )
         report["passed"] = True
     except ReplayFailure as error:
         report["failure"] = error.as_dict()

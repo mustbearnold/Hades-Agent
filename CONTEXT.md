@@ -23,6 +23,9 @@ progress from August 1, 2026 through 2027.
 - HAD-004 implements the first reference-backed core transition:
   submit text, enter a typed busy state, interrupt with Ctrl+C, then exit with
   Ctrl+C from ready.
+- HAD-007 aligns the 120x40 busy and interrupted projection with the observed
+  Hermes markers and drives those PTY assertions from the OBS-0006 visual
+  contract; exact face-state timing remains intentionally unclaimed.
 
 ## Unknown until observed
 

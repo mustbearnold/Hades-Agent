@@ -3,6 +3,7 @@
 - Subject: Hades visual and behavioral replay verification
 - Reference trace: `tests/fixtures/parity/OBS-0003-submit-interrupt.json`
 - Reference frame: `tests/fixtures/parity/OBS-0001-startup-120x40.txt`
+- Visual state contract: `tests/fixtures/parity/OBS-0006-busy-interrupt-visual.json`
 - Command: `python3 scripts/differential_replay.py`
 - Generated report: `.hades/runtime/differential-replay.json`
 - Task: HAD-006
@@ -14,7 +15,8 @@ Hades binary. First it invokes `hades --snapshot` and compares its normalized
 120x40 cell rows with the checked-in Hermes startup golden frame. Then it opens
 the actual binary in a 120x40 pseudo-terminal and replays every input in the
 sanitized submit/interrupt trace: type `hello`, submit, interrupt the busy turn,
-and exit with the second `Ctrl+C`.
+and exit with the second `Ctrl+C`. The busy and interrupted PTY markers are
+loaded from the separate OBS-0006 visual state contract.
 
 The PTY check also proves the startup markers, raw terminal mode, successful
 exit, alternate-screen leave sequence, and restoration of canonical input and
@@ -49,4 +51,5 @@ the generated terminal stream as a new reference artifact.
 - [Verification gate](../../../scripts/verify.sh)
 - [Trace fixture](../../../tests/fixtures/parity/OBS-0003-submit-interrupt.json)
 - [Golden frame](../../../tests/fixtures/parity/OBS-0001-startup-120x40.txt)
+- [Busy/interrupt visual contract](../../../tests/fixtures/parity/OBS-0006-busy-interrupt-visual.json)
 - [Lifecycle PTY helpers](../../../scripts/probe_tui_lifecycle.py)

@@ -25,7 +25,7 @@ The comparator keeps the row order and visible cell symbols, limits comparison t
 | Session ID, elapsed seconds, working directory, and empty prompt are placeholders | The captured reference values were dynamic and were normalized in OBS-0001. |
 | Tool and skill lists are captured startup content, not live discovery | Provider/tool integration is outside this first visual slice. |
 | The exact Hermes surface is selected only at 120x40 | No normalized reference frame exists yet for other terminal sizes; smaller sizes retain the bootstrap fallback. |
-| Busy state uses a deterministic Hades interrupt prompt | The reference busy face/timing stream is not yet implemented. |
+| Busy state uses deterministic captured face-state markers | The reference phase timing and exact musing/mulling order are not asserted; OBS-0006 owns the normalized busy/interrupt contract. |
 
 ## Linked artifacts
 
@@ -33,4 +33,5 @@ The comparator keeps the row order and visible cell symbols, limits comparison t
 - Product asset: [crates/hades-tui/assets/hermes-startup-120x40.txt](../../../crates/hades-tui/assets/hermes-startup-120x40.txt)
 - Cell comparator and renderer: [crates/hades-tui/src/lib.rs](../../../crates/hades-tui/src/lib.rs)
 - Replay trace: [tests/fixtures/parity/OBS-0001-lifecycle.json](../../../tests/fixtures/parity/OBS-0001-lifecycle.json)
+- Busy/interrupt visual contract: [tests/fixtures/parity/OBS-0006-busy-interrupt-visual.json](../../../tests/fixtures/parity/OBS-0006-busy-interrupt-visual.json)
 - Task: HAD-005

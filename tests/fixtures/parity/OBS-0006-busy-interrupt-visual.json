@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0006",
+  "reference_observation": "OBS-0001",
+  "surface": "hades-tui",
+  "terminal": {
+    "columns": 120,
+    "rows": 40
+  },
+  "normalization": [
+    "The reference exposes musing and mulling as transient face-state text; exact phase order and elapsed timing are not asserted.",
+    "The elapsed value is represented as <seconds>s and the completion value as ✓ <seconds>s.",
+    "The Hades replay checks stable PTY markers while the snapshot test checks the exact normalized strings."
+  ],
+  "steps": [
+    {
+      "id": "busy",
+      "input": {
+        "kind": "key",
+        "value": "Enter"
+      },
+      "output": {
+        "status": "busy",
+        "snapshot_markers": [
+          "musing…",
+          "mulling…",
+          "Ctrl+C to interrupt…"
+        ],
+        "pty_markers": [
+          "musing",
+          "mulling",
+          "interrupt"
+        ]
+      }
+    },
+    {
+      "id": "interrupted",
+      "input": {
+        "kind": "key",
+        "value": "Ctrl+C"
+      },
+      "output": {
+        "status": "ready",
+        "snapshot_markers": [
+          "interrupted",
+          "ready",
+          "✓ <seconds>s"
+        ],
+        "pty_markers": [
+          "interrupted",
+          "ready",
+          "seconds"
+        ]
+      }
+    }
+  ]
+}
