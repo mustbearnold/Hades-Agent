@@ -26,6 +26,9 @@ progress from August 1, 2026 through 2027.
 - HAD-007 aligns the 120x40 busy and interrupted projection with the observed
   Hermes markers and drives those PTY assertions from the OBS-0006 visual
   contract; exact face-state timing remains intentionally unclaimed.
+- HAD-008 adds typed session-overlay state, Ctrl+X open/Esc close transitions,
+  and a deterministic 120x40 session switcher projection; session creation,
+  switching, refresh, and persistence remain unknown.
 
 ## Unknown until observed
 

@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0007",
+  "reference_observation": "OBS-0001",
+  "surface": "hades-tui",
+  "terminal": {
+    "columns": 120,
+    "rows": 40
+  },
+  "normalization": [
+    "Session identity and live/resumable counts are deterministic Hades placeholders.",
+    "The overlay checks stable text and keyboard affordances, not colors, cursor placement, or session persistence."
+  ],
+  "steps": [
+    {
+      "id": "open-session-switcher",
+      "input": {
+        "kind": "key",
+        "value": "Ctrl+X"
+      },
+      "output": {
+        "overlay": "Sessions",
+        "snapshot_markers": [
+          "Sessions",
+          "live 1",
+          "resumable 0",
+          "+ new",
+          "current session",
+          "Enter switch",
+          "Ctrl+N new",
+          "Ctrl+R refresh",
+          "Ctrl+D close",
+          "Esc close"
+        ],
+        "pty_markers": [
+          "Sessions",
+          "live",
+          "resumable",
+          "new",
+          "current session",
+          "Enter switch",
+          "refresh",
+          "Esc close"
+        ]
+      }
+    },
+    {
+      "id": "close-session-switcher",
+      "input": {
+        "kind": "key",
+        "value": "Escape"
+      },
+      "output": {
+        "overlay": "closed",
+        "post_close_input": "hello",
+        "snapshot_markers": [],
+        "pty_markers": []
+      }
+    },
+    {
+      "id": "post-close-input",
+      "input": {
+        "kind": "text",
+        "value": "hello"
+      },
+      "output": {
+        "input": "hello",
+        "snapshot_markers": [],
+        "pty_markers": []
+      }
+    },
+    {
+      "id": "exit",
+      "input": {
+        "kind": "key",
+        "value": "Ctrl+C"
+      },
+      "output": {
+        "process": "exit 0",
+        "snapshot_markers": [],
+        "pty_markers": []
+      }
+    }
+  ]
+}

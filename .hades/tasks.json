@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T02:20:42Z",
+  "updated_at": "2026-08-01T02:22:27Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -291,6 +291,33 @@
           "docs/parity/MATRIX.md"
         ]
       }
+    },
+    {
+      "id": "HAD-008",
+      "title": "Implement the observed Ctrl+X session switcher overlay",
+      "status": "in_progress",
+      "priority": 78,
+      "lane": "interaction",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-007"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "unit_test",
+        "visual_contract",
+        "differential_report"
+      ],
+      "acceptance": [
+        "Open a deterministic Sessions overlay from ready state with Ctrl+X.",
+        "Expose the observed current/live/resumable/new and keyboard-control landmarks at 120x40.",
+        "Close the modal with Esc and prove that composer input resumes without changing unobserved session semantics."
+      ],
+      "evidence": [],
+      "ready_at": "2026-08-01T02:22:00Z",
+      "claimed_by": "hermes-implementer",
+      "claimed_at": "2026-08-01T02:22:27Z",
+      "attempts": 1
     }
   ]
 }

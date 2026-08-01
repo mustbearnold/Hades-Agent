@@ -1,6 +1,6 @@
 #![forbid(unsafe_code)]
 
-use hades_core::{InputEvent, Key, Message, SessionState, TurnState};
+use hades_core::{InputEvent, Key, Message, Overlay, SessionState, TurnState};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum DispatchOutcome {
@@ -39,9 +39,25 @@ impl App {
     }
 
     fn handle_key(&mut self, key: Key) -> DispatchOutcome {
+        if self.state.overlay.is_some() {
+            return match key {
+                Key::Escape => {
+                    self.state.overlay = None;
+                    self.state.status = "Sessions overlay closed.".to_owned();
+                    DispatchOutcome::Continue
+                }
+                _ => DispatchOutcome::Continue,
+            };
+        }
+
         match key {
             Key::Ctrl('c') if self.state.turn == TurnState::Busy => self.interrupt(),
             Key::Ctrl('c') | Key::Ctrl('q') => self.quit(),
+            Key::Ctrl('x') if self.state.turn == TurnState::Ready => {
+                self.state.overlay = Some(Overlay::Sessions);
+                self.state.status = "Sessions.".to_owned();
+                DispatchOutcome::Continue
+            }
             Key::Char('q') if self.state.input.is_empty() => self.quit(),
             Key::Char(character) => {
                 self.state.input.push(character);
@@ -148,5 +164,21 @@ mod tests {
         assert_eq!(app.state().surface, Surface::Conversation);
         assert_eq!(app.handle(InputEvent::Key(Key::Ctrl('c'))), DispatchOutcome::Quit);
         assert!(app.state().should_quit);
+    }
+
+    #[test]
+    fn ctrl_x_opens_sessions_overlay_and_escape_restores_composer() {
+        let mut app = App::new();
+
+        assert_eq!(app.handle(InputEvent::Key(Key::Ctrl('x'))), DispatchOutcome::Continue);
+        assert_eq!(app.state().overlay, Some(Overlay::Sessions));
+
+        app.handle(InputEvent::Key(Key::Char('h')));
+        assert_eq!(app.state().input, "");
+
+        assert_eq!(app.handle(InputEvent::Key(Key::Escape)), DispatchOutcome::Continue);
+        assert_eq!(app.state().overlay, None);
+        app.handle(InputEvent::Key(Key::Char('h')));
+        assert_eq!(app.state().input, "h");
     }
 }

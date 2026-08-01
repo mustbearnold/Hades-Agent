@@ -16,8 +16,9 @@ just snapshot
 without requiring an interactive terminal. `just run` launches the TUI.
 `just probe-lifecycle` runs the actual binary in a PTY and verifies startup,
 resize, exit, and terminal restoration. `just replay-differential` compares
-the normalized startup frame and replays the checked-in submit/interrupt trace
-against the actual binary, writing its generated report under `.hades/runtime/`.
+the normalized startup frame and replays the checked-in submit/interrupt and
+session-switcher traces against the actual binary, writing its generated report
+under `.hades/runtime/`.
 The current work queue is in
 `.hades/tasks.json`; use `just agent next` to select the next evidence-backed
 task.

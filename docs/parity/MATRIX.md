@@ -12,6 +12,7 @@ observation, contract, implementation, and oracle are all linked from a task.
 | Color and text styling | Unknown | — | — | HAD-001 / HAD-005 |
 | Keymap | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) (tested subset) | [lifecycle trace](../../tests/fixtures/parity/OBS-0001-lifecycle.json) | HAD-001 / HAD-004 |
 | Focus and navigation | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [lifecycle trace](../../tests/fixtures/parity/OBS-0001-lifecycle.json) | HAD-001 / HAD-004 |
+| Session switcher overlay | Verified | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [session contract + differential replay](../../tests/fixtures/parity/OBS-0007-session-switcher.json) | HAD-008 |
 | Input editing | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) (text entry only) | [lifecycle trace](../../tests/fixtures/parity/OBS-0001-lifecycle.json) | HAD-001 / HAD-004 |
 | Submission behavior | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [submit/interrupt trace](../../tests/fixtures/parity/OBS-0003-submit-interrupt.json) | HAD-001 / HAD-004 |
 | Busy/interrupt visual state | Verified | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [visual contract + differential replay](../../tests/fixtures/parity/OBS-0006-busy-interrupt-visual.json) | HAD-007 |

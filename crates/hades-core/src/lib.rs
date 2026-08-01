@@ -56,6 +56,11 @@ pub enum TurnState {
     Busy,
 }
 
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub enum Overlay {
+    Sessions,
+}
+
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Message {
     pub role: Role,
@@ -80,6 +85,7 @@ impl Message {
 pub struct SessionState {
     pub surface: Surface,
     pub turn: TurnState,
+    pub overlay: Option<Overlay>,
     pub input: String,
     pub messages: Vec<Message>,
     pub status: String,
@@ -91,6 +97,7 @@ impl Default for SessionState {
         Self {
             surface: Surface::Home,
             turn: TurnState::Ready,
+            overlay: None,
             input: String::new(),
             messages: Vec::new(),
             status: "Reference behavior pending capture.".to_owned(),

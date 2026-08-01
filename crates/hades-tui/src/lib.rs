@@ -1,14 +1,14 @@
 #![forbid(unsafe_code)]
 
 use hades_app::App;
-use hades_core::TurnState;
+use hades_core::{Overlay, TurnState};
 use ratatui::{
     Frame, Terminal,
     backend::TestBackend,
-    layout::{Constraint, Direction, Layout},
+    layout::{Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
     text::{Line, Span, Text},
-    widgets::{Block, Borders, Paragraph, Wrap},
+    widgets::{Block, Borders, Clear, Paragraph, Wrap},
 };
 
 const HERMES_STARTUP_WIDTH: u16 = 120;
@@ -22,10 +22,13 @@ const HERMES_INTERRUPTED_FOOTER: &str = " ─ ready │ mock model │ ✓ <seco
 pub fn draw(frame: &mut Frame<'_>, app: &App) {
     if frame.area().width == HERMES_STARTUP_WIDTH && frame.area().height == HERMES_STARTUP_HEIGHT {
         draw_hermes_startup(frame, app);
-        return;
+    } else {
+        draw_bootstrap(frame, app);
     }
 
-    draw_bootstrap(frame, app);
+    if app.state().overlay == Some(Overlay::Sessions) {
+        draw_sessions_overlay(frame);
+    }
 }
 
 fn draw_hermes_startup(frame: &mut Frame<'_>, app: &App) {
@@ -44,6 +47,35 @@ fn draw_hermes_startup(frame: &mut Frame<'_>, app: &App) {
     }
 
     frame.render_widget(Paragraph::new(Text::from(rows)), frame.area());
+}
+
+fn draw_sessions_overlay(frame: &mut Frame<'_>) {
+    let area = centered_rect(frame.area(), 76, 16);
+    let content = Text::from(vec![
+        Line::raw(" live 1 · resumable 0"),
+        Line::raw(""),
+        Line::raw(" + new"),
+        Line::raw(""),
+        Line::raw(" ● current session"),
+        Line::raw(""),
+        Line::raw(" Enter switch   Ctrl+N new   Ctrl+R refresh"),
+        Line::raw(" Ctrl+D close   Esc close"),
+    ]);
+    let panel =
+        Paragraph::new(content).block(Block::default().borders(Borders::ALL).title(" Sessions "));
+    frame.render_widget(Clear, area);
+    frame.render_widget(panel, area);
+}
+
+fn centered_rect(area: Rect, width: u16, height: u16) -> Rect {
+    let width = width.min(area.width);
+    let height = height.min(area.height);
+    Rect {
+        x: area.x + area.width.saturating_sub(width) / 2,
+        y: area.y + area.height.saturating_sub(height) / 2,
+        width,
+        height,
+    }
 }
 
 fn draw_bootstrap(frame: &mut Frame<'_>, app: &App) {
@@ -171,5 +203,32 @@ mod tests {
         let interrupted = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
         assert!(interrupted.contains("interrupted"));
         assert!(interrupted.contains("✓ <seconds>s"));
+    }
+
+    #[test]
+    fn hermes_startup_surface_renders_and_closes_sessions_overlay() {
+        let mut app = App::new();
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Ctrl('x')));
+
+        let overlay = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        for marker in [
+            "Sessions",
+            "live 1",
+            "resumable 0",
+            "+ new",
+            "current session",
+            "Enter switch",
+            "Ctrl+N new",
+            "Ctrl+R refresh",
+            "Ctrl+D close",
+            "Esc close",
+        ] {
+            assert!(overlay.contains(marker), "missing overlay marker: {marker}");
+        }
+
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Escape));
+        let closed = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        assert!(!closed.contains("current session"));
+        assert!(closed.contains("<prompt-placeholder>"));
     }
 }

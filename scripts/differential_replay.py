@@ -29,6 +29,8 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_TRACE = ROOT / "tests/fixtures/parity/OBS-0003-submit-interrupt.json"
 DEFAULT_GOLDEN = ROOT / "tests/fixtures/parity/OBS-0001-startup-120x40.txt"
 DEFAULT_VISUAL_CONTRACT = ROOT / "tests/fixtures/parity/OBS-0006-busy-interrupt-visual.json"
+DEFAULT_SESSION_TRACE = ROOT / "tests/fixtures/parity/OBS-0007-session-switcher.json"
+DEFAULT_SESSION_CONTRACT = ROOT / "tests/fixtures/parity/OBS-0007-session-switcher.json"
 DEFAULT_BINARY = ROOT / "target/debug/hades"
 DEFAULT_REPORT = ROOT / ".hades/runtime/differential-replay.json"
 SNAPSHOT_COLUMNS = 120
@@ -85,8 +87,12 @@ def contains_marker(text: str, marker: str) -> bool:
 
 
 def contains_all_markers(text: str, markers: tuple[str, ...]) -> bool:
+    return not missing_markers(text, markers)
+
+
+def missing_markers(text: str, markers: tuple[str, ...]) -> list[str]:
     compact = "".join(text.split()).lower()
-    return all(marker.lower() in compact for marker in markers)
+    return [marker for marker in markers if "".join(marker.lower().split()) not in compact]
 
 
 def first_cell_diff(actual: list[str], expected: list[str]) -> dict[str, Any] | None:
@@ -216,6 +222,8 @@ def key_payload(value: str) -> bytes:
     payloads = {
         "Enter": b"\r",
         "Ctrl+C": b"\x03",
+        "Ctrl+X": b"\x18",
+        "Escape": b"\x1b",
     }
     try:
         return payloads[value]
@@ -411,6 +419,181 @@ def run_behavior(
             pass
 
 
+def run_session_overlay(
+    binary: Path, trace: dict[str, Any], contract: dict[str, Any], timeout: float
+) -> dict[str, Any]:
+    pid, master, slave_path = spawn(binary, SNAPSHOT_COLUMNS, SNAPSHOT_ROWS)
+    output = bytearray()
+    reaped = False
+    replayed_steps: list[dict[str, Any]] = []
+    overlay_open = False
+
+    try:
+        startup_markers = (
+            "Hermes Agent",
+            "Nous Research",
+            "Available Tools",
+            "Available Skills",
+        )
+        wait_for(
+            pid,
+            master,
+            output,
+            "session-switcher startup",
+            lambda text: all(contains_marker(text, marker) for marker in startup_markers),
+            timeout,
+        )
+        startup_flags = terminal_flags(slave_path)
+        if startup_flags["canonical"] or startup_flags["echo"]:
+            raise ReplayFailure(
+                "behavior",
+                "session-switcher startup",
+                f"terminal did not enter raw mode: {startup_flags}",
+                {"terminal_flags": startup_flags, "output_tail": output_tail(output)},
+            )
+
+        for step in trace["steps"]:
+            step_id = step["id"]
+            input_value = step["input"]
+            kind = input_value["kind"]
+            value = input_value["value"]
+            if kind == "text":
+                if overlay_open:
+                    raise ReplayFailure(
+                        "behavior",
+                        step_id,
+                        "composer input was accepted while the overlay was open",
+                    )
+                send(master, value.encode("utf-8"))
+                wait_for(
+                    pid,
+                    master,
+                    output,
+                    f"{step_id}: composer input",
+                    lambda text, expected=value: contains_marker(text, expected),
+                    timeout,
+                )
+                replayed_steps.append(
+                    {"id": step_id, "input": input_value, "status": "passed", "observed": [value]}
+                )
+                continue
+
+            send(master, key_payload(value))
+            if value == "Ctrl+X":
+                open_contract = contract_step(contract, "open-session-switcher")
+                markers = tuple(open_contract["output"]["pty_markers"])
+                wait_for(
+                    pid,
+                    master,
+                    output,
+                    f"{step_id}: overlay open",
+                    lambda text, expected=markers: contains_all_markers(text, expected),
+                    timeout,
+                )
+                overlay_open = True
+                observed = list(markers)
+            elif value == "Escape":
+                if not overlay_open:
+                    raise ReplayFailure("behavior", step_id, "Esc was replayed without an open overlay")
+                output_length = len(output)
+                wait_for(
+                    pid,
+                    master,
+                    output,
+                    f"{step_id}: overlay redraw",
+                    lambda _text, previous_length=output_length: len(output) > previous_length,
+                    timeout,
+                )
+                overlay_open = False
+                observed = ["overlay closed"]
+            elif value == "Ctrl+C":
+                status = wait_for_exit(pid, master, output, timeout)
+                reaped = True
+                exit_status = describe_status(status)
+                if exit_status != {"kind": "exit", "code": 0}:
+                    raise ReplayFailure(
+                        "behavior",
+                        step_id,
+                        f"unexpected exit status: {exit_status}",
+                        {"exit": exit_status, "output_tail": output_tail(output)},
+                    )
+                observed = ["process exit 0"]
+            else:
+                raise ReplayFailure("input", step_id, f"unsupported session key: {value}")
+
+            replayed_steps.append(
+                {"id": step_id, "input": input_value, "status": "passed", "observed": observed}
+            )
+
+        if not reaped:
+            raise ReplayFailure(
+                "behavior",
+                "session-switcher trace",
+                "trace completed without a terminal exit step",
+                {"output_tail": output_tail(output)},
+            )
+
+        raw_output = bytes(output)
+        if b"\x1b[?1049h" not in raw_output or b"\x1b[?1049l" not in raw_output:
+            raise ReplayFailure(
+                "behavior",
+                "session-switcher cleanup",
+                "alternate-screen enter/leave sequence was not observed",
+                {"output_tail": output_tail(output)},
+            )
+        cleanup_flags = terminal_flags(slave_path)
+        if not cleanup_flags["canonical"] or not cleanup_flags["echo"]:
+            raise ReplayFailure(
+                "behavior",
+                "session-switcher cleanup",
+                f"terminal was not restored: {cleanup_flags}",
+                {"terminal_flags": cleanup_flags, "output_tail": output_tail(output)},
+            )
+
+        return {
+            "name": "session_switcher_replay",
+            "status": "passed",
+            "trace_observation": trace.get("observation_id"),
+            "startup": {
+                "dimensions": {"columns": SNAPSHOT_COLUMNS, "rows": SNAPSHOT_ROWS},
+                "raw_mode": startup_flags,
+            },
+            "steps": replayed_steps,
+            "cleanup": {
+                "alternate_screen_entered": True,
+                "alternate_screen_left": True,
+                "cursor_restore_observed": b"\x1b[?25h" in raw_output,
+                "terminal_flags": cleanup_flags,
+            },
+        }
+    except ProbeError as error:
+        raise ReplayFailure(
+            "behavior",
+            "session-switcher replay",
+            str(error),
+            {
+                "output_tail": output_tail(output),
+                "missing_markers": missing_markers(clean_output(output), markers)
+                if "markers" in locals()
+                else [],
+            },
+        ) from error
+    finally:
+        if not reaped:
+            try:
+                os.kill(pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            try:
+                os.waitpid(pid, 0)
+            except ChildProcessError:
+                pass
+        try:
+            os.close(master)
+        except OSError:
+            pass
+
+
 def emit_report(report: dict[str, Any], report_path: Path | None) -> None:
     rendered = json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
     print(rendered, end="")
@@ -425,6 +608,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--trace", type=Path, default=DEFAULT_TRACE)
     parser.add_argument("--golden", type=Path, default=DEFAULT_GOLDEN)
     parser.add_argument("--visual-contract", type=Path, default=DEFAULT_VISUAL_CONTRACT)
+    parser.add_argument("--session-trace", type=Path, default=DEFAULT_SESSION_TRACE)
+    parser.add_argument("--session-contract", type=Path, default=DEFAULT_SESSION_CONTRACT)
     parser.add_argument("--report", type=Path, default=None)
     parser.add_argument(
         "--timeout",
@@ -441,6 +626,8 @@ def main() -> int:
     trace_path = arguments.trace.resolve()
     golden_path = arguments.golden.resolve()
     visual_contract_path = arguments.visual_contract.resolve()
+    session_trace_path = arguments.session_trace.resolve()
+    session_contract_path = arguments.session_contract.resolve()
     report_path = arguments.report.resolve() if arguments.report is not None else None
     report: dict[str, Any] = {
         "schema_version": 1,
@@ -450,6 +637,8 @@ def main() -> int:
         "trace": str(trace_path),
         "golden_frame": str(golden_path),
         "visual_contract": str(visual_contract_path),
+        "session_trace": str(session_trace_path),
+        "session_contract": str(session_contract_path),
         "checks": [],
     }
 
@@ -465,11 +654,18 @@ def main() -> int:
     try:
         trace = load_trace(trace_path)
         visual_contract = load_visual_contract(visual_contract_path)
+        session_trace = load_trace(session_trace_path)
+        session_contract = load_visual_contract(session_contract_path)
         report["trace_observation"] = trace.get("observation_id")
         report["visual_contract_observation"] = visual_contract.get("observation_id")
+        report["session_trace_observation"] = session_trace.get("observation_id")
+        report["session_contract_observation"] = session_contract.get("observation_id")
         report["checks"].append(run_snapshot(binary, golden_path, arguments.timeout))
         report["checks"].append(
             run_behavior(binary, trace, visual_contract, arguments.timeout)
+        )
+        report["checks"].append(
+            run_session_overlay(binary, session_trace, session_contract, arguments.timeout)
         )
         report["passed"] = True
     except ReplayFailure as error:
