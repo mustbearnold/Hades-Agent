@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T16:12:44Z",
+  "updated_at": "2026-08-01T16:24:14Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -2910,6 +2910,62 @@
           "scripts/verify.sh",
           ".hades/runtime/local-provider-timing-replay.json",
           ".hades/runtime/had057-pre-completion-verify.log"
+        ]
+      }
+    },
+    {
+      "id": "HAD-058",
+      "title": "Capture Hermes provider failure and retry boundaries",
+      "status": "complete",
+      "priority": 25,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-057"
+      ],
+      "risk": "high",
+      "oracle": [
+        "reference_observation",
+        "provider_error_trace",
+        "direct_pty_retry_capture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Observe the pinned Hermes reference at 120x40 against deterministic loopback provider fixtures that return an HTTP error, a malformed SSE frame, and an incomplete stream, recording the visible transcript/status/error surface, ready/interrupted state, cleanup, and request counts without credentials or external network access.",
+        "For a bounded provider failure, record whether Hermes retries, changes request shape, displays a transient or terminal error, preserves the user draft/partial assistant response, or returns to ready; do not label repeated requests as retries unless the fixture isolates that behavior.",
+        "Add a provenance-bearing observation, sanitized fixture, and repeatable direct-PTY probe with explicit normalization and unknowns; preserve any observed subsequent requests without inferring their purpose.",
+        "Wire the deterministic probe and fixture validation into the complete no-skip just verify gate and leave Hades error/retry implementation unclaimed until the reference behavior is captured."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_provider_errors.py",
+        "tests/fixtures/parity/OBS-0054-hermes-provider-errors.json",
+        "docs/parity/observations/OBS-0054-hermes-provider-errors-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/had058-reference-probe.log",
+        ".hades/runtime/hermes-provider-errors-probe.json",
+        ".hades/runtime/had058-pre-completion-verify.log"
+      ],
+      "ready_at": "2026-08-01T16:13:18Z",
+      "attempts": 1,
+      "claimed_by": "hermes-provider-errors",
+      "claimed_at": "2026-08-01T16:13:33Z",
+      "result": {
+        "summary": "Captured pinned Hermes provider failure boundaries with local HTTP 500, malformed SSE, and incomplete-stream fixtures; recorded visible markers, cleanup, request counts, and unknown retry/error semantics. Hades implementation remains intentionally unclaimed.",
+        "completed_at": "2026-08-01T16:24:14Z",
+        "evidence": [
+          "scripts/probe_hermes_provider_errors.py",
+          "tests/fixtures/parity/OBS-0054-hermes-provider-errors.json",
+          "docs/parity/observations/OBS-0054-hermes-provider-errors-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/had058-reference-probe.log",
+          ".hades/runtime/hermes-provider-errors-probe.json",
+          ".hades/runtime/had058-pre-completion-verify.log"
         ]
       }
     }

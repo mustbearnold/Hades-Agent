@@ -254,6 +254,12 @@ progress from August 1, 2026 through 2027.
   the second release, partial-response preservation, no late second-delta
   rendering after Ctrl+C, provider socket closure, ready/interrupted state,
   and clean terminal restoration. The provider remains loopback-only.
+- HAD-058 captures bounded Hermes failure fixtures: HTTP 500 and malformed SSE
+  remain on the busy surface without a normalized provider-error or ready
+  marker before cleanup, while an incomplete stream yields a partial marker and
+  four observed chat requests with growing assistant/user role sequences before
+  a ready marker. The follow-up purpose, retry policy, and exact error copy are
+  intentionally unknown; Hades error/retry behavior remains unimplemented.
 
 ## Unknown until observed
 
@@ -266,9 +272,9 @@ progress from August 1, 2026 through 2027.
 - Hades provider/model streaming and tool calls beyond the bounded HAD-053 /
   HAD-054 / HAD-055 / HAD-057 seams; retries, tool execution, non-loopback
   providers, HTTPS, and provider discovery remain unimplemented. Hermes
-  subsequent chat-request purpose, provider errors, malformed streams, and
-  terminal-dependent surfaces beyond the captured observations remain
-  unknown.
+  subsequent chat-request purpose, exact provider-error copy, retry/backoff
+  policy, and terminal-dependent surfaces beyond the captured observations
+  remain unknown.
 - The complete slash-command catalog and argument semantics, provider/model
   discovery details, setup wizard continuation, numbered-fallback choices,
   terminal-backend selection and cancellation after deeper navigation, provider
