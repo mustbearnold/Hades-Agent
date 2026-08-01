@@ -31,6 +31,8 @@ DEFAULT_GOLDEN = ROOT / "tests/fixtures/parity/OBS-0001-startup-120x40.txt"
 DEFAULT_VISUAL_CONTRACT = ROOT / "tests/fixtures/parity/OBS-0006-busy-interrupt-visual.json"
 DEFAULT_SESSION_TRACE = ROOT / "tests/fixtures/parity/OBS-0007-session-switcher.json"
 DEFAULT_SESSION_CONTRACT = ROOT / "tests/fixtures/parity/OBS-0007-session-switcher.json"
+DEFAULT_SETUP_TRACE = ROOT / "tests/fixtures/parity/OBS-0008-setup-required.json"
+DEFAULT_SETUP_CONTRACT = ROOT / "tests/fixtures/parity/OBS-0008-setup-required.json"
 DEFAULT_BINARY = ROOT / "target/debug/hades"
 DEFAULT_REPORT = ROOT / ".hades/runtime/differential-replay.json"
 SNAPSHOT_COLUMNS = 120
@@ -594,6 +596,187 @@ def run_session_overlay(
             pass
 
 
+def run_setup_required(
+    binary: Path, trace: dict[str, Any], contract: dict[str, Any], timeout: float
+) -> dict[str, Any]:
+    pid, master, slave_path = spawn(binary, SNAPSHOT_COLUMNS, SNAPSHOT_ROWS)
+    output = bytearray()
+    reaped = False
+    replayed_steps: list[dict[str, Any]] = []
+    setup_open = False
+    input_visible = False
+    interrupt_count = 0
+
+    try:
+        startup_markers = (
+            "Hermes Agent",
+            "Nous Research",
+            "Available Tools",
+            "Available Skills",
+        )
+        wait_for(
+            pid,
+            master,
+            output,
+            "setup-required startup",
+            lambda text: all(contains_marker(text, marker) for marker in startup_markers),
+            timeout,
+        )
+        startup_flags = terminal_flags(slave_path)
+        if startup_flags["canonical"] or startup_flags["echo"]:
+            raise ReplayFailure(
+                "behavior",
+                "setup-required startup",
+                f"terminal did not enter raw mode: {startup_flags}",
+                {"terminal_flags": startup_flags, "output_tail": output_tail(output)},
+            )
+
+        for step in trace["steps"]:
+            step_id = step["id"]
+            input_value = step["input"]
+            kind = input_value["kind"]
+            value = input_value["value"]
+            if kind == "text":
+                if setup_open:
+                    raise ReplayFailure(
+                        "behavior",
+                        step_id,
+                        "composer input was accepted while Setup Required was open",
+                    )
+                send(master, value.encode("utf-8"))
+                wait_for(
+                    pid,
+                    master,
+                    output,
+                    f"{step_id}: composer input",
+                    lambda text, expected=value: contains_marker(text, expected),
+                    timeout,
+                )
+                input_visible = True
+                observed = [value]
+            else:
+                send(master, key_payload(value))
+                if value == "Enter":
+                    open_contract = contract_step(contract, "open-setup-required")
+                    markers = tuple(open_contract["output"]["pty_markers"])
+                    wait_for(
+                        pid,
+                        master,
+                        output,
+                        f"{step_id}: setup overlay open",
+                        lambda text, expected=markers: contains_all_markers(text, expected),
+                        timeout,
+                    )
+                    setup_open = True
+                    observed = list(markers)
+                elif value == "Ctrl+C":
+                    interrupt_count += 1
+                    if interrupt_count == 1:
+                        if not setup_open or not input_visible:
+                            raise ReplayFailure(
+                                "behavior",
+                                step_id,
+                                "first Ctrl+C did not follow an open setup overlay with retained input",
+                            )
+                        output_length = len(output)
+                        wait_for(
+                            pid,
+                            master,
+                            output,
+                            f"{step_id}: input clear redraw",
+                            lambda _text, previous_length=output_length: len(output)
+                            > previous_length,
+                            timeout,
+                        )
+                        input_visible = False
+                        observed = ["input cleared", "overlay remains"]
+                    elif interrupt_count == 2:
+                        status = wait_for_exit(pid, master, output, timeout)
+                        reaped = True
+                        exit_status = describe_status(status)
+                        if exit_status != {"kind": "exit", "code": 0}:
+                            raise ReplayFailure(
+                                "behavior",
+                                step_id,
+                                f"unexpected exit status: {exit_status}",
+                                {"exit": exit_status, "output_tail": output_tail(output)},
+                            )
+                        observed = ["process exit 0"]
+                    else:
+                        raise ReplayFailure(
+                            "input", step_id, "setup trace contains more than two Ctrl+C inputs"
+                        )
+                else:
+                    raise ReplayFailure("input", step_id, f"unsupported setup key: {value}")
+
+            replayed_steps.append(
+                {"id": step_id, "input": input_value, "status": "passed", "observed": observed}
+            )
+
+        if not reaped:
+            raise ReplayFailure(
+                "behavior",
+                "setup-required trace",
+                "trace completed without a terminal exit step",
+                {"output_tail": output_tail(output)},
+            )
+
+        raw_output = bytes(output)
+        if b"\x1b[?1049h" not in raw_output or b"\x1b[?1049l" not in raw_output:
+            raise ReplayFailure(
+                "behavior",
+                "setup-required cleanup",
+                "alternate-screen enter/leave sequence was not observed",
+                {"output_tail": output_tail(output)},
+            )
+        cleanup_flags = terminal_flags(slave_path)
+        if not cleanup_flags["canonical"] or not cleanup_flags["echo"]:
+            raise ReplayFailure(
+                "behavior",
+                "setup-required cleanup",
+                f"terminal was not restored: {cleanup_flags}",
+                {"terminal_flags": cleanup_flags, "output_tail": output_tail(output)},
+            )
+
+        return {
+            "name": "setup_required_replay",
+            "status": "passed",
+            "trace_observation": trace.get("observation_id"),
+            "startup": {
+                "dimensions": {"columns": SNAPSHOT_COLUMNS, "rows": SNAPSHOT_ROWS},
+                "raw_mode": startup_flags,
+            },
+            "steps": replayed_steps,
+            "cleanup": {
+                "alternate_screen_entered": True,
+                "alternate_screen_left": True,
+                "cursor_restore_observed": b"\x1b[?25h" in raw_output,
+                "terminal_flags": cleanup_flags,
+            },
+        }
+    except ProbeError as error:
+        raise ReplayFailure(
+            "behavior",
+            "setup-required replay",
+            str(error),
+            {"output_tail": output_tail(output)},
+        ) from error
+    finally:
+        if not reaped:
+            try:
+                os.kill(pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            try:
+                os.waitpid(pid, 0)
+            except ChildProcessError:
+                pass
+        try:
+            os.close(master)
+        except OSError:
+            pass
+
+
 def emit_report(report: dict[str, Any], report_path: Path | None) -> None:
     rendered = json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
     print(rendered, end="")
@@ -610,6 +793,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--visual-contract", type=Path, default=DEFAULT_VISUAL_CONTRACT)
     parser.add_argument("--session-trace", type=Path, default=DEFAULT_SESSION_TRACE)
     parser.add_argument("--session-contract", type=Path, default=DEFAULT_SESSION_CONTRACT)
+    parser.add_argument("--setup-trace", type=Path, default=DEFAULT_SETUP_TRACE)
+    parser.add_argument("--setup-contract", type=Path, default=DEFAULT_SETUP_CONTRACT)
     parser.add_argument("--report", type=Path, default=None)
     parser.add_argument(
         "--timeout",
@@ -628,6 +813,8 @@ def main() -> int:
     visual_contract_path = arguments.visual_contract.resolve()
     session_trace_path = arguments.session_trace.resolve()
     session_contract_path = arguments.session_contract.resolve()
+    setup_trace_path = arguments.setup_trace.resolve()
+    setup_contract_path = arguments.setup_contract.resolve()
     report_path = arguments.report.resolve() if arguments.report is not None else None
     report: dict[str, Any] = {
         "schema_version": 1,
@@ -639,6 +826,8 @@ def main() -> int:
         "visual_contract": str(visual_contract_path),
         "session_trace": str(session_trace_path),
         "session_contract": str(session_contract_path),
+        "setup_trace": str(setup_trace_path),
+        "setup_contract": str(setup_contract_path),
         "checks": [],
     }
 
@@ -656,16 +845,23 @@ def main() -> int:
         visual_contract = load_visual_contract(visual_contract_path)
         session_trace = load_trace(session_trace_path)
         session_contract = load_visual_contract(session_contract_path)
+        setup_trace = load_trace(setup_trace_path)
+        setup_contract = load_visual_contract(setup_contract_path)
         report["trace_observation"] = trace.get("observation_id")
         report["visual_contract_observation"] = visual_contract.get("observation_id")
         report["session_trace_observation"] = session_trace.get("observation_id")
         report["session_contract_observation"] = session_contract.get("observation_id")
+        report["setup_trace_observation"] = setup_trace.get("observation_id")
+        report["setup_contract_observation"] = setup_contract.get("observation_id")
         report["checks"].append(run_snapshot(binary, golden_path, arguments.timeout))
         report["checks"].append(
             run_behavior(binary, trace, visual_contract, arguments.timeout)
         )
         report["checks"].append(
             run_session_overlay(binary, session_trace, session_contract, arguments.timeout)
+        )
+        report["checks"].append(
+            run_setup_required(binary, setup_trace, setup_contract, arguments.timeout)
         )
         report["passed"] = True
     except ReplayFailure as error:

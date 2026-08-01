@@ -26,8 +26,10 @@ pub fn draw(frame: &mut Frame<'_>, app: &App) {
         draw_bootstrap(frame, app);
     }
 
-    if app.state().overlay == Some(Overlay::Sessions) {
-        draw_sessions_overlay(frame);
+    match app.state().overlay {
+        Some(Overlay::Sessions) => draw_sessions_overlay(frame),
+        Some(Overlay::SetupRequired) => draw_setup_required_overlay(frame, app),
+        None => {}
     }
 }
 
@@ -63,6 +65,24 @@ fn draw_sessions_overlay(frame: &mut Frame<'_>) {
     ]);
     let panel =
         Paragraph::new(content).block(Block::default().borders(Borders::ALL).title(" Sessions "));
+    frame.render_widget(Clear, area);
+    frame.render_widget(panel, area);
+}
+
+fn draw_setup_required_overlay(frame: &mut Frame<'_>, app: &App) {
+    let area = centered_rect(frame.area(), 84, 14);
+    let content = Text::from(vec![
+        Line::raw(" Hermes needs a model provider before the TUI can start a session."),
+        Line::raw(""),
+        Line::raw(" /model"),
+        Line::raw(" /setup"),
+        Line::raw(""),
+        Line::raw(" Ctrl+C"),
+        Line::raw(""),
+        Line::raw(format!(" ❯ {}", app.state().input)),
+    ]);
+    let panel = Paragraph::new(content)
+        .block(Block::default().borders(Borders::ALL).title(" Setup Required "));
     frame.render_widget(Clear, area);
     frame.render_widget(panel, area);
 }
@@ -230,5 +250,31 @@ mod tests {
         let closed = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
         assert!(!closed.contains("current session"));
         assert!(closed.contains("<prompt-placeholder>"));
+    }
+
+    #[test]
+    fn hermes_startup_surface_renders_setup_required_overlay_and_clears_input() {
+        let mut app = App::new();
+        for character in "/help".chars() {
+            app.handle(hades_core::InputEvent::Key(hades_core::Key::Char(character)));
+        }
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
+
+        let setup = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        for marker in [
+            "Setup Required",
+            "Hermes needs a model provider before the TUI can start a session.",
+            "/model",
+            "/setup",
+            "Ctrl+C",
+            "/help",
+        ] {
+            assert!(setup.contains(marker), "missing setup marker: {marker}");
+        }
+
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Ctrl('c')));
+        let cleared = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        assert!(cleared.contains("Setup Required"));
+        assert!(!cleared.contains("/help"));
     }
 }

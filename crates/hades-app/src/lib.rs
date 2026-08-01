@@ -39,14 +39,25 @@ impl App {
     }
 
     fn handle_key(&mut self, key: Key) -> DispatchOutcome {
-        if self.state.overlay.is_some() {
-            return match key {
-                Key::Escape => {
-                    self.state.overlay = None;
-                    self.state.status = "Sessions overlay closed.".to_owned();
-                    DispatchOutcome::Continue
-                }
-                _ => DispatchOutcome::Continue,
+        if let Some(overlay) = self.state.overlay {
+            return match overlay {
+                Overlay::Sessions => match key {
+                    Key::Escape => {
+                        self.state.overlay = None;
+                        self.state.status = "Sessions overlay closed.".to_owned();
+                        DispatchOutcome::Continue
+                    }
+                    _ => DispatchOutcome::Continue,
+                },
+                Overlay::SetupRequired => match key {
+                    Key::Ctrl('c') if !self.state.input.is_empty() => {
+                        self.state.input.clear();
+                        self.state.status = "Setup required.".to_owned();
+                        DispatchOutcome::Continue
+                    }
+                    Key::Ctrl('c') => self.quit(),
+                    _ => DispatchOutcome::Continue,
+                },
             };
         }
 
@@ -88,6 +99,12 @@ impl App {
         let content = self.state.input.trim().to_owned();
         if content.is_empty() {
             self.state.status = "Nothing to submit.".to_owned();
+            return DispatchOutcome::Continue;
+        }
+
+        if content == "/help" {
+            self.state.overlay = Some(Overlay::SetupRequired);
+            self.state.status = "Setup required.".to_owned();
             return DispatchOutcome::Continue;
         }
 
@@ -180,5 +197,25 @@ mod tests {
         assert_eq!(app.state().overlay, None);
         app.handle(InputEvent::Key(Key::Char('h')));
         assert_eq!(app.state().input, "h");
+    }
+
+    #[test]
+    fn help_opens_setup_overlay_and_requires_two_ctrl_c_presses_to_exit() {
+        let mut app = App::new();
+        for character in "/help".chars() {
+            app.handle(InputEvent::Key(Key::Char(character)));
+        }
+
+        assert_eq!(app.handle(InputEvent::Key(Key::Enter)), DispatchOutcome::Continue);
+        assert_eq!(app.state().overlay, Some(Overlay::SetupRequired));
+        assert_eq!(app.state().input, "/help");
+
+        assert_eq!(app.handle(InputEvent::Key(Key::Ctrl('c'))), DispatchOutcome::Continue);
+        assert_eq!(app.state().overlay, Some(Overlay::SetupRequired));
+        assert_eq!(app.state().input, "");
+        assert!(!app.state().should_quit);
+
+        assert_eq!(app.handle(InputEvent::Key(Key::Ctrl('c'))), DispatchOutcome::Quit);
+        assert!(app.state().should_quit);
     }
 }

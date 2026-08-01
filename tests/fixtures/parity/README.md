@@ -8,4 +8,5 @@ normalization rules, and be consumed by an executable test or replay command.
 The first captured Hermes startup frame is OBS-0001; the Hades startup surface
 and its cell-level comparison are covered by HAD-005. The normalized busy and
 interrupt visual contract is OBS-0006, and the session switcher contract is
-OBS-0007; both are consumed by the differential replay command.
+OBS-0007. The setup-required contract is OBS-0008. All three are consumed by
+the differential replay command.

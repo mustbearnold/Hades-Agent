@@ -29,6 +29,9 @@ progress from August 1, 2026 through 2027.
 - HAD-008 adds typed session-overlay state, Ctrl+X open/Esc close transitions,
   and a deterministic 120x40 session switcher projection; session creation,
   switching, refresh, and persistence remain unknown.
+- HAD-009 adds the observed `/help` setup-required path with retained-input
+  rendering, first-Ctrl+C clearing, and second-Ctrl+C clean exit; provider setup
+  and model selection remain unimplemented.
 
 ## Unknown until observed
 

@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0008",
+  "reference_observation": "OBS-0001",
+  "surface": "hades-tui",
+  "terminal": {
+    "columns": 120,
+    "rows": 40
+  },
+  "normalization": [
+    "The fresh-home provider absence is represented by a deterministic setup overlay.",
+    "The /help composer input is retained until the first Ctrl+C and then cleared.",
+    "Provider setup, model selection, and retry behavior are not implemented by this contract."
+  ],
+  "steps": [
+    {
+      "id": "type-help",
+      "input": {
+        "kind": "text",
+        "value": "/help"
+      },
+      "output": {
+        "input": "/help",
+        "snapshot_markers": [],
+        "pty_markers": []
+      }
+    },
+    {
+      "id": "open-setup-required",
+      "input": {
+        "kind": "key",
+        "value": "Enter"
+      },
+      "output": {
+        "overlay": "Setup Required",
+        "snapshot_markers": [
+          "Setup Required",
+          "Hermes needs a model provider before the TUI can start a session.",
+          "/model",
+          "/setup",
+          "Ctrl+C",
+          "/help"
+        ],
+        "pty_markers": [
+          "Setup Required",
+          "needs",
+          "/model",
+          "/setup",
+          "/help"
+        ]
+      }
+    },
+    {
+      "id": "clear-setup-input",
+      "input": {
+        "kind": "key",
+        "value": "Ctrl+C"
+      },
+      "output": {
+        "overlay": "Setup Required",
+        "input": "",
+        "snapshot_markers": [
+          "Setup Required"
+        ],
+        "pty_markers": []
+      }
+    },
+    {
+      "id": "exit-setup-required",
+      "input": {
+        "kind": "key",
+        "value": "Ctrl+C"
+      },
+      "output": {
+        "process": "exit 0",
+        "snapshot_markers": [],
+        "pty_markers": []
+      }
+    }
+  ]
+}
