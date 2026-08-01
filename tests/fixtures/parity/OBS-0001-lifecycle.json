@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0001",
+  "reference": {
+    "product": "Hermes TUI",
+    "version": "0.19.1",
+    "display_build": "2026.7.30",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "capture": "tmux capture-pane -p"
+    }
+  },
+  "normalization": [
+    "ANSI control sequences are removed.",
+    "Trailing spaces are removed from each row.",
+    "Elapsed second values are replaced with <seconds>s.",
+    "The dynamic session ID is replaced with <session-id>.",
+    "The temporary reference checkout path is replaced with <reference-cwd>.",
+    "The rotating empty-composer suggestion is replaced with <prompt-placeholder>."
+  ],
+  "steps": [
+    {
+      "id": "startup-ready",
+      "input": {
+        "kind": "launch",
+        "value": "hermes --tui"
+      },
+      "output": {
+        "frame": "tests/fixtures/parity/OBS-0001-startup-120x40.txt",
+        "status": "ready",
+        "landmarks": [
+          "Hermes ASCII banner",
+          "boxed agent information panel",
+          "Available Tools",
+          "Available Skills",
+          "model/provider line",
+          "session line",
+          "composer"
+        ]
+      }
+    },
+    {
+      "id": "type-text",
+      "input": {
+        "kind": "text",
+        "value": "hello"
+      },
+      "output": {
+        "composer": "❯ hello",
+        "status": "ready"
+      }
+    },
+    {
+      "id": "submit-unavailable-local-endpoint",
+      "input": {
+        "kind": "key",
+        "value": "Enter"
+      },
+      "output": {
+        "status": "busy",
+        "busy_landmarks": [
+          "musing…",
+          "mulling…",
+          "Ctrl+C to interrupt…"
+        ],
+        "assistant_response": "not observed because the intentionally absent local endpoint was never made available"
+      }
+    },
+    {
+      "id": "interrupt-active-turn",
+      "input": {
+        "kind": "key",
+        "value": "Ctrl+C"
+      },
+      "output": {
+        "transcript_marker": "interrupted",
+        "status": "ready",
+        "completion_marker": "✓ <seconds>s"
+      }
+    },
+    {
+      "id": "open-session-switcher",
+      "input": {
+        "kind": "key",
+        "value": "Ctrl+X"
+      },
+      "output": {
+        "overlay": "Sessions",
+        "landmarks": [
+          "live/resumable counts",
+          "+ new",
+          "current session",
+          "Enter switch",
+          "Ctrl+D close",
+          "Ctrl+N new",
+          "Ctrl+R refresh",
+          "Esc close"
+        ]
+      }
+    },
+    {
+      "id": "close-session-switcher",
+      "input": {
+        "kind": "key",
+        "value": "Esc"
+      },
+      "output": {
+        "overlay": "closed",
+        "composer": "visible"
+      }
+    },
+    {
+      "id": "resize",
+      "input": {
+        "kind": "terminal_resize",
+        "columns": 100,
+        "rows": 30
+      },
+      "output": {
+        "layout": "header reflowed/truncated while transcript, status, and composer remained visible"
+      }
+    },
+    {
+      "id": "setup-required",
+      "precondition": "fresh synthetic HERMES_HOME without a model provider",
+      "input": {
+        "kind": "text",
+        "value": "/help"
+      },
+      "output": {
+        "overlay": "Setup Required",
+        "message": "Hermes needs a model provider before the TUI can start a session.",
+        "actions": [
+          "/model",
+          "/setup",
+          "Ctrl+C"
+        ],
+        "status": "setup required"
+      }
+    },
+    {
+      "id": "exit-setup-required",
+      "input": {
+        "kind": "key_sequence",
+        "value": "Ctrl+C, Ctrl+C"
+      },
+      "output": {
+        "process": "exited",
+        "tmux_session": "exited"
+      }
+    }
+  ]
+}

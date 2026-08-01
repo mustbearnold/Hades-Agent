@@ -185,6 +185,7 @@ def write_locked(mutator: Callable[[dict[str, Any]], Any]) -> Any:
         fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX)
         data = read_validated()
         result = mutator(data)
+        promote_unblocked(data)
         data["updated_at"] = now()
         temporary = TASKS_PATH.with_name(f".{TASKS_PATH.name}.{os.getpid()}.tmp")
         with temporary.open("w", encoding="utf-8") as handle:
@@ -198,6 +199,17 @@ def write_locked(mutator: Callable[[dict[str, Any]], Any]) -> Any:
 
 def task_map(data: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return {task["id"]: task for task in data["tasks"]}
+
+
+def promote_unblocked(data: dict[str, Any]) -> None:
+    """Make queued tasks ready as soon as every declared dependency completes."""
+    by_id = task_map(data)
+    for task in data["tasks"]:
+        if task["status"] == "queued" and all(
+            by_id[dependency]["status"] == "complete" for dependency in task["depends_on"]
+        ):
+            task["status"] = "ready"
+            task["ready_at"] = now()
 
 
 def eligible_tasks(data: dict[str, Any]) -> list[dict[str, Any]]:

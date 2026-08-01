@@ -1,57 +1,104 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T00:00:00Z",
+  "updated_at": "2026-08-01T01:03:48Z",
   "tasks": [
     {
       "id": "HAD-001",
       "title": "Capture the Hermes TUI reference contract",
-      "status": "ready",
+      "status": "complete",
       "priority": 100,
       "lane": "parity",
       "owner_role": "researcher",
       "depends_on": [],
       "risk": "medium",
-      "oracle": ["reference_observation", "provenance_record"],
+      "oracle": [
+        "reference_observation",
+        "provenance_record"
+      ],
       "acceptance": [
         "Record the reference build, environment, terminal size, and capture method.",
         "Capture startup, input, navigation, error, and exit observations without redacting behavior into guesses.",
         "Mark every unobserved behavior as unknown and link the resulting ledger entries."
       ],
-      "evidence": []
+      "evidence": [
+        "docs/parity/observations/OBS-0001-hermes-main-2026-08-01.md",
+        "tests/fixtures/parity/OBS-0001-lifecycle.json",
+        "tests/fixtures/parity/OBS-0001-startup-120x40.txt"
+      ],
+      "claimed_by": "hermes-research",
+      "claimed_at": "2026-08-01T01:03:01Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Pinned Hermes TUI reference behavior captured at 120x40 with sanitized startup frame and lifecycle trace; unknown behavior is explicitly listed.",
+        "completed_at": "2026-08-01T01:03:16Z",
+        "evidence": [
+          "docs/parity/observations/OBS-0001-hermes-main-2026-08-01.md",
+          "tests/fixtures/parity/OBS-0001-lifecycle.json",
+          "tests/fixtures/parity/OBS-0001-startup-120x40.txt"
+        ]
+      }
     },
     {
       "id": "HAD-002",
       "title": "Define the first replay trace and golden-frame fixtures",
-      "status": "queued",
+      "status": "complete",
       "priority": 90,
       "lane": "parity",
       "owner_role": "researcher",
-      "depends_on": ["HAD-001"],
+      "depends_on": [
+        "HAD-001"
+      ],
       "risk": "low",
-      "oracle": ["replay_trace", "golden_frame"],
+      "oracle": [
+        "replay_trace",
+        "golden_frame"
+      ],
       "acceptance": [
         "Add one sanitized reference trace with ordered inputs and observable outputs.",
         "Add the matching normalized terminal frame fixture.",
         "Document normalization rules so unrelated terminal noise cannot hide a regression."
       ],
-      "evidence": []
+      "evidence": [
+        "tests/fixtures/parity/OBS-0001-lifecycle.json",
+        "tests/fixtures/parity/OBS-0001-startup-120x40.txt",
+        "docs/parity/observations/OBS-0001-hermes-main-2026-08-01.md"
+      ],
+      "ready_at": "2026-08-01T01:03:16Z",
+      "claimed_by": "hermes-research",
+      "claimed_at": "2026-08-01T01:03:48Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Added the sanitized ordered lifecycle trace, normalized 120x40 startup frame, and explicit normalization contract.",
+        "completed_at": "2026-08-01T01:03:48Z",
+        "evidence": [
+          "tests/fixtures/parity/OBS-0001-lifecycle.json",
+          "tests/fixtures/parity/OBS-0001-startup-120x40.txt",
+          "docs/parity/observations/OBS-0001-hermes-main-2026-08-01.md"
+        ]
+      }
     },
     {
       "id": "HAD-003",
       "title": "Characterize startup and exit lifecycle parity",
-      "status": "queued",
+      "status": "ready",
       "priority": 85,
       "lane": "lifecycle",
       "owner_role": "researcher",
-      "depends_on": ["HAD-001"],
+      "depends_on": [
+        "HAD-001"
+      ],
       "risk": "medium",
-      "oracle": ["lifecycle_probe", "replay_trace"],
+      "oracle": [
+        "lifecycle_probe",
+        "replay_trace"
+      ],
       "acceptance": [
         "Define observable startup and exit states for the chosen reference build.",
         "Define behavior for normal exit, interrupt exit, and terminal cleanup.",
         "Add a deterministic probe that fails if cleanup is skipped."
       ],
-      "evidence": []
+      "evidence": [],
+      "ready_at": "2026-08-01T01:03:16Z"
     },
     {
       "id": "HAD-004",
@@ -60,9 +107,15 @@
       "priority": 80,
       "lane": "core",
       "owner_role": "implementer",
-      "depends_on": ["HAD-002", "HAD-003"],
+      "depends_on": [
+        "HAD-002",
+        "HAD-003"
+      ],
       "risk": "medium",
-      "oracle": ["unit_test", "replay_trace"],
+      "oracle": [
+        "unit_test",
+        "replay_trace"
+      ],
       "acceptance": [
         "Implement only behavior covered by the first trace.",
         "Keep the transition deterministic and independent of terminal rendering.",
@@ -77,9 +130,14 @@
       "priority": 75,
       "lane": "visual",
       "owner_role": "implementer",
-      "depends_on": ["HAD-004"],
+      "depends_on": [
+        "HAD-004"
+      ],
       "risk": "medium",
-      "oracle": ["golden_frame", "snapshot_test"],
+      "oracle": [
+        "golden_frame",
+        "snapshot_test"
+      ],
       "acceptance": [
         "Render the reference-backed surface at the captured terminal size.",
         "Compare normalized cells rather than a human eyeball check.",
@@ -90,19 +148,25 @@
     {
       "id": "HAD-006",
       "title": "Build the differential replay verification command",
-      "status": "queued",
+      "status": "ready",
       "priority": 70,
       "lane": "verification",
       "owner_role": "verifier",
-      "depends_on": ["HAD-002"],
+      "depends_on": [
+        "HAD-002"
+      ],
       "risk": "medium",
-      "oracle": ["differential_report", "exit_code"],
+      "oracle": [
+        "differential_report",
+        "exit_code"
+      ],
       "acceptance": [
         "Replay a sanitized trace against Hades and emit a machine-readable result.",
         "Fail on behavioral or visual divergence with the first useful diff.",
         "Keep reference artifacts and generated reports separate."
       ],
-      "evidence": []
+      "evidence": [],
+      "ready_at": "2026-08-01T01:03:48Z"
     }
   ]
 }
