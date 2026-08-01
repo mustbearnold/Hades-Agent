@@ -90,8 +90,10 @@ progress from August 1, 2026 through 2027.
   fallback; image attachments and path paste remain unknown. HAD-024 captures
   Hermes remote `SSH_TTY` OSC52-first precedence and the native-provider
   timeout fallback. HAD-025 implements the bare SSH_TTY OSC52 query/DA1 barrier
-  path with bounded native fallback; tmux/STY wrapping, image attachments, and
-  gateway behavior remain unknown.
+  path with bounded native fallback. HAD-026 captures Hermes empty, query-marker,
+  invalid-base64, invalid-target, and unterminated OSC52 responses falling back
+  to native xclip while remaining ready; delayed/oversized responses,
+  tmux/STY wrapping, image attachments, and gateway behavior remain unknown.
 
 ## Unknown until observed
 

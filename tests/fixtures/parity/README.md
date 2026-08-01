@@ -51,3 +51,8 @@ contract derived from OBS-0024 and is consumed by the direct-PTY
 `scripts/replay_osc52_clipboard.py` oracle; invalid/empty/oversized responses,
 image/path/gateway behavior, and concurrent input during the bounded wait
 remain outside the claim.
+OBS-0026 captures Hermes fallback behavior for empty, query-marker,
+invalid-base64, invalid-target, and unterminated OSC52 responses. It is
+research-only, consumed by `scripts/validate_reference_fixture.py`, and keeps
+delayed/oversized responses, ST termination, multiplexers, and attachments as
+explicit unknowns.

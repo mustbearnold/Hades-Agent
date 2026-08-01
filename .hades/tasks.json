@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T06:44:31Z",
+  "updated_at": "2026-08-01T06:54:59Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -1202,6 +1202,57 @@
           "tests/fixtures/parity/OBS-0025-hades-osc52-clipboard.json",
           "docs/parity/observations/OBS-0025-hades-osc52-clipboard-2026-08-01.md",
           "scripts/replay_osc52_clipboard.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-026",
+      "title": "Capture Hermes invalid and empty OSC52 response boundaries",
+      "status": "complete",
+      "priority": 57,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-025"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "reference_observation",
+        "provenance_record",
+        "fixture_validator",
+        "direct_pty_probe"
+      ],
+      "acceptance": [
+        "Use the pinned Hermes reference in a direct 120x40 PTY with a bare SSH_TTY marker and synthetic xclip provider to probe empty and malformed OSC52 responses without touching the host clipboard.",
+        "Record exact response bytes, DA1 barrier exchange, native-provider invocation, inserted screen text, ready versus submitted state, and cleanup for empty, invalid-base64, invalid-target, and unterminated response controls.",
+        "Probe delayed and oversized responses only when the outcome is deterministic within the bounded harness; otherwise preserve each result as an explicit unknown instead of inferring behavior.",
+        "Add a sanitized OBS-0026 fixture, provenance observation, and executable probe wired into reference validation and just verify; keep this task research-only and do not change Hades behavior until the contract is stable.",
+        "Keep tmux/STY wrapping, image/path attachments, gateway behavior, and concurrent input out of scope unless directly observed by a separate contract."
+      ],
+      "evidence": [
+        "tests/fixtures/parity/OBS-0026-hermes-osc52-response-boundaries.json",
+        "docs/parity/observations/OBS-0026-hermes-osc52-response-boundaries-2026-08-01.md",
+        "scripts/probe_hermes_osc52_response_boundaries.py",
+        "scripts/validate_reference_fixture.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "ready_at": "2026-08-01T06:46:16Z",
+      "claimed_by": "hermes-research",
+      "claimed_at": "2026-08-01T06:46:41Z",
+      "attempts": 1,
+      "result": {
+        "summary": "captured-hermes-empty-and-malformed-osc52-fallback-boundaries-with-direct-pty-evidence-and-full-verify",
+        "completed_at": "2026-08-01T06:54:59Z",
+        "evidence": [
+          "tests/fixtures/parity/OBS-0026-hermes-osc52-response-boundaries.json",
+          "docs/parity/observations/OBS-0026-hermes-osc52-response-boundaries-2026-08-01.md",
+          "scripts/probe_hermes_osc52_response_boundaries.py",
+          "scripts/validate_reference_fixture.py",
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md"
