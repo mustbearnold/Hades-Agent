@@ -12,11 +12,12 @@ just agent next
 just snapshot
 ```
 
-`just snapshot` renders the deterministic bootstrap frame without requiring an
-interactive terminal. `just run` launches the TUI. `just probe-lifecycle`
-runs the actual binary in a PTY and verifies startup, resize, exit, and terminal
-restoration. The current work queue is in `.hades/tasks.json`; use `just agent next`
-to select the next evidence-backed task.
+`just snapshot` renders the normalized Hermes startup surface at 120x40
+without requiring an interactive terminal. `just run` launches the TUI.
+`just probe-lifecycle` runs the actual binary in a PTY and verifies startup,
+resize, exit, and terminal restoration. The current work queue is in
+`.hades/tasks.json`; use `just agent next` to select the next evidence-backed
+task.
 
 The development contract is in [`AGENTS.md`](AGENTS.md). The task ledger and
 bounded execution policy are in [`.hades/`](.hades/), and the role/workflow

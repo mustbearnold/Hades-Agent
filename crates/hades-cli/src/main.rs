@@ -23,7 +23,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             Ok(())
         }
         Some("--snapshot") => {
-            println!("{}", snapshot(&App::new(), 80, 24));
+            println!("{}", snapshot(&App::new(), 120, 40));
             Ok(())
         }
         Some(argument) => Err(format!("unknown argument: {argument}").into()),

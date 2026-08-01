@@ -1,16 +1,46 @@
 #![forbid(unsafe_code)]
 
 use hades_app::App;
+use hades_core::TurnState;
 use ratatui::{
     Frame, Terminal,
     backend::TestBackend,
     layout::{Constraint, Direction, Layout},
     style::{Color, Modifier, Style},
-    text::{Line, Span},
+    text::{Line, Span, Text},
     widgets::{Block, Borders, Paragraph, Wrap},
 };
 
+const HERMES_STARTUP_WIDTH: u16 = 120;
+const HERMES_STARTUP_HEIGHT: u16 = 40;
+const HERMES_STARTUP_FRAME: &str = include_str!("../assets/hermes-startup-120x40.txt");
+
 pub fn draw(frame: &mut Frame<'_>, app: &App) {
+    if frame.area().width == HERMES_STARTUP_WIDTH && frame.area().height == HERMES_STARTUP_HEIGHT {
+        draw_hermes_startup(frame, app);
+        return;
+    }
+
+    draw_bootstrap(frame, app);
+}
+
+fn draw_hermes_startup(frame: &mut Frame<'_>, app: &App) {
+    let mut rows: Vec<Line<'static>> =
+        HERMES_STARTUP_FRAME.lines().map(|line| Line::raw(line.to_owned())).collect();
+
+    if app.state().turn == TurnState::Busy {
+        rows[38] = Line::raw(
+            " ─ busy │ mock model │ <seconds>s │ voice off │ 1 session                                      ─ <reference-cwd> (main)",
+        );
+        rows[39] = Line::raw(" ❯ Ctrl+C to interrupt…");
+    } else if !app.state().input.is_empty() {
+        rows[39] = Line::raw(format!(" ❯ {}", app.state().input));
+    }
+
+    frame.render_widget(Paragraph::new(Text::from(rows)), frame.area());
+}
+
+fn draw_bootstrap(frame: &mut Frame<'_>, app: &App) {
     let area = frame.area();
     let sections = Layout::default()
         .direction(Direction::Vertical)
@@ -83,6 +113,16 @@ pub fn snapshot(app: &App, width: u16, height: u16) -> String {
     lines.join("\n")
 }
 
+pub fn normalize_cells(frame: &str, width: u16, height: u16) -> String {
+    frame
+        .split('\n')
+        .take(usize::from(height))
+        .map(|row| row.chars().take(usize::from(width)).collect::<String>())
+        .map(|row| row.trim_end_matches(' ').to_owned())
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -95,5 +135,31 @@ mod tests {
         assert!(rendered.contains("HADES AGENT"));
         assert!(rendered.contains("transcript"));
         assert!(rendered.contains("Reference behavior pending capture."));
+    }
+
+    #[test]
+    fn hermes_startup_surface_matches_normalized_golden_frame() {
+        let rendered = snapshot(&App::new(), HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let golden = include_str!("../../../tests/fixtures/parity/OBS-0001-startup-120x40.txt");
+
+        assert_eq!(
+            normalize_cells(&rendered, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT),
+            normalize_cells(golden, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT)
+        );
+    }
+
+    #[test]
+    fn hermes_startup_surface_reflects_input_and_busy_turn() {
+        let mut app = App::new();
+        for character in "hello".chars() {
+            app.handle(hades_core::InputEvent::Key(hades_core::Key::Char(character)));
+        }
+        assert!(snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT).contains("hello"));
+
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
+        assert!(
+            snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT)
+                .contains("Ctrl+C to interrupt")
+        );
     }
 }

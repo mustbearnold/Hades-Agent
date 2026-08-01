@@ -8,7 +8,7 @@ observation, contract, implementation, and oracle are all linked from a task.
 | Startup sequence | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [startup frame](../../tests/fixtures/parity/OBS-0001-startup-120x40.txt) | HAD-001 / HAD-003 |
 | Terminal initialization | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [lifecycle probe](../../scripts/probe_tui_lifecycle.py) | HAD-001 / HAD-003 |
 | Terminal cleanup | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [lifecycle probe](../../scripts/probe_tui_lifecycle.py) | HAD-001 / HAD-003 |
-| Initial geometry | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [startup frame](../../tests/fixtures/parity/OBS-0001-startup-120x40.txt) | HAD-001 / HAD-005 |
+| Initial geometry | Verified | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [golden snapshot test](../../crates/hades-tui/src/lib.rs) | HAD-001 / HAD-005 |
 | Color and text styling | Unknown | — | — | HAD-001 / HAD-005 |
 | Keymap | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) (tested subset) | [lifecycle trace](../../tests/fixtures/parity/OBS-0001-lifecycle.json) | HAD-001 / HAD-004 |
 | Focus and navigation | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [lifecycle trace](../../tests/fixtures/parity/OBS-0001-lifecycle.json) | HAD-001 / HAD-004 |

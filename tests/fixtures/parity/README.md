@@ -5,5 +5,5 @@ credentials, private transcripts, model payloads, or unreviewed screenshots.
 
 Each fixture should link back to an observation under `docs/parity/`, name its
 normalization rules, and be consumed by an executable test or replay command.
-There are no reference fixtures in the bootstrap commit because Hermes behavior
-has not yet been observed in this project.
+The first captured Hermes startup frame is OBS-0001; the Hades startup surface
+and its cell-level comparison are covered by HAD-005.

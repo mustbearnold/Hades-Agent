@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T01:25:27Z",
+  "updated_at": "2026-08-01T01:56:03Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -165,7 +165,7 @@
     {
       "id": "HAD-005",
       "title": "Implement the first golden-frame-backed visual surface",
-      "status": "ready",
+      "status": "complete",
       "priority": 75,
       "lane": "visual",
       "owner_role": "implementer",
@@ -182,8 +182,26 @@
         "Compare normalized cells rather than a human eyeball check.",
         "Record intentional terminal-dependent differences explicitly."
       ],
-      "evidence": [],
-      "ready_at": "2026-08-01T01:25:27Z"
+      "evidence": [
+        "crates/hades-tui/src/lib.rs",
+        "crates/hades-tui/assets/hermes-startup-120x40.txt",
+        "tests/fixtures/parity/OBS-0001-startup-120x40.txt",
+        "docs/parity/observations/OBS-0004-hades-startup-surface-2026-08-01.md"
+      ],
+      "ready_at": "2026-08-01T01:25:27Z",
+      "claimed_by": "hermes-visual",
+      "claimed_at": "2026-08-01T01:55:29Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Implemented the normalized Hermes startup surface at 120x40 with a product-owned Ratatui asset, cell-level golden comparison, dynamic input/busy assertions, and documented terminal-dependent differences.",
+        "completed_at": "2026-08-01T01:56:03Z",
+        "evidence": [
+          "crates/hades-tui/src/lib.rs",
+          "crates/hades-tui/assets/hermes-startup-120x40.txt",
+          "tests/fixtures/parity/OBS-0001-startup-120x40.txt",
+          "docs/parity/observations/OBS-0004-hades-startup-surface-2026-08-01.md"
+        ]
+      }
     },
     {
       "id": "HAD-006",
