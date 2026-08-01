@@ -61,6 +61,7 @@ pub enum TurnState {
 pub enum Overlay {
     Sessions,
     ModelPicker,
+    SetupWizard,
     SetupRequired,
 }
 
@@ -90,6 +91,85 @@ pub enum ModelPickerAction {
 
 pub const MODEL_PICKER_PROVIDER: &str = "palette-loopback";
 pub const MODEL_PICKER_MODEL: &str = "palette-model";
+
+pub const SETUP_WIZARD_CHOICES: [&str; 3] = [
+    "Quick Setup (Nous Portal) — free OAuth login, no API keys, model + tools (recommended)",
+    "Full setup — configure every provider, tool & option yourself (bring your own keys)",
+    "Blank Slate — everything off except the bare minimum; opt in to each capability",
+];
+
+#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub enum SetupWizardSurface {
+    #[default]
+    Choices,
+    NumberedFallback,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub enum SetupWizardAction {
+    Continue,
+    Moved,
+    EnteredFallback,
+    Quit,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub struct SetupWizardState {
+    surface: SetupWizardSurface,
+    cursor: usize,
+    selected: usize,
+}
+
+impl SetupWizardState {
+    pub fn surface(&self) -> SetupWizardSurface {
+        self.surface
+    }
+
+    pub fn cursor(&self) -> usize {
+        self.cursor
+    }
+
+    pub fn selected(&self) -> usize {
+        self.selected
+    }
+
+    pub fn cursor_label(&self) -> &'static str {
+        SETUP_WIZARD_CHOICES[self.cursor]
+    }
+
+    pub fn selected_label(&self) -> &'static str {
+        SETUP_WIZARD_CHOICES[self.selected]
+    }
+
+    pub fn is_fallback(&self) -> bool {
+        self.surface == SetupWizardSurface::NumberedFallback
+    }
+
+    pub fn handle_key(&mut self, key: Key) -> SetupWizardAction {
+        match self.surface {
+            SetupWizardSurface::Choices => match key {
+                Key::Down => {
+                    self.cursor = (self.cursor + 1).min(SETUP_WIZARD_CHOICES.len() - 1);
+                    SetupWizardAction::Moved
+                }
+                Key::Up => {
+                    self.cursor = self.cursor.saturating_sub(1);
+                    SetupWizardAction::Moved
+                }
+                Key::Escape => {
+                    self.surface = SetupWizardSurface::NumberedFallback;
+                    SetupWizardAction::EnteredFallback
+                }
+                Key::Ctrl('c') => SetupWizardAction::Quit,
+                _ => SetupWizardAction::Continue,
+            },
+            SetupWizardSurface::NumberedFallback => match key {
+                Key::Ctrl('c') => SetupWizardAction::Quit,
+                _ => SetupWizardAction::Continue,
+            },
+        }
+    }
+}
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct ModelPickerState {
@@ -186,6 +266,10 @@ impl CompletionState {
     pub fn for_draft(draft: &str) -> Self {
         if draft == "/model" {
             return Self { items: vec!["/model".to_owned()] };
+        }
+
+        if draft == "/setup" {
+            return Self { items: vec!["/setup".to_owned()] };
         }
 
         if draft == "/he" {
@@ -399,6 +483,7 @@ pub struct SessionState {
     pub turn: TurnState,
     pub overlay: Option<Overlay>,
     pub model_picker: Option<ModelPickerState>,
+    pub setup_wizard: Option<SetupWizardState>,
     pub notice: Option<Notice>,
     pub composer: Composer,
     pub completion: CompletionState,
@@ -414,6 +499,7 @@ impl Default for SessionState {
             turn: TurnState::Ready,
             overlay: None,
             model_picker: None,
+            setup_wizard: None,
             notice: None,
             composer: Composer::default(),
             completion: CompletionState::default(),
@@ -655,5 +741,19 @@ mod tests {
         assert_eq!(picker.handle_key(Key::Escape), ModelPickerAction::ReturnedToProvider);
         assert_eq!(picker.stage(), ModelPickerStage::Provider);
         assert_eq!(picker.handle_key(Key::Escape), ModelPickerAction::Closed);
+    }
+
+    #[test]
+    fn setup_wizard_moves_cursor_without_committing_then_enters_numbered_fallback() {
+        let mut wizard = SetupWizardState::default();
+
+        assert_eq!(wizard.cursor_label(), SETUP_WIZARD_CHOICES[0]);
+        assert_eq!(wizard.selected_label(), SETUP_WIZARD_CHOICES[0]);
+        assert_eq!(wizard.handle_key(Key::Down), SetupWizardAction::Moved);
+        assert_eq!(wizard.cursor_label(), SETUP_WIZARD_CHOICES[1]);
+        assert_eq!(wizard.selected_label(), SETUP_WIZARD_CHOICES[0]);
+        assert_eq!(wizard.handle_key(Key::Escape), SetupWizardAction::EnteredFallback);
+        assert!(wizard.is_fallback());
+        assert_eq!(wizard.handle_key(Key::Ctrl('c')), SetupWizardAction::Quit);
     }
 }

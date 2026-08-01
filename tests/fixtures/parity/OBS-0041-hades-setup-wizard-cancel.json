@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0041",
+  "reference_observation": "OBS-0040",
+  "surface": "hades-tui-bounded-initial-setup-wizard-cancellation",
+  "reference": {
+    "product": "Hades Agent",
+    "version": "workspace implementation",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "tmux-backed PTY"
+    },
+    "capture": "isolated Hades replay derived from the pinned Hermes OBS-0040 landmarks"
+  },
+  "terminal": {
+    "columns": 120,
+    "rows": 40,
+    "emulator": "tmux-backed PTY"
+  },
+  "normalization": [
+    "The Hades binary path, synthetic HERMES_HOME, PTY/session identifiers, timestamps, cursor placement, and ANSI styling are omitted.",
+    "The bounded implementation uses only typed local setup-wizard state; no credentials, OAuth flow, persistence, provider discovery, network request, or model response is exercised.",
+    "The replay asserts stable wizard landmarks and state transitions only; later setup pages and numbered choice submission remain outside this implementation contract.",
+    "The first Enter accepts the /setup completion and the second Enter opens the wizard, matching the observed two-step entry sequence."
+  ],
+  "steps": [
+    {
+      "id": "setup-wizard-contract",
+      "precondition": "Fresh Hades process at 120x40 with an isolated HERMES_HOME history directory.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "/setup",
+          "bytes_hex": "2f 73 65 74 75 70"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "key",
+          "value": "Down",
+          "bytes_hex": "1b 5b 42"
+        },
+        {
+          "kind": "key",
+          "value": "Escape",
+          "bytes_hex": "1b"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+C",
+          "bytes_hex": "03"
+        }
+      ],
+      "output": {
+        "status": "passed",
+        "pty_markers": [
+          "Hermes Agent Setup Wizard",
+          "Let's configure your Hermes Agent installation.",
+          "How would you like to set up Hermes?",
+          "Quick Setup (Nous Portal)",
+          "Full setup",
+          "Blank Slate",
+          "→ (○) Full setup",
+          "(●) Quick Setup",
+          "Enter for default (1)  Ctrl+C to exit",
+          "Select [1-3] (1):"
+        ],
+        "pty_absent_markers": [
+          "musing…",
+          "Ctrl+C to interrupt"
+        ],
+        "outcome": "The bounded wizard displays the initial radio list, moves the cursor to Full setup without committing a new choice, renders the observed numbered fallback after Escape, and exits cleanly on Ctrl+C without Busy or a model request."
+      }
+    }
+  ],
+  "cases": [
+    {
+      "id": "setup-wizard-initial-navigation-fallback",
+      "steps": [
+        {
+          "id": "type-setup",
+          "input": {
+            "kind": "text",
+            "value": "/setup"
+          },
+          "output": {
+            "pty_markers": [
+              "completions",
+              "/setup"
+            ],
+            "pty_absent_markers": []
+          }
+        },
+        {
+          "id": "accept-setup-completion",
+          "input": {
+            "kind": "key",
+            "value": "Enter"
+          },
+          "output": {
+            "pty_markers": [
+              "❯ /setup"
+            ],
+            "pty_absent_markers": [
+              "completions"
+            ]
+          }
+        },
+        {
+          "id": "open-setup-wizard",
+          "input": {
+            "kind": "key",
+            "value": "Enter"
+          },
+          "output": {
+            "pty_markers": [
+              "Hermes Agent Setup Wizard",
+              "Let's configure your Hermes Agent installation.",
+              "Press Ctrl+C at any time to exit.",
+              "How would you like to set up Hermes?",
+              "Quick Setup (Nous Portal)",
+              "Full setup",
+              "Blank Slate",
+              "→ (●) Quick Setup",
+              "ESC cancel"
+            ],
+            "pty_absent_markers": [
+              "musing…",
+              "Ctrl+C to interrupt"
+            ]
+          }
+        },
+        {
+          "id": "move-to-full-setup",
+          "input": {
+            "kind": "key",
+            "value": "Down"
+          },
+          "output": {
+            "pty_markers": [
+              "→ (○) Full setup",
+              "(●) Quick Setup"
+            ],
+            "pty_absent_markers": []
+          }
+        },
+        {
+          "id": "escape-to-numbered-fallback",
+          "input": {
+            "kind": "key",
+            "value": "Escape"
+          },
+          "output": {
+            "pty_markers": [
+              "Enter for default (1)  Ctrl+C to exit",
+              "Select [1-3] (1):"
+            ],
+            "pty_absent_markers": [
+              "ESC cancel"
+            ]
+          }
+        },
+        {
+          "id": "exit",
+          "input": {
+            "kind": "key",
+            "value": "Ctrl+C"
+          },
+          "output": {
+            "pty_markers": [],
+            "pty_absent_markers": [],
+            "process_exit": true
+          }
+        }
+      ]
+    }
+  ],
+  "unknowns": [
+    "Later setup pages, provider/API configuration, OAuth, persistence, numbered-choice submission, invalid input, and successful setup remain unimplemented and unobserved.",
+    "The bounded replay does not claim complete Hermes setup behavior or parity at other terminal sizes and themes.",
+    "Existing-configuration setup, alternate navigation keys, and concurrent input remain unknown."
+  ],
+  "passed": true
+}

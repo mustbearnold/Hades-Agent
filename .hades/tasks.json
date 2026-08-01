@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T10:34:14Z",
+  "updated_at": "2026-08-01T10:50:38Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -2026,6 +2026,60 @@
           "tests/fixtures/parity/OBS-0040-hermes-setup-wizard-cancel.json",
           "docs/parity/observations/OBS-0040-hermes-setup-wizard-cancel-2026-08-01.md",
           "scripts/probe_hermes_setup_wizard.py",
+          "justfile",
+          "scripts/verify.sh"
+        ]
+      }
+    },
+    {
+      "id": "HAD-042",
+      "title": "Implement the bounded Hermes setup wizard surface",
+      "status": "complete",
+      "priority": 41,
+      "lane": "behavior",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-038",
+        "HAD-041"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "typed_core_transition",
+        "focused_renderer_test",
+        "direct_pty_replay",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Add typed initial setup-wizard state for the observed Quick Setup, Full setup, and Blank Slate radio choices, cursor movement, committed selection marker, and bounded cancellation/fallback state without credentials, OAuth, persistence, or network behavior.",
+        "Route the observed two-step /setup entry through the bounded Hades wizard while preserving existing /help setup-required behavior, slash completion, unknown commands, model picker, ordinary submission, history, and lifecycle behavior.",
+        "Render the stable OBS-0040 landmarks at the 120x40 TUI seam: Hermes Agent Setup Wizard, setup explanation, initial Quick Setup selection, Full setup and Blank Slate rows, and the ESC cancel hint; keep dynamic or unobserved copy outside the claim.",
+        "Prove initial selection, Down navigation without changing the committed radio choice, Escape's observed numbered-fallback result, Ctrl+C cleanup, and no Busy/network/model request through focused core/app/TUI tests and an isolated direct-PTY replay.",
+        "Add a sanitized OBS-0041 Hades implementation fixture and observation, wire its replay through just verify, run the complete no-skip gate, and record later wizard pages, numbered choice submission, persistence, and provider configuration as unknown."
+      ],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-app/src/lib.rs",
+        "crates/hades-tui/src/lib.rs",
+        "tests/fixtures/parity/OBS-0041-hades-setup-wizard-cancel.json",
+        "scripts/replay_setup_wizard.py",
+        "docs/parity/observations/OBS-0041-hades-setup-wizard-cancel-2026-08-01.md",
+        "justfile",
+        "scripts/verify.sh"
+      ],
+      "ready_at": "2026-08-01T10:40:22Z",
+      "attempts": 1,
+      "claimed_by": "hades-implementer",
+      "claimed_at": "2026-08-01T10:41:19Z",
+      "result": {
+        "summary": "Implemented the bounded typed setup wizard with two-step /setup entry, radio navigation, observed Escape numbered fallback, clean Ctrl+C exit, focused tests, and a fresh 120x40 replay.",
+        "completed_at": "2026-08-01T10:50:38Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-app/src/lib.rs",
+          "crates/hades-tui/src/lib.rs",
+          "tests/fixtures/parity/OBS-0041-hades-setup-wizard-cancel.json",
+          "scripts/replay_setup_wizard.py",
+          "docs/parity/observations/OBS-0041-hades-setup-wizard-cancel-2026-08-01.md",
           "justfile",
           "scripts/verify.sh"
         ]

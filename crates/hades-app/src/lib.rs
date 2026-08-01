@@ -9,7 +9,8 @@ use std::{
 
 use hades_core::{
     CompletionState, Composer, EnterAction, InputEvent, Key, MAX_INPUT_HISTORY, Message,
-    ModelPickerAction, ModelPickerStage, Notice, Overlay, SessionState, TurnState,
+    ModelPickerAction, ModelPickerStage, Notice, Overlay, SessionState, SetupWizardAction,
+    SetupWizardState, TurnState,
 };
 
 #[derive(Clone, Debug)]
@@ -177,6 +178,7 @@ impl App {
                     _ => DispatchOutcome::Continue,
                 },
                 Overlay::ModelPicker => self.handle_model_picker_key(key),
+                Overlay::SetupWizard => self.handle_setup_wizard_key(key),
                 Overlay::SetupRequired => match key {
                     Key::Ctrl('c') if !self.state.composer.text().is_empty() => {
                         self.state.composer.clear();
@@ -211,7 +213,12 @@ impl App {
                 self.refresh_completion();
                 DispatchOutcome::Continue
             }
-            Key::Enter if self.state.completion.first_item() == Some("/model") => {
+            Key::Enter
+                if matches!(
+                    self.state.completion.first_item(),
+                    Some("/model") | Some("/setup")
+                ) =>
+            {
                 self.apply_completion();
                 DispatchOutcome::Continue
             }
@@ -348,6 +355,16 @@ impl App {
             return DispatchOutcome::Continue;
         }
 
+        if content == "/setup" {
+            self.clear_notice();
+            self.state.setup_wizard = Some(SetupWizardState::default());
+            self.state.overlay = Some(Overlay::SetupWizard);
+            self.state.composer.clear();
+            self.state.turn = TurnState::Ready;
+            self.state.status = "How would you like to set up Hermes?".to_owned();
+            return DispatchOutcome::Continue;
+        }
+
         if content.starts_with('/') {
             self.state.messages.push(Message::user(&content));
             self.state.messages.push(Message::system(format!(
@@ -426,6 +443,31 @@ impl App {
             }
         }
         DispatchOutcome::Continue
+    }
+
+    fn handle_setup_wizard_key(&mut self, key: Key) -> DispatchOutcome {
+        let Some(wizard) = &mut self.state.setup_wizard else {
+            self.state.overlay = None;
+            return DispatchOutcome::Continue;
+        };
+        let action = wizard.handle_key(key);
+
+        match action {
+            SetupWizardAction::Quit => {
+                self.state.overlay = None;
+                self.state.setup_wizard = None;
+                self.quit()
+            }
+            SetupWizardAction::EnteredFallback => {
+                self.state.status = "Enter for default (1)  Ctrl+C to exit".to_owned();
+                DispatchOutcome::Continue
+            }
+            SetupWizardAction::Moved => {
+                self.state.status = "Setup wizard navigation.".to_owned();
+                DispatchOutcome::Continue
+            }
+            SetupWizardAction::Continue => DispatchOutcome::Continue,
+        }
     }
 
     fn refresh_completion(&mut self) {
@@ -639,6 +681,42 @@ mod tests {
         assert!(app.state().model_picker.is_none());
         assert!(!app.state().should_quit);
         assert_eq!(app.state().turn, TurnState::Ready);
+    }
+
+    #[test]
+    fn setup_wizard_follows_the_two_step_entry_and_escape_fallback_contract() {
+        let mut app = App::new();
+        for character in "/setup".chars() {
+            app.handle(InputEvent::Key(Key::Char(character)));
+        }
+        assert_eq!(app.state().completion.items(), &vec!["/setup".to_owned()]);
+
+        assert_eq!(app.handle(InputEvent::Key(Key::Enter)), DispatchOutcome::Continue);
+        assert_eq!(app.state().overlay, None);
+        assert_eq!(app.state().composer.text(), "/setup");
+
+        assert_eq!(app.handle(InputEvent::Key(Key::Enter)), DispatchOutcome::Continue);
+        assert_eq!(app.state().overlay, Some(Overlay::SetupWizard));
+        assert_eq!(app.state().turn, TurnState::Ready);
+        assert_eq!(app.state().composer.text(), "");
+        let wizard = app.state().setup_wizard.as_ref().unwrap();
+        assert_eq!(wizard.cursor(), 0);
+        assert_eq!(wizard.selected(), 0);
+        assert!(!wizard.is_fallback());
+
+        app.handle(InputEvent::Key(Key::Down));
+        let wizard = app.state().setup_wizard.as_ref().unwrap();
+        assert_eq!(wizard.cursor(), 1);
+        assert_eq!(wizard.selected(), 0);
+
+        assert_eq!(app.handle(InputEvent::Key(Key::Escape)), DispatchOutcome::Continue);
+        assert!(app.state().setup_wizard.as_ref().unwrap().is_fallback());
+        assert_eq!(app.state().status, "Enter for default (1)  Ctrl+C to exit");
+
+        assert_eq!(app.handle(InputEvent::Key(Key::Ctrl('c'))), DispatchOutcome::Quit);
+        assert!(app.state().should_quit);
+        assert_eq!(app.state().overlay, None);
+        assert!(app.state().setup_wizard.is_none());
     }
 
     #[test]

@@ -2,7 +2,8 @@
 
 use hades_app::App;
 use hades_core::{
-    MODEL_PICKER_MODEL, MODEL_PICKER_PROVIDER, ModelPickerStage, Notice, Overlay, TurnState,
+    MODEL_PICKER_MODEL, MODEL_PICKER_PROVIDER, ModelPickerStage, Notice, Overlay,
+    SETUP_WIZARD_CHOICES, SetupWizardSurface, TurnState,
 };
 use ratatui::{
     Frame, Terminal,
@@ -60,6 +61,7 @@ pub fn draw(frame: &mut Frame<'_>, app: &App) {
     match app.state().overlay {
         Some(Overlay::Sessions) => draw_sessions_overlay(frame),
         Some(Overlay::ModelPicker) => draw_model_picker_overlay(frame, app),
+        Some(Overlay::SetupWizard) => draw_setup_wizard_overlay(frame, app),
         Some(Overlay::SetupRequired) => draw_setup_required_overlay(frame, app),
         None => {}
     }
@@ -232,6 +234,50 @@ fn draw_setup_required_overlay(frame: &mut Frame<'_>, app: &App) {
             .title_style(HERMES_PALETTE.brand())
             .title(" Setup Required "),
     );
+    frame.render_widget(Clear, area);
+    frame.render_widget(panel, area);
+}
+
+fn draw_setup_wizard_overlay(frame: &mut Frame<'_>, app: &App) {
+    let Some(wizard) = app.state().setup_wizard.as_ref() else {
+        return;
+    };
+    let area = centered_rect(frame.area(), 116, 20);
+    let mut lines = vec![
+        Line::styled(" Hermes Agent Setup Wizard", HERMES_PALETTE.brand()),
+        Line::raw(""),
+        Line::raw(" Let's configure your Hermes Agent installation."),
+        Line::raw(" Press Ctrl+C at any time to exit."),
+        Line::raw(""),
+        Line::styled(" How would you like to set up Hermes?", HERMES_PALETTE.brand()),
+    ];
+
+    for (index, choice) in SETUP_WIZARD_CHOICES.iter().enumerate() {
+        let cursor = if index == wizard.cursor() { "→" } else { " " };
+        let selected = if index == wizard.selected() { "●" } else { "○" };
+        let style = if index == wizard.cursor() {
+            HERMES_PALETTE.ready()
+        } else {
+            HERMES_PALETTE.secondary()
+        };
+        lines.push(Line::styled(format!(" {cursor} ({selected}) {choice}"), style));
+    }
+
+    lines.push(Line::raw(""));
+    if wizard.surface() == SetupWizardSurface::NumberedFallback {
+        lines.extend([
+            Line::styled(" Enter for default (1)  Ctrl+C to exit", HERMES_PALETTE.secondary()),
+            Line::styled(" Select [1-3] (1):", HERMES_PALETTE.secondary()),
+        ]);
+    } else {
+        lines.push(Line::styled(
+            " ↑↓ navigate  ENTER/SPACE select  ESC cancel",
+            HERMES_PALETTE.secondary(),
+        ));
+    }
+
+    let panel = Paragraph::new(Text::from(lines))
+        .block(Block::default().borders(Borders::ALL).title(" Setup wizard "));
     frame.render_widget(Clear, area);
     frame.render_widget(panel, area);
 }
@@ -639,6 +685,48 @@ mod tests {
         let closed = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
         assert!(!closed.contains("Select provider (step 1/2)"));
         assert!(closed.contains("─ ready │ mock model"));
+    }
+
+    #[test]
+    fn hermes_startup_surface_renders_setup_wizard_navigation_and_fallback() {
+        let mut app = App::new();
+        for character in "/setup".chars() {
+            app.handle(hades_core::InputEvent::Key(hades_core::Key::Char(character)));
+        }
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
+
+        let initial = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        for marker in [
+            "Hermes Agent Setup Wizard",
+            "Let's configure your Hermes Agent installation.",
+            "Press Ctrl+C at any time to exit.",
+            "How would you like to set up Hermes?",
+            "Quick Setup (Nous Portal)",
+            "Full setup",
+            "Blank Slate",
+            "●",
+            "ESC cancel",
+        ] {
+            assert!(initial.contains(marker), "missing setup wizard marker: {marker}");
+        }
+        assert!(initial.contains("→ (●) Quick Setup"));
+
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Down));
+        let moved = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        assert!(moved.contains("→ (○) Full setup"));
+        assert!(moved.contains("(●) Quick Setup"));
+
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Escape));
+        let fallback = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        assert!(fallback.contains("Enter for default (1)  Ctrl+C to exit"));
+        assert!(fallback.contains("Select [1-3] (1):"));
+        assert!(!fallback.contains("ESC cancel"));
+
+        assert_eq!(
+            app.handle(hades_core::InputEvent::Key(hades_core::Key::Ctrl('c'))),
+            hades_app::DispatchOutcome::Quit
+        );
     }
 
     #[test]

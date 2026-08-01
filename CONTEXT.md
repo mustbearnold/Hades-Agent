@@ -165,6 +165,11 @@ progress from August 1, 2026 through 2027.
   Escape-to-numbered-fallback boundary. Ctrl+C cleanup is verified without
   submitting an option; later setup pages, OAuth/API configuration, persistence,
   and Hades setup-wizard behavior remain unknown.
+- HAD-042 implements the bounded initial setup-wizard surface with typed choice
+  cursor/selection state, the observed two-step `/setup` entry, the
+  Escape-to-numbered-fallback result, and clean Ctrl+C exit. A fresh 120x40
+  replay verifies the stable landmarks without Busy, provider, OAuth, or
+  network behavior; later pages and choice submission remain unknown.
 
 ## Unknown until observed
 

@@ -39,6 +39,10 @@ replay-model-picker:
     cargo build --locked --package hades-cli
     python3 scripts/replay_model_picker.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0039-hades-model-picker-model-stage.json --report .hades/runtime/model-picker-replay.json
 
+replay-setup-wizard:
+    cargo build --locked --package hades-cli
+    python3 scripts/replay_setup_wizard.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0041-hades-setup-wizard-cancel.json --report .hades/runtime/setup-wizard-replay.json
+
 replay-paste:
     cargo build --locked --package hades-cli
     python3 scripts/replay_paste.py --binary target/debug/hades --report .hades/runtime/paste-replay.json
@@ -135,6 +139,7 @@ validate-reference:
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0038-hermes-model-picker-model-stage.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0039-hades-model-picker-model-stage.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0040-hermes-setup-wizard-cancel.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0041-hades-setup-wizard-cancel.json
 
 agent command *args:
     python3 scripts/agent/control_plane.py {{command}} {{args}}
