@@ -346,6 +346,11 @@ progress from August 1, 2026 through 2027.
   overlay alive and the second exits cleanly. A ready-marker redraw appeared
   beneath the retained overlay after the follow-up Enter presses; its meaning
   remains unknown and no Hades action route is inferred from it.
+- HAD-074 captures the standalone `hermes setup` entry boundary in a fresh
+  synthetic home: Hermes opens a curses setup choice surface, Escape returns
+  to the numbered fallback prompt, and Ctrl+C exits with status 1 while
+  restoring the terminal and leaving config absent. Selected setup paths,
+  persistence, and the Hades standalone setup command remain unimplemented.
 
 ## Unknown until observed
 

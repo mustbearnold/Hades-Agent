@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T21:13:32Z",
+  "updated_at": "2026-08-01T21:32:18Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -3860,6 +3860,61 @@
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/hermes-setup-required-actions-probe.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-074",
+      "title": "Capture Hermes standalone setup command boundary",
+      "status": "complete",
+      "priority": 11,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-073"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "hermes_direct_pty",
+        "sanitized_fixture",
+        "replayable_setup_entry",
+        "full_verify"
+      ],
+      "acceptance": [
+        "In the pinned Hermes reference, invoke the standalone hermes setup command from a fresh synthetic home with no credentials, OAuth, external network, provider values, or platform selections, and capture its first stable setup surface.",
+        "Record the exact safe input sequence through the first reversible boundary and bounded Ctrl+C cleanup, including visible surfaces, config/artifact changes, exit status, and terminal restoration; keep later setup behavior unknown.",
+        "Compare the standalone command entry with the TUI setup route only where the direct observation supports it; do not infer that either route is interchangeable from source inspection.",
+        "Add provenance, a sanitized OBS-0069 fixture, a repeatable direct-PTY probe, and an observation document; update the parity matrix/context/readme and wire fixture validation and the probe into just verify.",
+        "Run the complete no-skip just verify gate and record the standalone setup evidence before completion."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_standalone_setup.py",
+        "tests/fixtures/parity/OBS-0069-hermes-standalone-setup.json",
+        "docs/parity/observations/OBS-0069-hermes-standalone-setup-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hermes-standalone-setup-probe.json"
+      ],
+      "ready_at": "2026-08-02T00:00:00Z",
+      "attempts": 1,
+      "claimed_by": "hermes-standalone-setup",
+      "claimed_at": "2026-08-01T21:16:07Z",
+      "result": {
+        "summary": "Captured Hermes standalone setup entry in a fresh synthetic home: the curses choice surface, Escape-to-numbered-fallback transition, status-1 cancellation, terminal restoration, and no config mutation; direct Ctrl+C from the initial surface remains unknown.",
+        "completed_at": "2026-08-01T21:32:18Z",
+        "evidence": [
+          "scripts/probe_hermes_standalone_setup.py",
+          "tests/fixtures/parity/OBS-0069-hermes-standalone-setup.json",
+          "docs/parity/observations/OBS-0069-hermes-standalone-setup-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hermes-standalone-setup-probe.json"
         ]
       }
     }

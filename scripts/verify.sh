@@ -32,6 +32,7 @@ python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0041-had
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0042-hermes-full-setup-continuation.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0044-hermes-full-setup-provider-menu.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0045-hades-full-setup-provider-menu.json
+python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0069-hermes-standalone-setup.json
 cargo fmt --all -- --check
 cargo check --workspace --all-targets --locked
 cargo clippy --workspace --all-targets --locked -- -D warnings
@@ -110,6 +111,7 @@ python3 scripts/probe_hermes_unconfigured_resolution.py --report .hades/runtime/
 python3 scripts/probe_hermes_setup_required_reconciliation.py --report .hades/runtime/hermes-setup-required-reconciliation-probe.json --timeout 30 --observation-window 15
 python3 scripts/probe_hermes_help_setup_timing.py --report .hades/runtime/hermes-help-setup-timing-probe.json --timeout 30 --observation-window 15
 python3 scripts/probe_hermes_setup_required_actions.py --report .hades/runtime/hermes-setup-required-actions-probe.json --timeout 30 --observation-window 3
+python3 scripts/probe_hermes_standalone_setup.py --report .hades/runtime/hermes-standalone-setup-probe.json --timeout 30
 python3 scripts/replay_terminal_palette.py --binary target/debug/hades --report .hades/runtime/hades-terminal-palette-replay.json
 python3 scripts/replay_osc52_timing_limits.py --binary target/debug/hades --report .hades/runtime/hades-osc52-timing-limits-replay.json
 python3 scripts/replay_osc52_clipboard.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0029-hades-osc52-st-termination.json --report .hades/runtime/hades-osc52-st-termination-replay.json
