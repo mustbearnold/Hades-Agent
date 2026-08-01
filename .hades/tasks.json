@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T17:58:17Z",
+  "updated_at": "2026-08-01T18:24:34Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -3248,6 +3248,93 @@
           ".hades/runtime/had063-pre-completion-verify-final3.log",
           ".hades/runtime/had063-palette-after-redraw-fix.json",
           ".hades/runtime/had063-setup-wizard-encoding-1.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-064",
+      "title": "Implement Hades unconfigured startup boundary",
+      "status": "complete",
+      "priority": 19,
+      "lane": "implementation",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-063"
+      ],
+      "risk": "high",
+      "oracle": [
+        "typed_startup_state",
+        "tui_golden_surface",
+        "direct_pty_replay",
+        "full_verify"
+      ],
+      "acceptance": [
+        "When the CLI has no configured Hades provider endpoint, enter an explicit typed unconfigured-startup state instead of rendering a fake ready composer or attempting a provider request.",
+        "At 120x40 render the OBS-0059 boundary with the existing Hermes startup shell landmarks, the observed glm-5.2 / Nous Research model marker, a starting agent footer, and no ready footer or prompt placeholder; preserve clean Ctrl+C exit and terminal restoration.",
+        "Keep the state transition outside prompt text and keep App::new deterministic for existing configured/replay tests; add focused core/app/TUI coverage for the typed state and CLI selection without reading credentials or private runtime state.",
+        "Add a sanitized Hades replay fixture and direct-PTY oracle for the no-provider launch, wire it into just verify, update the parity matrix/context, and explicitly leave provider setup/persistence and eventual startup resolution out of scope.",
+        "Run the complete no-skip just verify gate and record implementation, replay, fixture, and verification evidence before completion."
+      ],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-app/src/lib.rs",
+        "crates/hades-cli/src/main.rs",
+        "crates/hades-tui/src/lib.rs",
+        "scripts/replay_unconfigured_startup.py",
+        "tests/fixtures/parity/OBS-0060-hades-unconfigured-startup.json",
+        "docs/parity/observations/OBS-0060-hades-unconfigured-startup-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "justfile",
+        "scripts/verify.sh",
+        "scripts/probe_tui_lifecycle.py",
+        "scripts/differential_replay.py",
+        "scripts/replay_local_provider.py",
+        "scripts/replay_model_picker.py",
+        "scripts/replay_setup_wizard.py",
+        "scripts/replay_setup_terminal_backend.py",
+        "scripts/replay_setup_provider_model_prompt.py",
+        "scripts/replay_setup_provider_menu.py",
+        "scripts/replay_clipboard_text.py",
+        "scripts/replay_osc52_clipboard.py",
+        ".hades/runtime/had064-unconfigured-startup-replay.json",
+        ".hades/runtime/had064-differential-check-2.json",
+        ".hades/runtime/had064-local-provider-check.json",
+        ".hades/runtime/had064-pre-completion-verify-4.log"
+      ],
+      "ready_at": "2026-08-01T17:59:14Z",
+      "attempts": 1,
+      "claimed_by": "unconfigured-startup-implementation",
+      "claimed_at": "2026-08-01T17:59:32Z",
+      "result": {
+        "summary": "Implemented the typed Hades unconfigured startup boundary from OBS-0059: no provider endpoint now renders the captured starting-agent shell, ignores prompt/provider input, and exits cleanly; added focused state/CLI/TUI tests, direct-PTY OBS-0060 evidence, verification wiring, and updated no-provider replay harnesses. Complete no-skip just verify passed.",
+        "completed_at": "2026-08-01T18:24:34Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-app/src/lib.rs",
+          "crates/hades-cli/src/main.rs",
+          "crates/hades-tui/src/lib.rs",
+          "scripts/replay_unconfigured_startup.py",
+          "tests/fixtures/parity/OBS-0060-hades-unconfigured-startup.json",
+          "docs/parity/observations/OBS-0060-hades-unconfigured-startup-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "justfile",
+          "scripts/verify.sh",
+          "scripts/probe_tui_lifecycle.py",
+          "scripts/differential_replay.py",
+          "scripts/replay_local_provider.py",
+          "scripts/replay_model_picker.py",
+          "scripts/replay_setup_wizard.py",
+          "scripts/replay_setup_terminal_backend.py",
+          "scripts/replay_setup_provider_model_prompt.py",
+          "scripts/replay_setup_provider_menu.py",
+          "scripts/replay_clipboard_text.py",
+          "scripts/replay_osc52_clipboard.py",
+          ".hades/runtime/had064-unconfigured-startup-replay.json",
+          ".hades/runtime/had064-differential-check-2.json",
+          ".hades/runtime/had064-local-provider-check.json",
+          ".hades/runtime/had064-pre-completion-verify-4.log"
         ]
       }
     }

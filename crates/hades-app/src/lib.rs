@@ -10,7 +10,7 @@ use std::{
 use hades_core::{
     CompletionState, Composer, EnterAction, InputEvent, Key, MAX_INPUT_HISTORY, Message,
     ModelPickerAction, ModelPickerStage, Notice, Overlay, ProviderEvent, SessionState,
-    SetupWizardAction, SetupWizardState, TurnState,
+    SetupWizardAction, SetupWizardState, StartupState, TurnState,
 };
 
 #[derive(Clone, Debug)]
@@ -127,7 +127,14 @@ pub struct App {
 
 impl App {
     pub fn new() -> Self {
-        let mut state = SessionState::default();
+        Self::with_startup_state(StartupState::Ready)
+    }
+
+    pub fn with_startup_state(startup: StartupState) -> Self {
+        let mut state = SessionState { startup, ..SessionState::default() };
+        if startup == StartupState::Unconfigured {
+            state.status = "starting agent".to_owned();
+        }
         state.messages.push(Message::system(
             "Hades Agent bootstrap shell. Reference-backed behavior is not implemented yet.",
         ));
@@ -135,8 +142,12 @@ impl App {
     }
 
     pub fn with_history_path(path: impl Into<PathBuf>) -> Self {
+        Self::with_history_path_and_startup(path, StartupState::Ready)
+    }
+
+    pub fn with_history_path_and_startup(path: impl Into<PathBuf>, startup: StartupState) -> Self {
         let history_store = HistoryStore::open(path.into());
-        let mut app = Self::new();
+        let mut app = Self::with_startup_state(startup);
         app.state.composer = Composer::with_history(history_store.entries.clone());
         app.history_store = Some(history_store);
         app
@@ -217,6 +228,14 @@ impl App {
     }
 
     fn handle_key(&mut self, key: Key) -> DispatchOutcome {
+        if self.state.startup == StartupState::Unconfigured {
+            return match key {
+                Key::Ctrl('c') | Key::Ctrl('q') => self.quit(),
+                Key::Char('q') => self.quit(),
+                _ => DispatchOutcome::Continue,
+            };
+        }
+
         if let Some(overlay) = self.state.overlay {
             return match overlay {
                 Overlay::Sessions => match key {
@@ -378,6 +397,10 @@ impl App {
     }
 
     fn submit_content(&mut self, content: String) -> DispatchOutcome {
+        if self.state.startup == StartupState::Unconfigured {
+            return DispatchOutcome::Continue;
+        }
+
         if content.is_empty() {
             self.state.status = "Nothing to submit.".to_owned();
             return DispatchOutcome::Continue;
@@ -449,7 +472,10 @@ impl App {
     }
 
     fn handle_paste(&mut self, text: String) -> DispatchOutcome {
-        if self.state.turn != TurnState::Ready || self.state.overlay.is_some() {
+        if self.state.startup == StartupState::Unconfigured
+            || self.state.turn != TurnState::Ready
+            || self.state.overlay.is_some()
+        {
             return DispatchOutcome::Continue;
         }
 
@@ -583,7 +609,7 @@ mod tests {
     };
 
     use super::*;
-    use hades_core::{InputEvent, Key, Surface};
+    use hades_core::{InputEvent, Key, StartupState, Surface};
 
     fn test_history_path(label: &str) -> PathBuf {
         let stamp = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
@@ -609,6 +635,21 @@ mod tests {
         assert_eq!(app.state().turn, TurnState::Busy);
         assert_eq!(app.state().status, "Busy; response adapter not connected.");
         assert_eq!(app.state().messages.last().unwrap().content, "hello");
+    }
+
+    #[test]
+    fn unconfigured_startup_blocks_input_and_exits_cleanly() {
+        let mut app = App::with_startup_state(StartupState::Unconfigured);
+
+        assert_eq!(app.state().startup, StartupState::Unconfigured);
+        assert_eq!(app.state().status, "starting agent");
+        assert_eq!(app.handle(InputEvent::Key(Key::Char('h'))), DispatchOutcome::Continue);
+        assert_eq!(app.handle(InputEvent::Key(Key::Enter)), DispatchOutcome::Continue);
+        assert_eq!(app.handle(InputEvent::Paste("ignored".to_owned())), DispatchOutcome::Continue);
+        assert_eq!(app.state().composer.text(), "");
+        assert!(app.state().messages.iter().all(|message| message.role != hades_core::Role::User));
+        assert_eq!(app.handle(InputEvent::Key(Key::Char('q'))), DispatchOutcome::Quit);
+        assert!(app.state().should_quit);
     }
 
     #[test]

@@ -38,6 +38,7 @@ DEFAULT_BINARY = ROOT / "target/debug/hades"
 DEFAULT_REPORT = ROOT / ".hades/runtime/differential-replay.json"
 SNAPSHOT_COLUMNS = 120
 SNAPSHOT_ROWS = 40
+CONFIGURED_LOOPBACK_ENV = {"HADES_PROVIDER_BASE_URL": "http://127.0.0.1:8765/v1"}
 
 
 class ReplayFailure(RuntimeError):
@@ -275,6 +276,73 @@ def run_behavior(
                 {"terminal_flags": startup_flags, "output_tail": output_tail(output)},
             )
 
+        unconfigured = contains_marker(clean_output(bytes(output)), "starting agent")
+        if not unconfigured:
+            try:
+                wait_for(
+                    pid,
+                    master,
+                    output,
+                    "unconfigured startup boundary",
+                    lambda text: contains_marker(text, "starting agent"),
+                    min(timeout, 1.0),
+                )
+                unconfigured = True
+            except ProbeError:
+                pass
+
+        if unconfigured:
+            send(master, b"hello\r\x03")
+            status = wait_for_exit(pid, master, output, timeout)
+            reaped = True
+            exit_status = describe_status(status)
+            if exit_status != {"kind": "exit", "code": 0}:
+                raise ReplayFailure(
+                    "behavior",
+                    "unconfigured-exit",
+                    f"unexpected exit status: {exit_status}",
+                    {"exit": exit_status, "output_tail": output_tail(output)},
+                )
+            raw_output = bytes(output)
+            if b"\x1b[?1049h" not in raw_output or b"\x1b[?1049l" not in raw_output:
+                raise ReplayFailure(
+                    "behavior",
+                    "unconfigured-cleanup",
+                    "unconfigured startup did not enter and leave the alternate screen",
+                    {"output_tail": output_tail(output)},
+                )
+            cleanup_flags = terminal_flags(slave_path)
+            if not cleanup_flags["canonical"] or not cleanup_flags["echo"]:
+                raise ReplayFailure(
+                    "behavior",
+                    "unconfigured-cleanup",
+                    f"terminal was not restored: {cleanup_flags}",
+                    {"terminal_flags": cleanup_flags, "output_tail": output_tail(output)},
+                )
+            return {
+                "name": "behavior_replay_unconfigured",
+                "status": "passed",
+                "trace_observation": trace.get("observation_id"),
+                "mode": "unconfigured-startup",
+                "startup": {
+                    "dimensions": {"columns": SNAPSHOT_COLUMNS, "rows": SNAPSHOT_ROWS},
+                    "markers": list(startup_markers),
+                    "raw_mode": startup_flags,
+                    "status": "starting agent",
+                },
+                "interaction": {
+                    "input": "hello + Enter ignored before Ctrl+C",
+                    "provider_started": False,
+                },
+                "exit": exit_status,
+                "cleanup": {
+                    "alternate_screen_entered": True,
+                    "alternate_screen_left": True,
+                    "cursor_restore_observed": b"\x1b[?25h" in raw_output,
+                    "terminal_flags": cleanup_flags,
+                },
+            }
+
         for step in trace["steps"]:
             step_id = step["id"]
             input_value = step["input"]
@@ -454,7 +522,9 @@ def run_behavior(
 def run_session_overlay(
     binary: Path, trace: dict[str, Any], contract: dict[str, Any], timeout: float
 ) -> dict[str, Any]:
-    pid, master, slave_path, history_home = spawn(binary, SNAPSHOT_COLUMNS, SNAPSHOT_ROWS)
+    pid, master, slave_path, history_home = spawn(
+        binary, SNAPSHOT_COLUMNS, SNAPSHOT_ROWS, CONFIGURED_LOOPBACK_ENV
+    )
     output = bytearray()
     reaped = False
     replayed_steps: list[dict[str, Any]] = []
@@ -630,7 +700,9 @@ def run_session_overlay(
 def run_setup_required(
     binary: Path, trace: dict[str, Any], contract: dict[str, Any], timeout: float
 ) -> dict[str, Any]:
-    pid, master, slave_path, history_home = spawn(binary, SNAPSHOT_COLUMNS, SNAPSHOT_ROWS)
+    pid, master, slave_path, history_home = spawn(
+        binary, SNAPSHOT_COLUMNS, SNAPSHOT_ROWS, CONFIGURED_LOOPBACK_ENV
+    )
     output = bytearray()
     reaped = False
     replayed_steps: list[dict[str, Any]] = []

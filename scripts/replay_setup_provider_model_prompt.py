@@ -81,7 +81,14 @@ def run_case(binary: Path, case: dict[str, Any], timeout: float, ordinal: int) -
     case_id = case["id"]
     session = f"had048-model-prompt-{ordinal}-{int(time.time() * 1000)}"
     history_home = Path(tempfile.mkdtemp(prefix="had048-model-prompt-history-"))
-    start_session(binary, session, {"HERMES_HOME": str(history_home)})
+    start_session(
+        binary,
+        session,
+        {
+            "HERMES_HOME": str(history_home),
+            "HADES_PROVIDER_BASE_URL": "http://127.0.0.1:8765/v1",
+        },
+    )
     replayed_steps: list[dict[str, Any]] = []
     try:
         startup_markers = ("Hermes Agent", "Nous Research", "Available Tools", "Available Skills")

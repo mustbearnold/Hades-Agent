@@ -169,6 +169,10 @@ replay-history:
     cargo build --locked --package hades-cli
     python3 scripts/replay_history.py --binary target/debug/hades --report .hades/runtime/history-replay.json
 
+replay-unconfigured-startup:
+    cargo build --locked --package hades-cli
+    python3 scripts/replay_unconfigured_startup.py --binary target/debug/hades --report .hades/runtime/had064-unconfigured-startup-replay.json
+
 replay-local-provider:
     cargo build --locked --package hades-cli
     python3 scripts/replay_local_provider.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0051-hades-local-provider-stream.json --report .hades/runtime/local-provider-replay.json
@@ -216,6 +220,7 @@ validate-reference:
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0057-hades-setup-platform-picker.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0058-hermes-empty-platform-confirmation.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0059-hermes-unconfigured-startup.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0060-hades-unconfigured-startup.json
 
 agent command *args:
     python3 scripts/agent/control_plane.py {{command}} {{args}}

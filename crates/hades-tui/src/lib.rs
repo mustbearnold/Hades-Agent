@@ -6,7 +6,8 @@ use hades_core::{
     SETUP_PLATFORM_PICKER_CONTROLS, SETUP_PLATFORM_PICKER_TITLE, SETUP_PLATFORM_ROWS,
     SETUP_PROVIDER_ACTIVE_PROVIDER, SETUP_PROVIDER_CURRENT_MODEL, SETUP_PROVIDER_MENU_ROWS,
     SETUP_PROVIDER_MODEL_NAME, SETUP_TERMINAL_BACKEND_CONTROLS, SETUP_TERMINAL_BACKEND_ROWS,
-    SETUP_TERMINAL_BACKEND_TITLE, SETUP_WIZARD_CHOICES, SetupWizardSurface, TurnState,
+    SETUP_TERMINAL_BACKEND_TITLE, SETUP_WIZARD_CHOICES, SetupWizardSurface, StartupState,
+    TurnState,
 };
 use ratatui::{
     Frame, Terminal,
@@ -24,6 +25,8 @@ const HERMES_BUSY_FOOTER: &str = " ─ musing… │ mulling… │ mock model �
 const HERMES_INTERRUPT_PROMPT: &str = " ❯ Ctrl+C to interrupt…";
 const HERMES_INTERRUPTED_MARKER: &str = " │ interrupted";
 const HERMES_INTERRUPTED_FOOTER: &str = " ─ ready │ mock model │ ✓ <seconds>s │ voice off │ 1 session                                      ─ <reference-cwd> (main)";
+const HERMES_UNCONFIGURED_MODEL: &str = " │ glm-5.2 · Nous Research          31 tools · 66 skills · /help for commands                                   │";
+const HERMES_UNCONFIGURED_FOOTER: &str = " ─ starting agent… │ glm5.2 │ 0s │ voice off │ 1 session                                      ─ <reference-cwd> (main)";
 const HERMES_CLIPBOARD_MISS: &str = "No image found in clipboard";
 const HERMES_COMPOSER_MAX_CHARS: usize = 117;
 
@@ -73,7 +76,11 @@ pub fn draw(frame: &mut Frame<'_>, app: &App) {
 fn draw_hermes_startup(frame: &mut Frame<'_>, app: &App) {
     let mut rows: Vec<String> = HERMES_STARTUP_FRAME.lines().map(str::to_owned).collect();
 
-    if app.state().turn == TurnState::Busy {
+    if app.state().startup == StartupState::Unconfigured {
+        rows[26] = HERMES_UNCONFIGURED_MODEL.to_owned();
+        rows[38] = HERMES_UNCONFIGURED_FOOTER.to_owned();
+        rows[39].clear();
+    } else if app.state().turn == TurnState::Busy {
         rows[38] = HERMES_BUSY_FOOTER.to_owned();
         rows[39] = HERMES_INTERRUPT_PROMPT.to_owned();
     } else if !app.state().composer.text().is_empty() {
@@ -716,6 +723,17 @@ mod tests {
             normalize_cells(&rendered, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT),
             normalize_cells(golden, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT)
         );
+    }
+
+    #[test]
+    fn hermes_startup_surface_renders_the_unconfigured_boundary() {
+        let app = App::with_startup_state(StartupState::Unconfigured);
+        let rendered = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+
+        assert!(rendered.contains("glm-5.2 · Nous Research"));
+        assert!(rendered.contains("starting agent…"));
+        assert!(!rendered.contains("─ ready │"));
+        assert!(!rendered.contains("<prompt-placeholder>"));
     }
 
     #[test]

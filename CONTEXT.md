@@ -288,8 +288,14 @@ progress from August 1, 2026 through 2027.
   startup shell displays `glm-5.2 · Nous Research` but remains on `starting
   agent` without a ready footer during the bounded eight-second window. No
   config file is created, normalized runtime artifact classes are recorded,
-  Ctrl+C cleanup is clean, and a fresh process repeats the same boundary.
-  Hades unconfigured-startup behavior remains unimplemented.
+  Ctrl+C cleanup is clean, and a fresh process repeats the same boundary. HAD-
+  064 implements this captured boundary in Hades.
+- HAD-064 carries that bounded boundary into the real Hades CLI: no provider
+  endpoint selects a typed unconfigured startup state, blocks prompt/provider
+  input, renders `glm-5.2 · Nous Research` with `starting agent…` and no ready
+  prompt, and exits/restores the terminal cleanly on Ctrl+C. Both `hades` and
+  `hades tui` direct-PTY replays pass; provider setup, persistence, credentials,
+  and eventual startup resolution remain unimplemented.
 
 ## Unknown until observed
 

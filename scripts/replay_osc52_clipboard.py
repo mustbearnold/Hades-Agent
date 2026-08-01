@@ -313,6 +313,7 @@ def spawn(
                 "TERM": "xterm-256color",
                 "HERMES_HOME": str(home),
                 "HOME": str(home),
+                "HADES_PROVIDER_BASE_URL": "http://127.0.0.1:8765/v1",
                 "PATH": f"{provider_dir}{os.pathsep}{environment.get('PATH', '')}",
                 "HADES_CLIPBOARD_PAYLOAD": str(payload_path),
                 "HADES_CLIPBOARD_LOG": str(log_path),

@@ -24,7 +24,7 @@ use crossterm::{
     },
 };
 use hades_app::{App, DispatchOutcome};
-use hades_core::{InputEvent, Key, PRODUCT_NAME, ProviderEvent, Role, TurnState};
+use hades_core::{InputEvent, Key, PRODUCT_NAME, ProviderEvent, Role, StartupState, TurnState};
 use hades_provider::{
     CancellationToken, ChatMessage, ChatRequest, LocalOpenAiTransport, StreamEvent, TransportError,
 };
@@ -157,7 +157,19 @@ fn event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> Result<(
 }
 
 fn configured_app() -> App {
-    history_path().map_or_else(App::new, App::with_history_path)
+    let startup =
+        startup_state_from_provider_endpoint(env::var(PROVIDER_BASE_URL_ENV).ok().as_deref());
+    history_path().map_or_else(
+        || App::with_startup_state(startup),
+        |path| App::with_history_path_and_startup(path, startup),
+    )
+}
+
+fn startup_state_from_provider_endpoint(endpoint: Option<&str>) -> StartupState {
+    endpoint
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+        .map_or(StartupState::Unconfigured, |_| StartupState::Ready)
 }
 
 fn history_path() -> Option<PathBuf> {
@@ -514,6 +526,16 @@ mod tests {
         assert_eq!(config.base_url, "http://127.0.0.1:8765/v1");
         assert_eq!(config.model, DEFAULT_PROVIDER_MODEL);
         assert_eq!(config.api_key.as_deref(), Some("synthetic-key"));
+    }
+
+    #[test]
+    fn startup_state_is_unconfigured_without_a_provider_endpoint() {
+        assert_eq!(startup_state_from_provider_endpoint(None), StartupState::Unconfigured);
+        assert_eq!(startup_state_from_provider_endpoint(Some("  ")), StartupState::Unconfigured);
+        assert_eq!(
+            startup_state_from_provider_endpoint(Some("http://127.0.0.1:8765/v1")),
+            StartupState::Ready
+        );
     }
 
     #[test]

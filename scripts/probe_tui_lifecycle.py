@@ -124,7 +124,12 @@ def send(master: int, payload: bytes) -> None:
         view = view[written:]
 
 
-def spawn(binary: Path, columns: int, rows: int) -> tuple[int, int, str, Path]:
+def spawn(
+    binary: Path,
+    columns: int,
+    rows: int,
+    extra_environment: dict[str, str] | None = None,
+) -> tuple[int, int, str, Path]:
     history_home = Path(tempfile.mkdtemp(prefix="hades-pty-history-"))
     pid, master = pty.fork()
     if pid == 0:
@@ -134,6 +139,8 @@ def spawn(binary: Path, columns: int, rows: int) -> tuple[int, int, str, Path]:
             os.environ["COLUMNS"] = str(columns)
             os.environ["LINES"] = str(rows)
             os.environ["HERMES_HOME"] = str(history_home)
+            if extra_environment:
+                os.environ.update(extra_environment)
             os.execv(str(binary), [str(binary)])
         except BaseException as error:
             os.write(2, f"probe child failed to start: {error}\n".encode())
@@ -196,6 +203,7 @@ def run_case(
         startup_flags = terminal_flags(slave_path)
         if startup_flags["canonical"] or startup_flags["echo"]:
             raise ProbeError(f"{name}: startup did not enter raw mode: {startup_flags}")
+        unconfigured = marker_present(clean_output(bytes(output)), "starting agent")
 
         resized = False
         if resize_before_exit:
@@ -225,28 +233,29 @@ def run_case(
         submitted = False
         if submit_before_exit:
             send(master, b"hello")
-            wait_for(
-                pid,
-                master,
-                output,
-                f"{name}: text input",
-                lambda text: "Editing input." in text,
-                timeout,
-            )
-            send(master, b"\r")
-            wait_for(
-                pid,
-                master,
-                output,
-                f"{name}: submit",
-                lambda text: marker_present(text, "response adapter not connected.")
-                or "HADES_PROVIDER_BASE_URL" in text,
-                timeout,
-            )
-            submitted = True
+            if not unconfigured:
+                wait_for(
+                    pid,
+                    master,
+                    output,
+                    f"{name}: text input",
+                    lambda text: "Editing input." in text,
+                    timeout,
+                )
+                send(master, b"\r")
+                wait_for(
+                    pid,
+                    master,
+                    output,
+                    f"{name}: submit",
+                    lambda text: marker_present(text, "response adapter not connected.")
+                    or "HADES_PROVIDER_BASE_URL" in text,
+                    timeout,
+                )
+                submitted = True
 
         if submit_before_exit:
-            missing_provider = marker_present(
+            missing_provider = unconfigured or marker_present(
                 clean_output(bytes(output)), "Provider error: HADES_PROVIDER_BASE_URL is not set"
             ) or "HADES_PROVIDER_BASE_URL" in clean_output(bytes(output))
             send(master, exit_key)
@@ -298,6 +307,7 @@ def run_case(
             "interaction": {
                 "resized": resized,
                 "submitted": submitted,
+                "unconfigured": unconfigured,
                 "exit_input": exit_input,
             },
             "exit": exit_status,

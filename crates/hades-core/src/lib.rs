@@ -57,6 +57,13 @@ pub enum TurnState {
     Busy,
 }
 
+#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub enum StartupState {
+    #[default]
+    Ready,
+    Unconfigured,
+}
+
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum Overlay {
     Sessions,
@@ -616,6 +623,7 @@ impl Composer {
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct SessionState {
     pub surface: Surface,
+    pub startup: StartupState,
     pub turn: TurnState,
     pub overlay: Option<Overlay>,
     pub model_picker: Option<ModelPickerState>,
@@ -632,6 +640,7 @@ impl Default for SessionState {
     fn default() -> Self {
         Self {
             surface: Surface::Home,
+            startup: StartupState::Ready,
             turn: TurnState::Ready,
             overlay: None,
             model_picker: None,
