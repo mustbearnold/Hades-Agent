@@ -213,7 +213,7 @@
     {
       "surface": "clipboard success",
       "status": "unknown",
-      "reason": "Only the empty-clipboard miss path was available in the isolated environment."
+      "reason": "The original isolated environment only exposed the empty-clipboard miss path; successful text clipboard behavior is captured separately in OBS-0022, while image/path paste remains unknown."
     }
   ],
   "unknowns": [
@@ -222,7 +222,7 @@
     "Modified Left/Right, Meta word movement, Ctrl+W, Ctrl+U, Delete, and queue-edit precedence.",
     "Native Shift+Enter and Alt+Enter sequences in terminal emulators that support modified-key reporting; the pinned direct-PTY capture is in OBS-0020, while broader terminal support remains unknown.",
     "Ctrl+G behavior with interactive or unavailable editors; deterministic modified, empty, cancelled, and multiline editor outcomes are captured in OBS-0018.",
-    "Successful text, image, and path paste behavior; mouse selection, scrolling, and click semantics.",
+    "Successful image and path paste behavior; successful text clipboard behavior is captured in OBS-0022. Mouse selection, scrolling, and click semantics remain unknown.",
     "Completion ordering, debounce races, path completion, skill-only inline completion, and completion behavior while busy or multiline."
   ]
 }

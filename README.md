@@ -38,6 +38,7 @@ and the newest-1,000 load cap.
 `just validate-reference` also checks the deterministic Hermes editor-outcome
 fixture covering modified, multiline, empty, and cancelled editor handoffs,
 plus the direct-PTY modified-Enter reference and Hades implementation fixtures.
+It also validates the synthetic-provider successful text clipboard fixture.
 The current work queue is in
 `.hades/tasks.json`; use `just agent next` to select the next evidence-backed
 task.

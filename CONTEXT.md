@@ -82,6 +82,11 @@ progress from August 1, 2026 through 2027.
   ordinary Enter still submits, and a direct-PTY replay proves both paths.
   xterm modifyOtherKeys, Ctrl+Enter, and universal terminal support remain
   unimplemented.
+- HAD-022 captures Hermes successful Ctrl+V text clipboard behavior through a
+  synthetic xclip provider: raw 0x16 invokes `xclip -selection clipboard -out`,
+  preserves internal newlines and meaningful spaces, removes trailing newlines,
+  and leaves the draft ready without submission. Image fallback and Hades
+  successful clipboard behavior remain unimplemented.
 
 ## Unknown until observed
 

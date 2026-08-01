@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T05:02:24Z",
+  "updated_at": "2026-08-01T05:11:15Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -997,6 +997,55 @@
           "tests/fixtures/parity/OBS-0021-hades-modified-enter.json",
           "docs/parity/observations/OBS-0021-hades-modified-enter-2026-08-01.md",
           "scripts/replay_modified_enter.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-022",
+      "title": "Capture Hermes successful text clipboard parity",
+      "status": "complete",
+      "priority": 61,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-021"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "reference_observation",
+        "provenance_record",
+        "fixture_validator"
+      ],
+      "acceptance": [
+        "Use the pinned Hermes reference in a direct 120x40 PTY with a synthetic clipboard provider, not the host clipboard, to capture Ctrl+V successful plain-text behavior and an empty-provider control.",
+        "Record exact input bytes, provider path/order, inserted text including trailing-newline handling, composer state, and whether the draft submits or stays ready.",
+        "Add a sanitized provenance observation and machine-validated fixture, update the existing clipboard unknowns and parity matrix, and wire the fixture into the reference verification gate.",
+        "Keep this task research-only: do not implement successful clipboard reads or image/path attachment behavior until the reference contract is stable and reviewable."
+      ],
+      "evidence": [
+        "tests/fixtures/parity/OBS-0022-hermes-text-clipboard.json",
+        "docs/parity/observations/OBS-0022-hermes-text-clipboard-2026-08-01.md",
+        "scripts/probe_hermes_text_clipboard.py",
+        "scripts/validate_reference_fixture.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "ready_at": "2026-08-01T05:07:00Z",
+      "attempts": 1,
+      "claimed_by": "hermes-research",
+      "claimed_at": "2026-08-01T05:03:56Z",
+      "result": {
+        "summary": "Captured Hermes successful text clipboard parity with a synthetic xclip provider in a direct 120x40 PTY: raw Ctrl+V invokes xclip with -selection clipboard -out, inserts text at the cursor, preserves internal newlines and meaningful spaces, strips trailing newlines, and remains ready without submission. An empty-provider control leaves the draft unchanged; the later image-gateway fallback is explicitly environment-sensitive because no gateway response was attached.",
+        "completed_at": "2026-08-01T05:11:15Z",
+        "evidence": [
+          "tests/fixtures/parity/OBS-0022-hermes-text-clipboard.json",
+          "docs/parity/observations/OBS-0022-hermes-text-clipboard-2026-08-01.md",
+          "scripts/probe_hermes_text_clipboard.py",
+          "scripts/validate_reference_fixture.py",
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md"

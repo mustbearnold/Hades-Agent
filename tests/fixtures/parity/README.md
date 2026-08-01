@@ -38,3 +38,6 @@ does not imply Hades implementation parity or universal terminal support.
 OBS-0021 is the Hades implementation contract derived from OBS-0020. It is
 consumed by the direct-PTY `scripts/replay_modified_enter.py` oracle and only
 claims crossterm-decoded Shift/Alt Enter events.
+OBS-0022 captures the reference-only successful text clipboard path with a
+synthetic xclip provider, including provider arguments, newline trimming, and
+the empty-provider control. It does not imply Hades clipboard parity.
