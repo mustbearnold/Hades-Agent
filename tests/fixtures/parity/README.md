@@ -59,3 +59,7 @@ explicit unknowns.
 OBS-0027 is the Hades implementation contract derived from OBS-0026 and is
 consumed by the dedicated direct-PTY response-boundary replay; it proves the
 same five controls fall back to native xclip without submission.
+OBS-0028 captures Hermes ST-terminated OSC52 response handling in a direct PTY;
+it proves a usable ST response wins before native xclip while empty and
+invalid-base64 ST responses fall back. It is research-only and does not claim
+Hades implementation parity.

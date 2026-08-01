@@ -59,6 +59,9 @@ replay-osc52-response-boundaries:
     cargo build --locked --package hades-cli
     python3 scripts/replay_osc52_clipboard.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0027-hades-osc52-response-boundaries.json --report .hades/runtime/osc52-response-boundaries-replay.json
 
+probe-osc52-st-termination:
+    python3 scripts/probe_hermes_osc52_st_termination.py --report .hades/runtime/hermes-osc52-st-termination-probe.json
+
 replay-history:
     cargo build --locked --package hades-cli
     python3 scripts/replay_history.py --binary target/debug/hades --report .hades/runtime/history-replay.json
@@ -74,6 +77,7 @@ validate-reference:
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0024-hermes-osc52-clipboard.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0025-hades-osc52-clipboard.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0026-hermes-osc52-response-boundaries.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0028-hermes-osc52-st-termination.json
 
 agent command *args:
     python3 scripts/agent/control_plane.py {{command}} {{args}}

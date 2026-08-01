@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T07:01:34Z",
+  "updated_at": "2026-08-01T07:09:27Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -1305,6 +1305,57 @@
           "tests/fixtures/parity/OBS-0027-hades-osc52-response-boundaries.json",
           "docs/parity/observations/OBS-0027-hades-osc52-response-boundaries-2026-08-01.md",
           "scripts/replay_osc52_clipboard.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-028",
+      "title": "Capture Hermes ST-terminated OSC52 response parity",
+      "status": "complete",
+      "priority": 55,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-027"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "reference_observation",
+        "provenance_record",
+        "fixture_validator",
+        "direct_pty_probe"
+      ],
+      "acceptance": [
+        "Observe the pinned Hermes reference at its recorded source revision in a direct 120x40 PTY with the same sanitized synthetic xclip provider and SSH_TTY marker used by OBS-0024 and OBS-0026.",
+        "Capture exact query, DA1 barrier, and ST-terminated OSC52 response bytes for a valid text payload, an empty payload, and an invalid-base64 payload; record whether each response wins, falls back to native xclip, or remains unresolved.",
+        "Record exact provider arguments and order, decoded payload/newline behavior, draft preservation, ready/busy/submission markers, cleanup, timeout, and any terminal bytes observed for every case.",
+        "Add sanitized OBS-0028 fixture, provenance observation, and deterministic probe; validate the fixture and wire its research probe through just verify without modifying Hades runtime behavior.",
+        "Keep delayed or oversized responses, multiplexers/TMUX/STY wrapping, image/path payloads, gateway behavior, and concurrent input explicitly unknown unless directly exercised by this task."
+      ],
+      "evidence": [
+        "tests/fixtures/parity/OBS-0028-hermes-osc52-st-termination.json",
+        "docs/parity/observations/OBS-0028-hermes-osc52-st-termination-2026-08-01.md",
+        "scripts/probe_hermes_osc52_st_termination.py",
+        "scripts/validate_reference_fixture.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "ready_at": "2026-08-01T07:02:57Z",
+      "attempts": 1,
+      "claimed_by": "hermes-research",
+      "claimed_at": "2026-08-01T07:03:22Z",
+      "result": {
+        "summary": "captured-hermes-st-terminated-osc52-acceptance-and-fallback-boundaries-with-direct-pty-evidence-and-full-verify",
+        "completed_at": "2026-08-01T07:09:27Z",
+        "evidence": [
+          "tests/fixtures/parity/OBS-0028-hermes-osc52-st-termination.json",
+          "docs/parity/observations/OBS-0028-hermes-osc52-st-termination-2026-08-01.md",
+          "scripts/probe_hermes_osc52_st_termination.py",
+          "scripts/validate_reference_fixture.py",
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md"

@@ -94,8 +94,10 @@ progress from August 1, 2026 through 2027.
   invalid-base64, invalid-target, and unterminated OSC52 responses falling back
   to native xclip while remaining ready. HAD-027 verifies the same response
   boundaries in Hades through a dedicated direct-PTY replay; delayed/oversized
-  responses, tmux/STY wrapping, image attachments, and gateway behavior remain
-  unknown.
+  responses, ST-terminated responses in Hades, tmux/STY wrapping, image
+  attachments, and gateway behavior remain unknown. HAD-028 observes Hermes'
+  ST-terminated behavior: usable text wins before native xclip, while empty and
+  invalid-base64 responses fall back; Hades parity is not yet claimed.
 
 ## Unknown until observed
 
