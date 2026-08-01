@@ -87,3 +87,9 @@ SGR sequences and a sanitized 120x40 cell model. It is research-only,
 consumed by `scripts/probe_hermes_terminal_palette.py` and the fixture
 validator; themes, terminals, animation frames, successful responses, and
 Hades styling parity remain outside the claim.
+OBS-0035 is the Hades implementation contract derived from OBS-0034. It is
+consumed by `scripts/replay_terminal_palette.py` and verifies the named
+indexed/truecolor landmark styles, Ratatui's grouped SGR forms, forced color
+output under an inherited `NO_COLOR` environment, and clean interruption/setup
+cleanup in fresh direct PTYs. It does not claim complete theme or redraw-stream
+identity.

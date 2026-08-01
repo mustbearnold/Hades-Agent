@@ -16,6 +16,7 @@ use std::{
 use crossterm::{
     event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers},
     execute,
+    style::force_color_output,
     terminal::{
         EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode, size,
     },
@@ -45,6 +46,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 }
 
 fn run_tui() -> Result<(), Box<dyn Error>> {
+    // Hermes keeps its palette active even when the parent process exports NO_COLOR.
+    force_color_output(true);
     enable_raw_mode()?;
     let mut stdout = io::stdout();
     execute!(stdout, EnterAlternateScreen)?;

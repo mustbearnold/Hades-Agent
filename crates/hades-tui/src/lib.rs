@@ -21,6 +21,33 @@ const HERMES_INTERRUPTED_FOOTER: &str = " ─ ready │ mock model │ ✓ <seco
 const HERMES_CLIPBOARD_MISS: &str = "No image found in clipboard";
 const HERMES_COMPOSER_MAX_CHARS: usize = 117;
 
+#[derive(Clone, Copy, Debug, Default)]
+struct HermesPalette;
+
+const HERMES_PALETTE: HermesPalette = HermesPalette;
+
+impl HermesPalette {
+    fn brand(self) -> Style {
+        Style::default().fg(Color::Indexed(220)).add_modifier(Modifier::BOLD)
+    }
+
+    fn secondary(self) -> Style {
+        Style::default().fg(Color::Indexed(178))
+    }
+
+    fn ready(self) -> Style {
+        Style::default().fg(Color::Indexed(72))
+    }
+
+    fn composer(self) -> Style {
+        Style::default().fg(Color::Indexed(230))
+    }
+
+    fn busy_interrupt(self) -> Style {
+        Style::default().fg(Color::Rgb(255, 255, 255)).bg(Color::Rgb(184, 134, 11))
+    }
+}
+
 pub fn draw(frame: &mut Frame<'_>, app: &App) {
     if frame.area().width == HERMES_STARTUP_WIDTH && frame.area().height == HERMES_STARTUP_HEIGHT {
         draw_hermes_startup(frame, app);
@@ -36,31 +63,32 @@ pub fn draw(frame: &mut Frame<'_>, app: &App) {
 }
 
 fn draw_hermes_startup(frame: &mut Frame<'_>, app: &App) {
-    let mut rows: Vec<Line<'static>> =
-        HERMES_STARTUP_FRAME.lines().map(|line| Line::raw(line.to_owned())).collect();
+    let mut rows: Vec<String> = HERMES_STARTUP_FRAME.lines().map(str::to_owned).collect();
 
     if app.state().turn == TurnState::Busy {
-        rows[38] = Line::raw(HERMES_BUSY_FOOTER);
-        rows[39] = Line::raw(HERMES_INTERRUPT_PROMPT);
+        rows[38] = HERMES_BUSY_FOOTER.to_owned();
+        rows[39] = HERMES_INTERRUPT_PROMPT.to_owned();
     } else if !app.state().composer.text().is_empty() {
         draw_hermes_composer(&mut rows, app.state().composer.text());
     } else if app.state().status == "Interrupted." {
-        rows[37] = Line::raw(HERMES_INTERRUPTED_MARKER);
-        rows[38] = Line::raw(HERMES_INTERRUPTED_FOOTER);
-        rows[39] = Line::raw(" ❯ <prompt-placeholder>");
+        rows[37] = HERMES_INTERRUPTED_MARKER.to_owned();
+        rows[38] = HERMES_INTERRUPTED_FOOTER.to_owned();
+        rows[39] = " ❯ <prompt-placeholder>".to_owned();
     }
 
     if app.state().completion.is_visible() {
         draw_hermes_completion(&mut rows, app.state().completion.items());
     }
     if app.state().status == HERMES_CLIPBOARD_MISS {
-        rows[37] = Line::raw(format!(" │ {HERMES_CLIPBOARD_MISS}"));
+        rows[37] = format!(" │ {HERMES_CLIPBOARD_MISS}");
     }
 
-    frame.render_widget(Paragraph::new(Text::from(rows)), frame.area());
+    let styled_rows =
+        rows.iter().enumerate().map(|(row, line)| style_hermes_line(row, line)).collect::<Vec<_>>();
+    frame.render_widget(Paragraph::new(Text::from(styled_rows)), frame.area());
 }
 
-fn draw_hermes_composer(rows: &mut [Line<'static>], input: &str) {
+fn draw_hermes_composer(rows: &mut [String], input: &str) {
     let lines: Vec<&str> = input.split('\n').collect();
     let start = 39usize.saturating_sub(lines.len().saturating_sub(1));
     if start >= rows.len() {
@@ -70,11 +98,11 @@ fn draw_hermes_composer(rows: &mut [Line<'static>], input: &str) {
     for (offset, line) in lines.iter().enumerate() {
         let row = start + offset;
         if row < rows.len() {
-            rows[row] = Line::raw(format!(
+            rows[row] = format!(
                 " {}{}",
                 if offset == 0 { "❯ " } else { "  " },
                 bounded_composer_line(line),
-            ));
+            );
         }
     }
 }
@@ -87,10 +115,10 @@ fn bounded_composer_line(line: &str) -> String {
     line.chars().rev().take(HERMES_COMPOSER_MAX_CHARS).collect::<String>().chars().rev().collect()
 }
 
-fn draw_hermes_completion(rows: &mut [Line<'static>], items: &[String]) {
+fn draw_hermes_completion(rows: &mut [String], items: &[String]) {
     let header_row = 33usize;
     if header_row < rows.len() {
-        rows[header_row] = Line::raw("  completions");
+        rows[header_row] = "  completions".to_owned();
     }
 
     for (index, item) in items.iter().enumerate() {
@@ -100,8 +128,62 @@ fn draw_hermes_completion(rows: &mut [Line<'static>], items: &[String]) {
         }
 
         let marker = if index == 0 { "▸ " } else { "  " };
-        rows[row] = Line::raw(format!(" {}{}", marker, item));
+        rows[row] = format!(" {}{}", marker, item);
     }
+}
+
+fn style_hermes_line(row: usize, line: &str) -> Line<'static> {
+    let mut markers = Vec::new();
+    match row {
+        7 => markers.push(("Nous Research", HERMES_PALETTE.secondary())),
+        11 => markers.push(("Hermes Agent", HERMES_PALETTE.brand())),
+        14 => markers.push(("Available Tools", HERMES_PALETTE.brand())),
+        25 => markers.push(("Available Skills", HERMES_PALETTE.brand())),
+        38 => {
+            markers.push(("ready", HERMES_PALETTE.ready()));
+            markers.push(("✓", HERMES_PALETTE.secondary()));
+        }
+        39 if line.contains("Ctrl+C to interrupt") => {
+            markers.push(("Ctrl+C to interrupt", HERMES_PALETTE.busy_interrupt()));
+        }
+        39 if line.contains("❯ ") => {
+            return Line::styled(line.to_owned(), HERMES_PALETTE.composer());
+        }
+        _ => {}
+    }
+
+    styled_markers(line, &markers)
+}
+
+fn styled_markers(line: &str, markers: &[(&str, Style)]) -> Line<'static> {
+    let mut matches = markers
+        .iter()
+        .filter_map(|(marker, style)| {
+            line.find(marker).map(|start| (start, start + marker.len(), *style))
+        })
+        .collect::<Vec<_>>();
+    matches.sort_by_key(|(start, _, _)| *start);
+
+    if matches.is_empty() {
+        return Line::raw(line.to_owned());
+    }
+
+    let mut spans = Vec::new();
+    let mut cursor = 0;
+    for (start, end, style) in matches {
+        if start < cursor {
+            continue;
+        }
+        if start > cursor {
+            spans.push(Span::raw(line[cursor..start].to_owned()));
+        }
+        spans.push(Span::styled(line[start..end].to_owned(), style));
+        cursor = end;
+    }
+    if cursor < line.len() {
+        spans.push(Span::raw(line[cursor..].to_owned()));
+    }
+    Line::from(spans)
 }
 
 fn draw_sessions_overlay(frame: &mut Frame<'_>) {
@@ -125,17 +207,24 @@ fn draw_sessions_overlay(frame: &mut Frame<'_>) {
 fn draw_setup_required_overlay(frame: &mut Frame<'_>, app: &App) {
     let area = centered_rect(frame.area(), 84, 14);
     let content = Text::from(vec![
-        Line::raw(" Hermes needs a model provider before the TUI can start a session."),
+        Line::styled(
+            " Hermes needs a model provider before the TUI can start a session.",
+            HERMES_PALETTE.secondary(),
+        ),
         Line::raw(""),
-        Line::raw(" /model"),
-        Line::raw(" /setup"),
+        Line::styled(" /model", HERMES_PALETTE.secondary()),
+        Line::styled(" /setup", HERMES_PALETTE.secondary()),
         Line::raw(""),
-        Line::raw(" Ctrl+C"),
+        Line::styled(" Ctrl+C", HERMES_PALETTE.secondary()),
         Line::raw(""),
-        Line::raw(format!(" ❯ {}", app.state().composer.text())),
+        Line::styled(format!(" ❯ {}", app.state().composer.text()), HERMES_PALETTE.composer()),
     ]);
-    let panel = Paragraph::new(content)
-        .block(Block::default().borders(Borders::ALL).title(" Setup Required "));
+    let panel = Paragraph::new(content).style(HERMES_PALETTE.secondary()).block(
+        Block::default()
+            .borders(Borders::ALL)
+            .title_style(HERMES_PALETTE.brand())
+            .title(" Setup Required "),
+    );
     frame.render_widget(Clear, area);
     frame.render_widget(panel, area);
 }
@@ -261,6 +350,18 @@ pub fn normalize_cells(frame: &str, width: u16, height: u16) -> String {
 mod tests {
     use super::*;
 
+    fn hermes_cell_style(app: &App, column: u16, row: u16) -> (Color, Color, Modifier) {
+        let backend = TestBackend::new(HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let mut terminal = Terminal::new(backend).expect("TestBackend construction is infallible");
+        terminal.draw(|frame| draw(frame, app)).expect("rendering is infallible");
+        let cell = terminal
+            .backend()
+            .buffer()
+            .cell((column, row))
+            .expect("landmark cell is inside the startup surface");
+        (cell.fg, cell.bg, cell.modifier)
+    }
+
     #[test]
     fn bootstrap_snapshot_has_stable_landmarks() {
         let rendered = snapshot(&App::new(), 80, 24);
@@ -299,6 +400,40 @@ mod tests {
         let interrupted = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
         assert!(interrupted.contains("interrupted"));
         assert!(interrupted.contains("✓ <seconds>s"));
+    }
+
+    #[test]
+    fn hermes_startup_surface_uses_the_observed_palette_landmarks() {
+        let app = App::new();
+        let (brand_fg, brand_bg, brand_modifier) = hermes_cell_style(&app, 59, 11);
+        assert_eq!(brand_fg, Color::Indexed(220));
+        assert_eq!(brand_bg, Color::Reset);
+        assert!(brand_modifier.contains(Modifier::BOLD));
+
+        let (secondary_fg, _, _) = hermes_cell_style(&app, 3, 7);
+        assert_eq!(secondary_fg, Color::Indexed(178));
+
+        let (ready_fg, _, _) = hermes_cell_style(&app, 3, 38);
+        assert_eq!(ready_fg, Color::Indexed(72));
+
+        let mut composer = App::new();
+        composer.handle(hades_core::InputEvent::Key(hades_core::Key::Char('x')));
+        let (composer_fg, _, _) = hermes_cell_style(&composer, 3, 39);
+        assert_eq!(composer_fg, Color::Indexed(230));
+
+        composer.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
+        let (busy_fg, busy_bg, _) = hermes_cell_style(&composer, 3, 39);
+        assert_eq!(busy_fg, Color::Rgb(255, 255, 255));
+        assert_eq!(busy_bg, Color::Rgb(184, 134, 11));
+
+        composer.handle(hades_core::InputEvent::Key(hades_core::Key::Ctrl('c')));
+        let completion_column = HERMES_INTERRUPTED_FOOTER
+            .chars()
+            .position(|character| character == '✓')
+            .expect("interrupted footer has a completion marker")
+            as u16;
+        let (completion_fg, _, _) = hermes_cell_style(&composer, completion_column, 38);
+        assert_eq!(completion_fg, Color::Indexed(178));
     }
 
     #[test]

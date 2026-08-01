@@ -52,7 +52,9 @@ diagnostics without turning transport jitter into a product contract.
 `just probe-terminal-palette` captures the pinned Hermes SGR palette and
 terminal-cell styles for deterministic startup, ready, busy, interrupted, and
 setup-required surfaces; animated faces and unobserved response states remain
-explicit unknowns.
+explicit unknowns. `just replay-terminal-palette` verifies the corresponding
+Hades palette implementation through fresh direct PTYs, including grouped SGR
+forms and color output when `NO_COLOR` is inherited.
 `just replay-osc52-timing-limits` replays those four bounded controls against
 Hades and checks the exact query/DA1 bytes, provider order, payload markers,
 readiness, non-submission, and cleanup.
@@ -95,6 +97,7 @@ just probe-osc52-st-termination # Hermes ST-terminated OSC52 reference probe
 just probe-osc52-multiplexer # Hermes TMUX/STY OSC52 wrapper reference probe
 just probe-osc52-timing-limits # Hermes OSC52 timing and bounded-size reference probe
 just probe-terminal-palette    # Hermes SGR palette and cell-style reference probe
+just replay-terminal-palette   # Hades SGR palette and cell-style parity replay
 just replay-osc52-timing-limits # Hades OSC52 timing and bounded-size parity replay
 just replay-osc52-st-termination # Hades ST-terminated OSC52 parity replay
 just replay-osc52-multiplexer # Hades TMUX/STY OSC52 wrapper parity replay

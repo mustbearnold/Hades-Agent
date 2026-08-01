@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T08:29:54Z",
+  "updated_at": "2026-08-01T08:52:05Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -1665,6 +1665,59 @@
           "tests/fixtures/parity/OBS-0034-hermes-terminal-palette.json",
           "docs/parity/observations/OBS-0034-hermes-terminal-palette-2026-08-01.md",
           "scripts/probe_hermes_terminal_palette.py",
+          "scripts/validate_reference_fixture.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-035",
+      "title": "Implement the observed Hermes terminal palette in Hades",
+      "status": "complete",
+      "priority": 48,
+      "lane": "parity",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-034"
+      ],
+      "risk": "high",
+      "oracle": [
+        "direct_pty_replay",
+        "focused_unit_test",
+        "fixture_validator",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Introduce a typed Hades palette seam using the exact OBS-0034 indexed and truecolor styles rather than terminal-default approximations.",
+        "Apply the observed styles to the 120x40 Hermes startup landmarks, ready composer, busy interrupt affordance, interrupted completion marker, and setup-required overlay without changing their existing text or geometry contracts.",
+        "Add a fresh direct-PTY Hades replay and sanitized implementation fixture that assert representative raw SGR forms and modeled landmark cell styles for the OBS-0034 controls, plus cleanup and no-submission behavior.",
+        "Keep animated face frames, successful model responses, alternate themes or terminals, cursor placement, hyperlinks, and unobserved surfaces outside the claim; wire the fixture and replay through just verify."
+      ],
+      "evidence": [
+        "crates/hades-tui/src/lib.rs",
+        "crates/hades-cli/src/main.rs",
+        "scripts/replay_terminal_palette.py",
+        "tests/fixtures/parity/OBS-0035-hades-terminal-palette.json",
+        "docs/parity/observations/OBS-0035-hades-terminal-palette-2026-08-01.md",
+        "scripts/validate_reference_fixture.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "claimed_by": "hades-implementer",
+      "claimed_at": "2026-08-01T08:35:03Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Implemented the OBS-0034 Hermes palette subset in a typed Hades renderer seam, forced live Crossterm color output to match Hermes under inherited NO_COLOR, added the sanitized OBS-0035 fixture and direct-PTY replay, and passed the complete just verify gate.",
+        "completed_at": "2026-08-01T08:52:05Z",
+        "evidence": [
+          "crates/hades-tui/src/lib.rs",
+          "crates/hades-cli/src/main.rs",
+          "scripts/replay_terminal_palette.py",
+          "tests/fixtures/parity/OBS-0035-hades-terminal-palette.json",
+          "docs/parity/observations/OBS-0035-hades-terminal-palette-2026-08-01.md",
           "scripts/validate_reference_fixture.py",
           "justfile",
           "scripts/verify.sh",

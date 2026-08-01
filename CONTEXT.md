@@ -124,12 +124,19 @@ progress from August 1, 2026 through 2027.
   setup-required surfaces. It records indexed and truecolor forms while
   keeping animated face timing, successful responses, alternate themes and
   terminals, and Hades implementation styling parity as unknowns.
+- HAD-035 implements the observed deterministic palette subset at the typed
+  Ratatui renderer seam and verifies it in fresh 120x40 Hades PTYs. The replay
+  proves the indexed/truecolor landmark cell styles, Ratatui's grouped SGR
+  forms, color output even when `NO_COLOR=1` is inherited, and clean busy/setup
+  cleanup. Complete theme coverage, redraw-stream identity, animation,
+  successful responses, alternate themes and terminals remain unknown.
 
 ## Unknown until observed
 
 - Hermes TUI typography, the unobserved keymap/focus surfaces, copy, error
   states, timing, history write failures/clearing, and the remaining
-  interaction surfaces. Hades styling parity remains unimplemented.
+  interaction surfaces. Hades styling parity remains limited to the named
+  deterministic palette subset.
 - Which Hermes behaviors are stable contracts versus implementation details;
   session recovery remains unobserved beyond input-history persistence.
 - Successful provider/model streaming, tool calls, and the exact behavior of

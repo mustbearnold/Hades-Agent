@@ -1,0 +1,300 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0035",
+  "reference_observation": "OBS-0034",
+  "surface": "hades-tui-terminal-palette",
+  "reference": {
+    "product": "Hades Agent",
+    "version": "workspace",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "direct PTY with raw bytes"
+    },
+    "capture": "Hades direct PTY replay derived from OBS-0034 with terminal-cell style assertions"
+  },
+  "normalization": [
+    "The Hades binary path, synthetic HOME, HERMES_HOME, PTY paths, session IDs, timestamps, elapsed durations, and rotating prompt text are represented by placeholders or omitted.",
+    "The replay uses TERM=xterm-256color and a 120x40 PTY. It compares only the named landmark cell styles and required SGR forms; cursor placement, wide-cell behavior, and the complete redraw stream are outside this implementation contract.",
+    "The ready case uses an intentionally absent model boundary. The busy turn is interrupted before any response, and the setup-required case starts with no provider state.",
+    "Required SGR sequences are subset checks because Ratatui may group adjacent spans or emit equivalent reset sequences in a different order."
+  ],
+  "steps": [
+    {
+      "id": "startup",
+      "precondition": "Fresh Hades process in a 120x40 direct PTY.",
+      "input_sequence": [
+        {
+          "kind": "wait",
+          "value": "Hades startup reaches the ready surface"
+        }
+      ],
+      "output": {
+        "status": "ready",
+        "landmark_styles": {
+          "Hermes Agent": {
+            "style": {
+              "fg": "indexed(220)",
+              "bg": "default",
+              "bold": true,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          },
+          "Nous Research": {
+            "style": {
+              "fg": "indexed(178)",
+              "bg": "default",
+              "bold": false,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          },
+          "Available Tools": {
+            "style": {
+              "fg": "indexed(220)",
+              "bg": "default",
+              "bold": true,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          },
+          "Available Skills": {
+            "style": {
+              "fg": "indexed(220)",
+              "bg": "default",
+              "bold": true,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          },
+          "ready": {
+            "style": {
+              "fg": "indexed(72)",
+              "bg": "default",
+              "bold": false,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          }
+        },
+        "required_sgr_sequences_hex": [
+          "1b 5b 33 38 3b 35 3b 32 32 30 3b 34 39 6d",
+          "1b 5b 33 38 3b 35 3b 31 37 38 3b 34 39 6d",
+          "1b 5b 33 38 3b 35 3b 37 32 3b 34 39 6d",
+          "1b 5b 31 6d"
+        ]
+      }
+    },
+    {
+      "id": "composer",
+      "precondition": "The ready surface is visible.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "palette-ready",
+          "bytes_hex": "70 61 6c 65 74 74 65 2d 72 65 61 64 79"
+        }
+      ],
+      "output": {
+        "status": "ready",
+        "landmark_styles": {
+          "palette-ready": {
+            "style": {
+              "fg": "indexed(230)",
+              "bg": "default",
+              "bold": false,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          }
+        },
+        "required_sgr_sequences_hex": [
+          "1b 5b 33 38 3b 35 3b 32 33 30 3b 34 39 6d"
+        ]
+      }
+    },
+    {
+      "id": "busy",
+      "precondition": "The composer contains palette-ready and remains unsubmitted.",
+      "input_sequence": [
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        }
+      ],
+      "output": {
+        "status": "busy",
+        "landmark_styles": {
+          "Ctrl+C to interrupt": {
+            "style": {
+              "fg": "rgb(255,255,255)",
+              "bg": "rgb(184,134,11)",
+              "bold": false,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          }
+        },
+        "required_sgr_sequences_hex": [
+          "1b 5b 33 38 3b 32 3b 32 35 35 3b 32 35 35 3b 32 35 35 3b 34 38 3b 32 3b 31 38 34 3b 31 33 34 3b 31 31 6d"
+        ],
+        "submission": "not asserted beyond the busy state and later interrupt cleanup"
+      }
+    },
+    {
+      "id": "interrupted",
+      "precondition": "The busy interrupt affordance is visible.",
+      "input_sequence": [
+        {
+          "kind": "key",
+          "value": "Ctrl+C",
+          "bytes_hex": "03"
+        }
+      ],
+      "output": {
+        "status": "ready after interruption",
+        "landmark_styles": {
+          "interrupted": {
+            "style": {
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          },
+          "✓": {
+            "style": {
+              "fg": "indexed(178)",
+              "bg": "default",
+              "bold": false,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          }
+        },
+        "required_sgr_sequences_hex": [
+          "1b 5b 33 38 3b 35 3b 31 37 38 3b 34 39 6d"
+        ]
+      }
+    },
+    {
+      "id": "setup-required",
+      "precondition": "Fresh Hades process with no configured provider.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "/help",
+          "bytes_hex": "2f 68 65 6c 70 0d"
+        }
+      ],
+      "output": {
+        "status": "setup required",
+        "landmark_styles": {
+          "Setup Required": {
+            "style": {
+              "fg": "indexed(220)",
+              "bg": "default",
+              "bold": true,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          },
+          "model provider": {
+            "style": {
+              "fg": "indexed(178)",
+              "bg": "default",
+              "bold": false,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          },
+          "/model": {
+            "style": {
+              "fg": "indexed(178)",
+              "bg": "default",
+              "bold": false,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          },
+          "/setup": {
+            "style": {
+              "fg": "indexed(178)",
+              "bg": "default",
+              "bold": false,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          },
+          "/help": {
+            "style": {
+              "fg": "indexed(230)",
+              "bg": "default",
+              "bold": false,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          }
+        },
+        "required_sgr_sequences_hex": [
+          "1b 5b 33 38 3b 35 3b 32 32 30 3b 34 39 6d",
+          "1b 5b 33 38 3b 35 3b 31 37 38 3b 34 39 6d",
+          "1b 5b 33 38 3b 35 3b 32 33 30 3b 34 39 6d",
+          "1b 5b 31 6d"
+        ],
+        "cleanup": "two Ctrl+C presses exit cleanly"
+      }
+    }
+  ],
+  "unknowns": [
+    "This implementation claim covers only the named OBS-0034 landmark styles under TERM=xterm-256color, the dark reference surface, and a 120x40 PTY.",
+    "Animated musing faces, successful model streaming, partial tokens, tool calls, tool results, provider errors, retries, alternate themes and terminals, cursor placement, hyperlinks, and wide-cell behavior remain unimplemented or unknown.",
+    "The replay checks representative SGR forms and modeled cells; it does not claim byte-for-byte redraw-stream identity or a complete Hermes theme implementation."
+  ]
+}
