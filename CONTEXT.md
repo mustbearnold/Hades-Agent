@@ -378,6 +378,14 @@ progress from August 1, 2026 through 2027.
   with status 130. Normalized config shape is unchanged by platform
   cancellation, and platform selection, platform-specific setup, and later
   tool configuration remain unimplemented.
+- HAD-079 carries that boundary into Hades. Accepting the highlighted local
+  backend renders the unconfigured platform picker without selecting a
+  platform or starting provider behavior. The first platform Ctrl+C leaves the
+  alternate screen, restores canonical input and echo, and prints the bounded
+  No platforms selected and Hermes Tool Configuration landmarks while keeping
+  setup alive; the second Ctrl+C exits with status 130. Platform selection,
+  platform-specific setup, tool enablement, credentials, OAuth, networking, and
+  successful save behavior remain unimplemented.
 
 ## Unknown until observed
 

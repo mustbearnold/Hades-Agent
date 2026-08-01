@@ -96,6 +96,7 @@ just replay-cli-launch        # no-argument and explicit-tui PTY launch replay
 just replay-unconfigured-help # delayed /help setup-required PTY replay
 just replay-standalone-setup  # standalone hades setup PTY replay
 just replay-standalone-full-setup # standalone Full setup continuation replay
+just replay-standalone-terminal-platform # standalone platform cancellation replay
 just install-user             # build and install hades/Hades on user PATH
 just snapshot                 # deterministic terminal snapshot
 just probe-lifecycle          # PTY lifecycle and cleanup oracle
@@ -154,9 +155,10 @@ opens Setup Required with `/model`, `/setup`, and Ctrl+C.
 `just replay-unconfigured-help` proves that transition against both launch
 forms, and `just verify` also refreshes and replays the installed `hades` and
 `Hades` launchers. Use `hades setup` for the separate first-run entry; its
-current bounded slice reaches the observed Full setup continuation and
-non-secret baseline config marker, then stops at the terminal-backend fallback.
-Provider credentials, OAuth, backend selection, and later setup remain outside
-the clone contract. Configure the loopback endpoint before expecting a model
-response. No external provider service is required for the deterministic
-bootstrap path.
+current bounded slice reaches the observed Full setup continuation, accepts the
+local terminal backend into the unconfigured platform picker, and carries
+platform cancellation through the plain Hermes Tool Configuration boundary.
+Provider credentials, OAuth, platform selection, backend alternatives, and
+later setup remain outside the clone contract. Configure the loopback endpoint
+before expecting a model response. No external provider service is required
+for the deterministic bootstrap path.

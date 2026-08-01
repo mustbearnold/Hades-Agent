@@ -189,6 +189,10 @@ replay-standalone-full-setup:
     cargo build --locked --package hades-cli
     python3 scripts/replay_standalone_full_setup.py --binary target/debug/hades --report .hades/runtime/hades-standalone-full-setup-replay.json --timeout 5
 
+replay-standalone-terminal-platform:
+    cargo build --locked --package hades-cli
+    python3 scripts/replay_standalone_terminal_platform.py --binary target/debug/hades --report .hades/runtime/hades-standalone-terminal-platform-replay.json --timeout 5
+
 replay-installed-help:
     python3 scripts/replay_unconfigured_help.py --binary "$HOME/.local/bin/hades" --report .hades/runtime/installed-help-setup-required-hades.json --timeout 12
     python3 scripts/replay_unconfigured_help.py --binary "$HOME/.local/bin/Hades" --report .hades/runtime/installed-help-setup-required-Hades.json --timeout 12
@@ -277,6 +281,7 @@ validate-reference:
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0067-hades-help-setup-required.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0068-hermes-setup-required-actions.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0073-hermes-standalone-terminal-platform.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0074-hades-standalone-terminal-platform.json
 
 agent command *args:
     python3 scripts/agent/control_plane.py {{command}} {{args}}

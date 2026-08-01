@@ -186,6 +186,13 @@ pub const SETUP_PLATFORM_ROWS: [&str; 27] = [
 ];
 pub const SETUP_PLATFORM_PICKER_CONTROLS: &str =
     "↑↓ navigate  SPACE toggle  ENTER confirm  ESC cancel";
+pub const SETUP_STANDALONE_NO_PLATFORMS: &str =
+    "No platforms selected. Run 'hermes setup gateway' later to configure.";
+pub const SETUP_STANDALONE_TOOL_CONFIGURATION_TITLE: &str = "⚕ Hermes Tool Configuration";
+pub const SETUP_STANDALONE_TOOL_CONFIGURATION_LINES: [&str; 2] = [
+    "Enable or disable tools per platform.",
+    "Tools that need API keys will be configured when enabled.",
+];
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub enum StandaloneSetupSurface {
@@ -193,6 +200,8 @@ pub enum StandaloneSetupSurface {
     Choices,
     FullSetupContinuation,
     TerminalBackend,
+    PlatformPicker,
+    ToolConfiguration,
     NumberedFallback,
 }
 
@@ -209,6 +218,8 @@ pub enum StandaloneSetupAction {
     Moved,
     EnteredFullSetupContinuation,
     SkippedProvider,
+    EnteredPlatformPicker,
+    EnteredToolConfiguration,
     EnteredFallback,
     Quit,
 }
@@ -263,6 +274,14 @@ impl StandaloneSetupState {
         self.surface == StandaloneSetupSurface::TerminalBackend
     }
 
+    pub fn is_platform_picker(&self) -> bool {
+        self.surface == StandaloneSetupSurface::PlatformPicker
+    }
+
+    pub fn is_tool_configuration(&self) -> bool {
+        self.surface == StandaloneSetupSurface::ToolConfiguration
+    }
+
     pub fn is_numbered_fallback(&self) -> bool {
         self.surface == StandaloneSetupSurface::NumberedFallback
     }
@@ -298,6 +317,12 @@ impl StandaloneSetupState {
                 _ => StandaloneSetupAction::Continue,
             },
             StandaloneSetupSurface::TerminalBackend => match key {
+                Key::Enter | Key::Char(' ')
+                    if self.terminal_backend_cursor + 1 == SETUP_TERMINAL_BACKEND_ROWS.len() =>
+                {
+                    self.surface = StandaloneSetupSurface::PlatformPicker;
+                    StandaloneSetupAction::EnteredPlatformPicker
+                }
                 Key::Down | Key::Char('j') => {
                     self.terminal_backend_cursor = (self.terminal_backend_cursor + 1)
                         .min(SETUP_TERMINAL_BACKEND_ROWS.len() - 1);
@@ -314,6 +339,14 @@ impl StandaloneSetupState {
                 }
                 _ => StandaloneSetupAction::Continue,
             },
+            StandaloneSetupSurface::PlatformPicker => match key {
+                Key::Ctrl('c') => {
+                    self.surface = StandaloneSetupSurface::ToolConfiguration;
+                    StandaloneSetupAction::EnteredToolConfiguration
+                }
+                _ => StandaloneSetupAction::Continue,
+            },
+            StandaloneSetupSurface::ToolConfiguration => StandaloneSetupAction::Continue,
             StandaloneSetupSurface::NumberedFallback => match key {
                 Key::Ctrl('c') => StandaloneSetupAction::Quit,
                 _ => StandaloneSetupAction::Continue,
@@ -1140,10 +1173,41 @@ mod tests {
         assert!(setup.is_terminal_backend());
         assert_eq!(setup.terminal_backend_cursor(), SETUP_TERMINAL_BACKEND_ROWS.len() - 1);
 
-        assert_eq!(setup.handle_key(Key::Ctrl('c')), StandaloneSetupAction::EnteredFallback);
-        assert!(setup.is_numbered_fallback());
-        assert!(setup.terminal_backend_fallback());
-        assert_eq!(setup.handle_key(Key::Ctrl('c')), StandaloneSetupAction::Quit);
+        assert_eq!(setup.handle_key(Key::Enter), StandaloneSetupAction::EnteredPlatformPicker);
+        assert!(setup.is_platform_picker());
+        assert_eq!(
+            setup.handle_key(Key::Ctrl('c')),
+            StandaloneSetupAction::EnteredToolConfiguration
+        );
+        assert!(setup.is_tool_configuration());
+    }
+
+    #[test]
+    fn standalone_setup_non_default_backend_does_not_claim_unobserved_selection() {
+        let mut setup = StandaloneSetupState::default();
+
+        setup.handle_key(Key::Down);
+        setup.handle_key(Key::Enter);
+        setup.handle_key(Key::Ctrl('c'));
+        setup.handle_key(Key::Up);
+
+        assert_eq!(setup.handle_key(Key::Enter), StandaloneSetupAction::Continue);
+        assert!(setup.is_terminal_backend());
+    }
+
+    #[test]
+    fn standalone_setup_platform_picker_cancellation_enters_tool_configuration() {
+        let mut setup = StandaloneSetupState::default();
+
+        setup.handle_key(Key::Down);
+        setup.handle_key(Key::Enter);
+        setup.handle_key(Key::Ctrl('c'));
+        assert_eq!(setup.handle_key(Key::Enter), StandaloneSetupAction::EnteredPlatformPicker);
+        assert_eq!(
+            setup.handle_key(Key::Ctrl('c')),
+            StandaloneSetupAction::EnteredToolConfiguration
+        );
+        assert!(setup.is_tool_configuration());
     }
 
     #[test]

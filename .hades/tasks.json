@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T22:57:53Z",
+  "updated_at": "2026-08-01T23:39:04Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -4149,6 +4149,68 @@
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/hermes-standalone-terminal-platform-probe.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-079",
+      "title": "Implement standalone platform-picker cancellation boundary",
+      "status": "complete",
+      "priority": 10,
+      "lane": "interaction",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-078"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "typed_core_state",
+        "focused_tests",
+        "direct_pty_replay",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Extend standalone `hades setup` only through the observed platform-picker boundary: after provider Ctrl+C, Enter on the default Keep current (local) terminal backend reaches the platform picker without selecting a platform or starting provider behavior.",
+        "Render the observed platform-picker title, controls, and unconfigured platform rows with typed state transitions; keep selection, platform setup, credentials, OAuth, endpoint/model values, network behavior, and successful-save behavior outside the bounded implementation.",
+        "Match the observed cancellation lifecycle: first Ctrl+C at the platform picker leaves the alternate screen, restores canonical input and echo, prints the stable No platforms selected and Hermes Tool Configuration landmarks, and keeps the process alive; second Ctrl+C exits with status 130 and leaves the terminal restored.",
+        "Add focused core/TUI/CLI tests, a sanitized OBS-0074 Hades fixture, a direct-PTY replay asserting the exact safe sequence, terminal flags, alternate-screen lifecycle, status, config shape, and no provider activity, and update parity/context/readme/gates.",
+        "Run the targeted replay and complete no-skip just verify gate before completion; preserve existing standalone Escape, Full setup, numbered fallback, and configured `/setup` behavior."
+      ],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-cli/src/main.rs",
+        "crates/hades-tui/src/lib.rs",
+        "scripts/replay_standalone_terminal_platform.py",
+        "tests/fixtures/parity/OBS-0074-hades-standalone-terminal-platform.json",
+        "docs/parity/observations/OBS-0074-hades-standalone-terminal-platform-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hades-standalone-terminal-platform-replay.json"
+      ],
+      "ready_at": "2026-08-02T00:00:00Z",
+      "attempts": 1,
+      "claimed_by": "standalone-platform-picker",
+      "claimed_at": "2026-08-01T23:20:43Z",
+      "result": {
+        "summary": "Implemented the standalone platform-picker boundary through the observed Tool Configuration cancellation surface, with typed transitions, terminal restoration, status-130 SIGINT cleanup, sanitized OBS-0074 evidence, targeted PTY replay, focused tests, and full no-skip verification.",
+        "completed_at": "2026-08-01T23:39:04Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-cli/src/main.rs",
+          "crates/hades-tui/src/lib.rs",
+          "scripts/replay_standalone_terminal_platform.py",
+          "tests/fixtures/parity/OBS-0074-hades-standalone-terminal-platform.json",
+          "docs/parity/observations/OBS-0074-hades-standalone-terminal-platform-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hades-standalone-terminal-platform-replay.json"
         ]
       }
     }

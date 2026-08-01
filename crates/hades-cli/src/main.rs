@@ -30,8 +30,10 @@ use crossterm::{
 use hades_app::{App, DispatchOutcome};
 use hades_core::{
     InputEvent, Key, PRODUCT_NAME, ProviderEvent, Role, SETUP_STANDALONE_BANNER,
-    SETUP_STANDALONE_PROMPT, SETUP_TERMINAL_BACKEND_ROWS, SETUP_WIZARD_CHOICES,
-    StandaloneSetupAction, StandaloneSetupState, StartupState, TurnState,
+    SETUP_STANDALONE_NO_PLATFORMS, SETUP_STANDALONE_PROMPT,
+    SETUP_STANDALONE_TOOL_CONFIGURATION_LINES, SETUP_STANDALONE_TOOL_CONFIGURATION_TITLE,
+    SETUP_TERMINAL_BACKEND_ROWS, SETUP_WIZARD_CHOICES, StandaloneSetupAction, StandaloneSetupState,
+    StartupState, TurnState,
 };
 use hades_provider::{
     CancellationToken, ChatMessage, ChatRequest, LocalOpenAiTransport, StreamEvent, TransportError,
@@ -72,12 +74,10 @@ fn main() -> Result<(), Box<dyn Error>> {
             Ok(())
         }
         Ok(CliCommand::Tui) => run_tui(),
-        Ok(CliCommand::Setup) => {
-            if matches!(run_setup()?, SetupOutcome::Cancelled) {
-                process::exit(1);
-            }
-            Ok(())
-        }
+        Ok(CliCommand::Setup) => match run_setup()? {
+            SetupOutcome::Cancelled => process::exit(1),
+            SetupOutcome::SignalInterrupt => process::exit(130),
+        },
         Err(argument) => Err(format!("unknown argument: {argument}").into()),
     }
 }
@@ -120,11 +120,13 @@ fn run_tui() -> Result<(), Box<dyn Error>> {
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum SetupOutcome {
     Cancelled,
+    SignalInterrupt,
 }
 
 #[derive(Debug)]
 enum SetupTransition {
     NumberedFallback(StandaloneSetupState),
+    ToolConfiguration,
 }
 
 fn run_setup() -> Result<SetupOutcome, Box<dyn Error>> {
@@ -150,11 +152,20 @@ fn run_setup() -> Result<SetupOutcome, Box<dyn Error>> {
     match transition {
         SetupTransition::NumberedFallback(wizard) => {
             print_setup_fallback(&wizard)?;
-            while !cancelled.load(Ordering::Relaxed) {
-                thread::sleep(Duration::from_millis(25));
-            }
+            wait_for_setup_signal(&cancelled);
             Ok(SetupOutcome::Cancelled)
         }
+        SetupTransition::ToolConfiguration => {
+            print_tool_configuration()?;
+            wait_for_setup_signal(&cancelled);
+            Ok(SetupOutcome::SignalInterrupt)
+        }
+    }
+}
+
+fn wait_for_setup_signal(cancelled: &AtomicBool) {
+    while !cancelled.load(Ordering::Relaxed) {
+        thread::sleep(Duration::from_millis(25));
     }
 }
 
@@ -184,9 +195,13 @@ fn setup_choice_loop(
             StandaloneSetupAction::EnteredFallback => {
                 return Ok(SetupTransition::NumberedFallback(wizard));
             }
+            StandaloneSetupAction::EnteredToolConfiguration => {
+                return Ok(SetupTransition::ToolConfiguration);
+            }
             StandaloneSetupAction::Continue
             | StandaloneSetupAction::Moved
             | StandaloneSetupAction::SkippedProvider
+            | StandaloneSetupAction::EnteredPlatformPicker
             | StandaloneSetupAction::Quit => {}
         }
     }
@@ -212,6 +227,16 @@ fn print_setup_fallback(wizard: &StandaloneSetupState) -> io::Result<()> {
         }
         writeln!(stdout, "    Enter for default (1)  Ctrl+C to exit")?;
         write!(stdout, "  Select [1-3] (1): ")?;
+    }
+    stdout.flush()
+}
+
+fn print_tool_configuration() -> io::Result<()> {
+    let mut stdout = io::stdout();
+    writeln!(stdout, "{SETUP_STANDALONE_NO_PLATFORMS}")?;
+    writeln!(stdout, "{SETUP_STANDALONE_TOOL_CONFIGURATION_TITLE}")?;
+    for line in SETUP_STANDALONE_TOOL_CONFIGURATION_LINES {
+        writeln!(stdout, "{line}")?;
     }
     stdout.flush()
 }

@@ -37,6 +37,7 @@ python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0070-had
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0071-hermes-standalone-full-setup.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0072-hades-standalone-full-setup.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0073-hermes-standalone-terminal-platform.json
+python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0074-hades-standalone-terminal-platform.json
 cargo fmt --all -- --check
 cargo check --workspace --all-targets --locked
 cargo clippy --workspace --all-targets --locked -- -D warnings
@@ -49,12 +50,14 @@ python3 scripts/replay_unconfigured_input.py --binary target/debug/hades --repor
 python3 scripts/replay_unconfigured_help.py --binary target/debug/hades --report .hades/runtime/hades-help-setup-required-replay.json --timeout 12
 python3 scripts/replay_standalone_setup.py --binary target/debug/hades --report .hades/runtime/hades-standalone-setup-replay.json --timeout 5
 python3 scripts/replay_standalone_full_setup.py --binary target/debug/hades --report .hades/runtime/hades-standalone-full-setup-replay.json --timeout 5
+python3 scripts/replay_standalone_terminal_platform.py --binary target/debug/hades --report .hades/runtime/hades-standalone-terminal-platform-replay.json --timeout 5
 cargo build --locked --release --package hades-cli
 bash scripts/install_user_launcher.sh
 python3 scripts/replay_unconfigured_help.py --binary "$HOME/.local/bin/hades" --report .hades/runtime/installed-help-setup-required-hades.json --timeout 12
 python3 scripts/replay_unconfigured_help.py --binary "$HOME/.local/bin/Hades" --report .hades/runtime/installed-help-setup-required-Hades.json --timeout 12
 python3 scripts/replay_standalone_setup.py --binary "$HOME/.local/bin/hades" --report .hades/runtime/installed-standalone-setup-hades.json --timeout 5
 python3 scripts/replay_standalone_full_setup.py --binary "$HOME/.local/bin/hades" --report .hades/runtime/installed-standalone-full-setup-hades.json --timeout 5
+python3 scripts/replay_standalone_terminal_platform.py --binary "$HOME/.local/bin/hades" --report .hades/runtime/installed-standalone-terminal-platform-hades.json --timeout 5
 python3 scripts/differential_replay.py --binary target/debug/hades --report .hades/runtime/differential-replay.json
 python3 scripts/replay_composer.py --binary target/debug/hades --report .hades/runtime/composer-replay.json
 python3 scripts/replay_completion.py --binary target/debug/hades --report .hades/runtime/completion-replay.json
