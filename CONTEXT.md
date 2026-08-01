@@ -187,6 +187,13 @@ progress from August 1, 2026 through 2027.
   bytes, and normalized backup/history/update-check artifact classes. Provider
   selection, credentials, OAuth, model discovery, network behavior, and later
   setup sections remain unknown.
+- HAD-046 implements the bounded Hades Full setup provider menu: selecting the
+  typed Full setup row reaches sanitized Configuration Location and Inference
+  Provider landmarks, preserves the active loopback/model marker while moving
+  to the custom-endpoint row, and exits cleanly without provider submission,
+  credentials, OAuth, persistence, model discovery, or network behavior. The
+  120x40 replay and focused core/app/TUI tests are wired through `just verify`;
+  later provider actions and setup sections remain unknown.
 
 ## Unknown until observed
 

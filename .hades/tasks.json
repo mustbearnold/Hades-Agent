@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T12:11:15Z",
+  "updated_at": "2026-08-01T12:28:25Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -2236,6 +2236,64 @@
           "tests/fixtures/parity/OBS-0044-hermes-full-setup-provider-menu.json",
           "docs/parity/observations/OBS-0044-hermes-full-setup-provider-menu-2026-08-01.md",
           "scripts/probe_hermes_full_setup_provider.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-046",
+      "title": "Implement bounded Full setup provider menu",
+      "status": "complete",
+      "priority": 37,
+      "lane": "behavior",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-042",
+        "HAD-043",
+        "HAD-045"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "typed_core_transition",
+        "focused_renderer_test",
+        "direct_pty_replay",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Extend the typed Hades setup state so selecting Full setup reaches a bounded Configuration Location and Inference Provider surface with stable sanitized labels, without credentials, OAuth, provider discovery, persistence, model requests, or network behavior.",
+        "Render the observed 120x40 provider-menu landmarks: current model, active provider, Select provider, palette-loopback/palette-model, Custom endpoint, and saved custom-provider removal rows; keep dynamic inventory and unobserved provider actions explicitly outside the claim.",
+        "Support only reversible provider-menu navigation and Ctrl+C cleanup; never submit a provider or enter a secret, and preserve the existing initial wizard, Escape fallback, slash completion, model picker, ordinary submission, history, and lifecycle behavior.",
+        "Add focused core/app/TUI tests plus a sanitized OBS-0045 Hades replay derived from OBS-0044, wire it through just verify, run the complete no-skip gate, and document all later setup/provider behavior as unknown."
+      ],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-app/src/lib.rs",
+        "crates/hades-tui/src/lib.rs",
+        "tests/fixtures/parity/OBS-0045-hades-full-setup-provider-menu.json",
+        "docs/parity/observations/OBS-0045-hades-full-setup-provider-menu-2026-08-01.md",
+        "scripts/replay_setup_provider_menu.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md"
+      ],
+      "ready_at": "2026-08-01T12:18:05Z",
+      "attempts": 1,
+      "claimed_by": "hades-setup-provider",
+      "claimed_at": "2026-08-01T12:18:35Z",
+      "result": {
+        "summary": "Implemented the bounded Full setup provider menu with typed reversible navigation, sanitized Configuration Location and Inference Provider rendering, focused core/app/TUI tests, and a 120x40 tmux replay derived from OBS-0044; provider submission, credentials, OAuth, persistence, model discovery, and network behavior remain outside the claim.",
+        "completed_at": "2026-08-01T12:28:25Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-app/src/lib.rs",
+          "crates/hades-tui/src/lib.rs",
+          "tests/fixtures/parity/OBS-0045-hades-full-setup-provider-menu.json",
+          "docs/parity/observations/OBS-0045-hades-full-setup-provider-menu-2026-08-01.md",
+          "scripts/replay_setup_provider_menu.py",
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md",

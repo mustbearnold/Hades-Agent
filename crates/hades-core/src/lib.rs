@@ -98,11 +98,22 @@ pub const SETUP_WIZARD_CHOICES: [&str; 3] = [
     "Blank Slate — everything off except the bare minimum; opt in to each capability",
 ];
 
+pub const SETUP_PROVIDER_CURRENT_MODEL: &str = "palette-model";
+pub const SETUP_PROVIDER_ACTIVE_PROVIDER: &str = "palette-loopback";
+pub const SETUP_PROVIDER_MENU_ROWS: [&str; 5] = [
+    "palette-loopback (loopback) — palette-model  ← currently active",
+    "Custom endpoint (enter URL manually)",
+    "Remove a saved custom provider",
+    "Configure auxiliary models...",
+    "Leave unchanged",
+];
+
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub enum SetupWizardSurface {
     #[default]
     Choices,
     NumberedFallback,
+    FullSetupProviderMenu,
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
@@ -110,6 +121,7 @@ pub enum SetupWizardAction {
     Continue,
     Moved,
     EnteredFallback,
+    EnteredProviderMenu,
     Quit,
 }
 
@@ -118,6 +130,7 @@ pub struct SetupWizardState {
     surface: SetupWizardSurface,
     cursor: usize,
     selected: usize,
+    provider_cursor: usize,
 }
 
 impl SetupWizardState {
@@ -145,9 +158,26 @@ impl SetupWizardState {
         self.surface == SetupWizardSurface::NumberedFallback
     }
 
+    pub fn is_provider_menu(&self) -> bool {
+        self.surface == SetupWizardSurface::FullSetupProviderMenu
+    }
+
+    pub fn provider_cursor(&self) -> usize {
+        self.provider_cursor
+    }
+
+    pub fn provider_cursor_label(&self) -> &'static str {
+        SETUP_PROVIDER_MENU_ROWS[self.provider_cursor]
+    }
+
     pub fn handle_key(&mut self, key: Key) -> SetupWizardAction {
         match self.surface {
             SetupWizardSurface::Choices => match key {
+                Key::Enter | Key::Char(' ') if self.cursor == 1 => {
+                    self.surface = SetupWizardSurface::FullSetupProviderMenu;
+                    self.provider_cursor = 0;
+                    SetupWizardAction::EnteredProviderMenu
+                }
                 Key::Down => {
                     self.cursor = (self.cursor + 1).min(SETUP_WIZARD_CHOICES.len() - 1);
                     SetupWizardAction::Moved
@@ -164,6 +194,19 @@ impl SetupWizardState {
                 _ => SetupWizardAction::Continue,
             },
             SetupWizardSurface::NumberedFallback => match key {
+                Key::Ctrl('c') => SetupWizardAction::Quit,
+                _ => SetupWizardAction::Continue,
+            },
+            SetupWizardSurface::FullSetupProviderMenu => match key {
+                Key::Down => {
+                    self.provider_cursor =
+                        (self.provider_cursor + 1).min(SETUP_PROVIDER_MENU_ROWS.len() - 1);
+                    SetupWizardAction::Moved
+                }
+                Key::Up => {
+                    self.provider_cursor = self.provider_cursor.saturating_sub(1);
+                    SetupWizardAction::Moved
+                }
                 Key::Ctrl('c') => SetupWizardAction::Quit,
                 _ => SetupWizardAction::Continue,
             },
@@ -754,6 +797,24 @@ mod tests {
         assert_eq!(wizard.selected_label(), SETUP_WIZARD_CHOICES[0]);
         assert_eq!(wizard.handle_key(Key::Escape), SetupWizardAction::EnteredFallback);
         assert!(wizard.is_fallback());
+        assert_eq!(wizard.handle_key(Key::Ctrl('c')), SetupWizardAction::Quit);
+    }
+
+    #[test]
+    fn setup_wizard_enters_bounded_full_provider_menu_without_selecting_a_provider() {
+        let mut wizard = SetupWizardState::default();
+
+        assert_eq!(wizard.handle_key(Key::Down), SetupWizardAction::Moved);
+        assert_eq!(wizard.handle_key(Key::Enter), SetupWizardAction::EnteredProviderMenu);
+        assert!(wizard.is_provider_menu());
+        assert_eq!(wizard.provider_cursor(), 0);
+        assert_eq!(wizard.provider_cursor_label(), SETUP_PROVIDER_MENU_ROWS[0]);
+        assert_eq!(wizard.selected_label(), SETUP_WIZARD_CHOICES[0]);
+
+        assert_eq!(wizard.handle_key(Key::Down), SetupWizardAction::Moved);
+        assert_eq!(wizard.provider_cursor(), 1);
+        assert_eq!(wizard.handle_key(Key::Up), SetupWizardAction::Moved);
+        assert_eq!(wizard.provider_cursor(), 0);
         assert_eq!(wizard.handle_key(Key::Ctrl('c')), SetupWizardAction::Quit);
     }
 }
