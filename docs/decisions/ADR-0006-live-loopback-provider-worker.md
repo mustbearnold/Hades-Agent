@@ -29,8 +29,9 @@ replay evidence.
 ## Consequences
 
 `hades tui` is no longer a silent submission shell when a local endpoint is
-configured, and no-endpoint launches fail visibly and cleanly. The current
-transport still buffers the complete HTTP response before returning its parsed
-event vector; true incremental socket cancellation/redraw timing remains a
-separate task. This decision does not add HTTPS, cloud providers, credentials
-discovery, persistence, retries, or tool execution.
+configured, and no-endpoint launches fail visibly and cleanly. The initial
+HAD-055 transport buffered the complete HTTP response before returning its
+parsed event vector; ADR-0007 supersedes that implementation limitation with
+incremental parsing and cooperative socket cancellation. This decision does
+not add HTTPS, cloud providers, credentials discovery, persistence, retries,
+or tool execution.

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T16:00:23Z",
+  "updated_at": "2026-08-01T16:12:44Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -2847,6 +2847,69 @@
           ".hades/runtime/had056-reference-probe.log",
           ".hades/runtime/hermes-stream-timing-probe.json",
           ".hades/runtime/had056-pre-completion-verify.log"
+        ]
+      }
+    },
+    {
+      "id": "HAD-057",
+      "title": "Implement incremental provider streaming and socket cancellation",
+      "status": "complete",
+      "priority": 26,
+      "lane": "product",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-056"
+      ],
+      "risk": "high",
+      "oracle": [
+        "typed_transport_tests",
+        "cancellation_unit_test",
+        "delayed_stream_pty_replay",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Replace the current full-response buffering seam with an incremental loopback SSE reader that emits parsed text deltas as response frames arrive while preserving the existing request shape, URL policy, HTTP validation, malformed-stream errors, DONE requirement, and missing-completion guard.",
+        "Add an explicit cancellation token owned by the CLI provider runtime; Ctrl+C and replacement of an active request must signal cancellation, close or release the transport read promptly, and prevent late worker events from reaching a later turn without logging or exposing API-key material.",
+        "Add focused transport tests for fragmented HTTP/SSE reads, first-delta-before-completion delivery, cancellation during an idle response, and existing malformed/incomplete boundaries; keep the reducer and terminal ownership separated from the provider crate.",
+        "Add a sanitized OBS-0053 Hades direct-PTY replay against a deterministic delayed loopback SSE server proving first-delta visibility before the second release, partial-response preservation on Ctrl+C, no second-delta rendering after cancellation, provider connection closure, ready/interrupted state, and clean terminal restoration; wire it into just verify and document the remaining unknowns.",
+        "Run the complete no-skip just verify gate and record all implementation, replay, fixture, decision, and verification evidence before completion."
+      ],
+      "evidence": [
+        "crates/hades-provider/src/lib.rs",
+        "crates/hades-cli/src/main.rs",
+        "scripts/replay_local_provider_timing.py",
+        "tests/fixtures/parity/OBS-0053-hades-stream-timing.json",
+        "docs/parity/observations/OBS-0053-hades-stream-timing-2026-08-02.md",
+        "docs/decisions/ADR-0007-incremental-provider-cancellation.md",
+        "docs/decisions/ADR-0006-live-loopback-provider-worker.md",
+        "CONTEXT.md",
+        "docs/parity/MATRIX.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/local-provider-timing-replay.json",
+        ".hades/runtime/had057-pre-completion-verify.log"
+      ],
+      "ready_at": "2026-08-01T16:01:47Z",
+      "attempts": 1,
+      "claimed_by": "incremental-provider-stream",
+      "claimed_at": "2026-08-01T16:02:02Z",
+      "result": {
+        "summary": "Replaced the loopback provider full-response buffer with an incremental SSE stream, added a cancellation token owned by the CLI runtime, and proved the direct-PTY delayed-delta/cancellation boundary. Hades now renders the first delta before later response frames, preserves the partial response on Ctrl+C, prevents late deltas, closes the provider socket, restores ready/interrupted state and the terminal, and retains existing request/error guards. Focused Rust tests, OBS-0053 replay, and complete no-skip verification passed.",
+        "completed_at": "2026-08-01T16:12:44Z",
+        "evidence": [
+          "crates/hades-provider/src/lib.rs",
+          "crates/hades-cli/src/main.rs",
+          "scripts/replay_local_provider_timing.py",
+          "tests/fixtures/parity/OBS-0053-hades-stream-timing.json",
+          "docs/parity/observations/OBS-0053-hades-stream-timing-2026-08-02.md",
+          "docs/decisions/ADR-0007-incremental-provider-cancellation.md",
+          "docs/decisions/ADR-0006-live-loopback-provider-worker.md",
+          "CONTEXT.md",
+          "docs/parity/MATRIX.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/local-provider-timing-replay.json",
+          ".hades/runtime/had057-pre-completion-verify.log"
         ]
       }
     }

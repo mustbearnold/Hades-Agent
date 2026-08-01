@@ -248,6 +248,12 @@ progress from August 1, 2026 through 2027.
   delta, shows the interrupted surface, returns to `ready`, and closes the
   provider connection. The measured release gap is fixture-specific; later
   chat requests and the exact socket byte cutoff remain unknown.
+- HAD-057 replaces the buffered Hades loopback response path with an
+  incremental SSE reader and a CLI-owned cancellation token. Focused transport
+  tests and the OBS-0053 direct-PTY replay verify first-delta visibility before
+  the second release, partial-response preservation, no late second-delta
+  rendering after Ctrl+C, provider socket closure, ready/interrupted state,
+  and clean terminal restoration. The provider remains loopback-only.
 
 ## Unknown until observed
 
@@ -258,11 +264,11 @@ progress from August 1, 2026 through 2027.
 - Which Hermes behaviors are stable contracts versus implementation details;
   session recovery remains unobserved beyond input-history persistence.
 - Hades provider/model streaming and tool calls beyond the bounded HAD-053 /
-  HAD-054 / HAD-055 seams; true incremental socket parsing/cancellation,
-  retries, tool execution, non-loopback providers, HTTPS, and provider
-  discovery remain unimplemented. Hermes subsequent chat-request purpose,
-  provider errors, malformed streams, and terminal-dependent surfaces beyond
-  the captured observations remain unknown.
+  HAD-054 / HAD-055 / HAD-057 seams; retries, tool execution, non-loopback
+  providers, HTTPS, and provider discovery remain unimplemented. Hermes
+  subsequent chat-request purpose, provider errors, malformed streams, and
+  terminal-dependent surfaces beyond the captured observations remain
+  unknown.
 - The complete slash-command catalog and argument semantics, provider/model
   discovery details, setup wizard continuation, numbered-fallback choices,
   terminal-backend selection and cancellation after deeper navigation, provider

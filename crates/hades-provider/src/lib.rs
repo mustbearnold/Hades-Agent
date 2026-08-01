@@ -11,7 +11,11 @@ use std::{
     fmt,
     io::{Read, Write},
     net::{SocketAddr, TcpStream},
-    time::Duration,
+    sync::{
+        Arc,
+        atomic::{AtomicBool, Ordering},
+    },
+    time::{Duration, Instant},
 };
 
 use serde::Serialize;
@@ -19,6 +23,8 @@ use serde_json::Value;
 
 pub const DEFAULT_MAX_TOKENS: u32 = 65_536;
 pub const DEFAULT_TIMEOUT: Duration = Duration::from_secs(10);
+const READ_POLL_INTERVAL: Duration = Duration::from_millis(50);
+const MAX_RESPONSE_HEADER_BYTES: usize = 64 * 1024;
 
 #[derive(Clone, Debug, Eq, PartialEq, Serialize)]
 pub struct ChatMessage {
@@ -69,6 +75,31 @@ pub enum StreamEvent {
     Done,
 }
 
+#[derive(Clone, Debug)]
+pub struct CancellationToken {
+    cancelled: Arc<AtomicBool>,
+}
+
+impl CancellationToken {
+    pub fn new() -> Self {
+        Self { cancelled: Arc::new(AtomicBool::new(false)) }
+    }
+
+    pub fn cancel(&self) {
+        self.cancelled.store(true, Ordering::Release);
+    }
+
+    fn is_cancelled(&self) -> bool {
+        self.cancelled.load(Ordering::Acquire)
+    }
+}
+
+impl Default for CancellationToken {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum TransportError {
     UnsupportedScheme(String),
@@ -83,6 +114,7 @@ pub enum TransportError {
     MalformedSse(String),
     MissingDone,
     MissingCompletionData,
+    Cancelled,
 }
 
 impl fmt::Display for TransportError {
@@ -114,6 +146,7 @@ impl fmt::Display for TransportError {
             Self::MissingCompletionData => {
                 formatter.write_str("provider stream contained no assistant text")
             }
+            Self::Cancelled => formatter.write_str("provider stream cancelled"),
         }
     }
 }
@@ -127,6 +160,15 @@ pub struct LocalOpenAiTransport {
     request_path: String,
     api_key: Option<String>,
     timeout: Duration,
+}
+
+pub struct OpenAiStream {
+    stream: TcpStream,
+    buffer: Vec<u8>,
+    data_lines: Vec<String>,
+    saw_text: bool,
+    done: bool,
+    cancellation: CancellationToken,
 }
 
 impl LocalOpenAiTransport {
@@ -154,13 +196,34 @@ impl LocalOpenAiTransport {
     }
 
     pub fn stream_chat(&self, request: &ChatRequest) -> Result<Vec<StreamEvent>, TransportError> {
+        let cancellation = CancellationToken::new();
+        let mut stream = self.open_stream(request, &cancellation)?;
+        let mut events = Vec::new();
+        while let Some(event) = stream.next_event()? {
+            let is_done = event == StreamEvent::Done;
+            events.push(event);
+            if is_done {
+                break;
+            }
+        }
+        Ok(events)
+    }
+
+    pub fn open_stream(
+        &self,
+        request: &ChatRequest,
+        cancellation: &CancellationToken,
+    ) -> Result<OpenAiStream, TransportError> {
+        if cancellation.is_cancelled() {
+            return Err(TransportError::Cancelled);
+        }
         let body = WireRequest::from(request);
         let body = serde_json::to_vec(&body)
             .map_err(|error| TransportError::Serialization(error.to_string()))?;
         let mut stream = TcpStream::connect_timeout(&self.address, self.timeout)
             .map_err(|error| TransportError::Io(error.to_string()))?;
         stream
-            .set_read_timeout(Some(self.timeout))
+            .set_read_timeout(Some(READ_POLL_INTERVAL))
             .map_err(|error| TransportError::Io(error.to_string()))?;
         stream
             .set_write_timeout(Some(self.timeout))
@@ -181,9 +244,93 @@ impl LocalOpenAiTransport {
             .and_then(|_| stream.write_all(&body))
             .map_err(|error| TransportError::Io(error.to_string()))?;
 
-        let mut response = Vec::new();
-        stream.read_to_end(&mut response).map_err(|error| TransportError::Io(error.to_string()))?;
-        parse_http_sse(&response)
+        let header_bytes = read_http_headers(&mut stream, cancellation, self.timeout)?;
+        let header = parse_http_header(&header_bytes)?;
+        if header.status != 200 {
+            let body = read_to_end_with_cancellation(&mut stream, cancellation)?;
+            return Err(TransportError::HttpStatus {
+                status: header.status,
+                body: String::from_utf8_lossy(&body).trim().to_owned(),
+            });
+        }
+        if !header.content_type.is_some_and(|value| value.starts_with("text/event-stream")) {
+            return Err(TransportError::InvalidResponse("expected text/event-stream".to_owned()));
+        }
+        Ok(OpenAiStream {
+            stream,
+            buffer: Vec::new(),
+            data_lines: Vec::new(),
+            saw_text: false,
+            done: false,
+            cancellation: cancellation.clone(),
+        })
+    }
+}
+
+impl OpenAiStream {
+    pub fn next_event(&mut self) -> Result<Option<StreamEvent>, TransportError> {
+        if self.done {
+            return Ok(None);
+        }
+
+        loop {
+            if self.cancellation.is_cancelled() {
+                return Err(TransportError::Cancelled);
+            }
+            if let Some(newline) = self.buffer.iter().position(|byte| *byte == b'\n') {
+                let line = self.buffer.drain(..=newline).collect::<Vec<_>>();
+                let line = line.strip_suffix(b"\n").unwrap_or(&line);
+                let line = line.strip_suffix(b"\r").unwrap_or(line);
+                if line.is_empty() {
+                    if self.data_lines.is_empty() {
+                        continue;
+                    }
+                    let data = self.data_lines.join("\n");
+                    self.data_lines.clear();
+                    let event = parse_sse_data(&data)?;
+                    if let Some(event) = event {
+                        if event == StreamEvent::Done {
+                            if !self.saw_text {
+                                return Err(TransportError::MissingCompletionData);
+                            }
+                            self.done = true;
+                        } else if matches!(event, StreamEvent::TextDelta(_)) {
+                            self.saw_text = true;
+                        }
+                        return Ok(Some(event));
+                    }
+                    continue;
+                }
+                if line.starts_with(b":") || line.starts_with(b"event:") || line.starts_with(b"id:")
+                {
+                    continue;
+                }
+                if let Some(data) = line.strip_prefix(b"data:") {
+                    let data = data.strip_prefix(b" ").unwrap_or(data);
+                    let data = std::str::from_utf8(data)
+                        .map_err(|error| TransportError::MalformedSse(error.to_string()))?;
+                    self.data_lines.push(data.to_owned());
+                    continue;
+                }
+                let line = String::from_utf8_lossy(line);
+                return Err(TransportError::MalformedSse(format!("unexpected line: {line}")));
+            }
+
+            let mut chunk = [0_u8; 8192];
+            match self.stream.read(&mut chunk) {
+                Ok(0) => return Err(TransportError::MissingDone),
+                Ok(read) => self.buffer.extend_from_slice(&chunk[..read]),
+                Err(error)
+                    if matches!(
+                        error.kind(),
+                        std::io::ErrorKind::TimedOut | std::io::ErrorKind::WouldBlock
+                    ) =>
+                {
+                    continue;
+                }
+                Err(error) => return Err(TransportError::Io(error.to_string())),
+            }
+        }
     }
 }
 
@@ -221,6 +368,11 @@ struct ParsedBaseUrl {
     request_path: String,
 }
 
+struct HttpHeader {
+    status: u16,
+    content_type: Option<String>,
+}
+
 fn parse_base_url(base_url: &str) -> Result<ParsedBaseUrl, TransportError> {
     let Some(rest) = base_url.strip_prefix("http://") else {
         let scheme = base_url.split_once("://").map_or("unknown", |(scheme, _)| scheme);
@@ -255,12 +407,49 @@ fn parse_base_url(base_url: &str) -> Result<ParsedBaseUrl, TransportError> {
     Ok(ParsedBaseUrl { address, host_header, request_path })
 }
 
-fn parse_http_sse(response: &[u8]) -> Result<Vec<StreamEvent>, TransportError> {
-    let separator =
-        response.windows(4).position(|window| window == b"\r\n\r\n").ok_or_else(|| {
-            TransportError::InvalidResponse("missing HTTP header boundary".to_owned())
-        })?;
-    let (header_bytes, body) = response.split_at(separator + 4);
+fn read_http_headers(
+    stream: &mut TcpStream,
+    cancellation: &CancellationToken,
+    timeout: Duration,
+) -> Result<Vec<u8>, TransportError> {
+    let deadline = Instant::now() + timeout;
+    let mut response = Vec::new();
+    let mut chunk = [0_u8; 8192];
+    loop {
+        if cancellation.is_cancelled() {
+            return Err(TransportError::Cancelled);
+        }
+        if response.windows(4).any(|window| window == b"\r\n\r\n") {
+            return Ok(response);
+        }
+        if response.len() >= MAX_RESPONSE_HEADER_BYTES {
+            return Err(TransportError::InvalidResponse("HTTP headers are too large".to_owned()));
+        }
+        match stream.read(&mut chunk) {
+            Ok(0) => {
+                return Err(TransportError::InvalidResponse(
+                    "missing HTTP header boundary".to_owned(),
+                ));
+            }
+            Ok(read) => response.extend_from_slice(&chunk[..read]),
+            Err(error)
+                if matches!(
+                    error.kind(),
+                    std::io::ErrorKind::TimedOut | std::io::ErrorKind::WouldBlock
+                ) =>
+            {
+                if Instant::now() >= deadline {
+                    return Err(TransportError::Io(
+                        "provider response headers timed out".to_owned(),
+                    ));
+                }
+            }
+            Err(error) => return Err(TransportError::Io(error.to_string())),
+        }
+    }
+}
+
+fn parse_http_header(header_bytes: &[u8]) -> Result<HttpHeader, TransportError> {
     let header = std::str::from_utf8(header_bytes)
         .map_err(|error| TransportError::InvalidResponse(error.to_string()))?;
     let mut status_parts = header.lines().next().unwrap_or_default().split_whitespace();
@@ -270,22 +459,40 @@ fn parse_http_sse(response: &[u8]) -> Result<Vec<StreamEvent>, TransportError> {
         .ok_or_else(|| TransportError::InvalidResponse("missing HTTP status".to_owned()))?
         .parse::<u16>()
         .map_err(|_| TransportError::InvalidResponse("invalid HTTP status".to_owned()))?;
-    if status != 200 {
-        let body = String::from_utf8_lossy(body).trim().to_owned();
-        return Err(TransportError::HttpStatus { status, body });
-    }
     let content_type = header.lines().find_map(|line| {
         let (name, value) = line.split_once(':')?;
         (name.eq_ignore_ascii_case("content-type")).then_some(value.trim())
     });
-    if !content_type.is_some_and(|value| value.starts_with("text/event-stream")) {
-        return Err(TransportError::InvalidResponse("expected text/event-stream".to_owned()));
-    }
-    parse_sse(std::str::from_utf8(body).map_err(|error| {
-        TransportError::InvalidResponse(format!("response body is not UTF-8: {error}"))
-    })?)
+    Ok(HttpHeader { status, content_type: content_type.map(str::to_owned) })
 }
 
+fn read_to_end_with_cancellation(
+    stream: &mut TcpStream,
+    cancellation: &CancellationToken,
+) -> Result<Vec<u8>, TransportError> {
+    let mut body = Vec::new();
+    let mut chunk = [0_u8; 8192];
+    loop {
+        if cancellation.is_cancelled() {
+            return Err(TransportError::Cancelled);
+        }
+        match stream.read(&mut chunk) {
+            Ok(0) => return Ok(body),
+            Ok(read) => body.extend_from_slice(&chunk[..read]),
+            Err(error)
+                if matches!(
+                    error.kind(),
+                    std::io::ErrorKind::TimedOut | std::io::ErrorKind::WouldBlock
+                ) =>
+            {
+                continue;
+            }
+            Err(error) => return Err(TransportError::Io(error.to_string())),
+        }
+    }
+}
+
+#[cfg(test)]
 fn parse_sse(body: &str) -> Result<Vec<StreamEvent>, TransportError> {
     let mut events = Vec::new();
     let mut data_lines = Vec::new();
@@ -348,11 +555,17 @@ fn parse_sse_event(data_lines: &[&str]) -> Result<Option<StreamEvent>, Transport
     Ok(text.filter(|value| !value.is_empty()).map(|value| StreamEvent::TextDelta(value.to_owned())))
 }
 
+fn parse_sse_data(data: &str) -> Result<Option<StreamEvent>, TransportError> {
+    let lines = data.split('\n').collect::<Vec<_>>();
+    parse_sse_event(&lines)
+}
+
 #[cfg(test)]
 mod tests {
     use std::{
         io::{Read, Write},
         net::TcpListener,
+        sync::mpsc,
         thread,
     };
 
@@ -464,6 +677,120 @@ mod tests {
             LocalOpenAiTransport::new("http://example.com:8765/v1", None),
             Err(TransportError::NonLoopbackHost(host)) if host == "example.com"
         ));
+    }
+
+    #[test]
+    fn incremental_stream_emits_first_delta_before_later_fixture_write() {
+        let listener = TcpListener::bind(("127.0.0.1", 0)).expect("bind loopback fixture");
+        let port = listener.local_addr().unwrap().port();
+        let (release_sender, release_receiver) = mpsc::channel();
+        let server = thread::spawn(move || {
+            let (mut stream, _) = listener.accept().expect("accept fixture client");
+            let mut request_bytes = Vec::new();
+            let mut chunk = [0_u8; 4096];
+            loop {
+                let read = stream.read(&mut chunk).expect("read request");
+                request_bytes.extend_from_slice(&chunk[..read]);
+                if request_bytes.windows(4).any(|window| window == b"\r\n\r\n") {
+                    let header_end =
+                        request_bytes.windows(4).position(|window| window == b"\r\n\r\n").unwrap()
+                            + 4;
+                    let header = String::from_utf8_lossy(&request_bytes[..header_end]);
+                    let length = header
+                        .lines()
+                        .find_map(|line| line.strip_prefix("Content-Length: "))
+                        .unwrap()
+                        .parse::<usize>()
+                        .unwrap();
+                    if request_bytes.len() >= header_end + length {
+                        break;
+                    }
+                }
+            }
+            write!(
+                stream,
+                "HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nConnection: close\r\n\r\n"
+            )
+            .expect("write response headers");
+            stream
+                .write_all(b"data: {\"choices\":[{\"delta\":{\"role\":\"assistant\"}}]}\n\n")
+                .expect("write role delta");
+            stream
+                .write_all(b"data: {\"choices\":[{\"delta\":{\"content\":\"first\"}}]}\n\n")
+                .expect("write first delta");
+            stream.flush().expect("flush first delta");
+            release_receiver.recv().expect("wait for incremental assertion");
+            stream
+                .write_all(b"data: {\"choices\":[{\"delta\":{\"content\":\"second\"}}]}\n\n")
+                .expect("write second delta");
+            stream
+                .write_all(b"data: {\"choices\":[{\"delta\":{},\"finish_reason\":\"stop\"}]}\n\ndata: [DONE]\n\n")
+                .expect("write completion");
+        });
+
+        let transport =
+            LocalOpenAiTransport::new(&format!("http://127.0.0.1:{port}/v1"), None).unwrap();
+        let cancellation = CancellationToken::new();
+        let mut stream = transport.open_stream(&request(), &cancellation).unwrap();
+        assert_eq!(stream.next_event().unwrap(), Some(StreamEvent::TextDelta("first".to_owned())));
+        release_sender.send(()).unwrap();
+        assert_eq!(stream.next_event().unwrap(), Some(StreamEvent::TextDelta("second".to_owned())));
+        assert_eq!(stream.next_event().unwrap(), Some(StreamEvent::Done));
+        server.join().unwrap();
+    }
+
+    #[test]
+    fn incremental_stream_cancellation_interrupts_an_idle_read() {
+        let listener = TcpListener::bind(("127.0.0.1", 0)).expect("bind loopback fixture");
+        let port = listener.local_addr().unwrap().port();
+        let (release_sender, release_receiver) = mpsc::channel();
+        let server = thread::spawn(move || {
+            let (mut stream, _) = listener.accept().expect("accept fixture client");
+            let mut request_bytes = Vec::new();
+            let mut chunk = [0_u8; 4096];
+            loop {
+                let read = stream.read(&mut chunk).expect("read request");
+                request_bytes.extend_from_slice(&chunk[..read]);
+                if request_bytes.windows(4).any(|window| window == b"\r\n\r\n") {
+                    let header_end =
+                        request_bytes.windows(4).position(|window| window == b"\r\n\r\n").unwrap()
+                            + 4;
+                    let header = String::from_utf8_lossy(&request_bytes[..header_end]);
+                    let length = header
+                        .lines()
+                        .find_map(|line| line.strip_prefix("Content-Length: "))
+                        .unwrap()
+                        .parse::<usize>()
+                        .unwrap();
+                    if request_bytes.len() >= header_end + length {
+                        break;
+                    }
+                }
+            }
+            write!(
+                stream,
+                "HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nConnection: close\r\n\r\n"
+            )
+            .expect("write response headers");
+            stream
+                .write_all(b"data: {\"choices\":[{\"delta\":{\"content\":\"first\"}}]}\n\n")
+                .expect("write first delta");
+            stream.flush().expect("flush first delta");
+            release_receiver.recv().expect("wait for cancellation assertion");
+            let _ = stream.write_all(b"data: [DONE]\n\n");
+        });
+
+        let transport =
+            LocalOpenAiTransport::new(&format!("http://127.0.0.1:{port}/v1"), None).unwrap();
+        let cancellation = CancellationToken::new();
+        let mut stream = transport.open_stream(&request(), &cancellation).unwrap();
+        assert_eq!(stream.next_event().unwrap(), Some(StreamEvent::TextDelta("first".to_owned())));
+        let reader = thread::spawn(move || stream.next_event());
+        thread::sleep(READ_POLL_INTERVAL * 2);
+        cancellation.cancel();
+        assert_eq!(reader.join().unwrap(), Err(TransportError::Cancelled));
+        release_sender.send(()).unwrap();
+        server.join().unwrap();
     }
 
     #[test]

@@ -25,7 +25,9 @@ use crossterm::{
 };
 use hades_app::{App, DispatchOutcome};
 use hades_core::{InputEvent, Key, PRODUCT_NAME, ProviderEvent, Role, TurnState};
-use hades_provider::{ChatMessage, ChatRequest, LocalOpenAiTransport, StreamEvent};
+use hades_provider::{
+    CancellationToken, ChatMessage, ChatRequest, LocalOpenAiTransport, StreamEvent, TransportError,
+};
 use hades_tui::{draw, snapshot};
 use ratatui::{Terminal, backend::CrosstermBackend};
 
@@ -43,6 +45,7 @@ struct ProviderConfig {
 
 struct ProviderRuntime {
     events: Receiver<ProviderEvent>,
+    cancellation: CancellationToken,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -119,6 +122,7 @@ fn event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> Result<(
         }
         terminal.draw(|frame| draw(frame, &app))?;
         if app.state().should_quit {
+            cancel_provider(&mut provider_runtime);
             return Ok(());
         }
 
@@ -193,7 +197,7 @@ fn dispatch_input(
     match app.handle(event) {
         DispatchOutcome::Submitted(content) => start_provider(app, provider_runtime, content),
         DispatchOutcome::Interrupted => {
-            provider_runtime.take();
+            cancel_provider(provider_runtime);
         }
         DispatchOutcome::EditorRequested(draft) => {
             run_editor(terminal, app, draft)?;
@@ -245,7 +249,7 @@ fn start_provider_from_latest_user(app: &mut App, provider_runtime: &mut Option<
 }
 
 fn start_provider(app: &mut App, provider_runtime: &mut Option<ProviderRuntime>, content: String) {
-    provider_runtime.take();
+    cancel_provider(provider_runtime);
     let config = match provider_config() {
         Ok(Some(config)) => config,
         Ok(None) => {
@@ -272,30 +276,53 @@ fn start_provider(app: &mut App, provider_runtime: &mut Option<ProviderRuntime>,
         vec![ChatMessage::new("system", PROVIDER_SYSTEM_PROMPT), ChatMessage::new("user", content)],
         Vec::new(),
     );
+    let cancellation = CancellationToken::new();
+    let worker_cancellation = cancellation.clone();
     let (sender, receiver) = mpsc::channel();
-    thread::spawn(move || run_provider_worker(transport, request, sender));
-    *provider_runtime = Some(ProviderRuntime { events: receiver });
+    thread::spawn(move || run_provider_worker(transport, request, sender, worker_cancellation));
+    *provider_runtime = Some(ProviderRuntime { events: receiver, cancellation });
+}
+
+fn cancel_provider(provider_runtime: &mut Option<ProviderRuntime>) {
+    if let Some(runtime) = provider_runtime.take() {
+        runtime.cancellation.cancel();
+    }
 }
 
 fn run_provider_worker(
     transport: LocalOpenAiTransport,
     request: ChatRequest,
     sender: Sender<ProviderEvent>,
+    cancellation: CancellationToken,
 ) {
     if sender.send(ProviderEvent::Started).is_err() {
         return;
     }
-    let events = match transport.stream_chat(&request) {
-        Ok(events) => events,
+    let mut stream = match transport.open_stream(&request, &cancellation) {
+        Ok(stream) => stream,
+        Err(TransportError::Cancelled) => return,
         Err(error) => {
             let _ = sender.send(ProviderEvent::Failed(error.to_string()));
             return;
         }
     };
-    for event in events {
-        let event = translate_stream_event(event);
-        if sender.send(event).is_err() {
-            return;
+    loop {
+        match stream.next_event() {
+            Ok(Some(event)) => {
+                let is_done = event == StreamEvent::Done;
+                if sender.send(translate_stream_event(event)).is_err() {
+                    return;
+                }
+                if is_done {
+                    return;
+                }
+            }
+            Ok(None) => return,
+            Err(TransportError::Cancelled) => return,
+            Err(error) => {
+                let _ = sender.send(ProviderEvent::Failed(error.to_string()));
+                return;
+            }
         }
     }
 }
@@ -504,7 +531,8 @@ mod tests {
         app.handle(InputEvent::Key(Key::Char('h')));
         app.handle(InputEvent::Key(Key::Enter));
         let (sender, receiver) = mpsc::channel();
-        let mut runtime = Some(ProviderRuntime { events: receiver });
+        let mut runtime =
+            Some(ProviderRuntime { events: receiver, cancellation: CancellationToken::new() });
         sender.send(ProviderEvent::Started).unwrap();
         sender.send(ProviderEvent::TextDelta("hello".to_owned())).unwrap();
         sender.send(ProviderEvent::Completed).unwrap();

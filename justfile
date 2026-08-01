@@ -154,6 +154,10 @@ replay-local-provider:
     cargo build --locked --package hades-cli
     python3 scripts/replay_local_provider.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0051-hades-local-provider-stream.json --report .hades/runtime/local-provider-replay.json
 
+replay-local-provider-timing:
+    cargo build --locked --package hades-cli
+    python3 scripts/replay_local_provider_timing.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0053-hades-stream-timing.json --report .hades/runtime/local-provider-timing-replay.json
+
 validate-reference:
     python3 scripts/validate_reference_fixture.py
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0016-hermes-input-history-persistence.json
@@ -186,6 +190,7 @@ validate-reference:
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0050-hermes-local-provider-stream.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0051-hades-local-provider-stream.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0052-hermes-stream-timing.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0053-hades-stream-timing.json
 
 agent command *args:
     python3 scripts/agent/control_plane.py {{command}} {{args}}
