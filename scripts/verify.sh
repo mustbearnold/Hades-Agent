@@ -12,6 +12,7 @@ python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0018-her
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0020-hermes-modified-enter.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0021-hades-modified-enter.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0022-hermes-text-clipboard.json
+python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0023-hades-text-clipboard.json
 cargo fmt --all -- --check
 cargo check --workspace --all-targets --locked
 cargo clippy --workspace --all-targets --locked -- -D warnings
@@ -26,6 +27,7 @@ python3 scripts/replay_editor.py --binary target/debug/hades --report .hades/run
 python3 scripts/replay_editor_outcomes.py --binary target/debug/hades --report .hades/runtime/editor-outcomes-replay.json
 python3 scripts/replay_modified_enter.py --binary target/debug/hades --report .hades/runtime/modified-enter-replay.json
 python3 scripts/replay_clipboard.py --binary target/debug/hades --report .hades/runtime/clipboard-replay.json
+python3 scripts/replay_clipboard_text.py --binary target/debug/hades --report .hades/runtime/clipboard-text-replay.json
 python3 scripts/replay_history.py --binary target/debug/hades --report .hades/runtime/history-replay.json
 git diff --check
 

@@ -40,4 +40,7 @@ consumed by the direct-PTY `scripts/replay_modified_enter.py` oracle and only
 claims crossterm-decoded Shift/Alt Enter events.
 OBS-0022 captures the reference-only successful text clipboard path with a
 synthetic xclip provider, including provider arguments, newline trimming, and
-the empty-provider control. It does not imply Hades clipboard parity.
+the empty-provider control. OBS-0023 is the Hades implementation contract for
+the native text path and is consumed by the direct-PTY
+`scripts/replay_clipboard_text.py` oracle; image/path/OSC52 behavior remains
+outside the contract.

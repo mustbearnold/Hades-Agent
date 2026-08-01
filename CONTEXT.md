@@ -85,8 +85,9 @@ progress from August 1, 2026 through 2027.
 - HAD-022 captures Hermes successful Ctrl+V text clipboard behavior through a
   synthetic xclip provider: raw 0x16 invokes `xclip -selection clipboard -out`,
   preserves internal newlines and meaningful spaces, removes trailing newlines,
-  and leaves the draft ready without submission. Image fallback and Hades
-  successful clipboard behavior remain unimplemented.
+  and leaves the draft ready without submission. HAD-023 implements the native
+  WSL/Wayland/xclip text path and preserves the empty-provider image-miss
+  fallback; image attachments, path paste, and OSC52 precedence remain unknown.
 
 ## Unknown until observed
 

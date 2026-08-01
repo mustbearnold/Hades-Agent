@@ -35,6 +35,8 @@ newline insertion, with plain Enter as the submission control.
 that the draft is unchanged. `just replay-history` proves persistent history
 across two Hades processes, multiline file encoding, duplicate byte stability,
 and the newest-1,000 load cap.
+`just replay-clipboard-text` replays successful native text insertion with a
+synthetic xclip provider plus the empty-provider control.
 `just validate-reference` also checks the deterministic Hermes editor-outcome
 fixture covering modified, multiline, empty, and cancelled editor handoffs,
 plus the direct-PTY modified-Enter reference and Hades implementation fixtures.
@@ -62,6 +64,7 @@ just replay-paste            # bracketed paste PTY replay
 just replay-editor             # unchanged-draft editor handoff PTY replay
 just replay-modified-enter     # native modified-Enter direct-PTY replay
 just replay-clipboard        # empty-clipboard Ctrl+V PTY replay
+just replay-clipboard-text   # successful text clipboard PTY replay
 just agent validate           # validate task/control-plane invariants
 just agent next               # choose the highest-priority ready task
 just agent claim HAD-001 bot  # claim a task with an agent identity

@@ -1,5 +1,7 @@
 #![forbid(unsafe_code)]
 
+mod clipboard;
+
 use std::{
     env,
     error::Error,
@@ -16,7 +18,7 @@ use crossterm::{
     terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
 };
 use hades_app::{App, DispatchOutcome};
-use hades_core::{InputEvent, Key, PRODUCT_NAME};
+use hades_core::{InputEvent, Key, PRODUCT_NAME, TurnState};
 use hades_tui::{draw, snapshot};
 use ratatui::{Terminal, backend::CrosstermBackend};
 
@@ -124,10 +126,29 @@ fn dispatch_input(
     app: &mut App,
     event: InputEvent,
 ) -> Result<(), Box<dyn Error>> {
+    let event = resolve_clipboard_event(app, event);
     if let DispatchOutcome::EditorRequested(draft) = app.handle(event) {
         run_editor(terminal, app, draft)?;
     }
     Ok(())
+}
+
+fn resolve_clipboard_event(app: &App, event: InputEvent) -> InputEvent {
+    resolve_clipboard_event_with(app, event, clipboard::read_usable_text)
+}
+
+fn resolve_clipboard_event_with<F>(app: &App, event: InputEvent, read: F) -> InputEvent
+where
+    F: FnOnce() -> Option<String>,
+{
+    match event {
+        InputEvent::Key(Key::Ctrl('v'))
+            if app.state().turn == TurnState::Ready && app.state().overlay.is_none() =>
+        {
+            read().map_or(InputEvent::Key(Key::Ctrl('v')), InputEvent::Paste)
+        }
+        other => other,
+    }
 }
 
 fn run_editor(
@@ -261,5 +282,43 @@ mod tests {
             Some(vec!["/bin/true".to_owned()])
         );
         assert_eq!(configured_editor_from(None, None), None);
+    }
+
+    #[test]
+    fn ready_ctrl_v_resolves_usable_text_to_a_non_submitting_paste_event() {
+        let app = App::new();
+        let event = resolve_clipboard_event_with(&app, InputEvent::Key(Key::Ctrl('v')), || {
+            Some("clip-one  \nclip-two".to_owned())
+        });
+
+        assert_eq!(event, InputEvent::Paste("clip-one  \nclip-two".to_owned()));
+    }
+
+    #[test]
+    fn empty_clipboard_keeps_the_existing_fallback_event() {
+        let app = App::new();
+        let event = resolve_clipboard_event_with(&app, InputEvent::Key(Key::Ctrl('v')), || None);
+
+        assert_eq!(event, InputEvent::Key(Key::Ctrl('v')));
+    }
+
+    #[test]
+    fn clipboard_is_not_read_for_busy_or_overlay_states() {
+        let mut busy = App::new();
+        busy.handle(InputEvent::Key(Key::Char('x')));
+        busy.handle(InputEvent::Key(Key::Enter));
+        let busy_event =
+            resolve_clipboard_event_with(&busy, InputEvent::Key(Key::Ctrl('v')), || {
+                panic!("busy clipboard must not be read")
+            });
+        assert_eq!(busy_event, InputEvent::Key(Key::Ctrl('v')));
+
+        let mut overlay = App::new();
+        overlay.handle(InputEvent::Key(Key::Ctrl('x')));
+        let overlay_event =
+            resolve_clipboard_event_with(&overlay, InputEvent::Key(Key::Ctrl('v')), || {
+                panic!("overlay clipboard must not be read")
+            });
+        assert_eq!(overlay_event, InputEvent::Key(Key::Ctrl('v')));
     }
 }

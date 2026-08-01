@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T05:11:15Z",
+  "updated_at": "2026-08-01T05:23:40Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -1046,6 +1046,60 @@
           "docs/parity/observations/OBS-0022-hermes-text-clipboard-2026-08-01.md",
           "scripts/probe_hermes_text_clipboard.py",
           "scripts/validate_reference_fixture.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-023",
+      "title": "Implement Hermes successful text clipboard parity",
+      "status": "complete",
+      "priority": 60,
+      "lane": "interaction",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-022"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "unit_test",
+        "direct_pty_replay",
+        "process_replay"
+      ],
+      "acceptance": [
+        "Add a CLI-owned text clipboard provider following the stable Hermes Linux order: WSL powershell.exe when WSL is detected, wl-paste --type text when Wayland is present, then xclip -selection clipboard -out; provider failures fall through.",
+        "Accept only usable text, remove trailing newline runs after a successful read, and preserve internal newlines, meaningful spaces, and cursor insertion semantics.",
+        "Wire ready, non-overlay Ctrl+V to InputEvent::Paste without submission or busy state, while retaining the existing no-image fallback for empty or unusable providers and leaving busy/overlay behavior unchanged.",
+        "Add focused provider/normalization tests plus a direct 120x40 PTY replay with a synthetic xclip success case and empty control; wire a sanitized Hades fixture into just verify without touching the host clipboard.",
+        "Keep image attachments, path paste, OSC52 precedence, and gateway behavior out of scope until their reference contracts are separately observed."
+      ],
+      "evidence": [
+        "crates/hades-cli/src/clipboard.rs",
+        "crates/hades-cli/src/main.rs",
+        "crates/hades-app/src/lib.rs",
+        "tests/fixtures/parity/OBS-0023-hades-text-clipboard.json",
+        "docs/parity/observations/OBS-0023-hades-text-clipboard-2026-08-01.md",
+        "scripts/replay_clipboard_text.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "ready_at": "2026-08-01T05:12:00Z",
+      "claimed_by": "hades-implementer",
+      "claimed_at": "2026-08-01T05:15:34Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Implemented Hermes-compatible native text clipboard parity at the Hades CLI boundary. The provider module follows WSL powershell.exe, Wayland wl-paste --type text, then xclip -selection clipboard -out; command failures fall through, successful empty/unusable output retains the existing image-miss fallback, and usable text preserves internal newlines/meaningful spaces while removing trailing newline runs. Ready non-overlay Ctrl+V becomes a non-submitting paste event; busy and overlay paths do not read the provider. Focused provider/event tests and an isolated 120x40 direct-PTY replay pass synthetic xclip success and empty controls without host clipboard access.",
+        "completed_at": "2026-08-01T05:23:40Z",
+        "evidence": [
+          "crates/hades-cli/src/clipboard.rs",
+          "crates/hades-cli/src/main.rs",
+          "crates/hades-app/src/lib.rs",
+          "tests/fixtures/parity/OBS-0023-hades-text-clipboard.json",
+          "docs/parity/observations/OBS-0023-hades-text-clipboard-2026-08-01.md",
+          "scripts/replay_clipboard_text.py",
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md"
