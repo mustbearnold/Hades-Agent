@@ -1,0 +1,251 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0049",
+  "reference_observation": "OBS-0048",
+  "surface": "hades-tui-bounded-model-default-terminal-backend",
+  "reference": {
+    "product": "Hades Agent",
+    "version": "workspace implementation",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "tmux-backed PTY"
+    },
+    "capture": "isolated Hades replay derived from the pinned Hermes OBS-0048 terminal-backend boundary"
+  },
+  "terminal": {
+    "columns": 120,
+    "rows": 40,
+    "emulator": "tmux-backed PTY"
+  },
+  "normalization": [
+    "The Hades binary path, synthetic HERMES_HOME, PTY/session identifiers, timestamps, cursor placement, and ANSI styling are omitted.",
+    "The bounded implementation retains the sanitized provider/model context and renders the stable terminal-backend picker rows and controls; no backend selection, backend configuration, persistence, credentials, OAuth flow, model request, or network request is exercised.",
+    "The replay asserts only the captured terminal-backend landmarks and clean Ctrl+C cleanup; backend-specific behavior and later setup sections remain outside the claim."
+  ],
+  "steps": [
+    {
+      "id": "hades-model-default-terminal-backend",
+      "precondition": "Fresh Hades process at 120x40 with an isolated HERMES_HOME history directory.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "/setup",
+          "bytes_hex": "2f 73 65 74 75 70"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "key",
+          "value": "Down",
+          "bytes_hex": "1b 5b 42"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+C",
+          "bytes_hex": "03"
+        }
+      ],
+      "output": {
+        "status": "passed",
+        "pty_markers": [
+          "Select terminal backend:",
+          "Local - run directly on this machine (default)",
+          "Docker - isolated container with configurable resources",
+          "Modal - serverless cloud sandbox",
+          "SSH - run on a remote machine",
+          "Daytona - persistent cloud development environment",
+          "Vercel Sandbox - cloud microVM with snapshot filesystem persistence",
+          "Singularity/Apptainer - HPC-friendly container",
+          "Keep current (local)",
+          "ENTER/SPACE select",
+          "ESC cancel"
+        ],
+        "pty_absent_markers": [
+          "musing…",
+          "Ctrl+C to interrupt",
+          "API key",
+          "OAuth"
+        ],
+        "outcome": "Accepting the displayed model default reaches a display-only terminal-backend picker. Ctrl+C exits without selecting a backend or entering later setup behavior."
+      }
+    }
+  ],
+  "cases": [
+    {
+      "id": "model-default-terminal-backend-replay",
+      "steps": [
+        {
+          "id": "type-setup",
+          "input": {
+            "kind": "text",
+            "value": "/setup"
+          },
+          "output": {
+            "pty_markers": [
+              "completions",
+              "/setup"
+            ],
+            "pty_absent_markers": []
+          }
+        },
+        {
+          "id": "accept-setup-completion",
+          "input": {
+            "kind": "key",
+            "value": "Enter"
+          },
+          "output": {
+            "pty_markers": [
+              "❯ /setup"
+            ],
+            "pty_absent_markers": [
+              "completions"
+            ]
+          }
+        },
+        {
+          "id": "open-setup-wizard",
+          "input": {
+            "kind": "key",
+            "value": "Enter"
+          },
+          "output": {
+            "pty_markers": [
+              "Hermes Agent Setup Wizard",
+              "Full setup",
+              "→ (●) Quick Setup"
+            ],
+            "pty_absent_markers": [
+              "musing…",
+              "Ctrl+C to interrupt"
+            ]
+          }
+        },
+        {
+          "id": "move-to-full-setup",
+          "input": {
+            "kind": "key",
+            "value": "Down"
+          },
+          "output": {
+            "pty_markers": [
+              "→ (○) Full setup",
+              "(●) Quick Setup"
+            ],
+            "pty_absent_markers": []
+          }
+        },
+        {
+          "id": "enter-provider-menu",
+          "input": {
+            "kind": "key",
+            "value": "Enter"
+          },
+          "output": {
+            "pty_markers": [
+              "Inference Provider",
+              "Current model: palette-model",
+              "Active provider: palette-loopback",
+              "→ (●) palette-loopback"
+            ],
+            "pty_absent_markers": [
+              "musing…",
+              "API key",
+              "OAuth"
+            ]
+          }
+        },
+        {
+          "id": "enter-active-provider",
+          "input": {
+            "kind": "key",
+            "value": "Enter"
+          },
+          "output": {
+            "pty_markers": [
+              "Model name [palette-model]:",
+              "Current model: palette-model",
+              "Active provider: palette-loopback"
+            ],
+            "pty_absent_markers": [
+              "musing…",
+              "Ctrl+C to interrupt",
+              "API key",
+              "OAuth"
+            ]
+          }
+        },
+        {
+          "id": "accept-model-default",
+          "input": {
+            "kind": "key",
+            "value": "Enter"
+          },
+          "output": {
+            "pty_markers": [
+              "Select terminal backend:",
+              "Local - run directly on this machine (default)",
+              "Docker - isolated container with configurable resources",
+              "Modal - serverless cloud sandbox",
+              "SSH - run on a remote machine",
+              "Daytona - persistent cloud development environment",
+              "Vercel Sandbox - cloud microVM with snapshot filesystem persistence",
+              "Singularity/Apptainer - HPC-friendly container",
+              "Keep current (local)",
+              "ENTER/SPACE select",
+              "ESC cancel"
+            ],
+            "pty_absent_markers": [
+              "musing…",
+              "Ctrl+C to interrupt",
+              "API key",
+              "OAuth"
+            ]
+          }
+        },
+        {
+          "id": "cancel-terminal-backend-picker",
+          "input": {
+            "kind": "key",
+            "value": "Ctrl+C"
+          },
+          "output": {
+            "pty_markers": [],
+            "pty_absent_markers": [],
+            "process_exit": true
+          }
+        }
+      ]
+    }
+  ],
+  "unknowns": [
+    "Terminal-backend selection, cursor movement, cancellation after deeper navigation, backend-specific configuration, persistence, validation, errors, and later setup sections remain unimplemented or unknown.",
+    "The exact persisted config delta, model-fetch failure/retry semantics, provider inventory, model discovery, credentials, OAuth, save behavior, and network behavior remain outside this bounded Hades replay."
+  ],
+  "passed": true
+}

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T13:44:20Z",
+  "updated_at": "2026-08-01T13:58:52Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -2503,6 +2503,64 @@
           "tests/fixtures/parity/OBS-0042-hermes-full-setup-continuation.json",
           "docs/parity/observations/OBS-0042-hermes-full-setup-continuation-2026-08-01.md",
           ".hades/runtime/had050-pre-completion-verify-retry-20260801T134135Z.log"
+        ]
+      }
+    },
+    {
+      "id": "HAD-051",
+      "title": "Implement bounded terminal-backend picker",
+      "status": "complete",
+      "priority": 32,
+      "lane": "implementation",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-049"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "reference_fixture",
+        "core_tests",
+        "tui_replay",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Extend the typed setup state so accepting the displayed Model name [palette-model] default reaches a bounded terminal-backend picker with the stable OBS-0048 title, rows, and controls.",
+        "Preserve the existing provider/model context and clean Ctrl+C exit; do not implement backend selection, backend configuration, persistence, credentials, OAuth, model requests, or network behavior that OBS-0048 leaves unknown.",
+        "Add a sanitized Hades replay fixture and focused core/app/TUI or replay assertions for the new display-only boundary, wire them through just verify, and document the parity claim and remaining unknowns.",
+        "Run the targeted replay and complete no-skip verification before marking the task complete."
+      ],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-app/src/lib.rs",
+        "crates/hades-tui/src/lib.rs",
+        "tests/fixtures/parity/OBS-0049-hades-model-default-terminal-backend.json",
+        "docs/parity/observations/OBS-0049-hades-model-default-terminal-backend-2026-08-01.md",
+        "scripts/replay_setup_terminal_backend.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        ".hades/runtime/had051-pre-completion-verify-20260801T135609Z.log"
+      ],
+      "ready_at": "2026-08-01T13:50:00Z",
+      "claimed_by": "hades-terminal-backend-picker",
+      "claimed_at": "2026-08-01T13:50:40Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Implemented the bounded terminal-backend picker after accepting the displayed model default, preserving provider/model context and clean Ctrl+C while leaving backend selection and later setup behavior unknown; OBS-0049 replay, focused tests, and complete no-skip verification passed.",
+        "completed_at": "2026-08-01T13:58:52Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-app/src/lib.rs",
+          "crates/hades-tui/src/lib.rs",
+          "tests/fixtures/parity/OBS-0049-hades-model-default-terminal-backend.json",
+          "docs/parity/observations/OBS-0049-hades-model-default-terminal-backend-2026-08-01.md",
+          "scripts/replay_setup_terminal_backend.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          ".hades/runtime/had051-pre-completion-verify-20260801T135609Z.log"
         ]
       }
     }

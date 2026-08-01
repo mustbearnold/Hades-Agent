@@ -108,6 +108,18 @@ pub const SETUP_PROVIDER_MENU_ROWS: [&str; 5] = [
     "Configure auxiliary models...",
     "Leave unchanged",
 ];
+pub const SETUP_TERMINAL_BACKEND_TITLE: &str = "Select terminal backend:";
+pub const SETUP_TERMINAL_BACKEND_ROWS: [&str; 8] = [
+    "Local - run directly on this machine (default)",
+    "Docker - isolated container with configurable resources",
+    "Modal - serverless cloud sandbox",
+    "SSH - run on a remote machine",
+    "Daytona - persistent cloud development environment",
+    "Vercel Sandbox - cloud microVM with snapshot filesystem persistence",
+    "Singularity/Apptainer - HPC-friendly container",
+    "Keep current (local)",
+];
+pub const SETUP_TERMINAL_BACKEND_CONTROLS: &str = "ENTER/SPACE select   ESC cancel";
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub enum SetupWizardSurface {
@@ -116,6 +128,7 @@ pub enum SetupWizardSurface {
     NumberedFallback,
     FullSetupProviderMenu,
     ModelNamePrompt,
+    TerminalBackendPicker,
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
@@ -125,6 +138,7 @@ pub enum SetupWizardAction {
     EnteredFallback,
     EnteredProviderMenu,
     EnteredModelNamePrompt,
+    EnteredTerminalBackendPicker,
     Quit,
 }
 
@@ -167,6 +181,10 @@ impl SetupWizardState {
 
     pub fn is_model_name_prompt(&self) -> bool {
         self.surface == SetupWizardSurface::ModelNamePrompt
+    }
+
+    pub fn is_terminal_backend_picker(&self) -> bool {
+        self.surface == SetupWizardSurface::TerminalBackendPicker
     }
 
     pub fn provider_cursor(&self) -> usize {
@@ -222,6 +240,14 @@ impl SetupWizardState {
                 _ => SetupWizardAction::Continue,
             },
             SetupWizardSurface::ModelNamePrompt => match key {
+                Key::Enter => {
+                    self.surface = SetupWizardSurface::TerminalBackendPicker;
+                    SetupWizardAction::EnteredTerminalBackendPicker
+                }
+                Key::Ctrl('c') => SetupWizardAction::Quit,
+                _ => SetupWizardAction::Continue,
+            },
+            SetupWizardSurface::TerminalBackendPicker => match key {
                 Key::Ctrl('c') => SetupWizardAction::Quit,
                 _ => SetupWizardAction::Continue,
             },
@@ -832,6 +858,21 @@ mod tests {
         assert_eq!(wizard.provider_cursor(), 0);
         assert_eq!(wizard.handle_key(Key::Enter), SetupWizardAction::EnteredModelNamePrompt);
         assert!(wizard.is_model_name_prompt());
+        assert_eq!(wizard.handle_key(Key::Ctrl('c')), SetupWizardAction::Quit);
+    }
+
+    #[test]
+    fn setup_wizard_accepts_the_model_default_into_a_display_only_backend_picker() {
+        let mut wizard = SetupWizardState::default();
+
+        assert_eq!(wizard.handle_key(Key::Down), SetupWizardAction::Moved);
+        assert_eq!(wizard.handle_key(Key::Enter), SetupWizardAction::EnteredProviderMenu);
+        assert_eq!(wizard.handle_key(Key::Enter), SetupWizardAction::EnteredModelNamePrompt);
+        assert_eq!(wizard.handle_key(Key::Enter), SetupWizardAction::EnteredTerminalBackendPicker);
+        assert!(wizard.is_terminal_backend_picker());
+        assert_eq!(wizard.provider_cursor(), 0);
+        assert_eq!(wizard.provider_cursor_label(), SETUP_PROVIDER_MENU_ROWS[0]);
+        assert_eq!(wizard.handle_key(Key::Char(' ')), SetupWizardAction::Continue);
         assert_eq!(wizard.handle_key(Key::Ctrl('c')), SetupWizardAction::Quit);
     }
 }

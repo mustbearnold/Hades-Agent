@@ -470,6 +470,10 @@ impl App {
                 self.state.status = "Model name [palette-model]:".to_owned();
                 DispatchOutcome::Continue
             }
+            SetupWizardAction::EnteredTerminalBackendPicker => {
+                self.state.status = "Select terminal backend:".to_owned();
+                DispatchOutcome::Continue
+            }
             SetupWizardAction::Moved => {
                 self.state.status = if wizard.is_provider_menu() {
                     "Provider menu navigation.".to_owned()
@@ -770,6 +774,28 @@ mod tests {
         assert!(wizard.is_model_name_prompt());
         assert_eq!(wizard.provider_cursor(), 0);
         assert_eq!(app.state().status, "Model name [palette-model]:");
+        assert_eq!(app.handle(InputEvent::Key(Key::Ctrl('c'))), DispatchOutcome::Quit);
+        assert!(app.state().setup_wizard.is_none());
+    }
+
+    #[test]
+    fn full_setup_model_default_reaches_display_only_terminal_backend_picker() {
+        let mut app = App::new();
+        for character in "/setup".chars() {
+            app.handle(InputEvent::Key(Key::Char(character)));
+        }
+        app.handle(InputEvent::Key(Key::Enter));
+        app.handle(InputEvent::Key(Key::Enter));
+        app.handle(InputEvent::Key(Key::Down));
+        app.handle(InputEvent::Key(Key::Enter));
+        app.handle(InputEvent::Key(Key::Enter));
+
+        assert_eq!(app.handle(InputEvent::Key(Key::Enter)), DispatchOutcome::Continue);
+        let wizard = app.state().setup_wizard.as_ref().unwrap();
+        assert!(wizard.is_terminal_backend_picker());
+        assert_eq!(app.state().status, "Select terminal backend:");
+        assert_eq!(app.handle(InputEvent::Key(Key::Char(' '))), DispatchOutcome::Continue);
+        assert!(app.state().setup_wizard.as_ref().unwrap().is_terminal_backend_picker());
         assert_eq!(app.handle(InputEvent::Key(Key::Ctrl('c'))), DispatchOutcome::Quit);
         assert!(app.state().setup_wizard.is_none());
     }

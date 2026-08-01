@@ -4,7 +4,8 @@ use hades_app::App;
 use hades_core::{
     MODEL_PICKER_MODEL, MODEL_PICKER_PROVIDER, ModelPickerStage, Notice, Overlay,
     SETUP_PROVIDER_ACTIVE_PROVIDER, SETUP_PROVIDER_CURRENT_MODEL, SETUP_PROVIDER_MENU_ROWS,
-    SETUP_PROVIDER_MODEL_NAME, SETUP_WIZARD_CHOICES, SetupWizardSurface, TurnState,
+    SETUP_PROVIDER_MODEL_NAME, SETUP_TERMINAL_BACKEND_CONTROLS, SETUP_TERMINAL_BACKEND_ROWS,
+    SETUP_TERMINAL_BACKEND_TITLE, SETUP_WIZARD_CHOICES, SetupWizardSurface, TurnState,
 };
 use ratatui::{
     Frame, Terminal,
@@ -243,6 +244,10 @@ fn draw_setup_wizard_overlay(frame: &mut Frame<'_>, app: &App) {
     let Some(wizard) = app.state().setup_wizard.as_ref() else {
         return;
     };
+    if wizard.is_terminal_backend_picker() {
+        draw_setup_terminal_backend_picker_overlay(frame);
+        return;
+    }
     if wizard.is_model_name_prompt() {
         draw_setup_model_name_prompt_overlay(frame, wizard);
         return;
@@ -327,6 +332,40 @@ fn draw_setup_model_name_prompt_overlay(
         Line::raw(""),
         Line::styled(format!(" {SETUP_PROVIDER_MODEL_NAME}"), HERMES_PALETTE.ready()),
         Line::styled(" Ctrl+C cancel", HERMES_PALETTE.secondary()),
+    ]);
+
+    let panel = Paragraph::new(Text::from(lines))
+        .block(Block::default().borders(Borders::ALL).title(" Full setup "));
+    frame.render_widget(Clear, area);
+    frame.render_widget(panel, area);
+}
+
+fn draw_setup_terminal_backend_picker_overlay(frame: &mut Frame<'_>) {
+    let area = centered_rect(frame.area(), 116, 30);
+    let mut lines = vec![
+        Line::styled(" Hermes Agent Setup Wizard", HERMES_PALETTE.brand()),
+        Line::raw(""),
+        Line::styled(" Inference Provider", HERMES_PALETTE.brand()),
+        Line::styled(
+            format!(" Current model: {SETUP_PROVIDER_CURRENT_MODEL}"),
+            HERMES_PALETTE.secondary(),
+        ),
+        Line::styled(
+            format!(" Active provider: {SETUP_PROVIDER_ACTIVE_PROVIDER}"),
+            HERMES_PALETTE.secondary(),
+        ),
+        Line::raw(""),
+        Line::styled(format!(" {SETUP_TERMINAL_BACKEND_TITLE}"), HERMES_PALETTE.brand()),
+    ];
+
+    lines.extend(
+        SETUP_TERMINAL_BACKEND_ROWS
+            .iter()
+            .map(|row| Line::styled(format!(" {row}"), HERMES_PALETTE.secondary())),
+    );
+    lines.extend([
+        Line::raw(""),
+        Line::styled(format!(" {SETUP_TERMINAL_BACKEND_CONTROLS}"), HERMES_PALETTE.secondary()),
     ]);
 
     let panel = Paragraph::new(Text::from(lines))
@@ -906,6 +945,45 @@ mod tests {
         }
         assert!(!prompt.contains("musing…"));
         assert!(!prompt.contains("API key"));
+        assert_eq!(
+            app.handle(hades_core::InputEvent::Key(hades_core::Key::Ctrl('c'))),
+            hades_app::DispatchOutcome::Quit
+        );
+    }
+
+    #[test]
+    fn hermes_startup_surface_renders_display_only_terminal_backend_picker() {
+        let mut app = App::new();
+        for character in "/setup".chars() {
+            app.handle(hades_core::InputEvent::Key(hades_core::Key::Char(character)));
+        }
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Down));
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
+
+        let picker = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        for marker in [
+            "Select terminal backend:",
+            "Local - run directly on this machine (default)",
+            "Docker - isolated container with configurable resources",
+            "Modal - serverless cloud sandbox",
+            "SSH - run on a remote machine",
+            "Daytona - persistent cloud development environment",
+            "Vercel Sandbox - cloud microVM with snapshot filesystem persistence",
+            "Singularity/Apptainer - HPC-friendly container",
+            "Keep current (local)",
+            "ENTER/SPACE select",
+            "ESC cancel",
+            "Current model: palette-model",
+            "Active provider: palette-loopback",
+        ] {
+            assert!(picker.contains(marker), "missing terminal backend marker: {marker}");
+        }
+        assert!(!picker.contains("musing…"));
+        assert!(!picker.contains("API key"));
         assert_eq!(
             app.handle(hades_core::InputEvent::Key(hades_core::Key::Ctrl('c'))),
             hades_app::DispatchOutcome::Quit

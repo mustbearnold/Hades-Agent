@@ -55,6 +55,10 @@ replay-setup-provider-model-prompt:
     cargo build --locked --package hades-cli
     python3 scripts/replay_setup_provider_model_prompt.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0047-hades-provider-selection-model-prompt.json --report .hades/runtime/setup-provider-model-prompt-replay.json
 
+replay-setup-terminal-backend:
+    cargo build --locked --package hades-cli
+    python3 scripts/replay_setup_terminal_backend.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0049-hades-model-default-terminal-backend.json --report .hades/runtime/setup-terminal-backend-replay.json
+
 replay-paste:
     cargo build --locked --package hades-cli
     python3 scripts/replay_paste.py --binary target/debug/hades --report .hades/runtime/paste-replay.json
@@ -168,6 +172,7 @@ validate-reference:
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0046-hermes-provider-selection.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0047-hades-provider-selection-model-prompt.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0048-hermes-model-default-terminal-backend.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0049-hades-model-default-terminal-backend.json
 
 agent command *args:
     python3 scripts/agent/control_plane.py {{command}} {{args}}

@@ -216,6 +216,11 @@ progress from August 1, 2026 through 2027.
   guarded retry only while Full remains visibly selected; it preserves the
   fresh synthetic-home, no-credential, no-network boundary and keeps the
   checked-in fixture semantics unchanged.
+- HAD-051 implements the bounded Hades terminal-backend picker after accepting
+  the displayed model default. It renders the OBS-0048 Local, Docker, Modal,
+  SSH, Daytona, Vercel Sandbox, Singularity/Apptainer, and Keep current rows
+  with their controls, preserves sanitized provider/model context, and exits
+  cleanly on Ctrl+C; backend selection and later setup behavior remain unknown.
 
 ## Unknown until observed
 
@@ -229,8 +234,8 @@ progress from August 1, 2026 through 2027.
   terminal-dependent surfaces beyond the captured observations.
 - The complete slash-command catalog and argument semantics, provider/model
   discovery details, setup wizard continuation, numbered-fallback choices,
-  cancellation after deeper navigation, provider configuration, backup
-  semantics, and persistence, configured command
+  terminal-backend selection and cancellation after deeper navigation, provider
+  configuration, backup semantics, and persistence, configured command
   behavior with a reachable provider, and model-picker behavior beyond the
   bounded deterministic provider/model seam.
 - OSC52 behavior outside the OBS-0032 timing controls and bounded payload
