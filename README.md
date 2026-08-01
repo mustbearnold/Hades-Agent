@@ -13,9 +13,10 @@ just snapshot
 ```
 
 `just snapshot` renders the deterministic bootstrap frame without requiring an
-interactive terminal. `just run` launches the TUI. The first queued task is to
-capture the Hermes reference contract; until that exists, visual and behavioral
-details remain intentionally unresolved.
+interactive terminal. `just run` launches the TUI. `just probe-lifecycle`
+runs the actual binary in a PTY and verifies startup, resize, exit, and terminal
+restoration. The current work queue is in `.hades/tasks.json`; use `just agent next`
+to select the next evidence-backed task.
 
 The development contract is in [`AGENTS.md`](AGENTS.md). The task ledger and
 bounded execution policy are in [`.hades/`](.hades/), and the role/workflow
@@ -28,6 +29,7 @@ contracts are in [`.agents/`](.agents/). Product requirements live in
 just check                    # complete local gate
 just run                      # interactive TUI
 just snapshot                 # deterministic terminal snapshot
+just probe-lifecycle          # PTY lifecycle and cleanup oracle
 just agent validate           # validate task/control-plane invariants
 just agent next               # choose the highest-priority ready task
 just agent claim HAD-001 bot  # claim a task with an agent identity

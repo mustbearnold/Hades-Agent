@@ -6,8 +6,8 @@ observation, contract, implementation, and oracle are all linked from a task.
 | Surface | Status | Reference evidence | Hades oracle | Owner/task |
 | --- | --- | --- | --- | --- |
 | Startup sequence | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [startup frame](../../tests/fixtures/parity/OBS-0001-startup-120x40.txt) | HAD-001 / HAD-003 |
-| Terminal initialization | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [lifecycle trace](../../tests/fixtures/parity/OBS-0001-lifecycle.json) | HAD-001 / HAD-003 |
-| Terminal cleanup | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [lifecycle trace](../../tests/fixtures/parity/OBS-0001-lifecycle.json) | HAD-001 / HAD-003 |
+| Terminal initialization | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [lifecycle probe](../../scripts/probe_tui_lifecycle.py) | HAD-001 / HAD-003 |
+| Terminal cleanup | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [lifecycle probe](../../scripts/probe_tui_lifecycle.py) | HAD-001 / HAD-003 |
 | Initial geometry | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [startup frame](../../tests/fixtures/parity/OBS-0001-startup-120x40.txt) | HAD-001 / HAD-005 |
 | Color and text styling | Unknown | — | — | HAD-001 / HAD-005 |
 | Keymap | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) (tested subset) | [lifecycle trace](../../tests/fixtures/parity/OBS-0001-lifecycle.json) | HAD-001 / HAD-004 |
@@ -16,7 +16,7 @@ observation, contract, implementation, and oracle are all linked from a task.
 | Submission behavior | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [lifecycle trace](../../tests/fixtures/parity/OBS-0001-lifecycle.json) | HAD-001 / HAD-004 |
 | Streaming behavior | Unknown | — | — | Future task |
 | Errors and retries | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) (setup-required path only) | [lifecycle trace](../../tests/fixtures/parity/OBS-0001-lifecycle.json) | Future task |
-| Resize behavior | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [lifecycle trace](../../tests/fixtures/parity/OBS-0001-lifecycle.json) | Future task |
+| Resize behavior | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [lifecycle probe](../../scripts/probe_tui_lifecycle.py) | HAD-003 / Future task |
 | Persistence and recovery | Unknown | — | — | Future task |
 
 Status vocabulary: `Unknown`, `Observed`, `Specified`, `Implemented`,

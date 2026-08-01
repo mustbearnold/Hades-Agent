@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T01:03:48Z",
+  "updated_at": "2026-08-01T01:16:12Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -80,7 +80,7 @@
     {
       "id": "HAD-003",
       "title": "Characterize startup and exit lifecycle parity",
-      "status": "ready",
+      "status": "complete",
       "priority": 85,
       "lane": "lifecycle",
       "owner_role": "researcher",
@@ -97,13 +97,31 @@
         "Define behavior for normal exit, interrupt exit, and terminal cleanup.",
         "Add a deterministic probe that fails if cleanup is skipped."
       ],
-      "evidence": [],
-      "ready_at": "2026-08-01T01:03:16Z"
+      "evidence": [
+        "docs/parity/observations/OBS-0002-hades-lifecycle-2026-08-01.md",
+        "scripts/probe_tui_lifecycle.py",
+        "scripts/verify.sh",
+        "justfile"
+      ],
+      "ready_at": "2026-08-01T01:03:16Z",
+      "claimed_by": "hermes-research",
+      "claimed_at": "2026-08-01T01:08:01Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Added and wired a real-PTY lifecycle oracle covering startup, raw mode, resize, normal exit, interrupt exit, alternate-screen/cursor cleanup, and termios restoration; just verify passes.",
+        "completed_at": "2026-08-01T01:16:12Z",
+        "evidence": [
+          "docs/parity/observations/OBS-0002-hades-lifecycle-2026-08-01.md",
+          "scripts/probe_tui_lifecycle.py",
+          "scripts/verify.sh",
+          "justfile"
+        ]
+      }
     },
     {
       "id": "HAD-004",
       "title": "Implement the first reference-backed state transition",
-      "status": "queued",
+      "status": "ready",
       "priority": 80,
       "lane": "core",
       "owner_role": "implementer",
@@ -121,7 +139,8 @@
         "Keep the transition deterministic and independent of terminal rendering.",
         "Prove the transition with a focused regression test and replay evidence."
       ],
-      "evidence": []
+      "evidence": [],
+      "ready_at": "2026-08-01T01:16:12Z"
     },
     {
       "id": "HAD-005",
