@@ -524,6 +524,10 @@ impl App {
                 self.state.status = "Select terminal backend:".to_owned();
                 DispatchOutcome::Continue
             }
+            SetupWizardAction::EnteredPlatformPicker => {
+                self.state.status = "Select platforms to configure:".to_owned();
+                DispatchOutcome::Continue
+            }
             SetupWizardAction::Moved => {
                 self.state.status = if wizard.is_provider_menu() {
                     "Provider menu navigation.".to_owned()
@@ -898,7 +902,8 @@ mod tests {
         assert!(wizard.is_terminal_backend_picker());
         assert_eq!(app.state().status, "Select terminal backend:");
         assert_eq!(app.handle(InputEvent::Key(Key::Char(' '))), DispatchOutcome::Continue);
-        assert!(app.state().setup_wizard.as_ref().unwrap().is_terminal_backend_picker());
+        assert!(app.state().setup_wizard.as_ref().unwrap().is_platform_picker());
+        assert_eq!(app.state().status, "Select platforms to configure:");
         assert_eq!(app.handle(InputEvent::Key(Key::Ctrl('c'))), DispatchOutcome::Quit);
         assert!(app.state().setup_wizard.is_none());
     }

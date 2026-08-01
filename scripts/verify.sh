@@ -48,6 +48,7 @@ python3 scripts/replay_setup_wizard.py --binary target/debug/hades --contract te
 python3 scripts/replay_setup_provider_menu.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0045-hades-full-setup-provider-menu.json --report .hades/runtime/setup-provider-replay.json
 python3 scripts/replay_setup_provider_model_prompt.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0047-hades-provider-selection-model-prompt.json --report .hades/runtime/setup-provider-model-prompt-replay.json
 python3 scripts/replay_setup_terminal_backend.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0049-hades-model-default-terminal-backend.json --report .hades/runtime/setup-terminal-backend-replay.json
+python3 scripts/replay_setup_terminal_backend.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0057-hades-setup-platform-picker.json --report .hades/runtime/setup-platform-picker-replay.json
 python3 scripts/replay_paste.py --binary target/debug/hades --report .hades/runtime/paste-replay.json
 python3 scripts/replay_editor.py --binary target/debug/hades --report .hades/runtime/editor-replay.json
 python3 scripts/replay_editor_outcomes.py --binary target/debug/hades --report .hades/runtime/editor-outcomes-replay.json
@@ -76,6 +77,7 @@ python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0053-had
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0054-hermes-provider-errors.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0055-hermes-provider-setup-persistence.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0056-hermes-setup-config-shape.json
+python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0057-hades-setup-platform-picker.json
 python3 scripts/probe_hermes_full_setup_provider_selection.py --report .hades/runtime/hermes-full-setup-provider-selection-probe.json --timeout 30
 python3 scripts/probe_hermes_full_setup_model_default.py --report .hades/runtime/hermes-full-setup-model-default-probe.json --timeout 30
 python3 scripts/probe_hermes_local_provider_stream.py --report .hades/runtime/hermes-local-provider-stream-probe.json --timeout 30

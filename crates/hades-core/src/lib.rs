@@ -120,6 +120,38 @@ pub const SETUP_TERMINAL_BACKEND_ROWS: [&str; 8] = [
     "Keep current (local)",
 ];
 pub const SETUP_TERMINAL_BACKEND_CONTROLS: &str = "ENTER/SPACE select   ESC cancel";
+pub const SETUP_PLATFORM_PICKER_TITLE: &str = "Select platforms to configure:";
+pub const SETUP_PLATFORM_ROWS: [&str; 27] = [
+    "💬  Mattermost",
+    "📡  Signal",
+    "💬  Weixin / WeChat",
+    "💬  BlueBubbles (iMessage)",
+    "🐧  QQ Bot",
+    "💎  Yuanbao",
+    "🐝  Buzz",
+    "🐳  DingTalk",
+    "🎮  Discord",
+    "📧  Email",
+    "🪽  Feishu / Lark",
+    "💬  Google Chat",
+    "🏠  Home Assistant",
+    "💬  IRC",
+    "💚  LINE",
+    "🔐  Matrix",
+    "🔔  ntfy",
+    "📱  iMessage via Photon",
+    "🔔  Raft",
+    "🔒  SimpleX Chat",
+    "💼  Slack",
+    "📱  SMS (Twilio)",
+    "💼  Microsoft Teams",
+    "✈️  Telegram",
+    "💼  WeCom (Enterprise WeChat)",
+    "💼  WeCom Callback (self-built apps)",
+    "💬  WhatsApp",
+];
+pub const SETUP_PLATFORM_PICKER_CONTROLS: &str =
+    "↑↓ navigate  SPACE toggle  ENTER confirm  ESC cancel";
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub enum SetupWizardSurface {
@@ -129,6 +161,7 @@ pub enum SetupWizardSurface {
     FullSetupProviderMenu,
     ModelNamePrompt,
     TerminalBackendPicker,
+    PlatformPicker,
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
@@ -139,6 +172,7 @@ pub enum SetupWizardAction {
     EnteredProviderMenu,
     EnteredModelNamePrompt,
     EnteredTerminalBackendPicker,
+    EnteredPlatformPicker,
     Quit,
 }
 
@@ -185,6 +219,10 @@ impl SetupWizardState {
 
     pub fn is_terminal_backend_picker(&self) -> bool {
         self.surface == SetupWizardSurface::TerminalBackendPicker
+    }
+
+    pub fn is_platform_picker(&self) -> bool {
+        self.surface == SetupWizardSurface::PlatformPicker
     }
 
     pub fn provider_cursor(&self) -> usize {
@@ -248,6 +286,14 @@ impl SetupWizardState {
                 _ => SetupWizardAction::Continue,
             },
             SetupWizardSurface::TerminalBackendPicker => match key {
+                Key::Enter | Key::Char(' ') => {
+                    self.surface = SetupWizardSurface::PlatformPicker;
+                    SetupWizardAction::EnteredPlatformPicker
+                }
+                Key::Ctrl('c') => SetupWizardAction::Quit,
+                _ => SetupWizardAction::Continue,
+            },
+            SetupWizardSurface::PlatformPicker => match key {
                 Key::Ctrl('c') => SetupWizardAction::Quit,
                 _ => SetupWizardAction::Continue,
             },
@@ -888,6 +934,8 @@ mod tests {
         assert!(wizard.is_terminal_backend_picker());
         assert_eq!(wizard.provider_cursor(), 0);
         assert_eq!(wizard.provider_cursor_label(), SETUP_PROVIDER_MENU_ROWS[0]);
+        assert_eq!(wizard.handle_key(Key::Char(' ')), SetupWizardAction::EnteredPlatformPicker);
+        assert!(wizard.is_platform_picker());
         assert_eq!(wizard.handle_key(Key::Char(' ')), SetupWizardAction::Continue);
         assert_eq!(wizard.handle_key(Key::Ctrl('c')), SetupWizardAction::Quit);
     }

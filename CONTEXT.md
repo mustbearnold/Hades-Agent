@@ -274,6 +274,11 @@ progress from August 1, 2026 through 2027.
   platform picker; cancellation preserves the shape and a fresh process is
   ready. Hades config-file persistence, credential handling, and platform
   implementation remain unclaimed.
+- HAD-061 implements the bounded Hades in-memory platform-picker continuation:
+  accepting the displayed Keep current (local) backend reaches the observed
+  platform title, controls, and unconfigured platform rows, while Ctrl+C exits
+  cleanly. Platform toggling/confirmation, config writes, credentials, and
+  later setup behavior remain unimplemented.
 
 ## Unknown until observed
 
@@ -293,8 +298,8 @@ progress from August 1, 2026 through 2027.
   discovery details, setup wizard continuation, numbered-fallback choices,
   terminal-backend selection and cancellation after deeper navigation, provider
   configuration beyond the bounded OBS-0055/OBS-0056 readbacks, backup
-  semantics, and Hades persistence, credential handling, platform setup,
-  configured command
+  semantics, and Hades persistence, credential handling, platform setup beyond
+  the bounded picker, configured command
   behavior with a reachable provider, and model-picker behavior beyond the
   bounded deterministic provider/model seam.
 - OSC52 behavior outside the OBS-0032 timing controls and bounded payload

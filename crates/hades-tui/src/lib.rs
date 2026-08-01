@@ -3,6 +3,7 @@
 use hades_app::App;
 use hades_core::{
     MODEL_PICKER_MODEL, MODEL_PICKER_PROVIDER, ModelPickerStage, Notice, Overlay, Role,
+    SETUP_PLATFORM_PICKER_CONTROLS, SETUP_PLATFORM_PICKER_TITLE, SETUP_PLATFORM_ROWS,
     SETUP_PROVIDER_ACTIVE_PROVIDER, SETUP_PROVIDER_CURRENT_MODEL, SETUP_PROVIDER_MENU_ROWS,
     SETUP_PROVIDER_MODEL_NAME, SETUP_TERMINAL_BACKEND_CONTROLS, SETUP_TERMINAL_BACKEND_ROWS,
     SETUP_TERMINAL_BACKEND_TITLE, SETUP_WIZARD_CHOICES, SetupWizardSurface, TurnState,
@@ -274,6 +275,10 @@ fn draw_setup_wizard_overlay(frame: &mut Frame<'_>, app: &App) {
     let Some(wizard) = app.state().setup_wizard.as_ref() else {
         return;
     };
+    if wizard.is_platform_picker() {
+        draw_setup_platform_picker_overlay(frame);
+        return;
+    }
     if wizard.is_terminal_backend_picker() {
         draw_setup_terminal_backend_picker_overlay(frame);
         return;
@@ -397,6 +402,29 @@ fn draw_setup_terminal_backend_picker_overlay(frame: &mut Frame<'_>) {
         Line::raw(""),
         Line::styled(format!(" {SETUP_TERMINAL_BACKEND_CONTROLS}"), HERMES_PALETTE.secondary()),
     ]);
+
+    let panel = Paragraph::new(Text::from(lines))
+        .block(Block::default().borders(Borders::ALL).title(" Full setup "));
+    frame.render_widget(Clear, area);
+    frame.render_widget(panel, area);
+}
+
+fn draw_setup_platform_picker_overlay(frame: &mut Frame<'_>) {
+    let area = centered_rect(frame.area(), 116, 38);
+    let mut lines = vec![
+        Line::styled(" Hermes Agent Setup Wizard", HERMES_PALETTE.brand()),
+        Line::raw(""),
+        Line::styled(format!(" {SETUP_PLATFORM_PICKER_TITLE}"), HERMES_PALETTE.brand()),
+        Line::styled(format!(" {SETUP_PLATFORM_PICKER_CONTROLS}"), HERMES_PALETTE.secondary()),
+        Line::raw(""),
+    ];
+    for (index, row) in SETUP_PLATFORM_ROWS.iter().enumerate() {
+        let cursor = if index == 0 { "→" } else { " " };
+        lines.push(Line::styled(
+            format!(" {cursor} [ ] {row}  (not configured)"),
+            if index == 0 { HERMES_PALETTE.ready() } else { HERMES_PALETTE.secondary() },
+        ));
+    }
 
     let panel = Paragraph::new(Text::from(lines))
         .block(Block::default().borders(Borders::ALL).title(" Full setup "));
@@ -1056,6 +1084,44 @@ mod tests {
             "Active provider: palette-loopback",
         ] {
             assert!(picker.contains(marker), "missing terminal backend marker: {marker}");
+        }
+        assert!(!picker.contains("musing…"));
+        assert!(!picker.contains("API key"));
+        assert_eq!(
+            app.handle(hades_core::InputEvent::Key(hades_core::Key::Ctrl('c'))),
+            hades_app::DispatchOutcome::Quit
+        );
+    }
+
+    #[test]
+    fn hermes_startup_surface_renders_bounded_platform_picker() {
+        let mut app = App::new();
+        for character in "/setup".chars() {
+            app.handle(hades_core::InputEvent::Key(hades_core::Key::Char(character)));
+        }
+        for key in [
+            hades_core::Key::Enter,
+            hades_core::Key::Enter,
+            hades_core::Key::Down,
+            hades_core::Key::Enter,
+            hades_core::Key::Enter,
+            hades_core::Key::Enter,
+            hades_core::Key::Enter,
+        ] {
+            app.handle(hades_core::InputEvent::Key(key));
+        }
+
+        let picker = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        for marker in [
+            "Select platforms to configure:",
+            "SPACE toggle",
+            "ENTER confirm",
+            "ESC cancel",
+            "Mattermost",
+            "Signal",
+            "(not configured)",
+        ] {
+            assert!(picker.contains(marker), "missing platform picker marker: {marker}");
         }
         assert!(!picker.contains("musing…"));
         assert!(!picker.contains("API key"));

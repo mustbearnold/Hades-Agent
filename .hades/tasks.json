@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T16:55:52Z",
+  "updated_at": "2026-08-01T17:05:50Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -3078,6 +3078,68 @@
           ".hades/runtime/hermes-setup-config-shape-probe.json",
           ".hades/runtime/had060-reference-probe.log",
           ".hades/runtime/had060-pre-completion-verify.log"
+        ]
+      }
+    },
+    {
+      "id": "HAD-061",
+      "title": "Implement bounded setup platform-picker continuation",
+      "status": "complete",
+      "priority": 22,
+      "lane": "product",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-060"
+      ],
+      "risk": "high",
+      "oracle": [
+        "typed_setup_state_tests",
+        "platform_picker_snapshot",
+        "direct_pty_platform_replay",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Add a typed Hades setup platform-picker surface reached when the bounded terminal-backend state accepts the displayed Keep current (local) row, rendering the observed title, toggle/confirm/cancel controls, and stable unconfigured platform markers from OBS-0056.",
+        "Preserve the exact observed boundary: accepting the model default and Keep current advances to platform selection; Ctrl+C from the platform picker exits cleanly, while platform toggling, confirmation, credentials, provider discovery, config file writes, and later setup pages remain unimplemented.",
+        "Add focused core/app/TUI regression tests and a sanitized Hades direct-PTY replay/fixture for the setup sequence, platform surface, no-busy/no-provider behavior, Ctrl+C cleanup, and terminal restoration; do not claim config persistence from the in-memory transition.",
+        "Run the complete no-skip just verify gate and record implementation, replay, fixture, decision/context, and verification evidence before completion."
+      ],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-app/src/lib.rs",
+        "crates/hades-tui/src/lib.rs",
+        "scripts/replay_setup_terminal_backend.py",
+        "tests/fixtures/parity/OBS-0057-hades-setup-platform-picker.json",
+        "docs/parity/observations/OBS-0057-hades-setup-platform-picker-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/setup-platform-picker-replay.json",
+        ".hades/runtime/had061-platform-picker-focused.log",
+        ".hades/runtime/had061-pre-completion-verify.log"
+      ],
+      "ready_at": "2026-08-01T16:56:33Z",
+      "attempts": 1,
+      "claimed_by": "setup-platform-picker",
+      "claimed_at": "2026-08-01T16:56:48Z",
+      "result": {
+        "summary": "Implemented the bounded Hades in-memory setup platform-picker continuation from OBS-0056. Accepting the displayed Keep current (local) backend now renders the observed platform title, controls, and unconfigured platform markers; Ctrl+C exits cleanly. Focused core/app/TUI tests, the sanitized OBS-0057 replay, and the complete no-skip verification passed. Platform toggling/confirmation, config writes, credentials, and later setup remain unimplemented.",
+        "completed_at": "2026-08-01T17:05:50Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-app/src/lib.rs",
+          "crates/hades-tui/src/lib.rs",
+          "scripts/replay_setup_terminal_backend.py",
+          "tests/fixtures/parity/OBS-0057-hades-setup-platform-picker.json",
+          "docs/parity/observations/OBS-0057-hades-setup-platform-picker-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/setup-platform-picker-replay.json",
+          ".hades/runtime/had061-platform-picker-focused.log",
+          ".hades/runtime/had061-pre-completion-verify.log"
         ]
       }
     }
