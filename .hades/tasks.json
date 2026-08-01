@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T09:03:28Z",
+  "updated_at": "2026-08-01T09:26:23Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -1767,6 +1767,57 @@
           "justfile",
           "README.md",
           "CONTEXT.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-037",
+      "title": "Capture Hermes slash-command and configuration entry surfaces",
+      "status": "complete",
+      "priority": 46,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-036"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "reference_observation",
+        "provenance_record",
+        "fixture_validator",
+        "direct_pty_probe"
+      ],
+      "acceptance": [
+        "Observe the pinned Hermes reference in fresh 120x40 direct PTYs with synthetic homes and a loopback custom provider configuration; never read or copy user credentials or private runtime state.",
+        "Capture configured /help, /model, and /setup entry behavior, including exact stable text landmarks, overlays, input retention or clearing, model/provider labels, and clean escape or interrupt behavior.",
+        "Exercise one unrecognized slash command only far enough to record whether it remains a message, enters the model/busy path, or produces an error; interrupt and clean up without making a network request.",
+        "Add sanitized OBS-0036 fixture, provenance observation, and repeatable direct-PTY probe with measured dynamic values normalized and unobserved command/configuration behavior explicit as unknown.",
+        "Wire fixture validation and the research probe through just verify without changing Hades runtime behavior."
+      ],
+      "evidence": [
+        "tests/fixtures/parity/OBS-0036-hermes-slash-command-surfaces.json",
+        "docs/parity/observations/OBS-0036-hermes-slash-command-surfaces-2026-08-01.md",
+        "scripts/probe_hermes_slash_commands.py",
+        "scripts/validate_reference_fixture.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "ready_at": "2026-08-01T09:20:00Z",
+      "claimed_by": "hermes-research",
+      "claimed_at": "2026-08-01T09:08:04Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Captured the configured Hermes slash-command subset in fresh sanitized direct PTYs: /help help surface, /model provider picker, /setup external wizard handoff, and unknown-command error with clean cleanup; wired the OBS-0036 validator and probe into just verify, and the full gate passed.",
+        "completed_at": "2026-08-01T09:26:23Z",
+        "evidence": [
+          "tests/fixtures/parity/OBS-0036-hermes-slash-command-surfaces.json",
+          "docs/parity/observations/OBS-0036-hermes-slash-command-surfaces-2026-08-01.md",
+          "scripts/probe_hermes_slash_commands.py",
+          "scripts/validate_reference_fixture.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
         ]
       }
     }

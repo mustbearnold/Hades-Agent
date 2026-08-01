@@ -134,6 +134,13 @@ progress from August 1, 2026 through 2027.
   the locked `hades-cli` release binary and creates collision-safe `hades` and
   `Hades` symlinks in `~/.local/bin` without modifying shell configuration;
   command-resolution and version checks are verified in Fish and Bash.
+- HAD-037 captures the configured Hermes slash-command subset in fresh direct
+  PTYs: `/help` renders a help surface, `/model` opens a two-stage provider
+  picker after the observed completion/submission sequence, `/setup` hands off
+  to the external setup wizard, and an unknown slash command reports an error
+  while remaining ready. Provider discovery, deeper setup behavior, and
+  reachable-provider outcomes remain unknown; the sanitized contract is in
+  OBS-0036.
 
 ## Unknown until observed
 
@@ -145,6 +152,9 @@ progress from August 1, 2026 through 2027.
   session recovery remains unobserved beyond input-history persistence.
 - Successful provider/model streaming, tool calls, and the exact behavior of
   terminal-dependent surfaces beyond the captured observations.
+- The complete slash-command catalog and argument semantics, provider/model
+  discovery details, setup wizard continuation and persistence, and configured
+  command behavior with a reachable provider.
 - OSC52 behavior outside the OBS-0032 timing controls and bounded payload
   sizes, including a universal timeout or maximum-size contract.
 
