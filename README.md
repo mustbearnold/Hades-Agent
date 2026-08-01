@@ -21,7 +21,9 @@ session-switcher, and setup-required traces against the actual binary, writing
 its generated report under `.hades/runtime/`. `just validate-reference` checks
 the provenance and sanitization contract for the reference-only input-editing
 fixture. `just replay-composer` replays the implemented editing, history, and
-multiline contract in isolated PTY cases.
+multiline contract in isolated PTY cases. `just replay-completion` replays the
+implemented `/he` slash-completion and Tab-application contract in isolated PTY
+cases.
 The current work queue is in
 `.hades/tasks.json`; use `just agent next` to select the next evidence-backed
 task.
@@ -40,6 +42,7 @@ just snapshot                 # deterministic terminal snapshot
 just probe-lifecycle          # PTY lifecycle and cleanup oracle
 just replay-differential     # visual + behavioral parity replay
 just replay-composer         # composer editing/history/multiline PTY replay
+just replay-completion       # slash completion and Tab application PTY replay
 just agent validate           # validate task/control-plane invariants
 just agent next               # choose the highest-priority ready task
 just agent claim HAD-001 bot  # claim a task with an agent identity

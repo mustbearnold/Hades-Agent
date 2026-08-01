@@ -82,6 +82,38 @@ impl Message {
     }
 }
 
+pub const OBSERVED_SLASH_COMPLETIONS: [&str; 3] =
+    ["/help", "/hermes-agent", "/hermes-agent-skill-authoring"];
+
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub struct CompletionState {
+    items: Vec<String>,
+}
+
+impl CompletionState {
+    pub fn for_draft(draft: &str) -> Self {
+        if draft == "/he" {
+            return Self {
+                items: OBSERVED_SLASH_COMPLETIONS.iter().map(|item| (*item).to_owned()).collect(),
+            };
+        }
+
+        Self::default()
+    }
+
+    pub fn is_visible(&self) -> bool {
+        !self.items.is_empty()
+    }
+
+    pub fn items(&self) -> &[String] {
+        &self.items
+    }
+
+    pub fn first_item(&self) -> Option<&str> {
+        self.items.first().map(String::as_str)
+    }
+}
+
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Composer {
     text: String,
@@ -171,6 +203,11 @@ impl Composer {
         self.reset_history_navigation();
     }
 
+    pub fn replace(&mut self, text: impl Into<String>) {
+        self.replace_text(text.into());
+        self.reset_history_navigation();
+    }
+
     pub fn history_up(&mut self) -> bool {
         if self.history.is_empty() {
             return false;
@@ -241,6 +278,7 @@ pub struct SessionState {
     pub turn: TurnState,
     pub overlay: Option<Overlay>,
     pub composer: Composer,
+    pub completion: CompletionState,
     pub messages: Vec<Message>,
     pub status: String,
     pub should_quit: bool,
@@ -253,6 +291,7 @@ impl Default for SessionState {
             turn: TurnState::Ready,
             overlay: None,
             composer: Composer::default(),
+            completion: CompletionState::default(),
             messages: Vec::new(),
             status: "Reference behavior pending capture.".to_owned(),
             should_quit: false,
@@ -360,6 +399,35 @@ mod tests {
         assert_eq!(composer.enter(), EnterAction::InsertedNewline);
         composer.insert('x');
         assert_eq!(composer.text(), "line-one\nx");
+    }
+
+    #[test]
+    fn completion_state_is_exactly_scoped_to_observed_slash_prefix() {
+        let completion = CompletionState::for_draft("/he");
+
+        assert_eq!(
+            completion.items(),
+            &[
+                "/help".to_owned(),
+                "/hermes-agent".to_owned(),
+                "/hermes-agent-skill-authoring".to_owned(),
+            ]
+        );
+        assert!(!CompletionState::for_draft("/h").is_visible());
+        assert!(!CompletionState::for_draft("/hel").is_visible());
+    }
+
+    #[test]
+    fn composer_replace_moves_cursor_to_the_applied_completion() {
+        let mut composer = Composer::default();
+        composer.insert('/');
+        composer.insert('h');
+        composer.insert('e');
+
+        composer.replace("/help");
+
+        assert_eq!(composer.text(), "/help");
+        assert_eq!(composer.cursor(), 5);
     }
 
     #[test]

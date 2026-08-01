@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T03:21:30Z",
+  "updated_at": "2026-08-01T03:36:11Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -481,6 +481,62 @@
           "crates/hades-tui/src/lib.rs",
           "tests/fixtures/parity/OBS-0011-hades-composer-editing.json",
           "docs/parity/observations/OBS-0011-hades-composer-editing-2026-08-01.md",
+          "scripts/replay_composer.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-012",
+      "title": "Implement the reference-backed slash completion slice",
+      "status": "complete",
+      "priority": 71,
+      "lane": "interaction",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-011"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "unit_test",
+        "snapshot_test",
+        "replay_trace"
+      ],
+      "acceptance": [
+        "Represent ready-state slash completion as typed state with the exact observed /he items: /help, /hermes-agent, and /hermes-agent-skill-authoring.",
+        "Apply completion with Tab to /help, collapse the panel, and leave unobserved completion contexts, ordering, and debounce races explicitly unclaimed.",
+        "Render the completion panel and prove typing and application with deterministic tests, a 120x40 snapshot, and isolated PTY replay integrated into verification."
+      ],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-app/src/lib.rs",
+        "crates/hades-cli/src/main.rs",
+        "crates/hades-tui/src/lib.rs",
+        "tests/fixtures/parity/OBS-0012-hades-slash-completion.json",
+        "docs/parity/observations/OBS-0012-hades-slash-completion-2026-08-01.md",
+        "scripts/replay_completion.py",
+        "scripts/replay_composer.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "ready_at": "2026-08-01T03:27:34Z",
+      "attempts": 1,
+      "claimed_by": "hermes-implementer",
+      "claimed_at": "2026-08-01T03:27:54Z",
+      "result": {
+        "summary": "Implemented the narrow reference-backed /he slash-completion slice with typed completion state, deterministic panel rendering, Tab application of /help before surface navigation, focused tests, and isolated tmux screen replay integrated into verification.",
+        "completed_at": "2026-08-01T03:36:11Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-app/src/lib.rs",
+          "crates/hades-cli/src/main.rs",
+          "crates/hades-tui/src/lib.rs",
+          "tests/fixtures/parity/OBS-0012-hades-slash-completion.json",
+          "docs/parity/observations/OBS-0012-hades-slash-completion-2026-08-01.md",
+          "scripts/replay_completion.py",
           "scripts/replay_composer.py",
           "justfile",
           "scripts/verify.sh",

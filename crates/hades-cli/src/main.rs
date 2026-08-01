@@ -110,5 +110,6 @@ mod tests {
     fn cursor_key_mapping_is_explicit() {
         assert_eq!(map_key(KeyEvent::new(KeyCode::Home, KeyModifiers::NONE)), Some(Key::Home));
         assert_eq!(map_key(KeyEvent::new(KeyCode::End, KeyModifiers::NONE)), Some(Key::End));
+        assert_eq!(map_key(KeyEvent::new(KeyCode::Tab, KeyModifiers::NONE)), Some(Key::Tab));
     }
 }

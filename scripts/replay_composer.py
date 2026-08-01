@@ -80,6 +80,13 @@ def load_contract(path: Path) -> dict[str, Any]:
             markers = output.get("pty_markers")
             if not isinstance(markers, list) or not all(isinstance(marker, str) for marker in markers):
                 raise ComposerReplayFailure("contract", step["id"], "pty_markers must be a string array")
+            absent_markers = output.get("pty_absent_markers", [])
+            if not isinstance(absent_markers, list) or not all(
+                isinstance(marker, str) for marker in absent_markers
+            ):
+                raise ComposerReplayFailure(
+                    "contract", step["id"], "pty_absent_markers must be a string array"
+                )
     return contract
 
 
@@ -146,6 +153,7 @@ def key_payload(value: str) -> str:
         "Right": "Right",
         "Home": "Home",
         "End": "End",
+        "Tab": "Tab",
     }
     try:
         return payloads[value]
@@ -189,9 +197,15 @@ def start_session(binary: Path, session: str) -> None:
         )
 
 
-def run_case(binary: Path, case: dict[str, Any], timeout: float, ordinal: int) -> dict[str, Any]:
+def run_case(
+    binary: Path,
+    case: dict[str, Any],
+    timeout: float,
+    ordinal: int,
+    session_prefix: str = "had011-composer",
+) -> dict[str, Any]:
     case_id = case["id"]
-    session = f"had011-composer-{ordinal}-{int(time.time() * 1000)}"
+    session = f"{session_prefix}-{ordinal}-{int(time.time() * 1000)}"
     start_session(binary, session)
     replayed_steps: list[dict[str, Any]] = []
     try:
@@ -208,6 +222,7 @@ def run_case(binary: Path, case: dict[str, Any], timeout: float, ordinal: int) -
             input_value = step["input"]
             output_contract = step["output"]
             markers = output_contract["pty_markers"]
+            absent_markers = output_contract.get("pty_absent_markers", [])
             send_input(session, input_value)
 
             if output_contract.get("process_exit"):
@@ -217,13 +232,14 @@ def run_case(binary: Path, case: dict[str, Any], timeout: float, ordinal: int) -
                 if session_exists(session):
                     raise ComposerReplayFailure(case_id, step_id, "process did not exit")
                 observed = ["process exit"]
-            elif markers:
+            elif markers or absent_markers:
                 screen = wait_for_screen(
                     session,
                     step_id,
-                    lambda current, expected=markers: all(
+                    lambda current, expected=markers, absent=absent_markers: all(
                         contains_marker(current, marker) for marker in expected
-                    ),
+                    )
+                    and all(not contains_marker(current, marker) for marker in absent),
                     timeout,
                 )
                 observed = list(markers)
@@ -240,6 +256,7 @@ def run_case(binary: Path, case: dict[str, Any], timeout: float, ordinal: int) -
                     "input": input_value,
                     "status": "passed",
                     "observed": observed,
+                    "absent": absent_markers,
                 }
             )
 

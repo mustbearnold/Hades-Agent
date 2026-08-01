@@ -48,6 +48,10 @@ fn draw_hermes_startup(frame: &mut Frame<'_>, app: &App) {
         rows[39] = Line::raw(" ❯ <prompt-placeholder>");
     }
 
+    if app.state().completion.is_visible() {
+        draw_hermes_completion(&mut rows, app.state().completion.items());
+    }
+
     frame.render_widget(Paragraph::new(Text::from(rows)), frame.area());
 }
 
@@ -63,6 +67,23 @@ fn draw_hermes_composer(rows: &mut [Line<'static>], input: &str) {
         if row < rows.len() {
             rows[row] = Line::raw(format!(" {}{}", if offset == 0 { "❯ " } else { "  " }, line));
         }
+    }
+}
+
+fn draw_hermes_completion(rows: &mut [Line<'static>], items: &[String]) {
+    let header_row = 33usize;
+    if header_row < rows.len() {
+        rows[header_row] = Line::raw("  completions");
+    }
+
+    for (index, item) in items.iter().enumerate() {
+        let row = header_row + 1 + index;
+        if row >= rows.len() {
+            break;
+        }
+
+        let marker = if index == 0 { "▸ " } else { "  " };
+        rows[row] = Line::raw(format!(" {}{}", marker, item));
     }
 }
 
@@ -158,11 +179,34 @@ fn draw_bootstrap(frame: &mut Frame<'_>, app: &App) {
         .block(Block::default().borders(Borders::ALL).title("input"));
     frame.render_widget(input, sections[2]);
 
+    if app.state().completion.is_visible() {
+        draw_bootstrap_completion(frame, app);
+    }
+
     let footer = Paragraph::new(Line::from(vec![
         Span::styled(app.state().status.as_str(), Style::default().fg(Color::Gray)),
         Span::raw("  |  Tab surface  Enter submit  q/Ctrl-C exit"),
     ]));
     frame.render_widget(footer, sections[3]);
+}
+
+fn draw_bootstrap_completion(frame: &mut Frame<'_>, app: &App) {
+    let area = centered_rect(frame.area(), 58, 7);
+    let lines = app
+        .state()
+        .completion
+        .items()
+        .iter()
+        .enumerate()
+        .map(|(index, item)| {
+            let marker = if index == 0 { "▸ " } else { "  " };
+            Line::raw(format!(" {}{}", marker, item))
+        })
+        .collect::<Vec<_>>();
+    let panel = Paragraph::new(Text::from(lines))
+        .block(Block::default().borders(Borders::ALL).title(" Completions "));
+    frame.render_widget(Clear, area);
+    frame.render_widget(panel, area);
 }
 
 pub fn snapshot(app: &App, width: u16, height: u16) -> String {
@@ -307,5 +351,24 @@ mod tests {
         let rendered = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
         assert!(rendered.contains("line-one"));
         assert!(rendered.contains("line-two"));
+    }
+
+    #[test]
+    fn hermes_startup_surface_renders_and_applies_slash_completion() {
+        let mut app = App::new();
+        for character in "/he".chars() {
+            app.handle(hades_core::InputEvent::Key(hades_core::Key::Char(character)));
+        }
+
+        let completion = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        for marker in ["completions", "/help", "/hermes-agent", "/hermes-agent-skill-authoring"] {
+            assert!(completion.contains(marker), "missing completion marker: {marker}");
+        }
+
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Tab));
+        let applied = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        assert!(applied.contains("❯ /help"));
+        assert!(!applied.contains("/hermes-agent"));
+        assert!(!app.state().completion.is_visible());
     }
 }

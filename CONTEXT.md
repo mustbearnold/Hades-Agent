@@ -42,6 +42,10 @@ progress from August 1, 2026 through 2027.
   multiline input, terminal Home/End mapping, focused tests, and isolated PTY
   replay. Disk history, completion, paste, editor handoff, mouse, and other
   unobserved keymap behavior remain outside the claim.
+- HAD-012 implements the observed slash-completion slice: exact `/he` items,
+  deterministic rendering, and Tab application of `/help` before the fallback
+  surface cycle. Completion gateway timing, other prefixes, multiline/busy
+  behavior, and selection semantics remain unknown.
 
 ## Unknown until observed
 

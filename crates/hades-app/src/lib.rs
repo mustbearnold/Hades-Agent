@@ -1,6 +1,8 @@
 #![forbid(unsafe_code)]
 
-use hades_core::{EnterAction, InputEvent, Key, Message, Overlay, SessionState, TurnState};
+use hades_core::{
+    CompletionState, EnterAction, InputEvent, Key, Message, Overlay, SessionState, TurnState,
+};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum DispatchOutcome {
@@ -72,15 +74,18 @@ impl App {
             Key::Char('q') if self.state.composer.text().is_empty() => self.quit(),
             Key::Char(character) => {
                 self.state.composer.insert(character);
+                self.refresh_completion();
                 self.state.status = "Editing input.".to_owned();
                 DispatchOutcome::Continue
             }
             Key::Backspace => {
                 self.state.composer.backspace();
+                self.refresh_completion();
                 DispatchOutcome::Continue
             }
             Key::Enter => match self.state.composer.enter() {
                 EnterAction::InsertedNewline => {
+                    self.refresh_completion();
                     self.state.status = "Editing input.".to_owned();
                     DispatchOutcome::Continue
                 }
@@ -88,7 +93,12 @@ impl App {
             },
             Key::Escape => {
                 self.state.composer.clear();
+                self.clear_completion();
                 self.state.status = "Input cleared.".to_owned();
+                DispatchOutcome::Continue
+            }
+            Key::Tab if self.state.completion.is_visible() => {
+                self.apply_completion();
                 DispatchOutcome::Continue
             }
             Key::Tab => {
@@ -98,34 +108,42 @@ impl App {
             }
             Key::Up => {
                 self.state.composer.history_up();
+                self.clear_completion();
                 DispatchOutcome::Continue
             }
             Key::Down => {
                 self.state.composer.history_down();
+                self.clear_completion();
                 DispatchOutcome::Continue
             }
             Key::Left => {
                 self.state.composer.move_left();
+                self.clear_completion();
                 DispatchOutcome::Continue
             }
             Key::Right => {
                 self.state.composer.move_right();
+                self.clear_completion();
                 DispatchOutcome::Continue
             }
             Key::Home => {
                 self.state.composer.move_home();
+                self.clear_completion();
                 DispatchOutcome::Continue
             }
             Key::End => {
                 self.state.composer.move_end();
+                self.clear_completion();
                 DispatchOutcome::Continue
             }
             Key::Ctrl('a') => {
                 self.state.composer.move_home();
+                self.clear_completion();
                 DispatchOutcome::Continue
             }
             Key::Ctrl('k') => {
                 self.state.composer.kill_to_end();
+                self.clear_completion();
                 DispatchOutcome::Continue
             }
             Key::Ctrl(_) => DispatchOutcome::Continue,
@@ -133,6 +151,7 @@ impl App {
     }
 
     fn submit(&mut self, draft: String) -> DispatchOutcome {
+        self.clear_completion();
         let content = draft.trim().to_owned();
         if content.is_empty() {
             self.state.status = "Nothing to submit.".to_owned();
@@ -154,6 +173,7 @@ impl App {
     }
 
     fn interrupt(&mut self) -> DispatchOutcome {
+        self.clear_completion();
         self.state.turn = TurnState::Ready;
         self.state.status = "Interrupted.".to_owned();
         DispatchOutcome::Interrupted
@@ -162,6 +182,30 @@ impl App {
     fn quit(&mut self) -> DispatchOutcome {
         self.state.should_quit = true;
         DispatchOutcome::Quit
+    }
+
+    fn refresh_completion(&mut self) {
+        if self.state.turn != TurnState::Ready {
+            self.clear_completion();
+            return;
+        }
+
+        let draft = self.state.composer.text().to_owned();
+        self.state.completion = CompletionState::for_draft(&draft);
+    }
+
+    fn clear_completion(&mut self) {
+        self.state.completion = CompletionState::default();
+    }
+
+    fn apply_completion(&mut self) {
+        let Some(item) = self.state.completion.first_item().map(str::to_owned) else {
+            return;
+        };
+
+        self.state.composer.replace(item);
+        self.clear_completion();
+        self.state.status = "Completion applied.".to_owned();
     }
 }
 
@@ -219,6 +263,21 @@ mod tests {
         assert_eq!(app.state().surface, Surface::Conversation);
         assert_eq!(app.handle(InputEvent::Key(Key::Ctrl('c'))), DispatchOutcome::Quit);
         assert!(app.state().should_quit);
+    }
+
+    #[test]
+    fn slash_completion_consumes_tab_before_surface_navigation() {
+        let mut app = App::new();
+        for character in "/he".chars() {
+            app.handle(InputEvent::Key(Key::Char(character)));
+        }
+
+        assert_eq!(app.state().completion.items().len(), 3);
+        assert_eq!(app.state().surface, Surface::Home);
+        assert_eq!(app.handle(InputEvent::Key(Key::Tab)), DispatchOutcome::Continue);
+        assert_eq!(app.state().composer.text(), "/help");
+        assert!(!app.state().completion.is_visible());
+        assert_eq!(app.state().surface, Surface::Home);
     }
 
     #[test]

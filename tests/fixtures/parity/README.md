@@ -13,3 +13,5 @@ the differential replay command. OBS-0010 records the reference-only input
 editing and keymap contract; its provenance and sanitization are checked by
 `scripts/validate_reference_fixture.py`. OBS-0011 is the Hades implementation
 contract derived from OBS-0010 and is consumed by `scripts/replay_composer.py`.
+OBS-0012 is the Hades slash-completion implementation contract derived from
+OBS-0010 and is consumed by `scripts/replay_completion.py`.

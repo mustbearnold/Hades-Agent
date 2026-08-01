@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0012",
+  "reference_observation": "OBS-0010",
+  "surface": "hades-tui",
+  "reference_contract": {
+    "input": "/he",
+    "completion_items": [
+      "/help",
+      "/hermes-agent",
+      "/hermes-agent-skill-authoring"
+    ],
+    "apply_key": "Tab",
+    "applied_item": "/help"
+  },
+  "terminal": {
+    "columns": 120,
+    "rows": 40,
+    "emulator": "tmux-backed PTY"
+  },
+  "normalization": [
+    "Capture stable screen text with tmux capture-pane -p after each redraw.",
+    "Ignore ANSI sequences, cursor placement, colors, and trailing spaces.",
+    "Each case runs in a fresh Hades process with the same 120x40 terminal size.",
+    "The completion panel is asserted by its header and item landmarks; application is asserted by the composer line and disappearance of the remaining completion item.",
+    "This contract covers only the observed /he completion slice and does not claim asynchronous gateway behavior or other prefixes."
+  ],
+  "cases": [
+    {
+      "id": "show-slash-completion",
+      "steps": [
+        {
+          "id": "type-slash-he",
+          "input": {
+            "kind": "text",
+            "value": "/he"
+          },
+          "output": {
+            "pty_markers": [
+              "completions",
+              "/help",
+              "/hermes-agent",
+              "/hermes-agent-skill-authoring"
+            ]
+          }
+        },
+        {
+          "id": "exit",
+          "input": {
+            "kind": "key",
+            "value": "Ctrl+C"
+          },
+          "output": {
+            "pty_markers": [
+              "process exit"
+            ],
+            "process_exit": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "apply-slash-completion",
+      "steps": [
+        {
+          "id": "type-slash-he",
+          "input": {
+            "kind": "text",
+            "value": "/he"
+          },
+          "output": {
+            "pty_markers": [
+              "completions",
+              "/hermes-agent"
+            ]
+          }
+        },
+        {
+          "id": "apply-first-item",
+          "input": {
+            "kind": "key",
+            "value": "Tab"
+          },
+          "output": {
+            "pty_markers": [
+              "❯ /help"
+            ],
+            "pty_absent_markers": [
+              "/hermes-agent"
+            ]
+          }
+        },
+        {
+          "id": "exit",
+          "input": {
+            "kind": "key",
+            "value": "Ctrl+C"
+          },
+          "output": {
+            "pty_markers": [
+              "process exit"
+            ],
+            "process_exit": true
+          }
+        }
+      ]
+    }
+  ]
+}
