@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T09:35:35Z",
+  "updated_at": "2026-08-01T09:54:36Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -1871,6 +1871,57 @@
           "scripts/verify.sh",
           "docs/parity/observations/OBS-0037-hades-unknown-slash-command-2026-08-01.md",
           "CONTEXT.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-039",
+      "title": "Capture Hermes model picker model-stage and back behavior",
+      "status": "complete",
+      "priority": 44,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-038"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "reference_observation",
+        "provenance_record",
+        "fixture_validator",
+        "direct_pty_probe"
+      ],
+      "acceptance": [
+        "Observe the pinned Hermes reference in fresh 120x40 direct PTYs with the sanitized loopback custom provider configuration and no credentials or private runtime state.",
+        "Open /model through the observed completion/submission sequence, filter to the synthetic loopback provider, and capture the stable model-stage title, provider/model labels, filter guidance, persistence label, and close hints.",
+        "Exercise model-stage Escape with and without an active filter to distinguish filter clearing from navigation back to provider selection, then close the picker without selecting a model or triggering setup/network side effects.",
+        "Add sanitized OBS-0038 fixture, provenance observation, and repeatable direct-PTY probe with provider rows, counts, loading text, timing, and exact dynamic model lists normalized or explicit as unknown.",
+        "Wire fixture validation and the research probe through just verify without changing Hades runtime behavior."
+      ],
+      "evidence": [
+        "tests/fixtures/parity/OBS-0038-hermes-model-picker-model-stage.json",
+        "docs/parity/observations/OBS-0038-hermes-model-picker-model-stage-2026-08-01.md",
+        "scripts/probe_hermes_model_picker.py",
+        "scripts/validate_reference_fixture.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "ready_at": "2026-08-01T09:40:34Z",
+      "claimed_by": "hermes-research",
+      "claimed_at": "2026-08-01T09:40:53Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Captured Hermes model-picker model-stage behavior and Escape back semantics in a fresh sanitized 120x40 direct PTY, with incremental redraws asserted through a terminal screen model; the complete just verify gate passes.",
+        "completed_at": "2026-08-01T09:54:36Z",
+        "evidence": [
+          "tests/fixtures/parity/OBS-0038-hermes-model-picker-model-stage.json",
+          "docs/parity/observations/OBS-0038-hermes-model-picker-model-stage-2026-08-01.md",
+          "scripts/probe_hermes_model_picker.py",
+          "scripts/validate_reference_fixture.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
         ]
       }
     }

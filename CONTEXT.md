@@ -146,6 +146,13 @@ progress from August 1, 2026 through 2027.
   ready without entering Busy, and exits cleanly through the existing lifecycle
   path. `/model`, `/setup`, aliases, arguments, and reachable-provider command
   behavior remain unimplemented and explicitly separate.
+- HAD-039 captures the pinned Hermes `/model` provider-to-model picker path in a
+  fresh 120x40 direct PTY: the synthetic loopback provider is reached through
+  the visible `palette` filter, the model stage exposes its title, provider,
+  current model, filter, session persistence, and close landmarks, and Escape
+  first clears the model filter before a second Escape returns to providers.
+  The full ANSI stream is replayed through a screen model to account for
+  incremental Ink redraws; Hades model-picker behavior remains unimplemented.
 
 ## Unknown until observed
 
@@ -158,8 +165,8 @@ progress from August 1, 2026 through 2027.
 - Successful provider/model streaming, tool calls, and the exact behavior of
   terminal-dependent surfaces beyond the captured observations.
 - The complete slash-command catalog and argument semantics, provider/model
-  discovery details, setup wizard continuation and persistence, and configured
-  command behavior with a reachable provider.
+  discovery details, setup wizard continuation and persistence, configured
+  command behavior with a reachable provider, and Hades model-picker behavior.
 - OSC52 behavior outside the OBS-0032 timing controls and bounded payload
   sizes, including a universal timeout or maximum-size contract.
 

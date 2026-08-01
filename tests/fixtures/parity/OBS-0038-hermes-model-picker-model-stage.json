@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0038",
+  "surface": "hermes-tui-model-picker-model-stage-and-back-controls",
+  "reference": {
+    "product": "Hermes TUI",
+    "version": "0.19.1 (2026.7.30)",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "direct PTY with ANSI screen model"
+    },
+    "capture": "fresh configured direct-PTY session with the complete redraw stream replayed through a 120x40 screen model"
+  },
+  "normalization": [
+    "The reference checkout, synthetic HOME/HERMES_HOME paths, loopback URL, credentials, session IDs, timestamps, and animated redraw bytes are omitted or replaced by placeholders.",
+    "The custom provider is reached only by typing the palette filter and pressing Enter to advance to the model stage; no model is selected or persisted and no setup or external network side effect is exercised.",
+    "Provider rows, provider counts, model inventories, row ordering, discovery timing, spinner text, warnings, and visual styling are dynamic; only stable stage, label, filter, persistence, and close landmarks are asserted.",
+    "Printable filter input is sent one key at a time and the full ANSI stream is modeled because Hermes redraws the picker incrementally."
+  ],
+  "steps": [
+    {
+      "id": "model-picker-model-stage-and-back",
+      "precondition": "Fresh synthetic home with the sanitized custom loopback provider configuration and a 120x40 direct PTY.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "/model",
+          "bytes_hex": "2f 6d 6f 64 65 6c"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "text",
+          "value": "palette",
+          "bytes_hex": "70 61 6c 65 74 74 65"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "text",
+          "value": "palette",
+          "bytes_hex": "70 61 6c 65 74 74 65"
+        },
+        {
+          "kind": "key",
+          "value": "Escape",
+          "bytes_hex": "1b"
+        },
+        {
+          "kind": "key",
+          "value": "Escape",
+          "bytes_hex": "1b"
+        },
+        {
+          "kind": "key",
+          "value": "q",
+          "bytes_hex": "71"
+        }
+      ],
+      "output": {
+        "status": "passed",
+        "provider_stage": {
+          "markers": [
+            "Select provider (step 1/2)",
+            "Current: palette-model",
+            "type to filter",
+            "persist: session",
+            "Esc clear/back",
+            "q close"
+          ],
+          "filter": "filter: palette",
+          "selected_row": "palette-loopback"
+        },
+        "model_stage": {
+          "markers": [
+            "Select model (step 2/2)",
+            "palette-loopback",
+            "type to filter",
+            "palette-model",
+            "persist: session",
+            "Esc clear/back",
+            "q close"
+          ],
+          "filter": "filter: palette"
+        },
+        "escape_with_filter": "The first Escape cleared the model-stage filter and remained on Select model (step 2/2).",
+        "escape_without_filter": "The second Escape returned to Select provider (step 1/2).",
+        "close": "q closed the picker and returned to ready.",
+        "selection": "No model was selected or persisted; no setup or external network side effect was exercised.",
+        "cleanup": "Bounded Ctrl+C cleanup exited the fresh Hermes process cleanly."
+      }
+    }
+  ],
+  "unknowns": [
+    "The complete provider and model inventories, exact row order, counts, warning copy, loading animation, and discovery timing are not fixed by this observation.",
+    "The model-stage Enter selection path, persistence toggle, provider setup/key entry, disconnect flow, and reachable-provider behavior remain unobserved.",
+    "The picker behavior at other terminal sizes/themes, with empty model lists, with no current provider, and after deeper setup navigation remains unknown.",
+    "Hades does not yet implement the observed model picker; this fixture is reference evidence only."
+  ],
+  "passed": true
+}
