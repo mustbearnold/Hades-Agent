@@ -104,6 +104,13 @@ progress from August 1, 2026 through 2027.
   exact wrapper bytes in Hades. Live multiplexer/outer-terminal forwarding,
   delayed/oversized responses, image attachments, and gateway behavior remain
   unknown.
+- HAD-032 observes the pinned Hermes 500 ms OSC52 race in direct PTY controls:
+  a usable response at a 100 ms target wins, a response supplied after the
+  timeout DA1 flush falls back to native xclip, and deterministic immediate
+  256 KiB and 512 KiB decoded payloads are consumed. The probe records measured
+  timing and hashes while deliberately avoiding universal timeout/size claims.
+  Hades delayed/size behavior, larger payloads, live forwarding, image
+  attachments, and gateway behavior remain separate unknowns.
 
 ## Unknown until observed
 
@@ -114,6 +121,8 @@ progress from August 1, 2026 through 2027.
   session recovery remains unobserved beyond input-history persistence.
 - Successful provider/model streaming, tool calls, and the exact behavior of
   terminal-dependent surfaces beyond the captured observations.
+- OSC52 behavior outside the OBS-0032 timing controls and bounded payload
+  sizes, including a universal timeout or maximum-size contract.
 
 Unknowns are deliberate. The first product task is to capture the reference
 contract rather than let the scaffold become an accidental specification.

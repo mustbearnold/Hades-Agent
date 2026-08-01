@@ -46,6 +46,9 @@ response controls and records the reference-only result.
 `just probe-osc52-multiplexer` probes the pinned Hermes TMUX/STY OSC52 query
 wrappers and their direct-response/native-fallback boundaries; it intentionally
 models raw PTY responses rather than a live multiplexer server.
+`just probe-osc52-timing-limits` probes the pinned Hermes 500 ms response race
+and bounded 256 KiB/512 KiB decoded OSC52 payload controls; it records timing
+diagnostics without turning transport jitter into a product contract.
 `just replay-osc52-st-termination` replays the same ST controls against Hades
 and verifies OSC52 precedence plus native fallback.
 `just replay-osc52-multiplexer` replays the OBS-0030 TMUX/STY wrapper controls
@@ -83,6 +86,7 @@ just replay-osc52-clipboard  # bare-SSH OSC52 and native fallback PTY replay
 just replay-osc52-response-boundaries # malformed/empty OSC52 fallback replay
 just probe-osc52-st-termination # Hermes ST-terminated OSC52 reference probe
 just probe-osc52-multiplexer # Hermes TMUX/STY OSC52 wrapper reference probe
+just probe-osc52-timing-limits # Hermes OSC52 timing and bounded-size reference probe
 just replay-osc52-st-termination # Hades ST-terminated OSC52 parity replay
 just replay-osc52-multiplexer # Hades TMUX/STY OSC52 wrapper parity replay
 just agent validate           # validate task/control-plane invariants

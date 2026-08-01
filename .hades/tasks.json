@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T07:35:02Z",
+  "updated_at": "2026-08-01T07:51:33Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -1511,6 +1511,57 @@
           "tests/fixtures/parity/OBS-0031-hades-osc52-multiplexer-passthrough.json",
           "docs/parity/observations/OBS-0031-hades-osc52-multiplexer-passthrough-2026-08-01.md",
           "scripts/replay_osc52_clipboard.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-032",
+      "title": "Capture Hermes delayed and oversized OSC52 response behavior",
+      "status": "complete",
+      "priority": 51,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-031"
+      ],
+      "risk": "high",
+      "oracle": [
+        "reference_observation",
+        "provenance_record",
+        "fixture_validator",
+        "direct_pty_probe"
+      ],
+      "acceptance": [
+        "Observe the pinned Hermes reference at its recorded source revision in fresh direct 120x40 PTYs with SSH_TTY, synthetic xclip, and no TMUX/STY markers.",
+        "Capture a usable OSC52 response supplied before the documented 500 ms race, and a usable response supplied after that boundary, recording exact query/DA1 bytes, provider order, payload/newline behavior, draft preservation, ready/busy/submission markers, cleanup, and measured probe timing without treating wall-clock jitter as a product contract.",
+        "Exercise bounded large and oversized decoded payload controls with deterministic sizes and hashes, recording whether Hermes consumes them or falls back and avoiding unbounded output or claims beyond the exercised limits.",
+        "Add sanitized OBS-0032 fixture, provenance observation, and deterministic direct-PTY probe; validate the fixture and wire the research probe through just verify without changing Hades runtime behavior.",
+        "Do not claim a universal timeout or maximum-size limit, delayed behavior outside the measured controls, multiplexer forwarding, images/paths, gateway behavior, or concurrent-input parity unless directly evidenced."
+      ],
+      "evidence": [
+        "tests/fixtures/parity/OBS-0032-hermes-osc52-timing-limits.json",
+        "docs/parity/observations/OBS-0032-hermes-osc52-timing-limits-2026-08-01.md",
+        "scripts/probe_hermes_osc52_timing_limits.py",
+        "scripts/validate_reference_fixture.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "ready_at": "2026-08-01T07:38:00Z",
+      "attempts": 1,
+      "claimed_by": "hermes-research",
+      "claimed_at": "2026-08-01T07:38:56Z",
+      "result": {
+        "summary": "Captured Hermes OSC52 timing and bounded payload behavior in a sanitized direct-PTY observation. The probe proves a usable 100 ms response wins, a response supplied after the timeout DA1 flush falls back to native xclip, and deterministic 256 KiB and 512 KiB decoded payloads are consumed; exact control bytes, hashes, provider order, readiness, non-submission, cleanup, and explicit unknowns are recorded.",
+        "completed_at": "2026-08-01T07:51:33Z",
+        "evidence": [
+          "tests/fixtures/parity/OBS-0032-hermes-osc52-timing-limits.json",
+          "docs/parity/observations/OBS-0032-hermes-osc52-timing-limits-2026-08-01.md",
+          "scripts/probe_hermes_osc52_timing_limits.py",
+          "scripts/validate_reference_fixture.py",
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md"

@@ -74,3 +74,7 @@ OBS-0031 is the Hades implementation contract derived from OBS-0030. It is
 consumed by `scripts/replay_osc52_clipboard.py` and verifies the exact TMUX/STY
 query wrappers, direct raw-response precedence, native DA1 fallback, and
 cleanup in the same synthetic direct-PTY model.
+OBS-0032 captures Hermes' 500 ms OSC52 timing race plus bounded 256 KiB and
+512 KiB decoded-payload controls in a direct PTY. It is research-only, consumed
+by `scripts/probe_hermes_osc52_timing_limits.py` and the fixture validator, and
+does not claim universal timeout/size limits or Hades implementation parity.
