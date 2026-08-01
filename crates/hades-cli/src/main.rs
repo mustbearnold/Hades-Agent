@@ -1,13 +1,21 @@
 #![forbid(unsafe_code)]
 
-use std::{env, error::Error, io, time::Duration};
+use std::{
+    env,
+    error::Error,
+    fs::{self, OpenOptions},
+    io::{self, Write},
+    path::PathBuf,
+    process::Command,
+    time::{Duration, SystemTime, UNIX_EPOCH},
+};
 
 use crossterm::{
     event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers},
     execute,
     terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
 };
-use hades_app::App;
+use hades_app::{App, DispatchOutcome};
 use hades_core::{InputEvent, Key, PRODUCT_NAME};
 use hades_tui::{draw, snapshot};
 use ratatui::{Terminal, backend::CrosstermBackend};
@@ -65,19 +73,82 @@ fn event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> Result<(
             match event::read()? {
                 Event::Key(key) if key.kind == KeyEventKind::Press => {
                     if let Some(mapped) = map_key(key) {
-                        app.handle(InputEvent::Key(mapped));
+                        dispatch_input(terminal, &mut app, InputEvent::Key(mapped))?;
                     }
                 }
                 Event::Resize(width, height) => {
                     app.handle(InputEvent::Resize { width, height });
                 }
                 Event::Paste(text) => {
-                    app.handle(InputEvent::Paste(text));
+                    dispatch_input(terminal, &mut app, InputEvent::Paste(text))?;
                 }
                 _ => {}
             }
         }
     }
+}
+
+fn dispatch_input(
+    terminal: &mut Terminal<CrosstermBackend<io::Stdout>>,
+    app: &mut App,
+    event: InputEvent,
+) -> Result<(), Box<dyn Error>> {
+    if let DispatchOutcome::EditorRequested(draft) = app.handle(event) {
+        run_editor(terminal, app, draft)?;
+    }
+    Ok(())
+}
+
+fn run_editor(
+    terminal: &mut Terminal<CrosstermBackend<io::Stdout>>,
+    app: &mut App,
+    draft: String,
+) -> Result<(), Box<dyn Error>> {
+    let Some(editor) = env::var_os("EDITOR") else {
+        return Ok(());
+    };
+
+    let path = create_editor_file(&draft)?;
+    let editor_result = (|| -> Result<Option<String>, Box<dyn Error>> {
+        disable_raw_mode()?;
+        execute!(terminal.backend_mut(), LeaveAlternateScreen)?;
+        terminal.show_cursor()?;
+
+        let status = Command::new(editor).arg(&path).status()?;
+        if !status.success() {
+            return Ok(None);
+        }
+
+        Ok(Some(fs::read_to_string(&path)?))
+    })();
+    let restore_result = restore_editor_terminal(terminal);
+    let remove_result = fs::remove_file(&path);
+
+    restore_result?;
+    remove_result?;
+    if let Some(edited_draft) = editor_result? {
+        app.submit_editor_draft(edited_draft);
+    }
+    Ok(())
+}
+
+fn create_editor_file(draft: &str) -> Result<PathBuf, Box<dyn Error>> {
+    let timestamp = SystemTime::now().duration_since(UNIX_EPOCH)?.as_nanos();
+    let path = env::temp_dir().join(format!("hades-editor-{}-{timestamp}.txt", std::process::id()));
+    let mut file = OpenOptions::new().create_new(true).write(true).open(&path)?;
+    file.write_all(draft.as_bytes())?;
+    file.flush()?;
+    Ok(path)
+}
+
+fn restore_editor_terminal(
+    terminal: &mut Terminal<CrosstermBackend<io::Stdout>>,
+) -> Result<(), Box<dyn Error>> {
+    enable_raw_mode()?;
+    execute!(terminal.backend_mut(), EnterAlternateScreen)?;
+    terminal.clear()?;
+    terminal.hide_cursor()?;
+    Ok(())
 }
 
 fn map_key(key: KeyEvent) -> Option<Key> {

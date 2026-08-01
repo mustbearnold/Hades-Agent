@@ -149,6 +149,7 @@ def key_payload(value: str) -> str:
         "Enter": "C-m",
         "Ctrl+A": "C-a",
         "Ctrl+C": "C-c",
+        "Ctrl+G": "C-g",
         "Ctrl+K": "C-k",
         "Backspace": "BSpace",
         "Up": "Up",
@@ -181,8 +182,11 @@ def send_input(session: str, input_value: dict[str, str]) -> None:
         )
 
 
-def start_session(binary: Path, session: str) -> None:
-    command = shlex.join(["env", "TERM=xterm-256color", str(binary)])
+def start_session(binary: Path, session: str, environment: dict[str, str] | None = None) -> None:
+    environment = {"TERM": "xterm-256color", **(environment or {})}
+    command = shlex.join(
+        ["env", *(f"{key}={value}" for key, value in environment.items()), str(binary)]
+    )
     result = tmux_run(
         "new-session",
         "-d",
@@ -210,10 +214,11 @@ def run_case(
     timeout: float,
     ordinal: int,
     session_prefix: str = "had011-composer",
+    environment: dict[str, str] | None = None,
 ) -> dict[str, Any]:
     case_id = case["id"]
     session = f"{session_prefix}-{ordinal}-{int(time.time() * 1000)}"
-    start_session(binary, session)
+    start_session(binary, session, environment)
     replayed_steps: list[dict[str, Any]] = []
     try:
         startup_markers = ("Hermes Agent", "Nous Research", "Available Tools", "Available Skills")

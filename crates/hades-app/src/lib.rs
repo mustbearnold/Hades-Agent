@@ -9,6 +9,7 @@ pub enum DispatchOutcome {
     Continue,
     Submitted(String),
     Interrupted,
+    EditorRequested(String),
     Quit,
 }
 
@@ -28,6 +29,10 @@ impl App {
 
     pub fn state(&self) -> &SessionState {
         &self.state
+    }
+
+    pub fn submit_editor_draft(&mut self, draft: String) -> DispatchOutcome {
+        self.submit(draft)
     }
 
     pub fn handle(&mut self, event: InputEvent) -> DispatchOutcome {
@@ -146,6 +151,15 @@ impl App {
                 self.state.composer.kill_to_end();
                 self.clear_completion();
                 DispatchOutcome::Continue
+            }
+            Key::Ctrl('g') if self.state.turn == TurnState::Ready => {
+                let draft = self.state.composer.text().to_owned();
+                if draft.trim().is_empty() {
+                    return DispatchOutcome::Continue;
+                }
+
+                self.clear_completion();
+                DispatchOutcome::EditorRequested(draft)
             }
             Key::Ctrl(_) => DispatchOutcome::Continue,
         }
@@ -398,5 +412,26 @@ mod tests {
                 .iter()
                 .all(|message| { message.content != "paste-one\npaste-two" })
         );
+    }
+
+    #[test]
+    fn ctrl_g_requests_editor_for_the_unchanged_draft() {
+        let mut app = App::new();
+        for character in "editor-probe".chars() {
+            app.handle(InputEvent::Key(Key::Char(character)));
+        }
+
+        assert_eq!(
+            app.handle(InputEvent::Key(Key::Ctrl('g'))),
+            DispatchOutcome::EditorRequested("editor-probe".to_owned())
+        );
+        assert_eq!(app.state().composer.text(), "editor-probe");
+        assert_eq!(app.state().turn, TurnState::Ready);
+
+        assert_eq!(
+            app.submit_editor_draft("editor-probe".to_owned()),
+            DispatchOutcome::Submitted("editor-probe".to_owned())
+        );
+        assert_eq!(app.state().turn, TurnState::Busy);
     }
 }

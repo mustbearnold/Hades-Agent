@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T03:44:11Z",
+  "updated_at": "2026-08-01T03:50:23Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -593,6 +593,58 @@
           "tests/fixtures/parity/OBS-0013-hades-bracketed-paste.json",
           "docs/parity/observations/OBS-0013-hades-bracketed-paste-2026-08-01.md",
           "scripts/replay_paste.py",
+          "scripts/replay_composer.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-014",
+      "title": "Implement the observed unchanged-draft editor handoff",
+      "status": "complete",
+      "priority": 69,
+      "lane": "interaction",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-013"
+      ],
+      "risk": "high",
+      "oracle": [
+        "unit_test",
+        "lifecycle_probe",
+        "replay_trace"
+      ],
+      "acceptance": [
+        "Emit a typed editor-request outcome for Ctrl+G from a ready non-empty composer instead of silently ignoring the key.",
+        "Suspend the alternate screen and raw mode, invoke the configured EDITOR against a temporary draft, and resubmit the unchanged draft after a clean editor exit while restoring terminal state.",
+        "Prove the EDITOR=/bin/true unchanged-draft path with reducer tests, terminal cleanup evidence, and isolated PTY replay; leave modified, cancelled, multiline, and unavailable-editor behavior explicitly unclaimed."
+      ],
+      "evidence": [
+        "crates/hades-app/src/lib.rs",
+        "crates/hades-cli/src/main.rs",
+        "tests/fixtures/parity/OBS-0014-hades-editor-handoff.json",
+        "docs/parity/observations/OBS-0014-hades-editor-handoff-2026-08-01.md",
+        "scripts/replay_editor.py",
+        "scripts/replay_composer.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "ready_at": "2026-08-01T03:45:04Z",
+      "attempts": 1,
+      "claimed_by": "hermes-implementer",
+      "claimed_at": "2026-08-01T03:45:47Z",
+      "result": {
+        "summary": "Implemented the observed unchanged-draft Ctrl+G editor handoff with a typed editor request, temporary draft file, raw/alternate-screen suspension and restoration, configured EDITOR invocation, busy submission, focused reducer coverage, and isolated tmux replay.",
+        "completed_at": "2026-08-01T03:50:23Z",
+        "evidence": [
+          "crates/hades-app/src/lib.rs",
+          "crates/hades-cli/src/main.rs",
+          "tests/fixtures/parity/OBS-0014-hades-editor-handoff.json",
+          "docs/parity/observations/OBS-0014-hades-editor-handoff-2026-08-01.md",
+          "scripts/replay_editor.py",
           "scripts/replay_composer.py",
           "justfile",
           "scripts/verify.sh",

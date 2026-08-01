@@ -50,6 +50,10 @@ progress from August 1, 2026 through 2027.
   events, cursor insertion, preserved newlines, and no implicit submission.
   Clipboard-provider reads, image/path paste, overlay/busy behavior, and mouse
   selection remain unknown.
+- HAD-014 implements the observed unchanged-draft editor handoff with a typed
+  Ctrl+G request, temporary draft file, configured EDITOR invocation, terminal
+  suspension/restoration, and busy submission after a clean exit. Modified,
+  cancelled, multiline, and unavailable-editor behavior remain unknown.
 
 ## Unknown until observed
 

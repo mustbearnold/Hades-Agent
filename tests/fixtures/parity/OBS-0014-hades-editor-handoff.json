@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0014",
+  "reference_observation": "OBS-0010",
+  "surface": "hades-tui",
+  "reference_contract": {
+    "environment": {
+      "EDITOR": "/bin/true"
+    },
+    "draft": "editor-probe",
+    "trigger": "Ctrl+G",
+    "result": "unchanged draft is submitted and enters busy state"
+  },
+  "terminal": {
+    "columns": 120,
+    "rows": 40,
+    "emulator": "tmux-backed PTY"
+  },
+  "normalization": [
+    "Capture stable screen text with tmux capture-pane -p after each redraw.",
+    "Ignore ANSI sequences, cursor placement, colors, and trailing spaces.",
+    "Each case runs in a fresh Hades process with EDITOR=/bin/true and the same 120x40 terminal size.",
+    "The unchanged editor draft is identified by the busy markers after Ctrl+G; the rotating face text is not asserted.",
+    "The replay's final Ctrl+C sequence also proves the process can restore terminal state and exit cleanly after the handoff."
+  ],
+  "cases": [
+    {
+      "id": "unchanged-editor-handoff",
+      "steps": [
+        {
+          "id": "type-editor-draft",
+          "input": {
+            "kind": "text",
+            "value": "editor-probe"
+          },
+          "output": {
+            "pty_markers": [
+              "editor-probe"
+            ]
+          }
+        },
+        {
+          "id": "open-editor-and-submit",
+          "input": {
+            "kind": "key",
+            "value": "Ctrl+G"
+          },
+          "output": {
+            "pty_markers": [
+              "musing",
+              "mulling",
+              "Ctrl+C to interrupt"
+            ]
+          }
+        },
+        {
+          "id": "interrupt",
+          "input": {
+            "kind": "key",
+            "value": "Ctrl+C"
+          },
+          "output": {
+            "pty_markers": [
+              "interrupted"
+            ]
+          }
+        },
+        {
+          "id": "exit",
+          "input": {
+            "kind": "key",
+            "value": "Ctrl+C"
+          },
+          "output": {
+            "pty_markers": [
+              "process exit"
+            ],
+            "process_exit": true
+          }
+        }
+      ]
+    }
+  ]
+}

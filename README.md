@@ -24,7 +24,9 @@ fixture. `just replay-composer` replays the implemented editing, history, and
 multiline contract in isolated PTY cases. `just replay-completion` replays the
 implemented `/he` slash-completion and Tab-application contract in isolated PTY
 cases. `just replay-paste` replays the bracketed-paste contract and verifies
-that embedded newlines remain in the draft without submitting it.
+that embedded newlines remain in the draft without submitting it. `just
+replay-editor` replays the configured `EDITOR=/bin/true` handoff and verifies
+the unchanged draft enters the busy state.
 The current work queue is in
 `.hades/tasks.json`; use `just agent next` to select the next evidence-backed
 task.
@@ -45,6 +47,7 @@ just replay-differential     # visual + behavioral parity replay
 just replay-composer         # composer editing/history/multiline PTY replay
 just replay-completion       # slash completion and Tab application PTY replay
 just replay-paste            # bracketed paste PTY replay
+just replay-editor           # unchanged-draft editor handoff PTY replay
 just agent validate           # validate task/control-plane invariants
 just agent next               # choose the highest-priority ready task
 just agent claim HAD-001 bot  # claim a task with an agent identity

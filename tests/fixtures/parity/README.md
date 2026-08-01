@@ -17,3 +17,5 @@ OBS-0012 is the Hades slash-completion implementation contract derived from
 OBS-0010 and is consumed by `scripts/replay_completion.py`.
 OBS-0013 is the Hades bracketed-paste implementation contract derived from
 OBS-0010 and is consumed by `scripts/replay_paste.py`.
+OBS-0014 is the Hades unchanged-draft editor implementation contract derived
+from OBS-0010 and is consumed by `scripts/replay_editor.py`.
