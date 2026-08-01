@@ -56,7 +56,9 @@ terminal harness.
 ## Explicitly unknown or unavailable
 
 - Native Shift+Enter and Alt+Enter could not be isolated through `tmux
-  send-keys`; the probe emitted ordinary Enter and submitted the draft.
+  send-keys`; the probe emitted ordinary Enter and submitted the draft. The
+  direct-PTY reference capture is recorded in
+  [OBS-0020](OBS-0020-hermes-modified-enter-2026-08-01.md).
 - Mouse injection was not stable through this capture method, so selection,
   scrolling, and click behavior remain unknown.
 - Only the empty-clipboard miss path was available. Successful text/image/path

@@ -34,9 +34,10 @@ progress from August 1, 2026 through 2027.
   and model selection remain unimplemented.
 - HAD-010 captures the pinned Hermes input-editing/keymap subset: persistent
   history recall, cursor editing, multiline fallback, slash completion, Ctrl+G
-  editor return, bracketed paste, and the empty-clipboard miss path. Native
-  modified Enter, mouse input, successful clipboard flows, and persistence
-  across process restart remain explicit unknowns.
+  editor return, bracketed paste, and the empty-clipboard miss path. HAD-020
+  separately captures native modified Enter through a direct PTY; Hades
+  modified-Enter mapping, mouse input, successful clipboard flows, and
+  persistence across process restart remain explicit unknowns.
 - HAD-011 implements the reference-backed composer subset with a dedicated
   Unicode-safe cursor model, session-local history recall, backslash-plus-Enter
   multiline input, terminal Home/End mapping, focused tests, and isolated PTY
@@ -71,6 +72,10 @@ progress from August 1, 2026 through 2027.
   empty-output draft preservation, nonzero cancellation, and tokenized
   VISUAL/EDITOR replay. Interactive, unavailable-editor, and busy-turn cases
   remain unimplemented.
+- HAD-020 captures the native Hermes modified-Enter contract through a direct
+  120x40 PTY: CSI-u Shift+Enter and Alt+Enter insert a newline while plain
+  Enter submits. Terminal emission support, alternate encodings, and Hades
+  mapping remain outside this research-only claim.
 
 ## Unknown until observed
 

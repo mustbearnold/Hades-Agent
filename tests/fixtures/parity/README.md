@@ -32,3 +32,6 @@ newline trimming, empty output, and nonzero cancellation. It is consumed by
 the reference fixture validator and does not imply Hades implementation parity.
 OBS-0019 is the Hades implementation contract derived from OBS-0018 and is
 consumed by `scripts/replay_editor_outcomes.py`.
+OBS-0020 captures the reference-only native modified-Enter contract through a
+direct PTY with raw CSI-u bytes. It is consumed by the fixture validator and
+does not imply Hades implementation parity or universal terminal support.

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T04:43:02Z",
+  "updated_at": "2026-08-01T04:53:00Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -897,6 +897,53 @@
           "tests/fixtures/parity/OBS-0019-hades-editor-outcomes.json",
           "docs/parity/observations/OBS-0019-hades-editor-outcomes-2026-08-01.md",
           "scripts/replay_editor_outcomes.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-020",
+      "title": "Capture Hermes native modified Enter parity",
+      "status": "complete",
+      "priority": 63,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-019"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "reference_observation",
+        "provenance_record",
+        "fixture_validator"
+      ],
+      "acceptance": [
+        "Use the pinned Hermes reference with a direct PTY byte stream, not tmux key translation, to send the documented Shift+Enter and Alt+Enter CSI-u sequences.",
+        "Record whether each modified Enter inserts a newline without submitting, including exact input bytes, composer text, ready/busy state, and a normal Enter control case.",
+        "Add a sanitized provenance observation and machine-validated fixture, update the prior keymap unknowns, fixture documentation, parity matrix, and verification gate without claiming unsupported terminal emulator behavior.",
+        "Keep this task research-only: do not change Hades input mapping until the reference bytes and post-input state are stable and reviewable."
+      ],
+      "evidence": [
+        "tests/fixtures/parity/OBS-0020-hermes-modified-enter.json",
+        "docs/parity/observations/OBS-0020-hermes-modified-enter-2026-08-01.md",
+        "scripts/validate_reference_fixture.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "ready_at": "2026-08-01T04:44:16Z",
+      "claimed_by": "hermes-research",
+      "claimed_at": "2026-08-01T04:44:42Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Captured the pinned Hermes native modified-Enter contract through a direct 120x40 PTY: CSI-u Shift+Enter and Alt+Enter insert a newline without submission, while plain Enter submits; alternate terminal encodings and universal terminal support remain unknown.",
+        "completed_at": "2026-08-01T04:53:00Z",
+        "evidence": [
+          "tests/fixtures/parity/OBS-0020-hermes-modified-enter.json",
+          "docs/parity/observations/OBS-0020-hermes-modified-enter-2026-08-01.md",
+          "scripts/validate_reference_fixture.py",
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md"

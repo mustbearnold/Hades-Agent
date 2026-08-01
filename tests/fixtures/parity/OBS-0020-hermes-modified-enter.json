@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0020",
+  "reference_observation": "OBS-0010",
+  "surface": "hermes-tui-modified-enter",
+  "reference": {
+    "product": "Hermes TUI",
+    "version": "0.19.1",
+    "display_build": "2026.7.30",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "direct PTY with raw byte writes"
+    },
+    "capture": "direct PTY byte stream with TIOCSWINSZ 120x40 and ANSI-stripped stable text markers",
+    "runtime": {
+      "node": "22.22.2",
+      "npm": "10.9.7",
+      "python": "3.11.14",
+      "uv": "0.12.1"
+    }
+  },
+  "normalization": [
+    "Temporary checkout and synthetic HERMES_HOME paths are represented by placeholders.",
+    "ANSI control sequences, cursor placement, colors, timestamps, session IDs, prompt faces, and dynamic working-directory text are not part of this contract.",
+    "The PTY window is explicitly set to 120 columns by 40 rows before process launch.",
+    "Modified Enter bytes are written directly to the PTY master; tmux key translation is not used.",
+    "A ready modified-Enter case is identified by the draft's two logical lines and the absence of the busy interrupt marker.",
+    "The fixture records reference behavior only and does not imply Hades input-mapping parity."
+  ],
+  "steps": [
+    {
+      "id": "shift-enter",
+      "precondition": "Fresh synthetic HERMES_HOME and ready composer in a 120x40 direct PTY.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "shift-probe",
+          "bytes_hex": "73 68 69 66 74 2d 70 72 6f 62 65"
+        },
+        {
+          "kind": "key",
+          "value": "Shift+Enter",
+          "bytes_hex": "1b 5b 31 33 3b 32 75"
+        },
+        {
+          "kind": "text",
+          "value": "after",
+          "bytes_hex": "61 66 74 65 72"
+        }
+      ],
+      "output": {
+        "status": "ready",
+        "composer": "shift-probe\\nafter",
+        "submission": "not submitted",
+        "busy_marker": "absent",
+        "cleanup": "two Ctrl+C presses exit cleanly"
+      }
+    },
+    {
+      "id": "alt-enter",
+      "precondition": "Fresh synthetic HERMES_HOME and ready composer in a 120x40 direct PTY.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "alt-probe",
+          "bytes_hex": "61 6c 74 2d 70 72 6f 62 65"
+        },
+        {
+          "kind": "key",
+          "value": "Alt+Enter",
+          "bytes_hex": "1b 5b 31 33 3b 33 75"
+        },
+        {
+          "kind": "text",
+          "value": "after",
+          "bytes_hex": "61 66 74 65 72"
+        }
+      ],
+      "output": {
+        "status": "ready",
+        "composer": "alt-probe\\nafter",
+        "submission": "not submitted",
+        "busy_marker": "absent",
+        "cleanup": "two Ctrl+C presses exit cleanly"
+      }
+    },
+    {
+      "id": "plain-enter-control",
+      "precondition": "Fresh synthetic HERMES_HOME and ready composer in a 120x40 direct PTY.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "plain-probe",
+          "bytes_hex": "70 6c 61 69 6e 2d 70 72 6f 62 65"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        }
+      ],
+      "output": {
+        "status": "busy",
+        "composer": "submitted",
+        "submission": "submitted",
+        "busy_marker": "Ctrl+C to interrupt…",
+        "cleanup": "interrupt then exit Ctrl+C presses restore the terminal"
+      }
+    }
+  ],
+  "environment_sensitive": [
+    {
+      "surface": "terminal support for CSI-u modified Enter",
+      "status": "environment-sensitive",
+      "reason": "The direct PTY bytes are stable for the pinned Hermes parser, but a terminal emulator must emit the modified-key sequence for users to reach this path."
+    },
+    {
+      "surface": "xterm modifyOtherKeys Shift+Enter sequence",
+      "status": "unknown",
+      "reason": "The alternate ESC[27;2;13~ encoding was not included in this executable capture."
+    }
+  ],
+  "unknowns": [
+    "Whether all supported terminal emulators emit CSI-u or modifyOtherKeys sequences for Shift+Enter and Alt+Enter.",
+    "Ctrl+Enter and other modified Return encodings beyond the two documented cases.",
+    "This observation does not claim Hades implementation parity."
+  ]
+}
