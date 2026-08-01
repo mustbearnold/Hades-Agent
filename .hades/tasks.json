@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T12:28:25Z",
+  "updated_at": "2026-08-01T12:43:25Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -2294,6 +2294,57 @@
           "tests/fixtures/parity/OBS-0045-hades-full-setup-provider-menu.json",
           "docs/parity/observations/OBS-0045-hades-full-setup-provider-menu-2026-08-01.md",
           "scripts/replay_setup_provider_menu.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-047",
+      "title": "Capture Hermes provider selection boundary",
+      "status": "complete",
+      "priority": 36,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-045"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "reference_observation",
+        "provenance_record",
+        "fixture_validator",
+        "direct_pty_probe"
+      ],
+      "acceptance": [
+        "Observe the pinned Hermes reference in a fresh 120x40 direct PTY using the sanitized loopback custom-provider configuration, synthetic home, and no credentials or private runtime state.",
+        "Reach the observed Full setup provider menu through the existing /setup, j, Enter path, then submit only the visible active loopback provider row to capture the first provider-selection continuation surface and stable labels.",
+        "Stop before entering an endpoint, API key, secret, OAuth action, save action, model request, or network-dependent behavior; use Ctrl+C at the first safe cancellation boundary and record the exact action boundary if the row opens a prompt or nested menu.",
+        "Normalize provider names, URLs, paths, model values, runtime identifiers, timestamps, animated redraw bytes, and dynamic inventory; compare config bytes and synthetic-home artifact classes before and after cleanup.",
+        "Add sanitized OBS-0046 fixture, provenance observation, and repeatable direct-PTY probe; wire validation and the probe through just verify without changing Hades runtime behavior."
+      ],
+      "evidence": [
+        "tests/fixtures/parity/OBS-0046-hermes-provider-selection.json",
+        "docs/parity/observations/OBS-0046-hermes-provider-selection-2026-08-01.md",
+        "scripts/probe_hermes_full_setup_provider_selection.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md"
+      ],
+      "ready_at": "2026-08-01T12:33:50Z",
+      "attempts": 1,
+      "claimed_by": "hermes-research-provider-selection",
+      "claimed_at": "2026-08-01T12:34:30Z",
+      "result": {
+        "summary": "Captured the bounded Hermes active-provider selection boundary: one Enter on the active palette-loopback row opens Model name [palette-model] while retaining the provider viewport, changes config bytes, creates a normalized backup artifact, and exits cleanly on Ctrl+C before model, credential, OAuth, save, model-request, or network behavior.",
+        "completed_at": "2026-08-01T12:43:25Z",
+        "evidence": [
+          "tests/fixtures/parity/OBS-0046-hermes-provider-selection.json",
+          "docs/parity/observations/OBS-0046-hermes-provider-selection-2026-08-01.md",
+          "scripts/probe_hermes_full_setup_provider_selection.py",
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md",

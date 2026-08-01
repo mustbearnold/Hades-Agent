@@ -194,6 +194,12 @@ progress from August 1, 2026 through 2027.
   credentials, OAuth, persistence, model discovery, or network behavior. The
   120x40 replay and focused core/app/TUI tests are wired through `just verify`;
   later provider actions and setup sections remain unknown.
+- HAD-047 captures the next Hermes boundary: submitting the active loopback
+  provider row opens `Model name [palette-model]:` while retaining the provider
+  menu viewport. Three fresh direct-PTY captures show a config-byte change,
+  clean Ctrl+C, and a normalized config-backup artifact; model-name entry,
+  credentials, OAuth, save, model discovery, network behavior, and later setup
+  sections remain unknown.
 
 ## Unknown until observed
 
