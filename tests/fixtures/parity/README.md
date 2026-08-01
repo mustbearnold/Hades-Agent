@@ -35,3 +35,6 @@ consumed by `scripts/replay_editor_outcomes.py`.
 OBS-0020 captures the reference-only native modified-Enter contract through a
 direct PTY with raw CSI-u bytes. It is consumed by the fixture validator and
 does not imply Hades implementation parity or universal terminal support.
+OBS-0021 is the Hades implementation contract derived from OBS-0020. It is
+consumed by the direct-PTY `scripts/replay_modified_enter.py` oracle and only
+claims crossterm-decoded Shift/Alt Enter events.

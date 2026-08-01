@@ -42,6 +42,7 @@ than relying on a terminal key-name abstraction.
 
 - [Sanitized reference fixture](../../../tests/fixtures/parity/OBS-0020-hermes-modified-enter.json)
 - [Fixture validator](../../../scripts/validate_reference_fixture.py)
+- [Hades implementation observation](OBS-0021-hades-modified-enter-2026-08-01.md)
 - [Original keymap observation](OBS-0010-hermes-input-editing-keymap-2026-08-01.md)
 - [Parity matrix](../MATRIX.md)
 - [Task ledger](../../../.hades/tasks.json)

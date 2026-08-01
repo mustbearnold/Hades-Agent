@@ -29,13 +29,15 @@ replay-editor` replays the configured `EDITOR=/bin/true` handoff and verifies
 the unchanged draft enters the busy state.
 `just replay-editor-outcomes` replays modified, multiline, empty-output, and
 cancelled deterministic editor handoffs against isolated Hades processes.
+`just replay-modified-enter` replays direct-PTY CSI-u Shift+Enter and Alt+Enter
+newline insertion, with plain Enter as the submission control.
 `just replay-clipboard` replays the empty-clipboard Ctrl+V fallback and checks
 that the draft is unchanged. `just replay-history` proves persistent history
 across two Hades processes, multiline file encoding, duplicate byte stability,
 and the newest-1,000 load cap.
 `just validate-reference` also checks the deterministic Hermes editor-outcome
 fixture covering modified, multiline, empty, and cancelled editor handoffs,
-plus the direct-PTY modified-Enter reference fixture.
+plus the direct-PTY modified-Enter reference and Hades implementation fixtures.
 The current work queue is in
 `.hades/tasks.json`; use `just agent next` to select the next evidence-backed
 task.
@@ -56,7 +58,8 @@ just replay-differential     # visual + behavioral parity replay
 just replay-composer         # composer editing/history/multiline PTY replay
 just replay-completion       # slash completion and Tab application PTY replay
 just replay-paste            # bracketed paste PTY replay
-just replay-editor           # unchanged-draft editor handoff PTY replay
+just replay-editor             # unchanged-draft editor handoff PTY replay
+just replay-modified-enter     # native modified-Enter direct-PTY replay
 just replay-clipboard        # empty-clipboard Ctrl+V PTY replay
 just agent validate           # validate task/control-plane invariants
 just agent next               # choose the highest-priority ready task

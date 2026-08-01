@@ -185,9 +185,11 @@ fn restore_editor_terminal(
 
 fn map_key(key: KeyEvent) -> Option<Key> {
     let control = key.modifiers.contains(KeyModifiers::CONTROL);
+    let modified_enter = key.modifiers.intersects(KeyModifiers::SHIFT | KeyModifiers::ALT);
     match key.code {
         KeyCode::Char(character) if control => Some(Key::Ctrl(character)),
         KeyCode::Char(character) => Some(Key::Char(character)),
+        KeyCode::Enter if modified_enter => Some(Key::ModifiedEnter),
         KeyCode::Enter => Some(Key::Enter),
         KeyCode::Backspace => Some(Key::Backspace),
         KeyCode::Esc => Some(Key::Escape),
@@ -217,6 +219,19 @@ mod tests {
         assert_eq!(map_key(KeyEvent::new(KeyCode::Home, KeyModifiers::NONE)), Some(Key::Home));
         assert_eq!(map_key(KeyEvent::new(KeyCode::End, KeyModifiers::NONE)), Some(Key::End));
         assert_eq!(map_key(KeyEvent::new(KeyCode::Tab, KeyModifiers::NONE)), Some(Key::Tab));
+    }
+
+    #[test]
+    fn modified_enter_mapping_preserves_shift_and_alt_newline_inputs() {
+        assert_eq!(
+            map_key(KeyEvent::new(KeyCode::Enter, KeyModifiers::SHIFT)),
+            Some(Key::ModifiedEnter)
+        );
+        assert_eq!(
+            map_key(KeyEvent::new(KeyCode::Enter, KeyModifiers::ALT)),
+            Some(Key::ModifiedEnter)
+        );
+        assert_eq!(map_key(KeyEvent::new(KeyCode::Enter, KeyModifiers::NONE)), Some(Key::Enter));
     }
 
     #[test]

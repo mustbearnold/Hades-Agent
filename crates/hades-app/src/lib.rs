@@ -216,6 +216,13 @@ impl App {
                 }
                 EnterAction::Submit(content) => self.submit(content),
             },
+            Key::ModifiedEnter if self.state.turn == TurnState::Ready => {
+                self.state.composer.insert_newline();
+                self.refresh_completion();
+                self.state.status = "Editing input.".to_owned();
+                DispatchOutcome::Continue
+            }
+            Key::ModifiedEnter => DispatchOutcome::Continue,
             Key::Escape => {
                 self.state.composer.clear();
                 self.clear_completion();
@@ -540,6 +547,28 @@ mod tests {
         assert_eq!(app.state().composer.text(), "line-one\nx");
         assert_eq!(app.state().turn, TurnState::Ready);
         assert!(app.state().messages.iter().all(|message| message.content != "line-one\nx"));
+    }
+
+    #[test]
+    fn modified_enter_inserts_multiline_draft_without_submitting() {
+        let mut app = App::new();
+        app.handle(InputEvent::Key(Key::Char('s')));
+        app.handle(InputEvent::Key(Key::Char('h')));
+        app.handle(InputEvent::Key(Key::Char('i')));
+        app.handle(InputEvent::Key(Key::Char('f')));
+        app.handle(InputEvent::Key(Key::Char('t')));
+
+        assert_eq!(app.handle(InputEvent::Key(Key::ModifiedEnter)), DispatchOutcome::Continue);
+        app.handle(InputEvent::Key(Key::Char('a')));
+        app.handle(InputEvent::Key(Key::Char('f')));
+        app.handle(InputEvent::Key(Key::Char('t')));
+        app.handle(InputEvent::Key(Key::Char('e')));
+        app.handle(InputEvent::Key(Key::Char('r')));
+
+        assert_eq!(app.state().composer.text(), "shift\nafter");
+        assert_eq!(app.state().turn, TurnState::Ready);
+        assert_eq!(app.state().status, "Editing input.");
+        assert!(app.state().messages.iter().all(|message| message.content != "shift\nafter"));
     }
 
     #[test]

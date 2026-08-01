@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T04:53:00Z",
+  "updated_at": "2026-08-01T05:02:24Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -944,6 +944,59 @@
           "tests/fixtures/parity/OBS-0020-hermes-modified-enter.json",
           "docs/parity/observations/OBS-0020-hermes-modified-enter-2026-08-01.md",
           "scripts/validate_reference_fixture.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-021",
+      "title": "Implement native modified Enter parity",
+      "status": "complete",
+      "priority": 62,
+      "lane": "interaction",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-020"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "unit_test",
+        "direct_pty_replay",
+        "process_replay"
+      ],
+      "acceptance": [
+        "Map terminal Enter events carrying Shift or Alt modifiers to composer newline insertion without submission, matching the stable CSI-u Shift+Enter and Alt+Enter contract from OBS-0020.",
+        "Keep ordinary Enter submission unchanged and add focused core, application, and CLI tests proving modified cases remain ready with multiline composer content while plain Enter enters busy state.",
+        "Add a sanitized Hades implementation contract and direct-PTY replay derived from OBS-0020, wire the replay into just verify, and update the parity matrix and fixture documentation.",
+        "Do not claim xterm modifyOtherKeys, Ctrl+Enter, or universal terminal-emulator support; this task covers only modifier events actually decoded by the Hades input layer."
+      ],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-app/src/lib.rs",
+        "crates/hades-cli/src/main.rs",
+        "tests/fixtures/parity/OBS-0021-hades-modified-enter.json",
+        "docs/parity/observations/OBS-0021-hades-modified-enter-2026-08-01.md",
+        "scripts/replay_modified_enter.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "ready_at": "2026-08-01T04:54:00Z",
+      "attempts": 1,
+      "claimed_by": "hades-implementer",
+      "claimed_at": "2026-08-01T04:54:17Z",
+      "result": {
+        "summary": "Implemented the stable modified-Enter slice: crossterm CSI-u Enter events with Shift or Alt map to a typed newline insertion, ordinary Enter still submits, focused core/app/CLI tests cover both paths, and a direct 120x40 PTY replay passes Shift+Enter, Alt+Enter, and plain Enter controls without claiming alternate encodings.",
+        "completed_at": "2026-08-01T05:02:24Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-app/src/lib.rs",
+          "crates/hades-cli/src/main.rs",
+          "tests/fixtures/parity/OBS-0021-hades-modified-enter.json",
+          "docs/parity/observations/OBS-0021-hades-modified-enter-2026-08-01.md",
+          "scripts/replay_modified_enter.py",
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md"

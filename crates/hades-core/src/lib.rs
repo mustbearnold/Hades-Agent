@@ -158,6 +158,10 @@ impl Composer {
         }
     }
 
+    pub fn insert_newline(&mut self) {
+        self.insert('\n');
+    }
+
     pub const fn move_left(&mut self) {
         self.cursor = self.cursor.saturating_sub(1);
     }
@@ -195,7 +199,7 @@ impl Composer {
     pub fn enter(&mut self) -> EnterAction {
         if self.character_before_cursor() == Some('\\') {
             self.remove_before_cursor();
-            self.insert('\n');
+            self.insert_newline();
             return EnterAction::InsertedNewline;
         }
 
@@ -320,6 +324,7 @@ impl Default for SessionState {
 pub enum Key {
     Char(char),
     Enter,
+    ModifiedEnter,
     Backspace,
     Escape,
     Tab,
@@ -451,6 +456,18 @@ mod tests {
         assert_eq!(composer.enter(), EnterAction::InsertedNewline);
         composer.insert('x');
         assert_eq!(composer.text(), "line-one\nx");
+    }
+
+    #[test]
+    fn composer_modified_enter_inserts_a_newline_at_the_cursor() {
+        let mut composer = Composer::default();
+        composer.insert_text("first");
+
+        composer.insert_newline();
+        composer.insert_text("second");
+
+        assert_eq!(composer.text(), "first\nsecond");
+        assert_eq!(composer.cursor(), 12);
     }
 
     #[test]
