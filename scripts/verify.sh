@@ -85,6 +85,8 @@ python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0059-her
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0061-hermes-unconfigured-input-queue.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0060-hades-unconfigured-startup.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0062-hades-unconfigured-input.json
+python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0063-hermes-unconfigured-setup-escape.json
+python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0064-hermes-unconfigured-resolution.json
 python3 scripts/probe_hermes_full_setup_provider_selection.py --report .hades/runtime/hermes-full-setup-provider-selection-probe.json --timeout 30
 python3 scripts/probe_hermes_full_setup_model_default.py --report .hades/runtime/hermes-full-setup-model-default-probe.json --timeout 30
 python3 scripts/probe_hermes_local_provider_stream.py --report .hades/runtime/hermes-local-provider-stream-probe.json --timeout 30
@@ -96,6 +98,7 @@ python3 scripts/probe_hermes_empty_platform_confirmation.py --report .hades/runt
 python3 scripts/probe_hermes_unconfigured_startup.py --report .hades/runtime/hermes-unconfigured-startup-probe.json --timeout 30
 python3 scripts/probe_hermes_unconfigured_input_queue.py --report .hades/runtime/hermes-unconfigured-input-queue-probe.json --timeout 30
 python3 scripts/probe_hermes_unconfigured_setup_escape.py --report .hades/runtime/hermes-unconfigured-setup-escape-probe.json --timeout 30
+python3 scripts/probe_hermes_unconfigured_resolution.py --report .hades/runtime/hermes-unconfigured-resolution-probe.json --timeout 30 --observation-window 15
 python3 scripts/replay_terminal_palette.py --binary target/debug/hades --report .hades/runtime/hades-terminal-palette-replay.json
 python3 scripts/replay_osc52_timing_limits.py --binary target/debug/hades --report .hades/runtime/hades-osc52-timing-limits-replay.json
 python3 scripts/replay_osc52_clipboard.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0029-hades-osc52-st-termination.json --report .hades/runtime/hades-osc52-st-termination-replay.json

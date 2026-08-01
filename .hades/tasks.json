@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T19:18:34Z",
+  "updated_at": "2026-08-01T19:40:02Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -3526,6 +3526,60 @@
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/hermes-unconfigured-setup-escape-probe.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-068",
+      "title": "Capture Hermes eventual no-provider startup resolution",
+      "status": "complete",
+      "priority": 17,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-067"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "hermes_direct_pty",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "In fresh pinned Hermes 120x40 direct PTYs with synthetic HOME/HERMES_HOME, no config, and no provider endpoint, observe a no-input startup case through a bounded 15-second window and record whether the stable starting-agent surface ever resolves.",
+        "In separate fresh cases, submit /setup and /model after the stable startup surface, then observe each through the same bounded window; record only visible state transitions, provider-request/error absence, normalized config/artifact changes, and cleanup/terminal restoration.",
+        "Do not enter credentials, OAuth, external network, later setup values, or model requests; preserve any behavior beyond the bounded window as unknown rather than inferring a timeout or eventual route.",
+        "Add provenance, a sanitized OBS-0064 fixture, a repeatable reference probe, and an observation document; update the parity matrix/context and wire fixture validation and the probe into just verify.",
+        "Run the complete no-skip just verify gate and record implementation, probe, fixture, and verification evidence before completion."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_unconfigured_resolution.py",
+        "tests/fixtures/parity/OBS-0064-hermes-unconfigured-resolution.json",
+        "docs/parity/observations/OBS-0064-hermes-unconfigured-resolution-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hermes-unconfigured-resolution-probe.json"
+      ],
+      "ready_at": "2026-08-02T00:00:00Z",
+      "claimed_by": "hermes-unconfigured-eventual-resolution",
+      "claimed_at": "2026-08-01T19:19:42Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Captured Hermes eventual no-provider startup in three fresh direct-PTY cases over a 15-second window: no-input, /setup, and /model all remained on starting agent with no ready surface, setup/model surface, provider error, or config change. No-input exited on one Ctrl+C; command cases exited on two with terminal restoration. Focused probe and full just verify passed.",
+        "completed_at": "2026-08-01T19:40:02Z",
+        "evidence": [
+          "scripts/probe_hermes_unconfigured_resolution.py",
+          "tests/fixtures/parity/OBS-0064-hermes-unconfigured-resolution.json",
+          "docs/parity/observations/OBS-0064-hermes-unconfigured-resolution-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hermes-unconfigured-resolution-probe.json"
         ]
       }
     }

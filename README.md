@@ -135,7 +135,8 @@ The CLI worker translates the local SSE response into typed reducer events and
 renders the assistant response. Without `HADES_PROVIDER_BASE_URL`, a fresh
 launch stays on the reference-backed `starting agent…` boundary and does not
 start a provider worker or deliver prompts; the bounded clone still accepts a
-visible draft during startup. `/setup` and `/model` are also still bounded
-startup input rather than a configuration escape. Configure the loopback
-endpoint before expecting a model response. No external provider service is
-required for the deterministic bootstrap path.
+visible draft during startup. Hermes also remains on that boundary for a
+bounded 15-second window after `/setup` or `/model`, so those commands are not
+yet a configuration escape in Hades. Configure the loopback endpoint before
+expecting a model response. No external provider service is required for the
+deterministic bootstrap path.

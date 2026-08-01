@@ -314,6 +314,11 @@ progress from August 1, 2026 through 2027.
   nor model picker, changes no config, and exits cleanly on two Ctrl+C presses.
   Whether either command is eventually dispatched after startup resolves remains
   unknown; Hades has no setup/model escape from this startup state yet.
+- HAD-068 extends that Hermes observation to a 15-second window across fresh
+  no-input, `/setup`, and `/model` cases. All remain on `starting agent` with no
+  ready surface, setup/model surface, provider error, or config change. The
+  no-input case exits on one Ctrl+C; command cases exit on two. Behavior beyond
+  the window and any configured startup route remain unknown.
 
 ## Unknown until observed
 
