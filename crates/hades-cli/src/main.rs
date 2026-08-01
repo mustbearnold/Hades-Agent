@@ -106,6 +106,19 @@ fn history_path_from(
     hermes_home.or(home_hermes_dir).map(|home| home.join(".hermes_history"))
 }
 
+fn configured_editor() -> Option<Vec<String>> {
+    let visual = env::var("VISUAL").ok();
+    let editor = env::var("EDITOR").ok();
+    configured_editor_from(visual.as_deref(), editor.as_deref())
+}
+
+fn configured_editor_from(visual: Option<&str>, editor: Option<&str>) -> Option<Vec<String>> {
+    [visual, editor].into_iter().flatten().find_map(|value| {
+        let command = value.split_whitespace().map(str::to_owned).collect::<Vec<_>>();
+        (!command.is_empty()).then_some(command)
+    })
+}
+
 fn dispatch_input(
     terminal: &mut Terminal<CrosstermBackend<io::Stdout>>,
     app: &mut App,
@@ -122,7 +135,7 @@ fn run_editor(
     app: &mut App,
     draft: String,
 ) -> Result<(), Box<dyn Error>> {
-    let Some(editor) = env::var_os("EDITOR") else {
+    let Some(editor) = configured_editor() else {
         return Ok(());
     };
 
@@ -132,7 +145,8 @@ fn run_editor(
         execute!(terminal.backend_mut(), LeaveAlternateScreen)?;
         terminal.show_cursor()?;
 
-        let status = Command::new(editor).arg(&path).status()?;
+        let (program, arguments) = editor.split_first().expect("configured editor is non-empty");
+        let status = Command::new(program).args(arguments).arg(&path).status()?;
         if !status.success() {
             return Ok(None);
         }
@@ -219,5 +233,18 @@ mod tests {
             Some(PathBuf::from("/tmp/home/.hermes/.hermes_history"))
         );
         assert_eq!(history_path_from(None, None), None);
+    }
+
+    #[test]
+    fn configured_editor_prefers_nonempty_visual_and_splits_arguments() {
+        assert_eq!(
+            configured_editor_from(Some("perl -0pi"), Some("/bin/true")),
+            Some(vec!["perl".to_owned(), "-0pi".to_owned()])
+        );
+        assert_eq!(
+            configured_editor_from(Some("  "), Some("/bin/true")),
+            Some(vec!["/bin/true".to_owned()])
+        );
+        assert_eq!(configured_editor_from(None, None), None);
     }
 }

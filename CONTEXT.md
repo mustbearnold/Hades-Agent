@@ -66,6 +66,11 @@ progress from August 1, 2026 through 2027.
   HERMES_HOME/HOME path resolution, fail-open file I/O, and a two-process PTY
   oracle. History clearing, malformed files, concurrent writers, and session
   recovery remain unimplemented.
+- HAD-019 implements the deterministic editor outcome slice from OBS-0018:
+  clean edited submission, multiline preservation, trailing-newline trimming,
+  empty-output draft preservation, nonzero cancellation, and tokenized
+  VISUAL/EDITOR replay. Interactive, unavailable-editor, and busy-turn cases
+  remain unimplemented.
 
 ## Unknown until observed
 

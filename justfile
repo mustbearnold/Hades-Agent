@@ -35,6 +35,10 @@ replay-editor:
     cargo build --locked --package hades-cli
     python3 scripts/replay_editor.py --binary target/debug/hades --report .hades/runtime/editor-replay.json
 
+replay-editor-outcomes:
+    cargo build --locked --package hades-cli
+    python3 scripts/replay_editor_outcomes.py --binary target/debug/hades --report .hades/runtime/editor-outcomes-replay.json
+
 replay-clipboard:
     cargo build --locked --package hades-cli
     python3 scripts/replay_clipboard.py --binary target/debug/hades --report .hades/runtime/clipboard-replay.json

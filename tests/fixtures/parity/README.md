@@ -30,3 +30,5 @@ OBS-0018 captures deterministic Hermes editor outcomes that extend the
 unchanged-draft editor probe: modified and multiline clean exits, trailing
 newline trimming, empty output, and nonzero cancellation. It is consumed by
 the reference fixture validator and does not imply Hades implementation parity.
+OBS-0019 is the Hades implementation contract derived from OBS-0018 and is
+consumed by `scripts/replay_editor_outcomes.py`.

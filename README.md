@@ -27,6 +27,8 @@ cases. `just replay-paste` replays the bracketed-paste contract and verifies
 that embedded newlines remain in the draft without submitting it. `just
 replay-editor` replays the configured `EDITOR=/bin/true` handoff and verifies
 the unchanged draft enters the busy state.
+`just replay-editor-outcomes` replays modified, multiline, empty-output, and
+cancelled deterministic editor handoffs against isolated Hades processes.
 `just replay-clipboard` replays the empty-clipboard Ctrl+V fallback and checks
 that the draft is unchanged. `just replay-history` proves persistent history
 across two Hades processes, multiline file encoding, duplicate byte stability,

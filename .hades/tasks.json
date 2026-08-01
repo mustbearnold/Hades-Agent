@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T04:31:30Z",
+  "updated_at": "2026-08-01T04:43:02Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -844,6 +844,59 @@
           "tests/fixtures/parity/OBS-0018-hermes-editor-outcomes.json",
           "docs/parity/observations/OBS-0018-hermes-editor-outcomes-2026-08-01.md",
           "scripts/validate_reference_fixture.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-019",
+      "title": "Implement deterministic editor outcome parity",
+      "status": "complete",
+      "priority": 64,
+      "lane": "interaction",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-018"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "unit_test",
+        "process_replay",
+        "history_readback"
+      ],
+      "acceptance": [
+        "Match OBS-0018 for configured Ctrl+G editor commands: a clean non-empty exit submits the edited draft, preserves internal newlines, and removes only trailing whitespace from the final result.",
+        "Treat clean empty editor output and nonzero editor exit as cancellation: preserve the original composer draft, avoid submission, and restore the TUI cleanly.",
+        "Keep ordinary Enter submission semantics intact while adding focused reducer/storage tests for editor-specific trimEnd behavior, multiline history encoding, empty output, and cancellation.",
+        "Add a sanitized Hades implementation contract and isolated PTY replay derived from OBS-0018, wire it into just verify, update the implementation contract and parity matrix, and do not claim interactive-editor, unavailable-editor, or busy-turn behavior."
+      ],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-app/src/lib.rs",
+        "crates/hades-cli/src/main.rs",
+        "tests/fixtures/parity/OBS-0019-hades-editor-outcomes.json",
+        "docs/parity/observations/OBS-0019-hades-editor-outcomes-2026-08-01.md",
+        "scripts/replay_editor_outcomes.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "ready_at": "2026-08-01T04:33:00Z",
+      "claimed_by": "hermes-implementer",
+      "claimed_at": "2026-08-01T04:33:25Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Implemented deterministic Hermes editor outcome parity: tokenized VISUAL/EDITOR execution, trimEnd-based non-empty editor submission with multiline preservation, empty-output draft retention, nonzero cancellation, history-compatible normalization, focused tests, and a five-case isolated PTY replay.",
+        "completed_at": "2026-08-01T04:43:02Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-app/src/lib.rs",
+          "crates/hades-cli/src/main.rs",
+          "tests/fixtures/parity/OBS-0019-hades-editor-outcomes.json",
+          "docs/parity/observations/OBS-0019-hades-editor-outcomes-2026-08-01.md",
+          "scripts/replay_editor_outcomes.py",
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md"

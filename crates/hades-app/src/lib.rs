@@ -48,12 +48,15 @@ impl HistoryStore {
     }
 
     fn append(&mut self, text: &str) {
-        let trimmed = text.trim();
-        if trimmed.is_empty() || self.entries.last().is_some_and(|last| last == trimmed) {
+        self.append_value(text.trim().to_owned());
+    }
+
+    fn append_value(&mut self, value: String) {
+        if value.is_empty() || self.entries.last().is_some_and(|last| last == &value) {
             return;
         }
 
-        self.entries.push(trimmed.to_owned());
+        self.entries.push(value.clone());
         if self.entries.len() > MAX_INPUT_HISTORY {
             let excess = self.entries.len() - MAX_INPUT_HISTORY;
             self.entries.drain(..excess);
@@ -67,7 +70,7 @@ impl HistoryStore {
         }
 
         let encoded =
-            trimmed.split('\n').map(|line| format!("+{line}")).collect::<Vec<_>>().join("\n");
+            value.split('\n').map(|line| format!("+{line}")).collect::<Vec<_>>().join("\n");
         let record = format!("\n# {}\n{encoded}\n", history_timestamp());
         let Ok(mut file) = OpenOptions::new().create(true).append(true).open(&self.path) else {
             return;
@@ -143,7 +146,12 @@ impl App {
     }
 
     pub fn submit_editor_draft(&mut self, draft: String) -> DispatchOutcome {
-        self.submit(draft)
+        let content = draft.trim_end().to_owned();
+        if content.is_empty() {
+            return DispatchOutcome::Continue;
+        }
+
+        self.submit_content(content)
     }
 
     pub fn handle(&mut self, event: InputEvent) -> DispatchOutcome {
@@ -284,6 +292,10 @@ impl App {
     fn submit(&mut self, draft: String) -> DispatchOutcome {
         self.clear_completion();
         let content = draft.trim().to_owned();
+        self.submit_content(content)
+    }
+
+    fn submit_content(&mut self, content: String) -> DispatchOutcome {
         if content.is_empty() {
             self.state.status = "Nothing to submit.".to_owned();
             return DispatchOutcome::Continue;
@@ -567,6 +579,37 @@ mod tests {
             DispatchOutcome::Submitted("editor-probe".to_owned())
         );
         assert_eq!(app.state().turn, TurnState::Busy);
+    }
+
+    #[test]
+    fn editor_submission_preserves_trimmed_multiline_content_and_history_bytes() {
+        let path = test_history_path("editor-outcome");
+        let mut app = App::with_history_path(path.clone());
+
+        assert_eq!(
+            app.submit_editor_draft("  edge-one  \nedge-two\n".to_owned()),
+            DispatchOutcome::Submitted("  edge-one  \nedge-two".to_owned())
+        );
+        assert_eq!(app.state().composer.text(), "");
+        assert_eq!(app.state().messages.last().unwrap().content, "  edge-one  \nedge-two");
+
+        let history = fs::read_to_string(&path).unwrap();
+        assert!(history.contains("+edge-one  \n+edge-two\n"));
+        remove_test_history(&path);
+    }
+
+    #[test]
+    fn empty_editor_output_preserves_the_existing_draft() {
+        let mut app = App::new();
+        for character in "empty-probe".chars() {
+            app.handle(InputEvent::Key(Key::Char(character)));
+        }
+        let status = app.state().status.clone();
+
+        assert_eq!(app.submit_editor_draft("\n  \n".to_owned()), DispatchOutcome::Continue);
+        assert_eq!(app.state().composer.text(), "empty-probe");
+        assert_eq!(app.state().status, status);
+        assert!(app.state().messages.iter().all(|message| message.content != "empty-probe"));
     }
 
     #[test]

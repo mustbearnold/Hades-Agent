@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0019",
+  "reference_observation": "OBS-0018",
+  "surface": "hades-tui-editor-outcomes",
+  "terminal": {
+    "columns": 120,
+    "rows": 40,
+    "emulator": "tmux-backed PTY"
+  },
+  "normalization": [
+    "Each case runs in a fresh Hades process and isolated HERMES_HOME.",
+    "Dynamic timestamps, session IDs, prompt faces, and temporary editor paths are not asserted.",
+    "The busy state is identified by the stable Ctrl+C interrupt affordance.",
+    "History assertions inspect semantic + records and ignore generated timestamp comments.",
+    "This contract is derived from OBS-0018 and covers deterministic editor commands only."
+  ],
+  "cases": [
+    {
+      "id": "modified-clean-exit",
+      "editor": "perl -0pi -e s/.*/edited-one\\nedited-two\\n/s",
+      "draft": "original-draft",
+      "expected": {
+        "submitted_text": "edited-one\\nedited-two",
+        "screen_markers": ["Ctrl+C to interrupt"],
+        "screen_absent_markers": ["original-draft"],
+        "history_records": ["+edited-one\n+edited-two"]
+      }
+    },
+    {
+      "id": "multiline-clean-exit",
+      "editor": "perl -0pi -e s/.*/multi-one\\nmulti-two\\n/s",
+      "draft": "seed-draft",
+      "expected": {
+        "submitted_text": "multi-one\\nmulti-two",
+        "screen_markers": ["Ctrl+C to interrupt"],
+        "screen_absent_markers": ["seed-draft"],
+        "history_records": ["+multi-one\n+multi-two"]
+      }
+    },
+    {
+      "id": "trailing-newline-trim",
+      "editor": "perl -0pi -e s/.*/\\x20edge-one\\x20\\x20\\nedge-two\\n/s",
+      "draft": "space-probe",
+      "expected": {
+        "submitted_text": "edge-one<two trailing spaces>\\nedge-two",
+        "screen_markers": ["Ctrl+C to interrupt"],
+        "screen_absent_markers": ["space-probe"],
+        "history_records": ["+edge-one  \n+edge-two"]
+      }
+    },
+    {
+      "id": "empty-clean-exit",
+      "editor": "truncate -s 0",
+      "draft": "empty-probe",
+      "expected": {
+        "submitted_text": "not submitted",
+        "screen_markers": ["empty-probe"],
+        "screen_absent_markers": ["Ctrl+C to interrupt"],
+        "history_records": []
+      }
+    },
+    {
+      "id": "cancelled-nonzero-exit",
+      "editor": "/bin/false",
+      "draft": "cancel-probe",
+      "expected": {
+        "submitted_text": "not submitted",
+        "screen_markers": ["cancel-probe"],
+        "screen_absent_markers": ["Ctrl+C to interrupt"],
+        "history_records": []
+      }
+    }
+  ]
+}
