@@ -51,6 +51,10 @@ replay-clipboard-text:
     cargo build --locked --package hades-cli
     python3 scripts/replay_clipboard_text.py --binary target/debug/hades --report .hades/runtime/clipboard-text-replay.json
 
+replay-osc52-clipboard:
+    cargo build --locked --package hades-cli
+    python3 scripts/replay_osc52_clipboard.py --binary target/debug/hades --report .hades/runtime/osc52-clipboard-replay.json
+
 replay-history:
     cargo build --locked --package hades-cli
     python3 scripts/replay_history.py --binary target/debug/hades --report .hades/runtime/history-replay.json
@@ -64,6 +68,7 @@ validate-reference:
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0022-hermes-text-clipboard.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0023-hades-text-clipboard.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0024-hermes-osc52-clipboard.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0025-hades-osc52-clipboard.json
 
 agent command *args:
     python3 scripts/agent/control_plane.py {{command}} {{args}}

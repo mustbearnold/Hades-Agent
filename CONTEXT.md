@@ -89,7 +89,9 @@ progress from August 1, 2026 through 2027.
   WSL/Wayland/xclip text path and preserves the empty-provider image-miss
   fallback; image attachments and path paste remain unknown. HAD-024 captures
   Hermes remote `SSH_TTY` OSC52-first precedence and the native-provider
-  timeout fallback; tmux/STY wrapping and Hades OSC52 behavior remain unknown.
+  timeout fallback. HAD-025 implements the bare SSH_TTY OSC52 query/DA1 barrier
+  path with bounded native fallback; tmux/STY wrapping, image attachments, and
+  gateway behavior remain unknown.
 
 ## Unknown until observed
 

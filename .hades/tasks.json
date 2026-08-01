@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T05:31:23Z",
+  "updated_at": "2026-08-01T06:44:31Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -1150,6 +1150,58 @@
           "docs/parity/observations/OBS-0024-hermes-osc52-clipboard-2026-08-01.md",
           "scripts/probe_hermes_osc52_clipboard.py",
           "scripts/validate_reference_fixture.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-025",
+      "title": "Implement Hermes remote OSC52 clipboard precedence",
+      "status": "complete",
+      "priority": 58,
+      "lane": "interaction",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-024"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "unit_test",
+        "direct_pty_replay",
+        "process_replay"
+      ],
+      "acceptance": [
+        "When a bare remote shell is detected through SSH_TTY, SSH_CONNECTION, or SSH_CLIENT, ready non-overlay Ctrl+V must issue the observed OSC52 query ESC]52;c;?BEL and accept a valid base64 text response before consulting native providers.",
+        "Decode OSC52 text with trailing-newline removal while preserving internal newlines and meaningful spaces; usable remote text becomes a non-submitting paste event and native providers are not invoked.",
+        "Flush the OSC52 query with the observed DA1 barrier exchange, bound the wait, and fall back to the existing native text provider on timeout, malformed response, empty response, or non-remote sessions; busy and overlay behavior remains unchanged.",
+        "Add focused parser/protocol tests and an isolated direct 120x40 PTY replay covering a controlled OSC52 response and the no-response native fallback, with a sanitized Hades fixture wired into just verify.",
+        "Keep tmux/STY passthrough, image/path attachments, gateway behavior, and unobserved terminal multiplexers out of scope; document those boundaries rather than claiming them."
+      ],
+      "evidence": [
+        "crates/hades-cli/src/osc52.rs",
+        "crates/hades-cli/src/main.rs",
+        "tests/fixtures/parity/OBS-0025-hades-osc52-clipboard.json",
+        "docs/parity/observations/OBS-0025-hades-osc52-clipboard-2026-08-01.md",
+        "scripts/replay_osc52_clipboard.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "ready_at": "2026-08-01T05:35:00Z",
+      "claimed_by": "hades-implementer",
+      "claimed_at": "2026-08-01T05:34:09Z",
+      "attempts": 1,
+      "result": {
+        "summary": "implemented-bare-ssh-osc52-with-direct-pty-evidence-and-full-verify",
+        "completed_at": "2026-08-01T06:44:31Z",
+        "evidence": [
+          "crates/hades-cli/src/osc52.rs",
+          "crates/hades-cli/src/main.rs",
+          "tests/fixtures/parity/OBS-0025-hades-osc52-clipboard.json",
+          "docs/parity/observations/OBS-0025-hades-osc52-clipboard-2026-08-01.md",
+          "scripts/replay_osc52_clipboard.py",
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md"

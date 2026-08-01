@@ -450,11 +450,13 @@ dependencies = [
 name = "hades-cli"
 version = "0.1.0"
 dependencies = [
+ "base64",
  "crossterm",
  "hades-app",
  "hades-core",
  "hades-tui",
  "ratatui",
+ "rustix",
 ]
 
 [[package]]

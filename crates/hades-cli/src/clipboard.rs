@@ -1,6 +1,6 @@
 use std::process::Command;
 
-const CLIPBOARD_MAX_BYTES: usize = 4 * 1024 * 1024;
+pub(crate) const CLIPBOARD_MAX_BYTES: usize = 4 * 1024 * 1024;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 struct ClipboardCommand {
@@ -29,11 +29,7 @@ where
     F: FnMut(&ClipboardCommand) -> Result<Vec<u8>, ()>,
 {
     let raw = read_raw_text_with(wsl, wayland, &mut run)?;
-    if !is_usable_text(&raw) {
-        return None;
-    }
-
-    Some(strip_trailing_paste_newlines(&raw).to_owned())
+    normalize_text(&raw)
 }
 
 fn read_raw_text_with<F>(wsl: bool, wayland: bool, mut run: F) -> Option<String>
@@ -69,6 +65,14 @@ fn clipboard_commands(wsl: bool, wayland: bool) -> Vec<ClipboardCommand> {
 fn run_command(command: &ClipboardCommand) -> Result<Vec<u8>, ()> {
     let output = Command::new(command.program).args(command.args).output().map_err(|_| ())?;
     if output.status.success() { Ok(output.stdout) } else { Err(()) }
+}
+
+pub(crate) fn normalize_text(text: &str) -> Option<String> {
+    if !is_usable_text(text) {
+        return None;
+    }
+
+    Some(strip_trailing_paste_newlines(text).to_owned())
 }
 
 fn is_usable_text(text: &str) -> bool {

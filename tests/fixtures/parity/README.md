@@ -46,4 +46,8 @@ the native text path and is consumed by the direct-PTY
 outside the contract.
 OBS-0024 captures Hermes research-only remote `SSH_TTY` OSC52 precedence and
 the native xclip timeout fallback with explicit query/DA1 bytes. It does not
-imply Hades OSC52 implementation parity or tmux/STY passthrough coverage.
+imply tmux/STY passthrough coverage. OBS-0025 is the Hades implementation
+contract derived from OBS-0024 and is consumed by the direct-PTY
+`scripts/replay_osc52_clipboard.py` oracle; invalid/empty/oversized responses,
+image/path/gateway behavior, and concurrent input during the bounded wait
+remain outside the claim.

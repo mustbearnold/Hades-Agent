@@ -1,6 +1,7 @@
 #![forbid(unsafe_code)]
 
 mod clipboard;
+mod osc52;
 
 use std::{
     env,
@@ -15,7 +16,9 @@ use std::{
 use crossterm::{
     event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers},
     execute,
-    terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
+    terminal::{
+        EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode, size,
+    },
 };
 use hades_app::{App, DispatchOutcome};
 use hades_core::{InputEvent, Key, PRODUCT_NAME, TurnState};
@@ -65,7 +68,13 @@ fn restore_terminal(
 
 fn event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> Result<(), Box<dyn Error>> {
     let mut app = configured_app();
+    let mut last_size = size()?;
     loop {
+        let current_size = size()?;
+        if current_size != last_size {
+            app.handle(InputEvent::Resize { width: current_size.0, height: current_size.1 });
+            last_size = current_size;
+        }
         terminal.draw(|frame| draw(frame, &app))?;
         if app.state().should_quit {
             return Ok(());
@@ -79,6 +88,7 @@ fn event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> Result<(
                     }
                 }
                 Event::Resize(width, height) => {
+                    last_size = (width, height);
                     app.handle(InputEvent::Resize { width, height });
                 }
                 Event::Paste(text) => {
@@ -126,26 +136,51 @@ fn dispatch_input(
     app: &mut App,
     event: InputEvent,
 ) -> Result<(), Box<dyn Error>> {
-    let event = resolve_clipboard_event(app, event);
+    let event = resolve_clipboard_event(terminal, app, event);
     if let DispatchOutcome::EditorRequested(draft) = app.handle(event) {
         run_editor(terminal, app, draft)?;
     }
     Ok(())
 }
 
-fn resolve_clipboard_event(app: &App, event: InputEvent) -> InputEvent {
-    resolve_clipboard_event_with(app, event, clipboard::read_usable_text)
+fn resolve_clipboard_event(
+    terminal: &mut Terminal<CrosstermBackend<io::Stdout>>,
+    app: &App,
+    event: InputEvent,
+) -> InputEvent {
+    resolve_clipboard_event_with_providers(
+        app,
+        event,
+        || osc52::read_usable_text(terminal.backend_mut()),
+        clipboard::read_usable_text,
+    )
 }
 
+#[cfg(test)]
 fn resolve_clipboard_event_with<F>(app: &App, event: InputEvent, read: F) -> InputEvent
 where
     F: FnOnce() -> Option<String>,
+{
+    resolve_clipboard_event_with_providers(app, event, || None, read)
+}
+
+fn resolve_clipboard_event_with_providers<R, N>(
+    app: &App,
+    event: InputEvent,
+    remote_read: R,
+    native_read: N,
+) -> InputEvent
+where
+    R: FnOnce() -> Option<String>,
+    N: FnOnce() -> Option<String>,
 {
     match event {
         InputEvent::Key(Key::Ctrl('v'))
             if app.state().turn == TurnState::Ready && app.state().overlay.is_none() =>
         {
-            read().map_or(InputEvent::Key(Key::Ctrl('v')), InputEvent::Paste)
+            remote_read()
+                .or_else(native_read)
+                .map_or(InputEvent::Key(Key::Ctrl('v')), InputEvent::Paste)
         }
         other => other,
     }
@@ -287,11 +322,27 @@ mod tests {
     #[test]
     fn ready_ctrl_v_resolves_usable_text_to_a_non_submitting_paste_event() {
         let app = App::new();
-        let event = resolve_clipboard_event_with(&app, InputEvent::Key(Key::Ctrl('v')), || {
-            Some("clip-one  \nclip-two".to_owned())
-        });
+        let event = resolve_clipboard_event_with_providers(
+            &app,
+            InputEvent::Key(Key::Ctrl('v')),
+            || Some("remote-one".to_owned()),
+            || Some("native-two".to_owned()),
+        );
 
-        assert_eq!(event, InputEvent::Paste("clip-one  \nclip-two".to_owned()));
+        assert_eq!(event, InputEvent::Paste("remote-one".to_owned()));
+    }
+
+    #[test]
+    fn remote_clipboard_falls_back_to_native_text_when_remote_is_unavailable() {
+        let app = App::new();
+        let event = resolve_clipboard_event_with_providers(
+            &app,
+            InputEvent::Key(Key::Ctrl('v')),
+            || None,
+            || Some("native-two".to_owned()),
+        );
+
+        assert_eq!(event, InputEvent::Paste("native-two".to_owned()));
     }
 
     #[test]
