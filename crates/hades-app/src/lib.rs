@@ -8,8 +8,8 @@ use std::{
 };
 
 use hades_core::{
-    CompletionState, Composer, EnterAction, InputEvent, Key, MAX_INPUT_HISTORY, Message, Overlay,
-    SessionState, TurnState,
+    CompletionState, Composer, EnterAction, InputEvent, Key, MAX_INPUT_HISTORY, Message, Notice,
+    Overlay, SessionState, TurnState,
 };
 
 #[derive(Clone, Debug)]
@@ -198,18 +198,21 @@ impl App {
             }
             Key::Char('q') if self.state.composer.text().is_empty() => self.quit(),
             Key::Char(character) => {
+                self.clear_notice();
                 self.state.composer.insert(character);
                 self.refresh_completion();
                 self.state.status = "Editing input.".to_owned();
                 DispatchOutcome::Continue
             }
             Key::Backspace => {
+                self.clear_notice();
                 self.state.composer.backspace();
                 self.refresh_completion();
                 DispatchOutcome::Continue
             }
             Key::Enter => match self.state.composer.enter() {
                 EnterAction::InsertedNewline => {
+                    self.clear_notice();
                     self.refresh_completion();
                     self.state.status = "Editing input.".to_owned();
                     DispatchOutcome::Continue
@@ -217,6 +220,7 @@ impl App {
                 EnterAction::Submit(content) => self.submit(content),
             },
             Key::ModifiedEnter if self.state.turn == TurnState::Ready => {
+                self.clear_notice();
                 self.state.composer.insert_newline();
                 self.refresh_completion();
                 self.state.status = "Editing input.".to_owned();
@@ -224,6 +228,7 @@ impl App {
             }
             Key::ModifiedEnter => DispatchOutcome::Continue,
             Key::Escape => {
+                self.clear_notice();
                 self.state.composer.clear();
                 self.clear_completion();
                 self.state.status = "Input cleared.".to_owned();
@@ -239,41 +244,49 @@ impl App {
                 DispatchOutcome::Continue
             }
             Key::Up => {
+                self.clear_notice();
                 self.state.composer.history_up();
                 self.clear_completion();
                 DispatchOutcome::Continue
             }
             Key::Down => {
+                self.clear_notice();
                 self.state.composer.history_down();
                 self.clear_completion();
                 DispatchOutcome::Continue
             }
             Key::Left => {
+                self.clear_notice();
                 self.state.composer.move_left();
                 self.clear_completion();
                 DispatchOutcome::Continue
             }
             Key::Right => {
+                self.clear_notice();
                 self.state.composer.move_right();
                 self.clear_completion();
                 DispatchOutcome::Continue
             }
             Key::Home => {
+                self.clear_notice();
                 self.state.composer.move_home();
                 self.clear_completion();
                 DispatchOutcome::Continue
             }
             Key::End => {
+                self.clear_notice();
                 self.state.composer.move_end();
                 self.clear_completion();
                 DispatchOutcome::Continue
             }
             Key::Ctrl('a') => {
+                self.clear_notice();
                 self.state.composer.move_home();
                 self.clear_completion();
                 DispatchOutcome::Continue
             }
             Key::Ctrl('k') => {
+                self.clear_notice();
                 self.state.composer.kill_to_end();
                 self.clear_completion();
                 DispatchOutcome::Continue
@@ -314,11 +327,25 @@ impl App {
         }
 
         if content == "/help" {
+            self.clear_notice();
             self.state.overlay = Some(Overlay::SetupRequired);
             self.state.status = "Setup required.".to_owned();
             return DispatchOutcome::Continue;
         }
 
+        if content.starts_with('/') {
+            self.state.messages.push(Message::user(&content));
+            self.state.messages.push(Message::system(format!(
+                "Unknown command: {content}\nType /help for available commands"
+            )));
+            self.state.notice = Some(Notice::UnknownCommand { command: content.clone() });
+            self.state.composer.clear();
+            self.state.turn = TurnState::Ready;
+            self.state.status = format!("Unknown command: {content}");
+            return DispatchOutcome::Continue;
+        }
+
+        self.clear_notice();
         self.state.messages.push(Message::user(&content));
         self.state.composer.clear();
         self.state.turn = TurnState::Busy;
@@ -327,6 +354,7 @@ impl App {
     }
 
     fn interrupt(&mut self) -> DispatchOutcome {
+        self.clear_notice();
         self.clear_completion();
         self.state.turn = TurnState::Ready;
         self.state.status = "Interrupted.".to_owned();
@@ -343,6 +371,7 @@ impl App {
             return DispatchOutcome::Continue;
         }
 
+        self.clear_notice();
         self.state.composer.insert_text(&text);
         self.clear_completion();
         self.state.status = "Pasted input.".to_owned();
@@ -361,6 +390,10 @@ impl App {
 
     fn clear_completion(&mut self) {
         self.state.completion = CompletionState::default();
+    }
+
+    fn clear_notice(&mut self) {
+        self.state.notice = None;
     }
 
     fn apply_completion(&mut self) {
@@ -493,6 +526,28 @@ mod tests {
 
         assert_eq!(app.handle(InputEvent::Key(Key::Ctrl('c'))), DispatchOutcome::Quit);
         assert!(app.state().should_quit);
+    }
+
+    #[test]
+    fn unknown_slash_command_stays_ready_and_reports_the_reference_error() {
+        let mut app = App::new();
+        for character in "/not-a-real-hermes-command".chars() {
+            app.handle(InputEvent::Key(Key::Char(character)));
+        }
+
+        assert_eq!(app.handle(InputEvent::Key(Key::Enter)), DispatchOutcome::Continue);
+        assert_eq!(app.state().turn, TurnState::Ready);
+        assert_eq!(app.state().overlay, None);
+        assert_eq!(app.state().composer.text(), "");
+        assert_eq!(
+            app.state().notice,
+            Some(Notice::UnknownCommand { command: "/not-a-real-hermes-command".to_owned() })
+        );
+        assert_eq!(
+            app.state().messages.last().map(|message| message.content.as_str()),
+            Some("Unknown command: /not-a-real-hermes-command\nType /help for available commands")
+        );
+        assert_eq!(app.state().status, "Unknown command: /not-a-real-hermes-command");
     }
 
     #[test]

@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0037",
+  "reference_observation": "OBS-0036",
+  "surface": "hades-tui-unknown-slash-command",
+  "reference": {
+    "product": "Hades Agent",
+    "version": "workspace",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "tmux-backed PTY"
+    },
+    "capture": "isolated Hades direct replay derived from OBS-0036 stable markers"
+  },
+  "normalization": [
+    "The Hades binary path, synthetic HERMES_HOME, PTY/session identifiers, timestamps, elapsed values, cursor placement, and ANSI styling are omitted.",
+    "The replay uses a fresh Hades process at 120x40 and asserts only the stable unknown-command, ready-state, and non-busy markers.",
+    "The command is intentionally unrecognized; provider configuration, network access, model responses, and setup flows are outside this contract."
+  ],
+  "terminal": {
+    "columns": 120,
+    "rows": 40,
+    "emulator": "tmux-backed PTY"
+  },
+  "cases": [
+    {
+      "id": "unknown-slash-command",
+      "steps": [
+        {
+          "id": "type-command",
+          "input": {
+            "kind": "text",
+            "value": "/not-a-real-hermes-command"
+          },
+          "output": {
+            "pty_markers": [
+              "❯ /not-a-real-hermes-command"
+            ]
+          }
+        },
+        {
+          "id": "submit-unknown-command",
+          "input": {
+            "kind": "key",
+            "value": "Enter"
+          },
+          "output": {
+            "pty_markers": [
+              "Unknown command: /not-a-real-hermes-command",
+              "Type /help for available commands",
+              "─ ready │ mock model"
+            ],
+            "pty_absent_markers": [
+              "musing…",
+              "Ctrl+C to interrupt",
+              "❯ /not-a-real-hermes-command"
+            ]
+          }
+        },
+        {
+          "id": "exit",
+          "input": {
+            "kind": "key",
+            "value": "Ctrl+C"
+          },
+          "output": {
+            "pty_markers": [
+              "process exit"
+            ],
+            "process_exit": true
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T09:26:23Z",
+  "updated_at": "2026-08-01T09:35:35Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -1818,6 +1818,59 @@
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-038",
+      "title": "Implement the Hermes unknown slash-command boundary",
+      "status": "complete",
+      "priority": 45,
+      "lane": "behavior",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-037"
+      ],
+      "risk": "low",
+      "oracle": [
+        "typed_core_transition",
+        "direct_pty_replay",
+        "focused_renderer_test",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Route an unrecognized slash command through a typed ready-state error path instead of recording a model submission or entering Busy.",
+        "Render the observed stable markers `Unknown command: <command>` and `Type /help for available commands` on the 120x40 Hermes surface while retaining the ready footer and clearing the composer draft.",
+        "Keep the existing /help setup-required behavior, ordinary prompt submission, history recording, completion, overlays, and Ctrl+C lifecycle behavior unchanged.",
+        "Add a focused Hades implementation contract and isolated direct-PTY replay for `/not-a-real-hermes-command`, including the absence of the busy interrupt marker and clean exit.",
+        "Run the complete no-skip just verify gate and record the evidence before completion."
+      ],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-app/src/lib.rs",
+        "crates/hades-tui/src/lib.rs",
+        "tests/fixtures/parity/OBS-0037-hades-unknown-slash-command.json",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/observations/OBS-0037-hades-unknown-slash-command-2026-08-01.md",
+        "CONTEXT.md"
+      ],
+      "ready_at": "2026-08-01T09:30:03Z",
+      "claimed_by": "hades-implementer",
+      "claimed_at": "2026-08-01T09:31:13Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Implemented the typed unknown slash-command boundary: unrecognized slash input remains ready, records the exact two-line error, clears the composer, avoids Busy, and passes focused core/TUI tests plus an isolated 120x40 replay wired into just verify.",
+        "completed_at": "2026-08-01T09:35:35Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-app/src/lib.rs",
+          "crates/hades-tui/src/lib.rs",
+          "tests/fixtures/parity/OBS-0037-hades-unknown-slash-command.json",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/observations/OBS-0037-hades-unknown-slash-command-2026-08-01.md",
+          "CONTEXT.md"
         ]
       }
     }

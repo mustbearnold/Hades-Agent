@@ -141,6 +141,11 @@ progress from August 1, 2026 through 2027.
   while remaining ready. Provider discovery, deeper setup behavior, and
   reachable-provider outcomes remain unknown; the sanitized contract is in
   OBS-0036.
+- HAD-038 implements the observed unknown slash-command boundary: unrecognized
+  slash input produces the exact two-line error, clears the composer, remains
+  ready without entering Busy, and exits cleanly through the existing lifecycle
+  path. `/model`, `/setup`, aliases, arguments, and reachable-provider command
+  behavior remain unimplemented and explicitly separate.
 
 ## Unknown until observed
 

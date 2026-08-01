@@ -33,6 +33,7 @@ python3 scripts/probe_tui_lifecycle.py --binary target/debug/hades
 python3 scripts/differential_replay.py --binary target/debug/hades --report .hades/runtime/differential-replay.json
 python3 scripts/replay_composer.py --binary target/debug/hades --report .hades/runtime/composer-replay.json
 python3 scripts/replay_completion.py --binary target/debug/hades --report .hades/runtime/completion-replay.json
+python3 scripts/replay_composer.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0037-hades-unknown-slash-command.json --report .hades/runtime/unknown-command-replay.json
 python3 scripts/replay_paste.py --binary target/debug/hades --report .hades/runtime/paste-replay.json
 python3 scripts/replay_editor.py --binary target/debug/hades --report .hades/runtime/editor-replay.json
 python3 scripts/replay_editor_outcomes.py --binary target/debug/hades --report .hades/runtime/editor-outcomes-replay.json

@@ -1,7 +1,7 @@
 #![forbid(unsafe_code)]
 
 use hades_app::App;
-use hades_core::{Overlay, TurnState};
+use hades_core::{Notice, Overlay, TurnState};
 use ratatui::{
     Frame, Terminal,
     backend::TestBackend,
@@ -81,6 +81,10 @@ fn draw_hermes_startup(frame: &mut Frame<'_>, app: &App) {
     }
     if app.state().status == HERMES_CLIPBOARD_MISS {
         rows[37] = format!(" │ {HERMES_CLIPBOARD_MISS}");
+    }
+    if let Some(Notice::UnknownCommand { command }) = &app.state().notice {
+        rows[36] = format!(" Unknown command: {command}");
+        rows[37] = " Type /help for available commands".to_owned();
     }
 
     let styled_rows =
@@ -487,6 +491,22 @@ mod tests {
         let cleared = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
         assert!(cleared.contains("Setup Required"));
         assert!(!cleared.contains("/help"));
+    }
+
+    #[test]
+    fn hermes_startup_surface_renders_unknown_command_without_busy_state() {
+        let mut app = App::new();
+        for character in "/not-a-real-hermes-command".chars() {
+            app.handle(hades_core::InputEvent::Key(hades_core::Key::Char(character)));
+        }
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
+
+        let rendered = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        assert!(rendered.contains("Unknown command: /not-a-real-hermes-command"));
+        assert!(rendered.contains("Type /help for available commands"));
+        assert!(rendered.contains("─ ready │ mock model"));
+        assert!(!rendered.contains("musing…"));
+        assert!(!rendered.contains("❯ /not-a-real-hermes-command"));
     }
 
     #[test]

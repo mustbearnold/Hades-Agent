@@ -64,6 +64,11 @@ pub enum Overlay {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub enum Notice {
+    UnknownCommand { command: String },
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Message {
     pub role: Role,
     pub content: String,
@@ -303,6 +308,7 @@ pub struct SessionState {
     pub surface: Surface,
     pub turn: TurnState,
     pub overlay: Option<Overlay>,
+    pub notice: Option<Notice>,
     pub composer: Composer,
     pub completion: CompletionState,
     pub messages: Vec<Message>,
@@ -316,6 +322,7 @@ impl Default for SessionState {
             surface: Surface::Home,
             turn: TurnState::Ready,
             overlay: None,
+            notice: None,
             composer: Composer::default(),
             completion: CompletionState::default(),
             messages: Vec::new(),

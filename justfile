@@ -31,6 +31,10 @@ replay-completion:
     cargo build --locked --package hades-cli
     python3 scripts/replay_completion.py --binary target/debug/hades --report .hades/runtime/completion-replay.json
 
+replay-unknown-command:
+    cargo build --locked --package hades-cli
+    python3 scripts/replay_composer.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0037-hades-unknown-slash-command.json --report .hades/runtime/unknown-command-replay.json
+
 replay-paste:
     cargo build --locked --package hades-cli
     python3 scripts/replay_paste.py --binary target/debug/hades --report .hades/runtime/paste-replay.json
