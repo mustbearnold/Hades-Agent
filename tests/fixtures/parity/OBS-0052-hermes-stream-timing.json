@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0052",
+  "surface": "hermes-tui-incremental-provider-delta-and-cancellation-boundary",
+  "reference": {
+    "product": "Hermes Agent",
+    "version": "0.19.1",
+    "display_build": "2026.7.30",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "direct PTY with delayed loopback HTTP/SSE recorder"
+    },
+    "capture": "fresh synthetic-home Hermes TUI processes with a probe-owned loopback server controlling separated SSE writes"
+  },
+  "normalization": [
+    "The reference checkout, synthetic HOME/HERMES_HOME paths, prompt text, credentials, authorization values, session identifiers, timestamps, process identifiers, and animated redraw bytes are omitted or replaced by stable markers.",
+    "The provider is a deterministic 127.0.0.1 HTTP/SSE fixture owned by the probe; no external network, OAuth flow, or user credential is used.",
+    "Requests are reduced to method/path, content type, authorization presence, top-level body keys, model, stream flag, message roles, and tool presence. The first chat request is the request whose body contains stream=true.",
+    "The fixture-controlled release gap and PTY observation delays are measured evidence for these runs only; they are not generalized into a Hermes latency, timeout, or redraw contract.",
+    "Visible output is reduced to stable first-delta, second-delta, interrupted, ready, and clean-exit landmarks rather than raw ANSI redraw bytes."
+  ],
+  "steps": [
+    {
+      "id": "delayed-delta-order",
+      "precondition": "Fresh Hermes TUI at 120x40 with a configured custom provider at the probe-owned loopback endpoint. The server writes a role chunk and HERMES_DELAY_FIRST, waits for a fixture-controlled gap of about 0.75 seconds, then writes HERMES_DELAY_SECOND, finish, and DONE.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "sanitized prompt",
+          "bytes_hex": "73 61 6e 69 74 69 7a 65 64 20 70 72 6f 6d 70 74"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+C",
+          "bytes_hex": "03"
+        }
+      ],
+      "output": {
+        "status": "passed",
+        "request_boundary": {
+          "discovery_request_count": 2,
+          "first_chat": {
+            "method": "POST",
+            "path": "/v1/chat/completions",
+            "content_type": "application/json",
+            "authorization_present": true,
+            "body_keys": [
+              "max_tokens",
+              "messages",
+              "model",
+              "stream",
+              "stream_options",
+              "tools"
+            ],
+            "model": "palette-model",
+            "stream": true,
+            "message_count": 2,
+            "message_roles": ["system", "user"],
+            "tools_present": true
+          },
+          "subsequent_chat_request_count": 2
+        },
+        "stream_boundary": {
+          "first_delta_marker": "HERMES_DELAY_FIRST",
+          "second_delta_marker": "HERMES_DELAY_SECOND",
+          "first_delta_visible_before_second_release": true,
+          "second_delta_visible_after_second_release": true,
+          "measured_release_gap": "about 0.75 seconds in the fixture-controlled run"
+        },
+        "visible_state": {
+          "first_delta_visible": true,
+          "second_delta_visible": true,
+          "assistant_response_visible": true,
+          "returned_to_ready": true,
+          "clean_exit": true
+        }
+      }
+    },
+    {
+      "id": "interrupt-before-completion",
+      "precondition": "Fresh Hermes TUI at 120x40 with the same loopback fixture. After HERMES_DELAY_FIRST is written and observed, Ctrl+C is sent before the delayed second chunk is released; the fixture then releases the second write to test the closed connection boundary.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "sanitized prompt",
+          "bytes_hex": "73 61 6e 69 74 69 7a 65 64 20 70 72 6f 6d 70 74"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+C",
+          "bytes_hex": "03"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+C",
+          "bytes_hex": "03"
+        }
+      ],
+      "output": {
+        "status": "passed",
+        "request_boundary": {
+          "discovery_request_count": 2,
+          "first_chat": {
+            "method": "POST",
+            "path": "/v1/chat/completions",
+            "content_type": "application/json",
+            "authorization_present": true,
+            "body_keys": [
+              "max_tokens",
+              "messages",
+              "model",
+              "stream",
+              "stream_options",
+              "tools"
+            ],
+            "model": "palette-model",
+            "stream": true,
+            "message_count": 2,
+            "message_roles": ["system", "user"],
+            "tools_present": true
+          },
+          "subsequent_chat_request_count": 0
+        },
+        "cancellation_boundary": {
+          "first_delta_visible_before_interrupt": true,
+          "second_delta_visible_after_interrupt": false,
+          "interrupted_surface_observed": true,
+          "server_observed_connection_close": true,
+          "server_second_write_may_complete_before_close_detection": true
+        },
+        "visible_state": {
+          "partial_first_delta_preserved": true,
+          "returned_to_ready_after_interrupt": true,
+          "clean_exit": true
+        }
+      }
+    }
+  ],
+  "unknowns": [
+    "The measured fixture release gap and PTY observation delay do not establish a universal Hermes token latency, redraw cadence, timeout, or cancellation deadline.",
+    "The two subsequent chat requests after the completed first stream were observed in the delayed case but their purpose and retry/follow-up semantics were not isolated.",
+    "The exact cutoff between a provider write, Hermes parsing, visible rendering, and socket close remains timing-sensitive; this fixture proves only the recorded boundary.",
+    "Hades incremental socket parsing, cancellation, retries, tool execution, malformed/delayed streams, non-loopback providers, HTTPS, credentials, and persistence remain unimplemented or separately unknown."
+  ]
+}

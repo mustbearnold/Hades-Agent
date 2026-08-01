@@ -127,6 +127,9 @@ probe-full-setup-model-default:
 probe-local-provider-stream:
     python3 scripts/probe_hermes_local_provider_stream.py --report .hades/runtime/hermes-local-provider-stream-probe.json --timeout 30
 
+probe-stream-timing:
+    python3 scripts/probe_hermes_stream_timing.py --report .hades/runtime/hermes-stream-timing-probe.json --timeout 30
+
 replay-terminal-palette:
     cargo build --locked --package hades-cli
     python3 scripts/replay_terminal_palette.py --binary target/debug/hades --report .hades/runtime/hades-terminal-palette-replay.json
@@ -182,6 +185,7 @@ validate-reference:
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0049-hades-model-default-terminal-backend.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0050-hermes-local-provider-stream.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0051-hades-local-provider-stream.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0052-hermes-stream-timing.json
 
 agent command *args:
     python3 scripts/agent/control_plane.py {{command}} {{args}}

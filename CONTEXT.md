@@ -242,6 +242,12 @@ progress from August 1, 2026 through 2027.
   logged. A missing endpoint becomes a visible provider error; the local PTY
   replay verifies the request shape, response rendering, ready transition,
   active-turn Ctrl+C cleanup, and no external-network path.
+- HAD-056 captures the next Hermes provider boundary with a delayed loopback
+  SSE fixture: the first assistant delta becomes visible before a separated
+  second delta, and Ctrl+C before that second release preserves the first
+  delta, shows the interrupted surface, returns to `ready`, and closes the
+  provider connection. The measured release gap is fixture-specific; later
+  chat requests and the exact socket byte cutoff remain unknown.
 
 ## Unknown until observed
 
@@ -252,11 +258,11 @@ progress from August 1, 2026 through 2027.
 - Which Hermes behaviors are stable contracts versus implementation details;
   session recovery remains unobserved beyond input-history persistence.
 - Hades provider/model streaming and tool calls beyond the bounded HAD-053 /
-  HAD-054 / HAD-055 seams; true incremental socket cancellation, retries,
-  tool execution, non-loopback providers, HTTPS, and provider discovery remain
-  unimplemented. Hermes subsequent chat-request purpose, provider errors,
-  malformed/delayed streams, and terminal-dependent surfaces beyond the
-  captured observations remain unknown.
+  HAD-054 / HAD-055 seams; true incremental socket parsing/cancellation,
+  retries, tool execution, non-loopback providers, HTTPS, and provider
+  discovery remain unimplemented. Hermes subsequent chat-request purpose,
+  provider errors, malformed streams, and terminal-dependent surfaces beyond
+  the captured observations remain unknown.
 - The complete slash-command catalog and argument semantics, provider/model
   discovery details, setup wizard continuation, numbered-fallback choices,
   terminal-backend selection and cancellation after deeper navigation, provider

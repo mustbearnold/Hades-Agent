@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T15:43:48Z",
+  "updated_at": "2026-08-01T16:00:23Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -2791,6 +2791,62 @@
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/had055-pre-completion-verify-retry4-20260801T164500Z.log"
+        ]
+      }
+    },
+    {
+      "id": "HAD-056",
+      "title": "Capture Hermes incremental provider streaming and cancellation boundary",
+      "status": "complete",
+      "priority": 27,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-055"
+      ],
+      "risk": "high",
+      "oracle": [
+        "reference_observation",
+        "delayed_stream_trace",
+        "direct_pty_cancellation",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Observe the pinned Hermes reference at 120x40 against a deterministic loopback HTTP/SSE fixture that releases multiple assistant deltas at separated boundaries, recording the request shape, response timing measurements, visible first-delta and completion ordering, and terminal cleanup without credentials or external network access.",
+        "Exercise Ctrl+C before the delayed stream completes and record the observable partial-response, status, ready/interrupted, socket-close, and second-Ctrl+C behavior without turning measured timing into a universal claim.",
+        "Add a provenance-bearing observation, sanitized fixture, and replay/probe that preserve raw-enough evidence for the delayed-delta and cancellation boundary; update the parity matrix and context only with what the reference run proves.",
+        "Wire the deterministic probe and fixture validation into the complete no-skip just verify gate and leave all unobserved provider retries, tools, credentials, and external-provider behavior explicitly unknown."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_stream_timing.py",
+        "tests/fixtures/parity/OBS-0052-hermes-stream-timing.json",
+        "docs/parity/observations/OBS-0052-hermes-stream-timing-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/had056-reference-probe.log",
+        ".hades/runtime/hermes-stream-timing-probe.json",
+        ".hades/runtime/had056-pre-completion-verify.log"
+      ],
+      "ready_at": "2026-08-01T15:49:36Z",
+      "attempts": 1,
+      "claimed_by": "hermes-stream-research",
+      "claimed_at": "2026-08-01T15:49:51Z",
+      "result": {
+        "summary": "Captured the pinned Hermes delayed-delta and pre-completion cancellation boundary with a deterministic direct-PTY loopback SSE probe: the first assistant delta rendered before the delayed second delta, Ctrl+C preserved the partial response and returned to interrupted/ready, and the provider connection closed before the second delta became visible. The observation, sanitized fixture, parity updates, probe recipe, and complete no-skip verification evidence are recorded.",
+        "completed_at": "2026-08-01T16:00:23Z",
+        "evidence": [
+          "scripts/probe_hermes_stream_timing.py",
+          "tests/fixtures/parity/OBS-0052-hermes-stream-timing.json",
+          "docs/parity/observations/OBS-0052-hermes-stream-timing-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/had056-reference-probe.log",
+          ".hades/runtime/hermes-stream-timing-probe.json",
+          ".hades/runtime/had056-pre-completion-verify.log"
         ]
       }
     }
