@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hades-agent.invalid/schemas/task.json",
+  "title": "Hades Agent task",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "status",
+    "priority",
+    "lane",
+    "owner_role",
+    "depends_on",
+    "risk",
+    "oracle",
+    "acceptance",
+    "evidence"
+  ],
+  "properties": {
+    "id": {"type": "string", "pattern": "^HAD-[0-9]{3,}$"},
+    "title": {"type": "string", "minLength": 1},
+    "status": {
+      "type": "string",
+      "enum": ["queued", "ready", "in_progress", "blocked", "complete", "cancelled"]
+    },
+    "priority": {"type": "integer", "minimum": 0},
+    "lane": {"type": "string", "minLength": 1},
+    "owner_role": {"type": "string", "minLength": 1},
+    "depends_on": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "risk": {"type": "string", "enum": ["low", "medium", "high"]},
+    "oracle": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "acceptance": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "evidence": {"type": "array", "items": {"type": "string"}},
+    "claimed_by": {"type": "string"},
+    "claimed_at": {"type": "string"},
+    "result": {"type": "object"}
+  },
+  "additionalProperties": true
+}

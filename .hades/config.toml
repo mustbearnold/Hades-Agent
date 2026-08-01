@@ -1,0 +1,44 @@
+schema_version = 1
+project = "hades-agent"
+reference_product = "Hermes TUI"
+development_start = "2026-08-01"
+default_branch = "main"
+
+required_gates = [
+    "control-plane",
+    "fmt",
+    "check",
+    "clippy",
+    "test",
+    "diff",
+]
+
+[autonomy]
+mode = "bounded"
+requires_task_claim = true
+requires_evidence_for_completion = true
+allow_external_side_effects = false
+allow_credential_access = false
+
+[paths]
+mutable = [
+    "AGENTS.md",
+    "CONTEXT.md",
+    "README.md",
+    "Cargo.toml",
+    "Cargo.lock",
+    "crates/**",
+    "docs/**",
+    ".agents/**",
+    ".hades/tasks.json",
+    "scripts/**",
+    "tests/**",
+]
+protected = [
+    ".env",
+    ".env.*",
+    ".git/**",
+    ".hades/runtime/**",
+    ".hades/locks/**",
+    "target/**",
+]

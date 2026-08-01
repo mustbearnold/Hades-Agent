@@ -1,0 +1,17 @@
+[package]
+name = "hades-cli"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "hades"
+path = "src/main.rs"
+
+[dependencies]
+crossterm.workspace = true
+hades-app = { path = "../hades-app" }
+hades-core = { path = "../hades-core" }
+hades-tui = { path = "../hades-tui" }
+ratatui.workspace = true

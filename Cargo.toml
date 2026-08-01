@@ -1,0 +1,26 @@
+[workspace]
+members = [
+    "crates/hades-core",
+    "crates/hades-app",
+    "crates/hades-tui",
+    "crates/hades-cli",
+]
+default-members = [
+    "crates/hades-core",
+    "crates/hades-app",
+    "crates/hades-tui",
+    "crates/hades-cli",
+]
+resolver = "3"
+
+[workspace.package]
+edition = "2024"
+version = "0.1.0"
+rust-version = "1.97.1"
+publish = false
+
+[workspace.dependencies]
+crossterm = "0.29.0"
+ratatui = "0.30.0"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.149"

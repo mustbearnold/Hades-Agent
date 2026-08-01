@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-08-01T00:00:00Z",
+  "tasks": [
+    {
+      "id": "HAD-001",
+      "title": "Capture the Hermes TUI reference contract",
+      "status": "ready",
+      "priority": 100,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [],
+      "risk": "medium",
+      "oracle": ["reference_observation", "provenance_record"],
+      "acceptance": [
+        "Record the reference build, environment, terminal size, and capture method.",
+        "Capture startup, input, navigation, error, and exit observations without redacting behavior into guesses.",
+        "Mark every unobserved behavior as unknown and link the resulting ledger entries."
+      ],
+      "evidence": []
+    },
+    {
+      "id": "HAD-002",
+      "title": "Define the first replay trace and golden-frame fixtures",
+      "status": "queued",
+      "priority": 90,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": ["HAD-001"],
+      "risk": "low",
+      "oracle": ["replay_trace", "golden_frame"],
+      "acceptance": [
+        "Add one sanitized reference trace with ordered inputs and observable outputs.",
+        "Add the matching normalized terminal frame fixture.",
+        "Document normalization rules so unrelated terminal noise cannot hide a regression."
+      ],
+      "evidence": []
+    },
+    {
+      "id": "HAD-003",
+      "title": "Characterize startup and exit lifecycle parity",
+      "status": "queued",
+      "priority": 85,
+      "lane": "lifecycle",
+      "owner_role": "researcher",
+      "depends_on": ["HAD-001"],
+      "risk": "medium",
+      "oracle": ["lifecycle_probe", "replay_trace"],
+      "acceptance": [
+        "Define observable startup and exit states for the chosen reference build.",
+        "Define behavior for normal exit, interrupt exit, and terminal cleanup.",
+        "Add a deterministic probe that fails if cleanup is skipped."
+      ],
+      "evidence": []
+    },
+    {
+      "id": "HAD-004",
+      "title": "Implement the first reference-backed state transition",
+      "status": "queued",
+      "priority": 80,
+      "lane": "core",
+      "owner_role": "implementer",
+      "depends_on": ["HAD-002", "HAD-003"],
+      "risk": "medium",
+      "oracle": ["unit_test", "replay_trace"],
+      "acceptance": [
+        "Implement only behavior covered by the first trace.",
+        "Keep the transition deterministic and independent of terminal rendering.",
+        "Prove the transition with a focused regression test and replay evidence."
+      ],
+      "evidence": []
+    },
+    {
+      "id": "HAD-005",
+      "title": "Implement the first golden-frame-backed visual surface",
+      "status": "queued",
+      "priority": 75,
+      "lane": "visual",
+      "owner_role": "implementer",
+      "depends_on": ["HAD-004"],
+      "risk": "medium",
+      "oracle": ["golden_frame", "snapshot_test"],
+      "acceptance": [
+        "Render the reference-backed surface at the captured terminal size.",
+        "Compare normalized cells rather than a human eyeball check.",
+        "Record intentional terminal-dependent differences explicitly."
+      ],
+      "evidence": []
+    },
+    {
+      "id": "HAD-006",
+      "title": "Build the differential replay verification command",
+      "status": "queued",
+      "priority": 70,
+      "lane": "verification",
+      "owner_role": "verifier",
+      "depends_on": ["HAD-002"],
+      "risk": "medium",
+      "oracle": ["differential_report", "exit_code"],
+      "acceptance": [
+        "Replay a sanitized trace against Hades and emit a machine-readable result.",
+        "Fail on behavioral or visual divergence with the first useful diff.",
+        "Keep reference artifacts and generated reports separate."
+      ],
+      "evidence": []
+    }
+  ]
+}
