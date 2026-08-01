@@ -78,6 +78,8 @@ It builds the locked release binary and creates `hades` and `Hades` symlinks in
 `~/.local/bin`; it does not modify shell configuration and refuses to replace
 an unrelated existing path. The existing shell must already include
 `~/.local/bin` on `PATH`.
+After source changes, rerun `just install-user`; the launcher points at the
+release artifact and is not refreshed by a debug build or `cargo run`.
 
 The development contract is in [`AGENTS.md`](AGENTS.md). The task ledger and
 bounded execution policy are in [`.hades/`](.hades/), and the role/workflow

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T19:40:02Z",
+  "updated_at": "2026-08-01T19:48:58Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -3580,6 +3580,53 @@
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/hermes-unconfigured-resolution-probe.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-069",
+      "title": "Verify installed Hades launchers track the current release",
+      "status": "complete",
+      "priority": 16,
+      "lane": "verification",
+      "owner_role": "verifier",
+      "depends_on": [
+        "HAD-068"
+      ],
+      "risk": "low",
+      "oracle": [
+        "user_local_install",
+        "installed_binary_direct_pty",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Run the repository's user-local release install and verify both hades and Hades resolve from PATH to the current target/release/hades artifact without replacing an unrelated existing path.",
+        "Replay the installed launcher itself in fresh 120x40 PTYs for no arguments and explicit tui with no provider endpoint; verify the visible unconfigured draft boundary, no provider request, clean exit, alternate-screen cleanup, and terminal restoration.",
+        "Document the stale-release refresh requirement next to the user-local install instructions so a source rebuild cannot be mistaken for an updated PATH binary.",
+        "Run the complete no-skip just verify gate and record install, direct-PTY, documentation, and verification evidence before completion."
+      ],
+      "evidence": [
+        "scripts/install_user_launcher.sh",
+        "README.md",
+        "scripts/replay_cli_launch.py",
+        "scripts/replay_unconfigured_input.py",
+        ".hades/runtime/installed-cli-launch-replay.json",
+        ".hades/runtime/installed-unconfigured-input-replay.json"
+      ],
+      "ready_at": "2026-08-02T00:00:00Z",
+      "claimed_by": "installed-launcher-verification",
+      "claimed_at": "2026-08-01T19:42:24Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Refreshed the user-local release binary and verified both PATH launchers, hades and Hades, resolve to target/release/hades. The installed launcher passed direct-PTY replays for no arguments and explicit tui: it rendered the unconfigured draft marker, made no provider request, exited cleanly, left the alternate screen, and restored terminal flags. README now states that just install-user must be rerun after source changes. Full just verify passed.",
+        "completed_at": "2026-08-01T19:48:58Z",
+        "evidence": [
+          "scripts/install_user_launcher.sh",
+          "README.md",
+          "scripts/replay_cli_launch.py",
+          "scripts/replay_unconfigured_input.py",
+          ".hades/runtime/installed-cli-launch-replay.json",
+          ".hades/runtime/installed-unconfigured-input-replay.json"
         ]
       }
     }
