@@ -308,6 +308,12 @@ progress from August 1, 2026 through 2027.
   first Ctrl+C, and exits on the second. Empty startup still exits on one
   Ctrl+C; provider setup, persistence, and actual queue delivery remain out of
   scope.
+- HAD-067 captures the next Hermes boundary: submitting `/setup` or `/model`
+  during fresh no-provider startup leaves the command visible on the stable
+  `starting agent` surface for the bounded window, opens neither setup wizard
+  nor model picker, changes no config, and exits cleanly on two Ctrl+C presses.
+  Whether either command is eventually dispatched after startup resolves remains
+  unknown; Hades has no setup/model escape from this startup state yet.
 
 ## Unknown until observed
 

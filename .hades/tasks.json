@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T19:06:49Z",
+  "updated_at": "2026-08-01T19:18:34Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -3473,6 +3473,59 @@
           ".hades/runtime/had066-unconfigured-input-replay.json",
           ".hades/runtime/had066-differential-check.json",
           ".hades/runtime/had066-local-provider-check.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-067",
+      "title": "Capture Hermes setup escapes from unconfigured startup",
+      "status": "complete",
+      "priority": 18,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-066"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "hermes_direct_pty",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "In fresh pinned Hermes 120x40 direct PTYs with synthetic HOME/HERMES_HOME and no provider endpoint, wait for the stable starting-agent surface and send /setup plus Enter in one case and /model plus Enter in another.",
+        "Record only bounded visible outcomes: draft/status or setup/model surface, provider-request absence, normalized config/artifact changes, cleanup presses, exit status, and terminal restoration; do not enter credentials, OAuth, external network, or later setup values.",
+        "Add provenance, a sanitized OBS-0063 fixture, a repeatable reference probe, and an observation document that preserve unknown eventual startup and any behavior outside the bounded window.",
+        "Update the parity matrix/context and wire fixture validation and the probe into just verify; complete only after the no-skip gate passes with real evidence paths."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_unconfigured_setup_escape.py",
+        "tests/fixtures/parity/OBS-0063-hermes-unconfigured-setup-escape.json",
+        "docs/parity/observations/OBS-0063-hermes-unconfigured-setup-escape-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hermes-unconfigured-setup-escape-probe.json"
+      ],
+      "ready_at": "2026-08-01T19:10:00Z",
+      "claimed_by": "hermes-unconfigured-setup-escape",
+      "claimed_at": "2026-08-01T19:08:42Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Captured Hermes direct-PTY behavior for /setup and /model during fresh no-provider startup: both commands remain visible while the app stays on starting agent, no setup/model surface or provider error appears, config remains absent, and two Ctrl+C presses restore the terminal and exit cleanly. Focused probe and full just verify both passed.",
+        "completed_at": "2026-08-01T19:18:34Z",
+        "evidence": [
+          "scripts/probe_hermes_unconfigured_setup_escape.py",
+          "tests/fixtures/parity/OBS-0063-hermes-unconfigured-setup-escape.json",
+          "docs/parity/observations/OBS-0063-hermes-unconfigured-setup-escape-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hermes-unconfigured-setup-escape-probe.json"
         ]
       }
     }
