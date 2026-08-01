@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T07:51:33Z",
+  "updated_at": "2026-08-01T08:08:20Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -1562,6 +1562,61 @@
           "docs/parity/observations/OBS-0032-hermes-osc52-timing-limits-2026-08-01.md",
           "scripts/probe_hermes_osc52_timing_limits.py",
           "scripts/validate_reference_fixture.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-033",
+      "title": "Implement Hermes OSC52 timing and bounded-payload parity in Hades",
+      "status": "complete",
+      "priority": 50,
+      "lane": "parity",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-032"
+      ],
+      "risk": "high",
+      "oracle": [
+        "direct_pty_replay",
+        "focused_unit_test",
+        "fixture_validator",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Align Hades' remote OSC52 response race with the observed Hermes 500 ms control while preserving the existing bare, TMUX, and STY query bytes.",
+        "Add a deterministic fresh 120x40 direct-PTY Hades replay for the OBS-0032 controls: a usable response before the boundary, a usable response after the timeout flush, and immediate 256 KiB and 512 KiB decoded payloads.",
+        "Assert exact query/DA1 bytes, native provider order, deterministic payload sizes and hashes or end markers, trailing-newline behavior, ready state, no busy marker, no submission, and cleanup.",
+        "Keep the bounded payload replay explicit about its exercised limits; do not infer or advertise a universal maximum-size contract from the 256 KiB and 512 KiB controls.",
+        "Wire the replay and Hades implementation observation through just verify, run the complete gate, and leave no skipped or weakened checks."
+      ],
+      "evidence": [
+        "crates/hades-cli/src/osc52.rs",
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-tui/src/lib.rs",
+        "scripts/replay_osc52_timing_limits.py",
+        "tests/fixtures/parity/OBS-0033-hades-osc52-timing-limits.json",
+        "docs/parity/observations/OBS-0033-hades-osc52-timing-limits-2026-08-01.md",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "ready_at": "2026-08-01T07:55:00Z",
+      "attempts": 1,
+      "claimed_by": "hades-implementer",
+      "claimed_at": "2026-08-01T07:54:17Z",
+      "result": {
+        "summary": "Implemented the observed 500 ms OSC52 race, incremental response parsing, efficient large-paste insertion, bounded Hermes-surface rendering, and a complete four-control direct-PTY parity replay with no universal size claim.",
+        "completed_at": "2026-08-01T08:08:20Z",
+        "evidence": [
+          "crates/hades-cli/src/osc52.rs",
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-tui/src/lib.rs",
+          "scripts/replay_osc52_timing_limits.py",
+          "tests/fixtures/parity/OBS-0033-hades-osc52-timing-limits.json",
+          "docs/parity/observations/OBS-0033-hades-osc52-timing-limits-2026-08-01.md",
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md"

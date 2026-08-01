@@ -15,7 +15,7 @@ const PASSTHROUGH_SUFFIX: &[u8] = b"\x1b\\";
 const DA1_QUERY: &[u8] = b"\x1b[c";
 const DA1_RESPONSE: &[u8] = b"\x1b[?62c";
 const OSC52_RESPONSE_PREFIX: &[u8] = b"\x1b]52;";
-const RESPONSE_TIMEOUT: Duration = Duration::from_millis(250);
+const RESPONSE_TIMEOUT: Duration = Duration::from_millis(500);
 const MAX_RESPONSE_BYTES: usize = clipboard::CLIPBOARD_MAX_BYTES * 2;
 
 pub(crate) fn read_usable_text<W: Write>(writer: &mut W) -> Option<String> {
@@ -50,6 +50,7 @@ fn read_response() -> Option<String> {
     let input = rustix::stdio::stdin();
     let deadline = Instant::now() + RESPONSE_TIMEOUT;
     let mut buffer = Vec::with_capacity(256);
+    let mut response_start = None;
 
     while Instant::now() < deadline {
         let remaining = deadline.saturating_duration_since(Instant::now());
@@ -68,12 +69,27 @@ fn read_response() -> Option<String> {
         if buffer.len().saturating_add(read) > MAX_RESPONSE_BYTES {
             return None;
         }
+        let previous_len = buffer.len();
         buffer.extend_from_slice(&chunk[..read]);
 
-        if let Some(text) = parse_response(&buffer) {
-            return text;
+        if response_start.is_none() {
+            let search_start =
+                previous_len.saturating_sub(OSC52_RESPONSE_PREFIX.len().saturating_sub(1));
+            response_start = find_subslice(&buffer[search_start..], OSC52_RESPONSE_PREFIX)
+                .map(|offset| search_start + offset);
         }
-        if find_subslice(&buffer, DA1_RESPONSE).is_some() {
+        if let Some(start) = response_start {
+            let body_start = start + OSC52_RESPONSE_PREFIX.len();
+            let terminator_start = previous_len.saturating_sub(1).max(body_start);
+            if find_osc_terminator(&buffer[terminator_start..]).is_some()
+                && let Some(text) = parse_response(&buffer[start..])
+            {
+                return text;
+            }
+        }
+
+        let da1_search_start = previous_len.saturating_sub(DA1_RESPONSE.len().saturating_sub(1));
+        if find_subslice(&buffer[da1_search_start..], DA1_RESPONSE).is_some() {
             return None;
         }
     }
@@ -212,5 +228,10 @@ mod tests {
         let payload = STANDARD.encode("usable");
         let response = format!("\x1b]52;c;{payload}");
         assert_eq!(parse_response(response.as_bytes()), None);
+    }
+
+    #[test]
+    fn response_timeout_matches_the_observed_hermes_race() {
+        assert_eq!(RESPONSE_TIMEOUT, Duration::from_millis(500));
     }
 }

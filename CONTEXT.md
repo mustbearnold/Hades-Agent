@@ -111,6 +111,13 @@ progress from August 1, 2026 through 2027.
   timing and hashes while deliberately avoiding universal timeout/size claims.
   Hades delayed/size behavior, larger payloads, live forwarding, image
   attachments, and gateway behavior remain separate unknowns.
+- HAD-033 aligns Hades' remote OSC52 race with the observed 500 ms boundary and
+  replays the four OBS-0032 controls in fresh 120x40 direct PTYs. Hades now
+  consumes the 100 ms response and bounded 256 KiB/512 KiB payloads before
+  native xclip, while a response supplied after the boundary falls back. The
+  bounded replay does not claim a universal maximum-size limit; larger payloads,
+  live forwarding, image attachments, gateway behavior, and concurrent input
+  remain separate unknowns.
 
 ## Unknown until observed
 

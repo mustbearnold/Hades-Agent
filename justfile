@@ -68,6 +68,10 @@ probe-osc52-multiplexer:
 probe-osc52-timing-limits:
     python3 scripts/probe_hermes_osc52_timing_limits.py --report .hades/runtime/hermes-osc52-timing-limits-probe.json
 
+replay-osc52-timing-limits:
+    cargo build --locked --package hades-cli
+    python3 scripts/replay_osc52_timing_limits.py --binary target/debug/hades --report .hades/runtime/hades-osc52-timing-limits-replay.json
+
 replay-osc52-st-termination:
     cargo build --locked --package hades-cli
     python3 scripts/replay_osc52_clipboard.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0029-hades-osc52-st-termination.json --report .hades/runtime/hades-osc52-st-termination-replay.json
@@ -96,6 +100,7 @@ validate-reference:
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0030-hermes-osc52-multiplexer-passthrough.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0031-hades-osc52-multiplexer-passthrough.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0032-hermes-osc52-timing-limits.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0033-hades-osc52-timing-limits.json
 
 agent command *args:
     python3 scripts/agent/control_plane.py {{command}} {{args}}

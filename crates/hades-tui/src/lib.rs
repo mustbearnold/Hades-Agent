@@ -19,6 +19,7 @@ const HERMES_INTERRUPT_PROMPT: &str = " ❯ Ctrl+C to interrupt…";
 const HERMES_INTERRUPTED_MARKER: &str = " │ interrupted";
 const HERMES_INTERRUPTED_FOOTER: &str = " ─ ready │ mock model │ ✓ <seconds>s │ voice off │ 1 session                                      ─ <reference-cwd> (main)";
 const HERMES_CLIPBOARD_MISS: &str = "No image found in clipboard";
+const HERMES_COMPOSER_MAX_CHARS: usize = 117;
 
 pub fn draw(frame: &mut Frame<'_>, app: &App) {
     if frame.area().width == HERMES_STARTUP_WIDTH && frame.area().height == HERMES_STARTUP_HEIGHT {
@@ -69,9 +70,21 @@ fn draw_hermes_composer(rows: &mut [Line<'static>], input: &str) {
     for (offset, line) in lines.iter().enumerate() {
         let row = start + offset;
         if row < rows.len() {
-            rows[row] = Line::raw(format!(" {}{}", if offset == 0 { "❯ " } else { "  " }, line));
+            rows[row] = Line::raw(format!(
+                " {}{}",
+                if offset == 0 { "❯ " } else { "  " },
+                bounded_composer_line(line),
+            ));
         }
     }
+}
+
+fn bounded_composer_line(line: &str) -> String {
+    if line.chars().count() <= HERMES_COMPOSER_MAX_CHARS {
+        return line.to_owned();
+    }
+
+    line.chars().rev().take(HERMES_COMPOSER_MAX_CHARS).collect::<String>().chars().rev().collect()
 }
 
 fn draw_hermes_completion(rows: &mut [Line<'static>], items: &[String]) {
@@ -365,6 +378,22 @@ mod tests {
         let rendered = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
         assert!(rendered.contains("paste-one"));
         assert!(rendered.contains("paste-two"));
+        assert!(!rendered.contains("musing…"));
+    }
+
+    #[test]
+    fn hermes_startup_surface_keeps_a_large_paste_visible_without_rendering_a_giant_line() {
+        let mut app = App::new();
+        app.handle(hades_core::InputEvent::Paste(
+            format!("{}large-response-end", "l".repeat(256),),
+        ));
+
+        let rendered = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let line = rendered
+            .lines()
+            .find(|line| line.contains("large-response-end"))
+            .expect("the bounded composer tail should remain visible");
+        assert!(line.chars().count() <= usize::from(HERMES_STARTUP_WIDTH));
         assert!(!rendered.contains("musing…"));
     }
 

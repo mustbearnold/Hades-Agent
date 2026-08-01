@@ -153,9 +153,14 @@ impl Composer {
     }
 
     pub fn insert_text(&mut self, text: &str) {
-        for character in text.chars() {
-            self.insert(character);
+        if text.is_empty() {
+            return;
         }
+
+        let byte = self.byte_index_at(self.cursor);
+        self.text.insert_str(byte, text);
+        self.cursor += text.chars().count();
+        self.reset_history_navigation();
     }
 
     pub fn insert_newline(&mut self) {
