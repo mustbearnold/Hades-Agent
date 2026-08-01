@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T03:54:42Z",
+  "updated_at": "2026-08-01T04:09:15Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -700,6 +700,51 @@
           "docs/parity/observations/OBS-0015-hades-empty-clipboard-2026-08-01.md",
           "scripts/replay_clipboard.py",
           "scripts/replay_composer.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-016",
+      "title": "Capture persistent Hermes input history parity",
+      "status": "complete",
+      "priority": 67,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-015"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "reference_observation",
+        "provenance_record",
+        "fixture_validator"
+      ],
+      "acceptance": [
+        "Use the pinned Hermes reference with a fresh synthetic HERMES_HOME to seed a uniquely identifiable submission, then start a second process against the same home and verify Up/Down recall across the process boundary.",
+        "Probe the reference-defined persistence edges that are safe and deterministic: consecutive duplicate suppression, trimming behavior, and a multiline entry's on-disk encoding; preserve exact bytes, terminal dimensions, runtime, and source commit.",
+        "Add a sanitized provenance document and machine-validated fixture, update the parity matrix and fixture documentation, and leave any unobservable edge explicitly unknown without implementing Hades behavior in this research task."
+      ],
+      "evidence": [
+        "tests/fixtures/parity/OBS-0016-hermes-input-history-persistence.json",
+        "docs/parity/observations/OBS-0016-hermes-input-history-persistence-2026-08-01.md",
+        "scripts/validate_reference_fixture.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "claimed_by": "hermes-research",
+      "claimed_at": "2026-08-01T03:57:33Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Captured pinned Hermes persistent input-history parity across process restart, consecutive duplicates, multiline + encoding, and the 1,000-entry load cap; added a sanitized fixture, provenance record, matrix/docs updates, validator integration, and a green full verification gate.",
+        "completed_at": "2026-08-01T04:09:15Z",
+        "evidence": [
+          "tests/fixtures/parity/OBS-0016-hermes-input-history-persistence.json",
+          "docs/parity/observations/OBS-0016-hermes-input-history-persistence-2026-08-01.md",
+          "scripts/validate_reference_fixture.py",
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md"

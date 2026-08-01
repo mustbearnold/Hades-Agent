@@ -18,13 +18,14 @@ observation, contract, implementation, and oracle are all linked from a task.
 | Bracketed paste | Verified | [OBS-0010](observations/OBS-0010-hermes-input-editing-keymap-2026-08-01.md) | [OBS-0013 paste replay + focused tests](observations/OBS-0013-hades-bracketed-paste-2026-08-01.md) | HAD-013 |
 | Editor handoff | Verified | [OBS-0010](observations/OBS-0010-hermes-input-editing-keymap-2026-08-01.md) | [OBS-0014 editor replay + focused tests](observations/OBS-0014-hades-editor-handoff-2026-08-01.md) | HAD-014 |
 | Empty clipboard fallback | Verified | [OBS-0010](observations/OBS-0010-hermes-input-editing-keymap-2026-08-01.md) | [OBS-0015 clipboard replay + focused tests](observations/OBS-0015-hades-empty-clipboard-2026-08-01.md) | HAD-015 |
+| Persistent input history | Observed | [OBS-0016](observations/OBS-0016-hermes-input-history-persistence-2026-08-01.md) | Reference fixture validator; Hades implementation pending | HAD-016 / Future task |
 | Submission behavior | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [submit/interrupt trace](../../tests/fixtures/parity/OBS-0003-submit-interrupt.json) | HAD-001 / HAD-004 |
 | Busy/interrupt visual state | Verified | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [visual contract + differential replay](../../tests/fixtures/parity/OBS-0006-busy-interrupt-visual.json) | HAD-007 |
 | Streaming behavior | Unknown | — | — | Future task |
 | Setup-required error path | Verified | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [setup contract + differential replay](../../tests/fixtures/parity/OBS-0008-setup-required.json) | HAD-009 |
 | Errors and retries | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) (setup-required path only) | [lifecycle trace](../../tests/fixtures/parity/OBS-0001-lifecycle.json) | Future task |
 | Resize behavior | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [lifecycle probe](../../scripts/probe_tui_lifecycle.py) | HAD-003 / Future task |
-| Persistence and recovery | Unknown | — | — | Future task |
+| Persistence and recovery | Observed (input history only) | [OBS-0016](observations/OBS-0016-hermes-input-history-persistence-2026-08-01.md) | Reference fixture validator; session recovery remains unimplemented | HAD-016 / Future task |
 
 Status vocabulary: `Unknown`, `Observed`, `Specified`, `Implemented`,
 `Verified`, and `Blocked`. A row must not jump directly from `Unknown` to

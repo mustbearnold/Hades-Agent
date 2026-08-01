@@ -21,3 +21,6 @@ OBS-0014 is the Hades unchanged-draft editor implementation contract derived
 from OBS-0010 and is consumed by `scripts/replay_editor.py`.
 OBS-0015 is the Hades empty-clipboard fallback contract derived from OBS-0010
 and is consumed by `scripts/replay_clipboard.py`.
+OBS-0016 is the reference-only persistent input-history contract derived from
+the pinned Hermes executable and is consumed by the fixture validator. It does
+not imply that Hades has implemented disk history yet.

@@ -57,13 +57,18 @@ progress from August 1, 2026 through 2027.
 - HAD-015 implements the observed empty-clipboard Ctrl+V fallback with the
   exact miss message and unchanged draft. Successful clipboard reads, image or
   path paste, provider discovery, and overlay/busy behavior remain unknown.
+- HAD-016 captures persistent Hermes input history against the exact pinned
+  commit: restart recall, consecutive duplicate suppression, multiline `+`
+  encoding, and the newest-1,000 load cap. Hades disk-history implementation
+  and session recovery remain pending.
 
 ## Unknown until observed
 
 - Hermes TUI color palette, typography, the unobserved keymap/focus surfaces,
-  copy, error states, timing, persistent history, and the remaining interaction
-  surfaces.
-- Which Hermes behaviors are stable contracts versus implementation details.
+  copy, error states, timing, history write failures/clearing, and the remaining
+  interaction surfaces.
+- Which Hermes behaviors are stable contracts versus implementation details;
+  session recovery remains unobserved beyond input-history persistence.
 - Successful provider/model streaming, tool calls, and the exact behavior of
   terminal-dependent surfaces beyond the captured observations.
 

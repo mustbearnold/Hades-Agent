@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0016",
+  "reference_observation": "OBS-0010",
+  "surface": "hermes-tui-input-history",
+  "reference": {
+    "product": "Hermes TUI",
+    "version": "0.19.1",
+    "display_build": "2026.7.30",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "tmux-backed PTY"
+    },
+    "capture": "live tmux input with stable screen capture and sanitized HERMES_HOME history-file readback",
+    "runtime": {
+      "node": "22.22.2",
+      "npm": "10.9.7",
+      "python": "3.11.14",
+      "uv": "0.12.1"
+    }
+  },
+  "normalization": [
+    "Temporary checkout and synthetic HERMES_HOME paths are represented by placeholders.",
+    "Timestamps, session IDs, elapsed seconds, rotating prompt suggestions, and dynamic working-directory text are omitted or represented by placeholders.",
+    "History-file samples preserve semantic line bytes while replacing the generated timestamp comment with <timestamp>.",
+    "Input bytes are recorded in hexadecimal after tmux key translation; repeated key probes record one representative event plus an explicit repeat count.",
+    "The fixture contains no credentials, provider responses, model payloads, or private Hermes state."
+  ],
+  "steps": [
+    {
+      "id": "seed-submit",
+      "precondition": "Fresh synthetic HERMES_HOME with a configured loopback custom provider and no existing .hermes_history.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "hades-history-single-016",
+          "bytes_hex": "68 61 64 65 73 2d 68 69 73 74 6f 72 79 2d 73 69 6e 67 6c 65 2d 30 31 36"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+C",
+          "bytes_hex": "03"
+        }
+      ],
+      "output": {
+        "status": "ready after an interrupted busy turn",
+        "history_file_entry": [
+          "# <timestamp>",
+          "+hades-history-single-016"
+        ],
+        "history_effect": "the submitted text is persisted for a later process"
+      }
+    },
+    {
+      "id": "restart-recall",
+      "precondition": "The first TUI process has exited cleanly; a second process uses the same HERMES_HOME.",
+      "input_sequence": [
+        {
+          "kind": "key",
+          "value": "Up",
+          "bytes_hex": "1b 5b 41"
+        },
+        {
+          "kind": "key",
+          "value": "Down",
+          "bytes_hex": "1b 5b 42"
+        }
+      ],
+      "output": {
+        "after_up": "hades-history-single-016",
+        "after_down": "",
+        "status": "ready"
+      }
+    },
+    {
+      "id": "consecutive-duplicate",
+      "precondition": "The second process submits the same text again after the persisted entry is already the newest entry.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "hades-history-single-016",
+          "bytes_hex": "68 61 64 65 73 2d 68 69 73 74 6f 72 79 2d 73 69 6e 67 6c 65 2d 30 31 36"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+C",
+          "bytes_hex": "03"
+        }
+      ],
+      "output": {
+        "history_file_bytes_before": 53,
+        "history_file_bytes_after": 53,
+        "history_file_unchanged": true,
+        "effect": "consecutive duplicate was suppressed"
+      }
+    },
+    {
+      "id": "multiline-persist",
+      "precondition": "Fresh synthetic HERMES_HOME with the same loopback custom provider; the draft is inserted through one bracketed paste event.",
+      "input_sequence": [
+        {
+          "kind": "paste",
+          "value": "multi-paste-one\nmulti-paste-two",
+          "bytes_hex": "1b 5b 32 30 30 7e 6d 75 6c 74 69 2d 70 61 73 74 65 2d 6f 6e 65 0a 6d 75 6c 74 69 2d 70 61 73 74 65 2d 74 77 6f 1b 5b 32 30 31 7e"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+C",
+          "bytes_hex": "03"
+        }
+      ],
+      "output": {
+        "history_file_entry": [
+          "# <timestamp>",
+          "+multi-paste-one",
+          "+multi-paste-two"
+        ],
+        "encoding": "each logical line is stored with a leading plus marker and reconstructed with a newline"
+      }
+    },
+    {
+      "id": "load-cap-newest",
+      "precondition": "A sanitized history file contains exactly 1001 entries named cap-0001 through cap-1001 before process launch.",
+      "input_sequence": [
+        {
+          "kind": "key",
+          "value": "Up",
+          "bytes_hex": "1b 5b 41",
+          "repeat": 1
+        }
+      ],
+      "output": {
+        "composer": "cap-1001",
+        "loaded_entry_count": 1000
+      }
+    },
+    {
+      "id": "load-cap-oldest-retained",
+      "input_sequence": [
+        {
+          "kind": "key",
+          "value": "Up",
+          "bytes_hex": "1b 5b 41",
+          "repeat": 999
+        }
+      ],
+      "output": {
+        "composer": "cap-0002",
+        "effect": "the oldest retained entry is the second entry from the 1001-entry seed"
+      }
+    },
+    {
+      "id": "load-cap-floor",
+      "input_sequence": [
+        {
+          "kind": "key",
+          "value": "Up",
+          "bytes_hex": "1b 5b 41",
+          "repeat": 1
+        }
+      ],
+      "output": {
+        "composer": "cap-0002",
+        "effect": "history navigation remains at the oldest retained entry"
+      }
+    }
+  ],
+  "unknowns": [
+    "History-file write failures, malformed lines, and concurrent writers were not exercised.",
+    "Non-consecutive duplicate entries, explicit history clearing, and history behavior across profile migration remain unobserved.",
+    "The cap was verified at load/navigation time; file compaction or physical truncation after appending beyond 1000 entries was not exercised.",
+    "This observation does not claim Hades implementation parity; it only records the Hermes reference contract."
+  ]
+}

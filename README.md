@@ -19,8 +19,8 @@ resize, exit, and terminal restoration. `just replay-differential` compares
 the normalized startup frame and replays the checked-in submit/interrupt,
 session-switcher, and setup-required traces against the actual binary, writing
 its generated report under `.hades/runtime/`. `just validate-reference` checks
-the provenance and sanitization contract for the reference-only input-editing
-fixture. `just replay-composer` replays the implemented editing, history, and
+the provenance and sanitization contracts for the reference-only input-editing
+and persistent-history fixtures. `just replay-composer` replays the implemented editing, history, and
 multiline contract in isolated PTY cases. `just replay-completion` replays the
 implemented `/he` slash-completion and Tab-application contract in isolated PTY
 cases. `just replay-paste` replays the bracketed-paste contract and verifies
