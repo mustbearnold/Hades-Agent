@@ -185,6 +185,10 @@ replay-standalone-setup:
     cargo build --locked --package hades-cli
     python3 scripts/replay_standalone_setup.py --binary target/debug/hades --report .hades/runtime/hades-standalone-setup-replay.json --timeout 5
 
+replay-standalone-full-setup:
+    cargo build --locked --package hades-cli
+    python3 scripts/replay_standalone_full_setup.py --binary target/debug/hades --report .hades/runtime/hades-standalone-full-setup-replay.json --timeout 5
+
 replay-installed-help:
     python3 scripts/replay_unconfigured_help.py --binary "$HOME/.local/bin/hades" --report .hades/runtime/installed-help-setup-required-hades.json --timeout 12
     python3 scripts/replay_unconfigured_help.py --binary "$HOME/.local/bin/Hades" --report .hades/runtime/installed-help-setup-required-Hades.json --timeout 12

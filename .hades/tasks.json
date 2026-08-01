@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T22:11:41Z",
+  "updated_at": "2026-08-01T22:36:54Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -4032,6 +4032,68 @@
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/hermes-standalone-full-setup-probe.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-077",
+      "title": "Implement standalone Full setup continuation boundary",
+      "status": "complete",
+      "priority": 10,
+      "lane": "interaction",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-076"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "typed_core_state",
+        "focused_tests",
+        "direct_pty_replay",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Extend standalone `hades setup` only through the observed Full setup continuation: selecting Full setup creates a non-secret baseline config marker, renders Configuration Location and Inference Provider landmarks, and does not start a provider or collect credentials.",
+        "Match the observed standalone cancellation chain with typed state transitions: Ctrl+C at the provider surface opens Terminal Backend, a second Ctrl+C opens the numbered terminal-backend fallback with canonical input/echo restored, and a third Ctrl+C exits with status 1; preserve initial Escape fallback behavior and leave direct initial-surface Ctrl+C unclaimed.",
+        "Render the stable 120x40 Configuration Location, Inference Provider, Terminal Backend, and numbered fallback landmarks without claiming provider inventory, endpoint/model values, backend selection, OAuth, credentials, or later setup behavior.",
+        "Add focused core/TUI/CLI tests, a sanitized OBS-0072 Hades fixture, a direct-PTY replay that asserts config creation, terminal flags, cleanup, status, and no provider activity, and update parity/context/readme/gates.",
+        "Run the targeted replay and complete no-skip just verify gate before completion; preserve existing standalone Escape and configured `/setup` behavior."
+      ],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-cli/src/main.rs",
+        "crates/hades-tui/src/lib.rs",
+        "scripts/replay_standalone_full_setup.py",
+        "tests/fixtures/parity/OBS-0072-hades-standalone-full-setup.json",
+        "docs/parity/observations/OBS-0072-hades-standalone-full-setup-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hades-standalone-full-setup-replay.json"
+      ],
+      "ready_at": "2026-08-02T00:00:00Z",
+      "attempts": 1,
+      "claimed_by": "standalone-full-setup-route",
+      "claimed_at": "2026-08-01T22:14:05Z",
+      "result": {
+        "summary": "Implemented the bounded standalone Full setup continuation through terminal-backend fallback, with non-secret baseline config creation, typed transitions, PTY replay evidence, and full no-skip verification.",
+        "completed_at": "2026-08-01T22:36:54Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-cli/src/main.rs",
+          "crates/hades-tui/src/lib.rs",
+          "scripts/replay_standalone_full_setup.py",
+          "tests/fixtures/parity/OBS-0072-hades-standalone-full-setup.json",
+          "docs/parity/observations/OBS-0072-hades-standalone-full-setup-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hades-standalone-full-setup-replay.json"
         ]
       }
     }

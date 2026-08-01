@@ -15,6 +15,22 @@ pub const SETUP_STANDALONE_BANNER: [&str; 6] = [
 ];
 pub const SETUP_STANDALONE_PROMPT: &str = "How would you like to set up Hermes?";
 pub const SETUP_STANDALONE_CONTROLS: &str = "↑↓ navigate  ENTER/SPACE select  ESC cancel";
+pub const SETUP_STANDALONE_CONFIG_TITLE: &str = "◆ Configuration Location";
+pub const SETUP_STANDALONE_CONFIG_LINES: [&str; 5] = [
+    "Config file:  <config-path>",
+    "Secrets file: <secrets-path>",
+    "Data folder:  <data-path>",
+    "Install dir:  <install-dir>",
+    "You can edit these files directly or use 'hermes config edit'",
+];
+pub const SETUP_STANDALONE_PROVIDER_TITLE: &str = "◆ Inference Provider";
+pub const SETUP_STANDALONE_PROVIDER_PROMPT: &str = "Choose how to connect to your main chat model.";
+pub const SETUP_STANDALONE_TERMINAL_TITLE: &str = "Terminal Backend";
+pub const SETUP_STANDALONE_TERMINAL_LINES: [&str; 3] = [
+    "Choose where Hermes runs shell commands and code.",
+    "This affects tool execution, file access, and isolation.",
+    "Guide: https://hermes-agent.nousresearch.com/docs/user-guide/configuration#terminal-backend-configuration",
+];
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub enum Surface {
@@ -170,6 +186,141 @@ pub const SETUP_PLATFORM_ROWS: [&str; 27] = [
 ];
 pub const SETUP_PLATFORM_PICKER_CONTROLS: &str =
     "↑↓ navigate  SPACE toggle  ENTER confirm  ESC cancel";
+
+#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub enum StandaloneSetupSurface {
+    #[default]
+    Choices,
+    FullSetupContinuation,
+    TerminalBackend,
+    NumberedFallback,
+}
+
+#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub enum StandaloneSetupFallback {
+    #[default]
+    SetupChoices,
+    TerminalBackend,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub enum StandaloneSetupAction {
+    Continue,
+    Moved,
+    EnteredFullSetupContinuation,
+    SkippedProvider,
+    EnteredFallback,
+    Quit,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct StandaloneSetupState {
+    surface: StandaloneSetupSurface,
+    fallback: StandaloneSetupFallback,
+    cursor: usize,
+    selected: usize,
+    terminal_backend_cursor: usize,
+}
+
+impl Default for StandaloneSetupState {
+    fn default() -> Self {
+        Self {
+            surface: StandaloneSetupSurface::Choices,
+            fallback: StandaloneSetupFallback::SetupChoices,
+            cursor: 0,
+            selected: 0,
+            terminal_backend_cursor: SETUP_TERMINAL_BACKEND_ROWS.len() - 1,
+        }
+    }
+}
+
+impl StandaloneSetupState {
+    pub fn surface(&self) -> StandaloneSetupSurface {
+        self.surface
+    }
+
+    pub fn cursor(&self) -> usize {
+        self.cursor
+    }
+
+    pub fn selected(&self) -> usize {
+        self.selected
+    }
+
+    pub fn terminal_backend_cursor(&self) -> usize {
+        self.terminal_backend_cursor
+    }
+
+    pub fn terminal_backend_fallback(&self) -> bool {
+        self.fallback == StandaloneSetupFallback::TerminalBackend
+    }
+
+    pub fn is_full_setup_continuation(&self) -> bool {
+        self.surface == StandaloneSetupSurface::FullSetupContinuation
+    }
+
+    pub fn is_terminal_backend(&self) -> bool {
+        self.surface == StandaloneSetupSurface::TerminalBackend
+    }
+
+    pub fn is_numbered_fallback(&self) -> bool {
+        self.surface == StandaloneSetupSurface::NumberedFallback
+    }
+
+    pub fn handle_key(&mut self, key: Key) -> StandaloneSetupAction {
+        match self.surface {
+            StandaloneSetupSurface::Choices => match key {
+                Key::Enter | Key::Char(' ') if self.cursor == 1 => {
+                    self.surface = StandaloneSetupSurface::FullSetupContinuation;
+                    StandaloneSetupAction::EnteredFullSetupContinuation
+                }
+                Key::Down | Key::Char('j') => {
+                    self.cursor = (self.cursor + 1).min(SETUP_WIZARD_CHOICES.len() - 1);
+                    StandaloneSetupAction::Moved
+                }
+                Key::Up | Key::Char('k') => {
+                    self.cursor = self.cursor.saturating_sub(1);
+                    StandaloneSetupAction::Moved
+                }
+                Key::Escape => {
+                    self.fallback = StandaloneSetupFallback::SetupChoices;
+                    self.surface = StandaloneSetupSurface::NumberedFallback;
+                    StandaloneSetupAction::EnteredFallback
+                }
+                Key::Ctrl('c') => StandaloneSetupAction::Quit,
+                _ => StandaloneSetupAction::Continue,
+            },
+            StandaloneSetupSurface::FullSetupContinuation => match key {
+                Key::Ctrl('c') => {
+                    self.surface = StandaloneSetupSurface::TerminalBackend;
+                    StandaloneSetupAction::SkippedProvider
+                }
+                _ => StandaloneSetupAction::Continue,
+            },
+            StandaloneSetupSurface::TerminalBackend => match key {
+                Key::Down | Key::Char('j') => {
+                    self.terminal_backend_cursor = (self.terminal_backend_cursor + 1)
+                        .min(SETUP_TERMINAL_BACKEND_ROWS.len() - 1);
+                    StandaloneSetupAction::Moved
+                }
+                Key::Up | Key::Char('k') => {
+                    self.terminal_backend_cursor = self.terminal_backend_cursor.saturating_sub(1);
+                    StandaloneSetupAction::Moved
+                }
+                Key::Ctrl('c') => {
+                    self.fallback = StandaloneSetupFallback::TerminalBackend;
+                    self.surface = StandaloneSetupSurface::NumberedFallback;
+                    StandaloneSetupAction::EnteredFallback
+                }
+                _ => StandaloneSetupAction::Continue,
+            },
+            StandaloneSetupSurface::NumberedFallback => match key {
+                Key::Ctrl('c') => StandaloneSetupAction::Quit,
+                _ => StandaloneSetupAction::Continue,
+            },
+        }
+    }
+}
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub enum SetupWizardSurface {
@@ -972,5 +1123,36 @@ mod tests {
         assert!(wizard.is_platform_picker());
         assert_eq!(wizard.handle_key(Key::Char(' ')), SetupWizardAction::Continue);
         assert_eq!(wizard.handle_key(Key::Ctrl('c')), SetupWizardAction::Quit);
+    }
+
+    #[test]
+    fn standalone_setup_full_branch_follows_the_observed_interrupt_chain() {
+        let mut setup = StandaloneSetupState::default();
+
+        assert_eq!(setup.handle_key(Key::Down), StandaloneSetupAction::Moved);
+        assert_eq!(
+            setup.handle_key(Key::Enter),
+            StandaloneSetupAction::EnteredFullSetupContinuation
+        );
+        assert!(setup.is_full_setup_continuation());
+
+        assert_eq!(setup.handle_key(Key::Ctrl('c')), StandaloneSetupAction::SkippedProvider);
+        assert!(setup.is_terminal_backend());
+        assert_eq!(setup.terminal_backend_cursor(), SETUP_TERMINAL_BACKEND_ROWS.len() - 1);
+
+        assert_eq!(setup.handle_key(Key::Ctrl('c')), StandaloneSetupAction::EnteredFallback);
+        assert!(setup.is_numbered_fallback());
+        assert!(setup.terminal_backend_fallback());
+        assert_eq!(setup.handle_key(Key::Ctrl('c')), StandaloneSetupAction::Quit);
+    }
+
+    #[test]
+    fn standalone_setup_escape_keeps_the_initial_numbered_fallback_contract() {
+        let mut setup = StandaloneSetupState::default();
+
+        assert_eq!(setup.handle_key(Key::Escape), StandaloneSetupAction::EnteredFallback);
+        assert!(setup.is_numbered_fallback());
+        assert!(!setup.terminal_backend_fallback());
+        assert_eq!(setup.handle_key(Key::Ctrl('c')), StandaloneSetupAction::Quit);
     }
 }

@@ -5,9 +5,12 @@ use hades_core::{
     MODEL_PICKER_MODEL, MODEL_PICKER_PROVIDER, ModelPickerStage, Notice, Overlay, Role,
     SETUP_PLATFORM_PICKER_CONTROLS, SETUP_PLATFORM_PICKER_TITLE, SETUP_PLATFORM_ROWS,
     SETUP_PROVIDER_ACTIVE_PROVIDER, SETUP_PROVIDER_CURRENT_MODEL, SETUP_PROVIDER_MENU_ROWS,
-    SETUP_PROVIDER_MODEL_NAME, SETUP_STANDALONE_CONTROLS, SETUP_STANDALONE_PROMPT,
-    SETUP_TERMINAL_BACKEND_CONTROLS, SETUP_TERMINAL_BACKEND_ROWS, SETUP_TERMINAL_BACKEND_TITLE,
-    SETUP_WIZARD_CHOICES, SetupWizardState, SetupWizardSurface, StartupState, TurnState,
+    SETUP_PROVIDER_MODEL_NAME, SETUP_STANDALONE_CONFIG_LINES, SETUP_STANDALONE_CONFIG_TITLE,
+    SETUP_STANDALONE_CONTROLS, SETUP_STANDALONE_PROMPT, SETUP_STANDALONE_PROVIDER_PROMPT,
+    SETUP_STANDALONE_PROVIDER_TITLE, SETUP_STANDALONE_TERMINAL_LINES,
+    SETUP_STANDALONE_TERMINAL_TITLE, SETUP_TERMINAL_BACKEND_CONTROLS, SETUP_TERMINAL_BACKEND_ROWS,
+    SETUP_TERMINAL_BACKEND_TITLE, SETUP_WIZARD_CHOICES, SetupWizardSurface, StandaloneSetupState,
+    StartupState, TurnState,
 };
 use ratatui::{
     Frame, Terminal,
@@ -73,7 +76,20 @@ pub fn draw(frame: &mut Frame<'_>, app: &App) {
     }
 }
 
-pub fn draw_standalone_setup(frame: &mut Frame<'_>, wizard: &SetupWizardState) {
+pub fn draw_standalone_setup(frame: &mut Frame<'_>, wizard: &StandaloneSetupState) {
+    if wizard.is_full_setup_continuation() {
+        draw_standalone_full_setup_continuation(frame);
+        return;
+    }
+    if wizard.is_terminal_backend() {
+        draw_standalone_terminal_backend(frame, wizard);
+        return;
+    }
+    if wizard.is_numbered_fallback() && wizard.terminal_backend_fallback() {
+        draw_standalone_terminal_backend_fallback(frame);
+        return;
+    }
+
     let mut lines = vec![Line::from(vec![
         Span::styled(SETUP_STANDALONE_PROMPT, HERMES_PALETTE.brand()),
         Span::raw("  "),
@@ -91,6 +107,67 @@ pub fn draw_standalone_setup(frame: &mut Frame<'_>, wizard: &SetupWizardState) {
         lines.push(Line::styled(format!(" {cursor} ({selected}) {choice}"), style));
     }
 
+    frame.render_widget(Paragraph::new(Text::from(lines)), frame.area());
+}
+
+fn draw_standalone_full_setup_continuation(frame: &mut Frame<'_>) {
+    let mut lines = vec![Line::styled(SETUP_STANDALONE_CONFIG_TITLE, HERMES_PALETTE.brand())];
+    lines.extend(
+        SETUP_STANDALONE_CONFIG_LINES
+            .iter()
+            .map(|line| Line::styled(format!("  {line}"), HERMES_PALETTE.secondary())),
+    );
+    lines.extend([
+        Line::raw(""),
+        Line::styled(SETUP_STANDALONE_PROVIDER_TITLE, HERMES_PALETTE.brand()),
+        Line::styled(format!("  {SETUP_STANDALONE_PROVIDER_PROMPT}"), HERMES_PALETTE.secondary()),
+    ]);
+    frame.render_widget(Paragraph::new(Text::from(lines)), frame.area());
+}
+
+fn draw_standalone_terminal_backend(frame: &mut Frame<'_>, wizard: &StandaloneSetupState) {
+    let mut lines = vec![Line::styled(SETUP_STANDALONE_TERMINAL_TITLE, HERMES_PALETTE.brand())];
+    lines.extend(
+        SETUP_STANDALONE_TERMINAL_LINES
+            .iter()
+            .map(|line| Line::styled(format!("  {line}"), HERMES_PALETTE.secondary())),
+    );
+    lines.extend([
+        Line::raw(""),
+        Line::styled(
+            format!("{SETUP_TERMINAL_BACKEND_TITLE}  {SETUP_STANDALONE_CONTROLS}"),
+            HERMES_PALETTE.brand(),
+        ),
+    ]);
+    for (index, row) in SETUP_TERMINAL_BACKEND_ROWS.iter().enumerate() {
+        let cursor = if index == wizard.terminal_backend_cursor() { "→" } else { " " };
+        let selected = if index == wizard.terminal_backend_cursor() { "●" } else { "○" };
+        let style = if index == wizard.terminal_backend_cursor() {
+            HERMES_PALETTE.ready()
+        } else {
+            HERMES_PALETTE.secondary()
+        };
+        lines.push(Line::styled(format!(" {cursor} ({selected}) {row}"), style));
+    }
+    lines.push(Line::styled(SETUP_TERMINAL_BACKEND_CONTROLS, HERMES_PALETTE.secondary()));
+    frame.render_widget(Paragraph::new(Text::from(lines)), frame.area());
+}
+
+fn draw_standalone_terminal_backend_fallback(frame: &mut Frame<'_>) {
+    let mut lines = vec![Line::styled(SETUP_TERMINAL_BACKEND_TITLE, HERMES_PALETTE.brand())];
+    for (index, row) in SETUP_TERMINAL_BACKEND_ROWS.iter().enumerate() {
+        let selected = if index + 1 == SETUP_TERMINAL_BACKEND_ROWS.len() { "●" } else { "○" };
+        let cursor = if index + 1 == SETUP_TERMINAL_BACKEND_ROWS.len() { "→" } else { " " };
+        lines.push(Line::styled(
+            format!(" {cursor} ({selected}) {row}"),
+            HERMES_PALETTE.secondary(),
+        ));
+    }
+    lines.extend([
+        Line::raw(""),
+        Line::styled(" Enter for default (8)  Ctrl+C to exit", HERMES_PALETTE.secondary()),
+        Line::styled(" Select [1-8] (8):", HERMES_PALETTE.secondary()),
+    ]);
     frame.render_widget(Paragraph::new(Text::from(lines)), frame.area());
 }
 
@@ -745,7 +822,7 @@ mod tests {
     fn standalone_setup_surface_renders_the_reference_choice_landmarks() {
         let backend = TestBackend::new(HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
         let mut terminal = Terminal::new(backend).expect("TestBackend construction is infallible");
-        let wizard = SetupWizardState::default();
+        let wizard = StandaloneSetupState::default();
         terminal
             .draw(|frame| draw_standalone_setup(frame, &wizard))
             .expect("rendering is infallible");
@@ -772,6 +849,55 @@ mod tests {
         assert!(rendered.contains("Full setup"));
         assert!(rendered.contains("Blank Slate"));
         assert!(rendered.contains("ESC cancel"));
+    }
+
+    #[test]
+    fn standalone_full_setup_renders_the_reference_continuation_landmarks() {
+        let backend = TestBackend::new(HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let mut terminal = Terminal::new(backend).expect("TestBackend construction is infallible");
+        let mut wizard = StandaloneSetupState::default();
+        wizard.handle_key(hades_core::Key::Down);
+        wizard.handle_key(hades_core::Key::Enter);
+        terminal
+            .draw(|frame| draw_standalone_setup(frame, &wizard))
+            .expect("rendering is infallible");
+
+        let rendered = terminal
+            .backend()
+            .buffer()
+            .content()
+            .iter()
+            .map(|cell| cell.symbol())
+            .collect::<String>();
+        assert!(rendered.contains("Configuration Location"));
+        assert!(rendered.contains("Config file:"));
+        assert!(rendered.contains("Inference Provider"));
+        assert!(rendered.contains("Choose how to connect to your main chat model."));
+    }
+
+    #[test]
+    fn standalone_terminal_backend_renders_and_preserves_the_default_cursor() {
+        let backend = TestBackend::new(HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let mut terminal = Terminal::new(backend).expect("TestBackend construction is infallible");
+        let mut wizard = StandaloneSetupState::default();
+        wizard.handle_key(hades_core::Key::Down);
+        wizard.handle_key(hades_core::Key::Enter);
+        wizard.handle_key(hades_core::Key::Ctrl('c'));
+        terminal
+            .draw(|frame| draw_standalone_setup(frame, &wizard))
+            .expect("rendering is infallible");
+
+        let rendered = terminal
+            .backend()
+            .buffer()
+            .content()
+            .iter()
+            .map(|cell| cell.symbol())
+            .collect::<String>();
+        assert!(rendered.contains("Terminal Backend"));
+        assert!(rendered.contains("Select terminal backend:"));
+        assert!(rendered.contains("Keep current (local)"));
+        assert!(rendered.contains("→ (●) Keep current (local)"));
     }
 
     #[test]

@@ -363,6 +363,12 @@ progress from August 1, 2026 through 2027.
   then follows the observed three-Ctrl+C chain: provider skip, Terminal Backend
   fallback, and status-1 exit. Backend selection, later setup pages, and Hades
   standalone continuation remain unimplemented.
+- HAD-077 carries that bounded standalone Full branch into Hades. The `j`,
+  Enter path writes only a non-secret baseline config marker and renders the
+  observed Configuration Location/Inference Provider surface; Ctrl+C then
+  traverses Terminal Backend and its numbered fallback before status-1 exit.
+  Provider values, credentials, OAuth, backend selection, and later setup remain
+  outside the claim.
 
 ## Unknown until observed
 
@@ -382,8 +388,8 @@ progress from August 1, 2026 through 2027.
   discovery details, setup wizard continuation, numbered-fallback choices,
   terminal-backend selection and cancellation after deeper navigation, provider
   configuration beyond the bounded OBS-0055/OBS-0056 readbacks, backup
-  semantics, and Hades persistence, credential handling, platform setup beyond
-  the bounded picker, configured command
+  semantics, Hades successful provider-config persistence, credential handling,
+  platform setup beyond the bounded picker, configured command
   behavior with a reachable provider, and model-picker behavior beyond the
   bounded deterministic provider/model seam.
 - OSC52 behavior outside the OBS-0032 timing controls and bounded payload

@@ -30,7 +30,8 @@ use crossterm::{
 use hades_app::{App, DispatchOutcome};
 use hades_core::{
     InputEvent, Key, PRODUCT_NAME, ProviderEvent, Role, SETUP_STANDALONE_BANNER,
-    SETUP_STANDALONE_PROMPT, SETUP_WIZARD_CHOICES, SetupWizardState, StartupState, TurnState,
+    SETUP_STANDALONE_PROMPT, SETUP_TERMINAL_BACKEND_ROWS, SETUP_WIZARD_CHOICES,
+    StandaloneSetupAction, StandaloneSetupState, StartupState, TurnState,
 };
 use hades_provider::{
     CancellationToken, ChatMessage, ChatRequest, LocalOpenAiTransport, StreamEvent, TransportError,
@@ -123,7 +124,7 @@ enum SetupOutcome {
 
 #[derive(Debug)]
 enum SetupTransition {
-    NumberedFallback(SetupWizardState),
+    NumberedFallback(StandaloneSetupState),
 }
 
 fn run_setup() -> Result<SetupOutcome, Box<dyn Error>> {
@@ -160,7 +161,7 @@ fn run_setup() -> Result<SetupOutcome, Box<dyn Error>> {
 fn setup_choice_loop(
     terminal: &mut Terminal<CrosstermBackend<io::Stdout>>,
 ) -> Result<SetupTransition, Box<dyn Error>> {
-    let mut wizard = SetupWizardState::default();
+    let mut wizard = StandaloneSetupState::default();
     loop {
         terminal.draw(|frame| draw_standalone_setup(frame, &wizard))?;
         if !event::poll(Duration::from_millis(250))? {
@@ -175,25 +176,72 @@ fn setup_choice_loop(
         let Some(mapped) = map_key(key) else {
             continue;
         };
-        if mapped == Key::Escape {
-            wizard.handle_key(mapped);
-            return Ok(SetupTransition::NumberedFallback(wizard));
+        let action = wizard.handle_key(mapped);
+        match action {
+            StandaloneSetupAction::EnteredFullSetupContinuation => {
+                create_standalone_setup_config()?;
+            }
+            StandaloneSetupAction::EnteredFallback => {
+                return Ok(SetupTransition::NumberedFallback(wizard));
+            }
+            StandaloneSetupAction::Continue
+            | StandaloneSetupAction::Moved
+            | StandaloneSetupAction::SkippedProvider
+            | StandaloneSetupAction::Quit => {}
         }
-        wizard.handle_key(mapped);
     }
 }
 
-fn print_setup_fallback(wizard: &SetupWizardState) -> io::Result<()> {
+fn print_setup_fallback(wizard: &StandaloneSetupState) -> io::Result<()> {
     let mut stdout = io::stdout();
-    writeln!(stdout, "{SETUP_STANDALONE_PROMPT}")?;
-    for (index, choice) in SETUP_WIZARD_CHOICES.iter().enumerate() {
-        let cursor = if index == wizard.cursor() { "→" } else { " " };
-        let selected = if index == wizard.selected() { "●" } else { "○" };
-        writeln!(stdout, " {cursor} ({selected}) {choice}")?;
+    if wizard.terminal_backend_fallback() {
+        writeln!(stdout, "Select terminal backend:")?;
+        for (index, row) in SETUP_TERMINAL_BACKEND_ROWS.iter().enumerate() {
+            let cursor = if index == wizard.terminal_backend_cursor() { "→" } else { " " };
+            let selected = if index == wizard.terminal_backend_cursor() { "●" } else { "○" };
+            writeln!(stdout, " {cursor} ({selected}) {row}")?;
+        }
+        writeln!(stdout, "    Enter for default (8)  Ctrl+C to exit")?;
+        write!(stdout, "  Select [1-8] (8): ")?;
+    } else {
+        writeln!(stdout, "{SETUP_STANDALONE_PROMPT}")?;
+        for (index, choice) in SETUP_WIZARD_CHOICES.iter().enumerate() {
+            let cursor = if index == wizard.cursor() { "→" } else { " " };
+            let selected = if index == wizard.selected() { "●" } else { "○" };
+            writeln!(stdout, " {cursor} ({selected}) {choice}")?;
+        }
+        writeln!(stdout, "    Enter for default (1)  Ctrl+C to exit")?;
+        write!(stdout, "  Select [1-3] (1): ")?;
     }
-    writeln!(stdout, "    Enter for default (1)  Ctrl+C to exit")?;
-    write!(stdout, "  Select [1-3] (1): ")?;
     stdout.flush()
+}
+
+fn create_standalone_setup_config() -> io::Result<()> {
+    let Some(path) = standalone_setup_config_path_from(
+        env::var_os("HERMES_HOME").map(PathBuf::from),
+        env::var_os("HOME").map(PathBuf::from),
+    ) else {
+        return Ok(());
+    };
+    if path.exists() {
+        return Ok(());
+    }
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent)?;
+    }
+    fs::write(
+        path,
+        "# Hades Agent setup baseline\nsetup:\n  mode: full\n  provider: unconfigured\n",
+    )
+}
+
+fn standalone_setup_config_path_from(
+    hermes_home: Option<PathBuf>,
+    home: Option<PathBuf>,
+) -> Option<PathBuf> {
+    hermes_home
+        .or_else(|| home.map(|path| path.join(".hermes")))
+        .map(|path| path.join("config.yaml"))
 }
 
 fn restore_terminal(
@@ -608,6 +656,22 @@ mod tests {
         assert_eq!(cli_command(Some("--snapshot")), Ok(CliCommand::Snapshot));
         assert_eq!(cli_command(Some("setup")), Ok(CliCommand::Setup));
         assert_eq!(cli_command(Some("wat")), Err("wat"));
+    }
+
+    #[test]
+    fn standalone_setup_config_path_prefers_hermes_home_without_reading_existing_state() {
+        assert_eq!(
+            standalone_setup_config_path_from(
+                Some(PathBuf::from("/synthetic/hermes")),
+                Some(PathBuf::from("/synthetic/home")),
+            ),
+            Some(PathBuf::from("/synthetic/hermes/config.yaml"))
+        );
+        assert_eq!(
+            standalone_setup_config_path_from(None, Some(PathBuf::from("/synthetic/home"))),
+            Some(PathBuf::from("/synthetic/home/.hermes/config.yaml"))
+        );
+        assert_eq!(standalone_setup_config_path_from(None, None), None);
     }
 
     #[test]
