@@ -64,8 +64,10 @@ terminal harness.
 - This observation only covered one in-process recalled entry. Persistent
   history across process restart, duplicate suppression, the load cap, and
   multiline history encoding are captured separately in [OBS-0016](OBS-0016-hermes-input-history-persistence-2026-08-01.md).
-- Modified word movement, queue-edit precedence, editor cancellation or edited
-  content, and completion behavior in multiline/busy contexts remain unknown.
+- Modified word movement, queue-edit precedence, interactive or unavailable
+  editor behavior, and completion behavior in multiline/busy contexts remain
+  unknown. Deterministic editor outcomes are captured separately in
+  [OBS-0018](OBS-0018-hermes-editor-outcomes-2026-08-01.md).
 
 These gaps are preserved in the fixture's `environment_sensitive` and `unknowns`
 sections. They must not be treated as implementation requirements until another

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T04:22:24Z",
+  "updated_at": "2026-08-01T04:31:30Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -797,6 +797,53 @@
           "tests/fixtures/parity/OBS-0017-hades-input-history-persistence.json",
           "docs/parity/observations/OBS-0017-hades-input-history-persistence-2026-08-01.md",
           "scripts/replay_history.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-018",
+      "title": "Capture Hermes editor modified and cancelled draft parity",
+      "status": "complete",
+      "priority": 65,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-014"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "reference_observation",
+        "provenance_record",
+        "fixture_validator"
+      ],
+      "acceptance": [
+        "Use the pinned Hermes reference and controlled editor commands to capture clean exit with modified content, multiline content, empty output, and nonzero cancellation from Ctrl+G.",
+        "Record whether the original composer is cleared, preserved, or submitted for each outcome, including exact trimming and multiline preservation visible at the TUI boundary.",
+        "Add a sanitized provenance observation and machine-validated fixture linked to the existing editor contract, update the parity matrix and fixture documentation, and leave unavailable-editor and interactive-editor edge cases explicitly unknown.",
+        "Keep this task research-only: do not change Hades implementation behavior until the reference contract is stable and reviewable."
+      ],
+      "evidence": [
+        "tests/fixtures/parity/OBS-0018-hermes-editor-outcomes.json",
+        "docs/parity/observations/OBS-0018-hermes-editor-outcomes-2026-08-01.md",
+        "scripts/validate_reference_fixture.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "ready_at": "2026-08-01T04:24:34Z",
+      "claimed_by": "hermes-research",
+      "claimed_at": "2026-08-01T04:25:33Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Captured deterministic Hermes editor outcomes on the pinned 0.19.1 reference: modified and multiline clean exits submit trimmed text, trailing-newline trimming preserves meaningful spaces, empty output preserves the draft, and nonzero exit cancels without submission; added provenance, validated fixture, and gate/docs links.",
+        "completed_at": "2026-08-01T04:31:30Z",
+        "evidence": [
+          "tests/fixtures/parity/OBS-0018-hermes-editor-outcomes.json",
+          "docs/parity/observations/OBS-0018-hermes-editor-outcomes-2026-08-01.md",
+          "scripts/validate_reference_fixture.py",
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md"

@@ -221,7 +221,7 @@
     "History truncation, duplicate suppression, and multiline history file encoding beyond the single observed entry.",
     "Modified Left/Right, Meta word movement, Ctrl+W, Ctrl+U, Delete, and queue-edit precedence.",
     "Native Shift+Enter and Alt+Enter sequences in terminal emulators that support modified-key reporting.",
-    "Ctrl+G behavior with an interactive editor that modifies the temporary draft, editor cancellation, and multiline editor round-trips.",
+    "Ctrl+G behavior with interactive or unavailable editors; deterministic modified, empty, cancelled, and multiline editor outcomes are captured in OBS-0018.",
     "Successful text, image, and path paste behavior; mouse selection, scrolling, and click semantics.",
     "Completion ordering, debounce races, path completion, skill-only inline completion, and completion behavior while busy or multiline."
   ]

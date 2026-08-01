@@ -46,6 +46,7 @@ replay-history:
 validate-reference:
     python3 scripts/validate_reference_fixture.py
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0016-hermes-input-history-persistence.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0018-hermes-editor-outcomes.json
 
 agent command *args:
     python3 scripts/agent/control_plane.py {{command}} {{args}}

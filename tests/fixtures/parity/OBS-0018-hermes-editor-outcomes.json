@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0018",
+  "reference_observation": "OBS-0010",
+  "surface": "hermes-tui-editor-outcomes",
+  "reference": {
+    "product": "Hermes TUI",
+    "version": "0.19.1",
+    "display_build": "2026.7.30",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "tmux-backed PTY"
+    },
+    "capture": "live tmux input with stable screen capture and sanitized history-file readback",
+    "runtime": {
+      "node": "22.22.2",
+      "npm": "10.9.7",
+      "python": "3.11.14",
+      "uv": "0.12.1"
+    }
+  },
+  "normalization": [
+    "Temporary checkout and synthetic HERMES_HOME paths are represented by placeholders.",
+    "Timestamps, session IDs, elapsed seconds, rotating prompt suggestions, and dynamic working-directory text are omitted or represented by placeholders.",
+    "The busy face is normalized to the stable Ctrl+C interrupt affordance; editor process output and terminal control sequences are not part of the contract.",
+    "Editor file content records use explicit \\n and <trailing newline> notation; history samples replace generated timestamp comments with <timestamp>.",
+    "Input bytes are recorded in hexadecimal after tmux key translation.",
+    "The fixture records deterministic editor outcomes only and does not imply complete interactive-editor parity."
+  ],
+  "steps": [
+    {
+      "id": "modified-clean-exit",
+      "precondition": "Fresh synthetic HERMES_HOME and ready composer with EDITOR replaced by a deterministic command that writes edited-one\\nedited-two\\n and exits 0.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "original-draft",
+          "bytes_hex": "6f 72 69 67 69 6e 61 6c 2d 64 72 61 66 74"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+G",
+          "bytes_hex": "07"
+        }
+      ],
+      "output": {
+        "editor_exit_code": 0,
+        "editor_file_content": "edited-one\\nedited-two<trailing newline>",
+        "status": "busy",
+        "composer": "",
+        "submitted_text": "edited-one\\nedited-two",
+        "busy_markers": ["Ctrl+C to interrupt…"]
+      }
+    },
+    {
+      "id": "multiline-clean-exit",
+      "precondition": "Fresh synthetic HERMES_HOME and ready composer with EDITOR replacing the temporary file with two logical lines and a trailing newline, then exiting 0.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "seed-draft",
+          "bytes_hex": "73 65 65 64 2d 64 72 61 66 74"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+G",
+          "bytes_hex": "07"
+        }
+      ],
+      "output": {
+        "editor_exit_code": 0,
+        "editor_file_content": "multi-one\\nmulti-two<trailing newline>",
+        "status": "busy",
+        "composer": "",
+        "submitted_text": "multi-one\\nmulti-two",
+        "newline_behavior": "internal newline preserved; one trailing newline removed before submission",
+        "busy_markers": ["Ctrl+C to interrupt…"]
+      }
+    },
+    {
+      "id": "trailing-newline-trim",
+      "precondition": "Fresh synthetic HERMES_HOME and ready composer with EDITOR writing two lines where the first line ends with two spaces and the file ends with a newline, then exiting 0.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "space-probe",
+          "bytes_hex": "73 70 61 63 65 2d 70 72 6f 62 65"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+G",
+          "bytes_hex": "07"
+        }
+      ],
+      "output": {
+        "editor_exit_code": 0,
+        "editor_file_content": "edge-one<two trailing spaces>\\nedge-two<trailing newline>",
+        "status": "busy",
+        "submitted_text": "edge-one<two trailing spaces>\\nedge-two",
+        "history_file_entry": [
+          "# <timestamp>",
+          "+edge-one  ",
+          "+edge-two"
+        ],
+        "trim_behavior": "trimEnd removes the final newline but preserves spaces before an internal newline"
+      }
+    },
+    {
+      "id": "empty-clean-exit",
+      "precondition": "Fresh synthetic HERMES_HOME and ready composer with EDITOR truncating the temporary file to zero bytes and exiting 0.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "empty-probe",
+          "bytes_hex": "65 6d 70 74 79 2d 70 72 6f 62 65"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+G",
+          "bytes_hex": "07"
+        }
+      ],
+      "output": {
+        "editor_exit_code": 0,
+        "editor_file_content": "",
+        "status": "ready",
+        "composer": "empty-probe",
+        "submitted_text": "not submitted",
+        "busy_markers": [],
+        "effect": "empty editor output leaves the original draft intact"
+      }
+    },
+    {
+      "id": "cancelled-nonzero-exit",
+      "precondition": "Fresh synthetic HERMES_HOME and ready composer with EDITOR exiting nonzero without producing a clean result.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "cancel-probe",
+          "bytes_hex": "63 61 6e 63 65 6c 2d 70 72 6f 62 65"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+G",
+          "bytes_hex": "07"
+        }
+      ],
+      "output": {
+        "editor_exit_code": 1,
+        "status": "ready",
+        "composer": "cancel-probe",
+        "submitted_text": "not submitted",
+        "busy_markers": [],
+        "effect": "nonzero editor exit preserves the original draft and does not submit"
+      }
+    }
+  ],
+  "environment_sensitive": [
+    {
+      "surface": "interactive editor save and cancellation semantics",
+      "status": "unknown",
+      "reason": "Only deterministic editor commands were used; terminal editors and their own unsaved-change prompts were not exercised."
+    },
+    {
+      "surface": "unavailable editor and editor launch failure",
+      "status": "unknown",
+      "reason": "The reference fallback chain and error reporting were not exercised in this PTY capture."
+    }
+  ],
+  "unknowns": [
+    "How interactive editors behave when the user cancels inside the editor or leaves unsaved changes.",
+    "How Hermes reports an unavailable editor, failed editor launch, or unreadable temporary file.",
+    "How editor handoff interacts with attached images, queue editing, overlays, busy turns, or an empty initial composer.",
+    "This observation does not claim Hades implementation parity; it records the deterministic Hermes reference contract."
+  ]
+}

@@ -26,3 +26,7 @@ the pinned Hermes executable and is consumed by the fixture validator. It does
 not imply that Hades has implemented disk history yet.
 OBS-0017 is the Hades implementation contract derived from OBS-0016 and is
 consumed by `scripts/replay_history.py`.
+OBS-0018 captures deterministic Hermes editor outcomes that extend the
+unchanged-draft editor probe: modified and multiline clean exits, trailing
+newline trimming, empty output, and nonzero cancellation. It is consumed by
+the reference fixture validator and does not imply Hades implementation parity.

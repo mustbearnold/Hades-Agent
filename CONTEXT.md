@@ -52,8 +52,10 @@ progress from August 1, 2026 through 2027.
   selection remain unknown.
 - HAD-014 implements the observed unchanged-draft editor handoff with a typed
   Ctrl+G request, temporary draft file, configured EDITOR invocation, terminal
-  suspension/restoration, and busy submission after a clean exit. Modified,
-  cancelled, multiline, and unavailable-editor behavior remain unknown.
+  suspension/restoration, and busy submission after a clean exit. HAD-018
+  captures deterministic modified/multiline clean exits, trailing-newline
+  trimming, empty output, and nonzero cancellation; interactive and
+  unavailable-editor behavior remain unknown and unimplemented.
 - HAD-015 implements the observed empty-clipboard Ctrl+V fallback with the
   exact miss message and unchanged draft. Successful clipboard reads, image or
   path paste, provider discovery, and overlay/busy behavior remain unknown.
