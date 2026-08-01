@@ -1,0 +1,373 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0034",
+  "surface": "hermes-tui-terminal-palette",
+  "reference": {
+    "product": "Hermes TUI",
+    "version": "0.19.1",
+    "display_build": "2026.7.30",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "direct PTY with raw bytes"
+    },
+    "capture": "raw direct-PTY bytes plus a sanitized 120x40 terminal-cell model",
+    "runtime": {
+      "node": "22.22.2",
+      "npm": "10.9.7",
+      "python": "3.11.14",
+      "uv": "0.12.1"
+    }
+  },
+  "normalization": [
+    "Reference checkout, synthetic HOME, HERMES_HOME, PTY paths, loopback URL, session IDs, timestamps, elapsed durations, and rotating prompt text are represented by placeholders or omitted.",
+    "Raw terminal output is not copied into the fixture. Exact SGR control sequences are retained as hexadecimal byte sequences, while raw-surface digests remain in the generated probe report.",
+    "Cell landmarks record the first matching marker's 1-based row, column, foreground/background color, and text attributes in the modeled 120x40 screen.",
+    "The capture uses TERM=xterm-256color, HERMES_TUI_THEME=dark, a fresh process, and no external provider or credential. The configured ready case targets an intentionally absent loopback endpoint."
+  ],
+  "steps": [
+    {
+      "id": "ready-startup-palette",
+      "precondition": "Fresh synthetic HERMES_HOME with a loopback custom provider and a 120x40 direct PTY.",
+      "input_sequence": [
+        {
+          "kind": "wait",
+          "value": "Hermes startup reaches the ready surface"
+        }
+      ],
+      "output": {
+        "status": "ready",
+        "landmark_styles": {
+          "Hermes Agent": {
+            "row": 12,
+            "column": 60,
+            "style": {
+              "fg": "indexed(220)",
+              "bg": "default",
+              "bold": true,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          },
+          "Nous Research": {
+            "row": 8,
+            "column": 4,
+            "style": {
+              "fg": "indexed(178)",
+              "bg": "default",
+              "bold": false,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          },
+          "Available Tools": {
+            "row": 15,
+            "column": 43,
+            "style": {
+              "fg": "indexed(220)",
+              "bg": "default",
+              "bold": true,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          },
+          "Available Skills": {
+            "row": 26,
+            "column": 43,
+            "style": {
+              "fg": "indexed(220)",
+              "bg": "default",
+              "bold": true,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          },
+          "ready": {
+            "row": 39,
+            "column": 4,
+            "style": {
+              "fg": "indexed(72)",
+              "bg": "default",
+              "bold": false,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          }
+        },
+        "sgr_sequences_hex": [
+          "1b 5b 30 6d",
+          "1b 5b 33 38 3b 35 3b 32 32 30 6d",
+          "1b 5b 33 38 3b 35 3b 31 37 33 6d",
+          "1b 5b 33 38 3b 35 3b 31 37 39 6d",
+          "1b 5b 33 38 3b 35 3b 32 33 30 6d",
+          "1b 5b 31 6d",
+          "1b 5b 32 32 6d",
+          "1b 5b 34 38 3b 32 3b 32 30 32 3b 31 35 38 3b 32 39 6d",
+          "1b 5b 33 38 3b 32 3b 30 3b 30 3b 30 6d",
+          "1b 5b 34 39 6d",
+          "1b 5b 33 39 6d",
+          "1b 5b 33 38 3b 35 3b 31 37 38 6d",
+          "1b 5b 34 38 3b 32 3b 31 38 34 3b 31 33 34 3b 31 31 6d",
+          "1b 5b 33 38 3b 32 3b 32 35 35 3b 32 35 35 3b 32 35 35 6d",
+          "1b 5b 33 38 3b 35 3b 31 38 36 6d",
+          "1b 5b 33 38 3b 35 3b 31 34 35 6d",
+          "1b 5b 33 38 3b 35 3b 37 32 6d"
+        ]
+      }
+    },
+    {
+      "id": "ready-composer-palette",
+      "precondition": "The configured ready surface is visible.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "palette-ready",
+          "bytes_hex": "70 61 6c 65 74 74 65 2d 72 65 61 64 79"
+        }
+      ],
+      "output": {
+        "status": "ready",
+        "landmark_styles": {
+          "palette-ready": {
+            "row": 40,
+            "column": 4,
+            "style": {
+              "fg": "indexed(230)",
+              "bg": "default",
+              "bold": false,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          },
+          "ready": {
+            "row": 39,
+            "column": 4,
+            "style": {
+              "fg": "indexed(72)",
+              "bg": "default",
+              "bold": false,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          }
+        },
+        "sgr_sequences_hex": [
+          "1b 5b 33 38 3b 35 3b 32 33 30 6d",
+          "1b 5b 33 39 6d"
+        ]
+      }
+    },
+    {
+      "id": "busy-palette",
+      "precondition": "The composer contains palette-ready and remains unsubmitted.",
+      "input_sequence": [
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        }
+      ],
+      "output": {
+        "status": "busy",
+        "landmark_styles": {
+          "Ctrl+C to interrupt": {
+            "style": {
+              "fg": "rgb(255,255,255)",
+              "bg": "rgb(184,134,11)",
+              "bold": false,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          }
+        },
+        "sgr_sequences_hex": [
+          "1b 5b 33 38 3b 35 3b 31 37 38 6d",
+          "1b 5b 33 38 3b 35 3b 32 32 30 6d",
+          "1b 5b 34 38 3b 32 3b 31 38 34 3b 31 33 34 3b 31 31 6d",
+          "1b 5b 33 38 3b 32 3b 32 35 35 3b 32 35 35 3b 32 35 35 6d",
+          "1b 5b 34 39 6d",
+          "1b 5b 33 38 3b 32 3b 31 38 34 3b 31 33 34 3b 31 31 6d",
+          "1b 5b 33 39 6d",
+          "1b 5b 33 38 3b 35 3b 31 37 39 6d",
+          "1b 5b 31 6d",
+          "1b 5b 32 32 6d"
+        ],
+        "dynamic_face_markers": [
+          "musing",
+          "mulling",
+          "analyzing",
+          "synthesizing"
+        ]
+      }
+    },
+    {
+      "id": "interrupted-completion-palette",
+      "precondition": "The busy surface is visible.",
+      "input_sequence": [
+        {
+          "kind": "key",
+          "value": "Ctrl+C",
+          "bytes_hex": "03"
+        }
+      ],
+      "output": {
+        "status": "ready after interruption",
+        "landmark_styles": {
+          "interrupted": {
+            "style": {
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          },
+          "✓": {
+            "style": {
+              "fg": "indexed(178)",
+              "bg": "default",
+              "bold": false,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          }
+        },
+        "sgr_sequences_hex": [
+          "1b 5b 33 38 3b 35 3b 31 37 38 6d",
+          "1b 5b 33 39 6d",
+          "1b 5b 33 38 3b 35 3b 32 31 35 6d",
+          "1b 5b 33 38 3b 35 3b 32 32 30 6d",
+          "1b 5b 33 38 3b 35 3b 32 33 30 6d",
+          "1b 5b 33 38 3b 35 3b 37 32 6d"
+        ]
+      }
+    },
+    {
+      "id": "setup-required-palette",
+      "precondition": "Fresh synthetic HERMES_HOME without a configured model provider.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "/help",
+          "bytes_hex": "2f 68 65 6c 70 0d"
+        }
+      ],
+      "output": {
+        "status": "setup required",
+        "landmark_styles": {
+          "Setup Required": {
+            "style": {
+              "fg": "indexed(220)",
+              "bg": "default",
+              "bold": true,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          },
+          "model provider": {
+            "style": {
+              "fg": "indexed(178)",
+              "bg": "default",
+              "bold": false,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          },
+          "/model": {
+            "style": {
+              "fg": "indexed(178)",
+              "bg": "default",
+              "bold": false,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          },
+          "/setup": {
+            "style": {
+              "fg": "indexed(178)",
+              "bg": "default",
+              "bold": false,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          }
+        },
+        "selection_style_observed": {
+          "fg": "indexed(230)",
+          "bg": "indexed(60)",
+          "bold": false,
+          "dim": false,
+          "italic": false,
+          "underline": false,
+          "reverse": false,
+          "strike": false
+        },
+        "sgr_sequences_hex": [
+          "1b 5b 33 38 3b 35 3b 32 33 30 6d",
+          "1b 5b 33 39 6d",
+          "1b 5b 33 38 3b 35 3b 31 37 39 6d",
+          "1b 5b 33 38 3b 35 3b 31 38 36 6d",
+          "1b 5b 33 38 3b 35 3b 32 32 30 6d",
+          "1b 5b 34 38 3b 35 3b 36 30 6d",
+          "1b 5b 31 6d",
+          "1b 5b 32 32 6d",
+          "1b 5b 34 39 6d",
+          "1b 5b 33 38 3b 35 3b 31 37 33 6d",
+          "1b 5b 33 38 3b 35 3b 31 37 38 6d",
+          "1b 5b 33 38 3b 35 3b 31 34 35 6d",
+          "1b 5b 33 38 3b 35 3b 39 35 6d"
+        ]
+      }
+    }
+  ],
+  "unknowns": [
+    "The ready, busy, interrupted, and setup-required controls were captured only with TERM=xterm-256color, the dark theme, and a 120x40 direct PTY; other terminals, themes, and dimensions are unknown.",
+    "Musing-face animation is dynamic. The probe records representative face markers and the stable interrupt affordance, but does not claim one fixed face, timing, or per-frame color.",
+    "Successful model streaming, partial-token rendering, tool calls, tool results, provider errors, retries, and completion surfaces after a successful response were not observed.",
+    "Exact cursor placement, wide-cell behavior, hyperlinks, mouse styling, and the complete raw redraw stream are outside this sanitized fixture; only the named marker cells and exact SGR sequence forms are retained.",
+    "This is a Hermes reference observation. Hades implementation parity is not claimed by OBS-0034."
+  ]
+}

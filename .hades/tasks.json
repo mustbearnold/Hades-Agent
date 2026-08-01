@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T08:08:20Z",
+  "updated_at": "2026-08-01T08:29:54Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -1617,6 +1617,55 @@
           "scripts/replay_osc52_timing_limits.py",
           "tests/fixtures/parity/OBS-0033-hades-osc52-timing-limits.json",
           "docs/parity/observations/OBS-0033-hades-osc52-timing-limits-2026-08-01.md",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-034",
+      "title": "Capture Hermes terminal palette and text styling parity",
+      "status": "complete",
+      "priority": 49,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-033"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "reference_observation",
+        "provenance_record",
+        "fixture_validator",
+        "direct_pty_probe"
+      ],
+      "acceptance": [
+        "Observe the pinned Hermes reference at its exact commit in a fresh 120x40 direct PTY with a synthetic HOME and no private runtime state.",
+        "Capture raw ANSI styling and normalized terminal-cell colors for deterministic startup, ready-composer, busy, interrupted, setup-required, and completion surfaces where they are observable; separate exact observations from dynamic or unknown styling.",
+        "Add a sanitized fixture, provenance record, and repeatable probe that preserve exact escape/style evidence without copying credentials, transcript payloads, or private paths.",
+        "Wire fixture validation and the reference probe through just verify without changing Hades runtime behavior; record every unobserved styling dimension as an explicit unknown."
+      ],
+      "evidence": [
+        "tests/fixtures/parity/OBS-0034-hermes-terminal-palette.json",
+        "docs/parity/observations/OBS-0034-hermes-terminal-palette-2026-08-01.md",
+        "scripts/probe_hermes_terminal_palette.py",
+        "scripts/validate_reference_fixture.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "claimed_by": "hermes-research",
+      "claimed_at": "2026-08-01T08:14:11Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Captured the pinned Hermes terminal palette subset in fresh 120x40 direct PTYs, recording exact SGR forms and sanitized landmark cell styles for startup, ready, busy, interrupted, and setup-required surfaces with explicit animation and coverage unknowns.",
+        "completed_at": "2026-08-01T08:29:54Z",
+        "evidence": [
+          "tests/fixtures/parity/OBS-0034-hermes-terminal-palette.json",
+          "docs/parity/observations/OBS-0034-hermes-terminal-palette-2026-08-01.md",
+          "scripts/probe_hermes_terminal_palette.py",
+          "scripts/validate_reference_fixture.py",
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md"

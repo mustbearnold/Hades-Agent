@@ -118,12 +118,18 @@ progress from August 1, 2026 through 2027.
   bounded replay does not claim a universal maximum-size limit; larger payloads,
   live forwarding, image attachments, gateway behavior, and concurrent input
   remain separate unknowns.
+- HAD-034 captures the pinned Hermes terminal palette subset in fresh 120x40
+  direct PTYs: raw SGR forms and modeled landmark cell styles for startup,
+  ready composer, busy interruption, interrupted completion, and
+  setup-required surfaces. It records indexed and truecolor forms while
+  keeping animated face timing, successful responses, alternate themes and
+  terminals, and Hades implementation styling parity as unknowns.
 
 ## Unknown until observed
 
-- Hermes TUI color palette, typography, the unobserved keymap/focus surfaces,
-  copy, error states, timing, history write failures/clearing, and the remaining
-  interaction surfaces.
+- Hermes TUI typography, the unobserved keymap/focus surfaces, copy, error
+  states, timing, history write failures/clearing, and the remaining
+  interaction surfaces. Hades styling parity remains unimplemented.
 - Which Hermes behaviors are stable contracts versus implementation details;
   session recovery remains unobserved beyond input-history persistence.
 - Successful provider/model streaming, tool calls, and the exact behavior of

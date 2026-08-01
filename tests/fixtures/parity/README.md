@@ -82,3 +82,8 @@ OBS-0033 is the Hades implementation contract derived from OBS-0032. It is
 consumed by `scripts/replay_osc52_timing_limits.py` and proves the same four
 bounded controls, exact query/DA1 bytes, provider order, readiness,
 non-submission, and cleanup without claiming a universal maximum-size limit.
+OBS-0034 captures Hermes' deterministic terminal palette subset through raw
+SGR sequences and a sanitized 120x40 cell model. It is research-only,
+consumed by `scripts/probe_hermes_terminal_palette.py` and the fixture
+validator; themes, terminals, animation frames, successful responses, and
+Hades styling parity remain outside the claim.
