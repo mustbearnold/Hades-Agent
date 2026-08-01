@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T22:36:54Z",
+  "updated_at": "2026-08-01T22:57:53Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -4094,6 +4094,61 @@
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/hades-standalone-full-setup-replay.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-078",
+      "title": "Capture Hermes standalone terminal-backend and platform continuation boundary",
+      "status": "complete",
+      "priority": 10,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-077"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "hermes_direct_pty",
+        "sanitized_fixture",
+        "replayable_setup_platform_boundary",
+        "full_verify"
+      ],
+      "acceptance": [
+        "In the pinned Hermes reference, invoke standalone hermes setup from a fresh synthetic home, choose only Full setup, skip the unconfigured provider step with Ctrl+C, accept only the displayed Keep current (local) terminal backend, and capture the first stable platform-picker surface.",
+        "Record the exact safe input sequence, terminal-backend and platform landmarks, cursor/selection state where observable, alternate-screen and terminal flags, config/artifact changes, fresh-process readback, and bounded cancellation without selecting a platform or entering credentials.",
+        "Keep provider inventory, endpoint/model values, backend alternatives, platform configuration, OAuth, credentials, network behavior, later setup sections, and successful-save behavior explicitly unknown unless directly observed by this bounded probe; do not infer a model-default step when the fresh standalone route skips provider setup.",
+        "Add provenance, a sanitized OBS-0073 fixture, a repeatable direct-PTY probe, and an observation document; update the parity matrix/context/readme and wire fixture validation and the probe into just verify.",
+        "Run the targeted probe and complete no-skip just verify gate, recording only the standalone terminal-backend/platform boundary evidence before completion."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_standalone_terminal_platform.py",
+        "tests/fixtures/parity/OBS-0073-hermes-standalone-terminal-platform.json",
+        "docs/parity/observations/OBS-0073-hermes-standalone-terminal-platform-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hermes-standalone-terminal-platform-probe.json"
+      ],
+      "ready_at": "2026-08-02T00:00:00Z",
+      "attempts": 1,
+      "claimed_by": "standalone-terminal-platform",
+      "claimed_at": "2026-08-01T22:38:30Z",
+      "result": {
+        "summary": "Captured standalone Hermes Full setup through Keep current (local) terminal backend and the unconfigured platform picker, including normalized config/artifact shape, two-stage Ctrl+C cleanup, fresh-process readback, sanitized OBS-0073 evidence, targeted replay, and full no-skip verification.",
+        "completed_at": "2026-08-01T22:57:53Z",
+        "evidence": [
+          "scripts/probe_hermes_standalone_terminal_platform.py",
+          "tests/fixtures/parity/OBS-0073-hermes-standalone-terminal-platform.json",
+          "docs/parity/observations/OBS-0073-hermes-standalone-terminal-platform-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hermes-standalone-terminal-platform-probe.json"
         ]
       }
     }

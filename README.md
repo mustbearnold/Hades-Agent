@@ -117,6 +117,7 @@ just probe-hermes-help-setup-timing # timed /help setup-required reference probe
 just probe-hermes-setup-required-actions # post-delay /model /setup action probe
 just probe-hermes-standalone-setup # standalone hermes setup first-run probe
 just probe-hermes-standalone-full-setup # standalone Full setup continuation probe
+just probe-hermes-standalone-terminal-platform # standalone backend/platform boundary probe
 just replay-terminal-palette   # Hades SGR palette and cell-style parity replay
 just replay-osc52-timing-limits # Hades OSC52 timing and bounded-size parity replay
 just replay-osc52-st-termination # Hades ST-terminated OSC52 parity replay

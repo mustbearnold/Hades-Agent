@@ -217,6 +217,9 @@ probe-hermes-standalone-setup:
 probe-hermes-standalone-full-setup:
     python3 scripts/probe_hermes_standalone_full_setup.py --report .hades/runtime/hermes-standalone-full-setup-probe.json --timeout 30
 
+probe-hermes-standalone-terminal-platform:
+    python3 scripts/probe_hermes_standalone_terminal_platform.py --report .hades/runtime/hermes-standalone-terminal-platform-probe.json --timeout 30
+
 replay-local-provider:
     cargo build --locked --package hades-cli
     python3 scripts/replay_local_provider.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0051-hades-local-provider-stream.json --report .hades/runtime/local-provider-replay.json
@@ -273,6 +276,7 @@ validate-reference:
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0066-hermes-help-setup-timing.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0067-hades-help-setup-required.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0068-hermes-setup-required-actions.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0073-hermes-standalone-terminal-platform.json
 
 agent command *args:
     python3 scripts/agent/control_plane.py {{command}} {{args}}

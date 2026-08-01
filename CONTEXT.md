@@ -369,6 +369,15 @@ progress from August 1, 2026 through 2027.
   traverses Terminal Backend and its numbered fallback before status-1 exit.
   Provider values, credentials, OAuth, backend selection, and later setup remain
   outside the claim.
+- HAD-078 captures the next standalone Hermes boundary. After skipping the
+  unconfigured provider with Ctrl+C, accepting the highlighted Keep current
+  (local) backend reaches the platform picker with unconfigured Mattermost,
+  Signal, and other rows. The first platform Ctrl+C leaves the alternate screen,
+  restores canonical input and echo, and advances to No platforms selected and
+  Hermes Tool Configuration while the process remains alive; the second exits
+  with status 130. Normalized config shape is unchanged by platform
+  cancellation, and platform selection, platform-specific setup, and later
+  tool configuration remain unimplemented.
 
 ## Unknown until observed
 
@@ -389,7 +398,8 @@ progress from August 1, 2026 through 2027.
   terminal-backend selection and cancellation after deeper navigation, provider
   configuration beyond the bounded OBS-0055/OBS-0056 readbacks, backup
   semantics, Hades successful provider-config persistence, credential handling,
-  platform setup beyond the bounded picker, configured command
+  platform setup beyond the bounded picker, standalone platform continuation,
+  configured command
   behavior with a reachable provider, and model-picker behavior beyond the
   bounded deterministic provider/model seam.
 - OSC52 behavior outside the OBS-0032 timing controls and bounded payload
