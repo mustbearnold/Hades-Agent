@@ -297,7 +297,14 @@ def create_xclip(provider_dir: Path, payload_path: Path, log_path: Path) -> None
     log_path.touch()
 
 
-def spawn(binary: Path, home: Path, provider_dir: Path, payload_path: Path, log_path: Path) -> tuple[int, int]:
+def spawn(
+    binary: Path,
+    home: Path,
+    provider_dir: Path,
+    payload_path: Path,
+    log_path: Path,
+    multiplexer_marker: str | None = None,
+) -> tuple[int, int]:
     pid, fd = pty.fork()
     if pid == 0:
         environment = os.environ.copy()
@@ -312,8 +319,20 @@ def spawn(binary: Path, home: Path, provider_dir: Path, payload_path: Path, log_
                 "SSH_TTY": "/dev/pts/999",
             }
         )
-        for key in ("SSH_CONNECTION", "SSH_CLIENT", "TMUX", "STY", "WAYLAND_DISPLAY", "WSL_INTEROP", "WSL_DISTRO_NAME"):
+        for key in (
+            "SSH_CONNECTION",
+            "SSH_CLIENT",
+            "TMUX",
+            "STY",
+            "WAYLAND_DISPLAY",
+            "WSL_INTEROP",
+            "WSL_DISTRO_NAME",
+        ):
             environment.pop(key, None)
+        if multiplexer_marker == "TMUX":
+            environment["TMUX"] = "/tmp/tmux-999/default,123,0"
+        elif multiplexer_marker == "STY":
+            environment["STY"] = "1234.pts-0.host"
         os.execve(str(binary), [str(binary)], environment)
 
     set_window_size(fd)
@@ -362,6 +381,12 @@ def load_contract(path: Path) -> dict[str, Any]:
         "osc52-empty-st-response",
         "osc52-invalid-base64-st-response",
     }
+    multiplexer_ids = {
+        "osc52-tmux-direct-response",
+        "osc52-tmux-da1-fallback",
+        "osc52-sty-direct-response",
+        "osc52-sty-da1-fallback",
+    }
     if ids == legacy_ids:
         return contract
     if ids == boundary_ids and all(
@@ -376,10 +401,18 @@ def load_contract(path: Path) -> dict[str, Any]:
         for step in steps
     ):
         return contract
+    if ids == multiplexer_ids and all(
+        isinstance(step, dict)
+        and step.get("multiplexer_marker") in {"TMUX", "STY"}
+        and isinstance(step.get("wrapped_query_bytes_hex"), str)
+        and step.get("expected_outcome") in {"osc52-response", "native-fallback"}
+        for step in steps
+    ):
+        return contract
     raise Osc52ReplayFailure(
         "contract",
         "load",
-        f"step ids must be {sorted(legacy_ids)}, {sorted(boundary_ids)}, or {sorted(st_ids)}",
+        f"step ids must be {sorted(legacy_ids)}, {sorted(boundary_ids)}, {sorted(st_ids)}, or {sorted(multiplexer_ids)}",
     )
 
 
@@ -395,7 +428,13 @@ def run_case(binary: Path, case: dict[str, Any], timeout: float, ordinal: int) -
     fd: int | None = None
     buffer = b""
     try:
-        pid, fd = spawn(binary, home, provider_dir, payload_path, log_path)
+        multiplexer_marker = case.get("multiplexer_marker")
+        wrapped_query = (
+            bytes.fromhex(case["wrapped_query_bytes_hex"])
+            if "wrapped_query_bytes_hex" in case
+            else OSC52_QUERY
+        )
+        pid, fd = spawn(binary, home, provider_dir, payload_path, log_path, multiplexer_marker)
         startup_markers = ("Hermes Agent", "Nous Research", "Available Tools", "Available Skills")
         buffer = wait_for(
             pid,
@@ -417,20 +456,20 @@ def run_case(binary: Path, case: dict[str, Any], timeout: float, ordinal: int) -
             buffer,
             case_id,
             "osc52-query",
-            lambda current: OSC52_QUERY in current[start:],
+            lambda current: wrapped_query in current[start:],
             timeout,
         )
-        query_at = buffer.find(OSC52_QUERY, start)
+        query_at = buffer.find(wrapped_query, start)
         buffer = wait_for(
             pid,
             fd,
             buffer,
             case_id,
             "da1-query",
-            lambda current: DA1_QUERY in current[query_at + len(OSC52_QUERY) :],
+            lambda current: DA1_QUERY in current[query_at + len(wrapped_query) :],
             timeout,
         )
-        da1_at = buffer.find(DA1_QUERY, query_at + len(OSC52_QUERY))
+        da1_at = buffer.find(DA1_QUERY, query_at + len(wrapped_query))
 
         if case_id == "osc52-response":
             response_payload = case["osc52_payload"]
@@ -452,6 +491,7 @@ def run_case(binary: Path, case: dict[str, Any], timeout: float, ordinal: int) -
                 "status": "passed",
                 "path": "OSC52 response won before native provider",
                 "osc52_query_bytes_hex": OSC52_QUERY.hex(" "),
+                "wrapped_query_bytes_hex": wrapped_query.hex(" "),
                 "osc52_response_bytes_hex": response.hex(" "),
                 "da1_query_bytes_hex": DA1_QUERY.hex(" "),
                 "da1_response_bytes_hex": DA1_RESPONSE.hex(" "),
@@ -477,8 +517,13 @@ def run_case(binary: Path, case: dict[str, Any], timeout: float, ordinal: int) -
                     raise Osc52ReplayFailure(case_id, "provider-order", "native xclip ran after usable ST OSC52 text")
                 outcome = {
                     "status": "passed",
-                    "path": "ST-terminated OSC52 response won before native provider",
+                    "path": (
+                        f"{multiplexer_marker} passthrough OSC52 response won before native provider"
+                        if multiplexer_marker
+                        else "ST-terminated OSC52 response won before native provider"
+                    ),
                     "osc52_query_bytes_hex": OSC52_QUERY.hex(" "),
+                    "wrapped_query_bytes_hex": wrapped_query.hex(" "),
                     "osc52_response_bytes_hex": response.hex(" "),
                     "da1_query_bytes_hex": DA1_QUERY.hex(" "),
                     "da1_response_bytes_hex": DA1_RESPONSE.hex(" "),
@@ -489,8 +534,13 @@ def run_case(binary: Path, case: dict[str, Any], timeout: float, ordinal: int) -
                     raise Osc52ReplayFailure(case_id, "provider-order", f"unexpected native provider log: {provider_arguments!r}")
                 outcome = {
                     "status": "passed",
-                    "path": "Malformed or empty OSC52 response fell back to native provider",
+                    "path": (
+                        f"{multiplexer_marker} passthrough OSC52 response fell back to native provider"
+                        if multiplexer_marker
+                        else "Malformed or empty OSC52 response fell back to native provider"
+                    ),
                     "osc52_query_bytes_hex": OSC52_QUERY.hex(" "),
+                    "wrapped_query_bytes_hex": wrapped_query.hex(" "),
                     "osc52_response_bytes_hex": response.hex(" "),
                     "da1_query_bytes_hex": DA1_QUERY.hex(" "),
                     "da1_response_bytes_hex": DA1_RESPONSE.hex(" "),
@@ -513,8 +563,13 @@ def run_case(binary: Path, case: dict[str, Any], timeout: float, ordinal: int) -
                 raise Osc52ReplayFailure(case_id, "provider-order", f"unexpected native provider log: {provider_arguments!r}")
             outcome = {
                 "status": "passed",
-                "path": "DA1 barrier acknowledged, then native provider fallback ran",
+                "path": (
+                    f"{multiplexer_marker} passthrough DA1 barrier acknowledged, then native provider fallback ran"
+                    if multiplexer_marker
+                    else "DA1 barrier acknowledged, then native provider fallback ran"
+                ),
                 "osc52_query_bytes_hex": OSC52_QUERY.hex(" "),
+                "wrapped_query_bytes_hex": wrapped_query.hex(" "),
                 "osc52_response": "not sent",
                 "da1_query_bytes_hex": DA1_QUERY.hex(" "),
                 "da1_response_bytes_hex": DA1_RESPONSE.hex(" "),
@@ -535,6 +590,7 @@ def run_case(binary: Path, case: dict[str, Any], timeout: float, ordinal: int) -
             "status": "passed",
             "draft": draft,
             "ssh_marker": "SSH_TTY=/dev/pts/999",
+            "multiplexer_marker": multiplexer_marker,
             "input_bytes_hex": [draft.encode("utf-8").hex(" "), "16"],
             "query_offset": query_at,
             "da1_query_offset": da1_at,

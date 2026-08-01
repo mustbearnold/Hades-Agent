@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0031",
+  "reference_observation": "OBS-0030",
+  "surface": "hades-tui-remote-osc52-multiplexer-passthrough",
+  "reference": {
+    "product": "Hades Agent implementation of Hermes TMUX/STY OSC52 passthrough behavior",
+    "version": "0.1.0",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "direct PTY with raw byte writes"
+    },
+    "capture": "Hades direct PTY replay with synthetic SSH_TTY, synthetic TMUX or STY marker, direct raw OSC52 response, DA1 barrier, and synthetic xclip provider"
+  },
+  "normalization": [
+    "Each case runs in a fresh Hades process with synthetic HERMES_HOME, HOME, SSH_TTY, multiplexer marker, payload, log, and xclip paths.",
+    "Each case sets exactly one synthetic TMUX or STY marker; the other marker and local clipboard environment markers are removed.",
+    "ANSI control sequences, cursor placement, colors, timestamps, prompt faces, dynamic working-directory text, offsets, and wall-clock durations are not asserted.",
+    "The PTY window is explicitly set to 120 columns by 40 rows before input is sent.",
+    "Ctrl+V is written as raw byte 0x16. Hades' bare query payload, wrapper bytes, direct OSC52 response, and DA1 barrier bytes are asserted as raw PTY output/input bytes.",
+    "The synthetic xclip provider records exact arguments and returns a case-specific native payload with one trailing newline.",
+    "A direct response is supplied after the wrapped query and before the DA1 response; the fallback control answers Hades' DA1 barrier before native xclip. No wall-clock latency contract is claimed.",
+    "The PTY writes a raw OSC52 response directly after Hades emits its wrapper. No live tmux or GNU Screen daemon, outer-terminal forwarding, or multiplexer server is part of this model."
+  ],
+  "steps": [
+    {
+      "id": "osc52-tmux-direct-response",
+      "multiplexer_marker": "TMUX",
+      "draft": "mux-boundary-tmux-direct-response",
+      "native_payload": "native-tmux-direct-response\n",
+      "wrapped_query_bytes_hex": "1b 50 74 6d 75 78 3b 1b 1b 5d 35 32 3b 63 3b 3f 07 1b 5c",
+      "osc52_response_bytes_hex": "1b 5d 35 32 3b 63 3b 62 58 56 34 4c 58 4a 6c 62 57 39 30 5a 53 41 67 43 6d 78 70 62 6d 55 74 64 48 64 76 43 67 6f 3d 07",
+      "expected_outcome": "osc52-response",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "mux-boundary-tmux-direct-response",
+          "bytes_hex": "6d 75 78 2d 62 6f 75 6e 64 61 72 79 2d 74 6d 75 78 2d 64 69 72 65 63 74 2d 72 65 73 70 6f 6e 73 65"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+V",
+          "bytes_hex": "16"
+        }
+      ],
+      "terminal_response": {
+        "osc52_query_bytes_hex": "1b 5d 35 32 3b 63 3b 3f 07",
+        "wrapped_query_bytes_hex": "1b 50 74 6d 75 78 3b 1b 1b 5d 35 32 3b 63 3b 3f 07 1b 5c",
+        "osc52_response_bytes_hex": "1b 5d 35 32 3b 63 3b 62 58 56 34 4c 58 4a 6c 62 57 39 30 5a 53 41 67 43 6d 78 70 62 6d 55 74 64 48 64 76 43 67 6f 3d 07",
+        "da1_query_bytes_hex": "1b 5b 63",
+        "da1_response_bytes_hex": "1b 5b 3f 36 32 63",
+        "da1_barriers_answered": 1
+      },
+      "screen_markers": ["mux-boundary-tmux-direct-response", "mux-remote", "line-two"],
+      "screen_absent_markers": ["native-tmux-direct-response", "Ctrl+C to interrupt"],
+      "output": {
+        "status": "ready",
+        "outcome": "osc52-response",
+        "osc52_text": "mux-remote  \nline-two",
+        "submission": "not submitted",
+        "provider_order": "TMUX-wrapped OSC52 response before native provider",
+        "native_provider": "not invoked",
+        "native_provider_arguments": "",
+        "trailing_newlines": "removed from the OSC52 payload",
+        "cleanup": "Ctrl+C exits from ready without submission"
+      }
+    },
+    {
+      "id": "osc52-tmux-da1-fallback",
+      "multiplexer_marker": "TMUX",
+      "draft": "mux-boundary-tmux-da1-fallback",
+      "native_payload": "native-tmux-da1-fallback\n",
+      "wrapped_query_bytes_hex": "1b 50 74 6d 75 78 3b 1b 1b 5d 35 32 3b 63 3b 3f 07 1b 5c",
+      "expected_outcome": "native-fallback",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "mux-boundary-tmux-da1-fallback",
+          "bytes_hex": "6d 75 78 2d 62 6f 75 6e 64 61 72 79 2d 74 6d 75 78 2d 64 61 31 2d 66 61 6c 6c 62 61 63 6b"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+V",
+          "bytes_hex": "16"
+        }
+      ],
+      "terminal_response": {
+        "osc52_query_bytes_hex": "1b 5d 35 32 3b 63 3b 3f 07",
+        "wrapped_query_bytes_hex": "1b 50 74 6d 75 78 3b 1b 1b 5d 35 32 3b 63 3b 3f 07 1b 5c",
+        "osc52_response": "not sent",
+        "da1_query_bytes_hex": "1b 5b 63",
+        "da1_response_bytes_hex": "1b 5b 3f 36 32 63",
+        "da1_barriers_answered": 1
+      },
+      "screen_markers": ["mux-boundary-tmux-da1-fallback", "native-tmux-da1-fallback"],
+      "screen_absent_markers": ["mux-remote", "Ctrl+C to interrupt"],
+      "output": {
+        "status": "ready",
+        "outcome": "native-fallback",
+        "submission": "not submitted",
+        "provider_order": "native provider after TMUX-wrapped OSC52 query and DA1 barrier",
+        "native_provider": "xclip",
+        "native_provider_arguments": "-selection clipboard -out",
+        "trailing_newlines": "removed from the native payload",
+        "cleanup": "Ctrl+C exits from ready without submission"
+      }
+    },
+    {
+      "id": "osc52-sty-direct-response",
+      "multiplexer_marker": "STY",
+      "draft": "mux-boundary-sty-direct-response",
+      "native_payload": "native-sty-direct-response\n",
+      "wrapped_query_bytes_hex": "1b 50 1b 5d 35 32 3b 63 3b 3f 07 1b 5c",
+      "osc52_response_bytes_hex": "1b 5d 35 32 3b 63 3b 62 58 56 34 4c 58 4a 6c 62 57 39 30 5a 53 41 67 43 6d 78 70 62 6d 55 74 64 48 64 76 43 67 6f 3d 07",
+      "expected_outcome": "osc52-response",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "mux-boundary-sty-direct-response",
+          "bytes_hex": "6d 75 78 2d 62 6f 75 6e 64 61 72 79 2d 73 74 79 2d 64 69 72 65 63 74 2d 72 65 73 70 6f 6e 73 65"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+V",
+          "bytes_hex": "16"
+        }
+      ],
+      "terminal_response": {
+        "osc52_query_bytes_hex": "1b 5d 35 32 3b 63 3b 3f 07",
+        "wrapped_query_bytes_hex": "1b 50 1b 5d 35 32 3b 63 3b 3f 07 1b 5c",
+        "osc52_response_bytes_hex": "1b 5d 35 32 3b 63 3b 62 58 56 34 4c 58 4a 6c 62 57 39 30 5a 53 41 67 43 6d 78 70 62 6d 55 74 64 48 64 76 43 67 6f 3d 07",
+        "da1_query_bytes_hex": "1b 5b 63",
+        "da1_response_bytes_hex": "1b 5b 3f 36 32 63",
+        "da1_barriers_answered": 1
+      },
+      "screen_markers": ["mux-boundary-sty-direct-response", "mux-remote", "line-two"],
+      "screen_absent_markers": ["native-sty-direct-response", "Ctrl+C to interrupt"],
+      "output": {
+        "status": "ready",
+        "outcome": "osc52-response",
+        "osc52_text": "mux-remote  \nline-two",
+        "submission": "not submitted",
+        "provider_order": "STY-wrapped OSC52 response before native provider",
+        "native_provider": "not invoked",
+        "native_provider_arguments": "",
+        "trailing_newlines": "removed from the OSC52 payload",
+        "cleanup": "Ctrl+C exits from ready without submission"
+      }
+    },
+    {
+      "id": "osc52-sty-da1-fallback",
+      "multiplexer_marker": "STY",
+      "draft": "mux-boundary-sty-da1-fallback",
+      "native_payload": "native-sty-da1-fallback\n",
+      "wrapped_query_bytes_hex": "1b 50 1b 5d 35 32 3b 63 3b 3f 07 1b 5c",
+      "expected_outcome": "native-fallback",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "mux-boundary-sty-da1-fallback",
+          "bytes_hex": "6d 75 78 2d 62 6f 75 6e 64 61 72 79 2d 73 74 79 2d 64 61 31 2d 66 61 6c 6c 62 61 63 6b"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+V",
+          "bytes_hex": "16"
+        }
+      ],
+      "terminal_response": {
+        "osc52_query_bytes_hex": "1b 5d 35 32 3b 63 3b 3f 07",
+        "wrapped_query_bytes_hex": "1b 50 1b 5d 35 32 3b 63 3b 3f 07 1b 5c",
+        "osc52_response": "not sent",
+        "da1_query_bytes_hex": "1b 5b 63",
+        "da1_response_bytes_hex": "1b 5b 3f 36 32 63",
+        "da1_barriers_answered": 1
+      },
+      "screen_markers": ["mux-boundary-sty-da1-fallback", "native-sty-da1-fallback"],
+      "screen_absent_markers": ["mux-remote", "Ctrl+C to interrupt"],
+      "output": {
+        "status": "ready",
+        "outcome": "native-fallback",
+        "submission": "not submitted",
+        "provider_order": "native provider after STY-wrapped OSC52 query and DA1 barrier",
+        "native_provider": "xclip",
+        "native_provider_arguments": "-selection clipboard -out",
+        "trailing_newlines": "removed from the native payload",
+        "cleanup": "Ctrl+C exits from ready without submission"
+      }
+    }
+  ],
+  "unknowns": [
+    "The replay writes a raw OSC52 response directly after Hades emits its wrapper; it does not exercise a live tmux or GNU Screen server or outer-terminal forwarding.",
+    "Whether a real multiplexer forwards, transforms, delays, filters, or wraps the response remains unknown.",
+    "Image/path payloads, gateway behavior, delayed or oversized responses, and concurrent input remain unknown."
+  ]
+}

@@ -70,3 +70,7 @@ OBS-0030 captures the reference-only TMUX/STY OSC52 passthrough query wrappers
 and direct raw-response/native-fallback boundaries in a synthetic direct PTY.
 It is consumed by `scripts/probe_hermes_osc52_multiplexer.py` and does not claim
 live multiplexer, outer-terminal forwarding, or Hades implementation parity.
+OBS-0031 is the Hades implementation contract derived from OBS-0030. It is
+consumed by `scripts/replay_osc52_clipboard.py` and verifies the exact TMUX/STY
+query wrappers, direct raw-response precedence, native DA1 fallback, and
+cleanup in the same synthetic direct-PTY model.

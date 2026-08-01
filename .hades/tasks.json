@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T07:25:58Z",
+  "updated_at": "2026-08-01T07:35:02Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -1459,6 +1459,58 @@
           "docs/parity/observations/OBS-0030-hermes-osc52-multiplexer-passthrough-2026-08-01.md",
           "scripts/probe_hermes_osc52_multiplexer.py",
           "scripts/validate_reference_fixture.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-031",
+      "title": "Implement Hades TMUX/STY OSC52 passthrough parity",
+      "status": "complete",
+      "priority": 52,
+      "lane": "interaction",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-030"
+      ],
+      "risk": "high",
+      "oracle": [
+        "unit_test",
+        "direct_pty_replay",
+        "process_replay"
+      ],
+      "acceptance": [
+        "Extend the Hades remote OSC52 query seam to emit the exact Hermes TMUX and STY wrapper bytes from OBS-0030 when the corresponding marker is present, while preserving the bare SSH_TTY query for the comparison path.",
+        "For TMUX and STY, a directly supplied usable raw OSC52 response must be consumed before native xclip; when no response is supplied, answering the observed DA1 barriers must lead to xclip -selection clipboard -out with the native payload newline normalization already established by OBS-0030.",
+        "Add focused unit tests for marker precedence and exact wrapped query bytes, and assert the parser continues to accept the existing BEL and ST response boundaries without claiming wrapper response forwarding.",
+        "Add a sanitized OBS-0031 Hades implementation contract and observation derived from OBS-0030, extend scripts/replay_osc52_clipboard.py for the four TMUX/STY controls, and wire the dedicated replay through just verify.",
+        "Preserve the explicit model boundary: do not claim live tmux or GNU Screen servers, outer-terminal forwarding, images/paths, gateway behavior, delayed/oversized responses, or concurrent-input parity without separate evidence."
+      ],
+      "evidence": [
+        "crates/hades-cli/src/osc52.rs",
+        "crates/hades-cli/src/main.rs",
+        "tests/fixtures/parity/OBS-0031-hades-osc52-multiplexer-passthrough.json",
+        "docs/parity/observations/OBS-0031-hades-osc52-multiplexer-passthrough-2026-08-01.md",
+        "scripts/replay_osc52_clipboard.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "ready_at": "2026-08-01T07:26:10Z",
+      "attempts": 1,
+      "claimed_by": "hades-implementer",
+      "claimed_at": "2026-08-01T07:28:18Z",
+      "result": {
+        "summary": "implemented-and-replayed-hades-tmux-sty-osc52-wrapper-and-fallback-parity-with-full-verify",
+        "completed_at": "2026-08-01T07:35:02Z",
+        "evidence": [
+          "crates/hades-cli/src/osc52.rs",
+          "crates/hades-cli/src/main.rs",
+          "tests/fixtures/parity/OBS-0031-hades-osc52-multiplexer-passthrough.json",
+          "docs/parity/observations/OBS-0031-hades-osc52-multiplexer-passthrough-2026-08-01.md",
+          "scripts/replay_osc52_clipboard.py",
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md"

@@ -9,6 +9,9 @@ use base64::{Engine as _, engine::general_purpose::STANDARD};
 use crate::clipboard;
 
 const OSC52_QUERY: &[u8] = b"\x1b]52;c;?\x07";
+const TMUX_QUERY_PREFIX: &[u8] = b"\x1bPtmux;\x1b";
+const STY_QUERY_PREFIX: &[u8] = b"\x1bP";
+const PASSTHROUGH_SUFFIX: &[u8] = b"\x1b\\";
 const DA1_QUERY: &[u8] = b"\x1b[c";
 const DA1_RESPONSE: &[u8] = b"\x1b[?62c";
 const OSC52_RESPONSE_PREFIX: &[u8] = b"\x1b]52;";
@@ -34,8 +37,10 @@ pub(crate) fn read_usable_text<W: Write>(writer: &mut W) -> Option<String> {
 
 #[cfg(unix)]
 fn read_remote_text<W: Write>(writer: &mut W) -> std::io::Result<Option<String>> {
-    writer.write_all(OSC52_QUERY)?;
-    writer.write_all(DA1_QUERY)?;
+    writer.write_all(&request_bytes(
+        std::env::var_os("TMUX").as_deref(),
+        std::env::var_os("STY").as_deref(),
+    ))?;
     writer.flush()?;
     Ok(read_response())
 }
@@ -90,12 +95,22 @@ fn is_remote_shell_with(
     ssh_tty: Option<&OsStr>,
     ssh_connection: Option<&OsStr>,
     ssh_client: Option<&OsStr>,
-    tmux: Option<&OsStr>,
-    sty: Option<&OsStr>,
+    _tmux: Option<&OsStr>,
+    _sty: Option<&OsStr>,
 ) -> bool {
-    let remote_marker =
-        [ssh_tty, ssh_connection, ssh_client].into_iter().flatten().any(|value| !value.is_empty());
-    remote_marker && ![tmux, sty].into_iter().flatten().any(|value| !value.is_empty())
+    [ssh_tty, ssh_connection, ssh_client].into_iter().flatten().any(|value| !value.is_empty())
+}
+
+fn request_bytes(tmux: Option<&OsStr>, sty: Option<&OsStr>) -> Vec<u8> {
+    let wrapped_query = if tmux.is_some_and(|value| !value.is_empty()) {
+        [TMUX_QUERY_PREFIX, OSC52_QUERY, PASSTHROUGH_SUFFIX].concat()
+    } else if sty.is_some_and(|value| !value.is_empty()) {
+        [STY_QUERY_PREFIX, OSC52_QUERY, PASSTHROUGH_SUFFIX].concat()
+    } else {
+        OSC52_QUERY.to_vec()
+    };
+
+    [wrapped_query.as_slice(), DA1_QUERY].concat()
 }
 
 fn parse_response(buffer: &[u8]) -> Option<Option<String>> {
@@ -134,15 +149,24 @@ mod tests {
 
     #[test]
     fn request_bytes_match_the_observed_bare_remote_sequence() {
-        let mut request = Vec::new();
-        request.extend_from_slice(OSC52_QUERY);
-        request.extend_from_slice(DA1_QUERY);
-        assert_eq!(request, b"\x1b]52;c;?\x07\x1b[c");
+        assert_eq!(request_bytes(None, None), b"\x1b]52;c;?\x07\x1b[c");
         assert_eq!(DA1_RESPONSE, b"\x1b[?62c");
     }
 
     #[test]
-    fn remote_detection_requires_a_marker_and_excludes_unobserved_wrappers() {
+    fn request_bytes_match_the_observed_tmux_and_sty_wrappers() {
+        let tmux = OsStr::new("/tmp/tmux-999/default,123,0");
+        let sty = OsStr::new("1234.pts-0.host");
+        assert_eq!(request_bytes(Some(tmux), None), b"\x1bPtmux;\x1b\x1b]52;c;?\x07\x1b\\\x1b[c");
+        assert_eq!(request_bytes(None, Some(sty)), b"\x1bP\x1b]52;c;?\x07\x1b\\\x1b[c");
+        assert_eq!(
+            request_bytes(Some(tmux), Some(sty)),
+            b"\x1bPtmux;\x1b\x1b]52;c;?\x07\x1b\\\x1b[c"
+        );
+    }
+
+    #[test]
+    fn remote_detection_requires_a_marker_and_allows_wrappers() {
         assert!(is_remote_shell_with(Some(OsStr::new("/dev/pts/999")), None, None, None, None,));
         assert!(is_remote_shell_with(
             None,
@@ -152,7 +176,7 @@ mod tests {
             None,
         ));
         assert!(!is_remote_shell_with(None, None, None, None, None));
-        assert!(!is_remote_shell_with(
+        assert!(is_remote_shell_with(
             Some(OsStr::new("/dev/pts/999")),
             None,
             None,

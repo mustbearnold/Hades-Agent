@@ -69,6 +69,10 @@ replay-osc52-st-termination:
     cargo build --locked --package hades-cli
     python3 scripts/replay_osc52_clipboard.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0029-hades-osc52-st-termination.json --report .hades/runtime/hades-osc52-st-termination-replay.json
 
+replay-osc52-multiplexer:
+    cargo build --locked --package hades-cli
+    python3 scripts/replay_osc52_clipboard.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0031-hades-osc52-multiplexer-passthrough.json --report .hades/runtime/hades-osc52-multiplexer-replay.json
+
 replay-history:
     cargo build --locked --package hades-cli
     python3 scripts/replay_history.py --binary target/debug/hades --report .hades/runtime/history-replay.json
@@ -87,6 +91,7 @@ validate-reference:
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0028-hermes-osc52-st-termination.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0029-hades-osc52-st-termination.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0030-hermes-osc52-multiplexer-passthrough.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0031-hades-osc52-multiplexer-passthrough.json
 
 agent command *args:
     python3 scripts/agent/control_plane.py {{command}} {{args}}

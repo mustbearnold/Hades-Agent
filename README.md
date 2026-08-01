@@ -48,6 +48,8 @@ wrappers and their direct-response/native-fallback boundaries; it intentionally
 models raw PTY responses rather than a live multiplexer server.
 `just replay-osc52-st-termination` replays the same ST controls against Hades
 and verifies OSC52 precedence plus native fallback.
+`just replay-osc52-multiplexer` replays the OBS-0030 TMUX/STY wrapper controls
+against Hades and verifies the exact query bytes plus fallback order.
 `just validate-reference` also checks the deterministic Hermes editor-outcome
 fixture covering modified, multiline, empty, and cancelled editor handoffs,
 plus the direct-PTY modified-Enter reference and Hades implementation fixtures.
@@ -82,6 +84,7 @@ just replay-osc52-response-boundaries # malformed/empty OSC52 fallback replay
 just probe-osc52-st-termination # Hermes ST-terminated OSC52 reference probe
 just probe-osc52-multiplexer # Hermes TMUX/STY OSC52 wrapper reference probe
 just replay-osc52-st-termination # Hades ST-terminated OSC52 parity replay
+just replay-osc52-multiplexer # Hades TMUX/STY OSC52 wrapper parity replay
 just agent validate           # validate task/control-plane invariants
 just agent next               # choose the highest-priority ready task
 just agent claim HAD-001 bot  # claim a task with an agent identity
