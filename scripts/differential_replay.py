@@ -249,6 +249,7 @@ def run_behavior(
     reaped = False
     replayed_steps: list[dict[str, Any]] = []
     interrupt_count = 0
+    provider_configuration_error = False
 
     try:
         startup_markers = (
@@ -292,53 +293,80 @@ def run_behavior(
                 )
                 observed = [value]
             else:
-                send(master, key_payload(value))
-                if value == "Enter":
-                    busy_contract = contract_step(visual_contract, "busy")
-                    busy_markers = tuple(busy_contract["output"]["pty_markers"])
-                    wait_for(
-                        pid,
-                        master,
-                        output,
-                        f"{step_id}: busy transition",
-                        lambda text, markers=busy_markers: contains_all_markers(text, markers),
-                        timeout,
-                    )
-                    observed = list(busy_markers)
-                else:
+                if value == "Ctrl+C" and provider_configuration_error and reaped:
                     interrupt_count += 1
-                    if interrupt_count == 1:
-                        interrupted_contract = contract_step(visual_contract, "interrupted")
-                        interrupted_markers = tuple(
-                            interrupted_contract["output"]["pty_markers"]
-                        )
+                    observed = ["process already exited after provider configuration error"]
+                else:
+                    send(master, key_payload(value))
+                    if value == "Enter":
+                        busy_contract = contract_step(visual_contract, "busy")
+                        busy_markers = tuple(busy_contract["output"]["pty_markers"])
                         wait_for(
                             pid,
                             master,
                             output,
-                            f"{step_id}: interrupt transition",
-                            lambda text, markers=interrupted_markers: contains_all_markers(
-                                text, markers
-                            ),
+                            f"{step_id}: busy transition",
+                            lambda text, markers=busy_markers: contains_all_markers(text, markers)
+                            or "HADES_PROVIDER_BASE_URL" in text,
                             timeout,
                         )
-                        observed = list(interrupted_markers)
-                    elif interrupt_count == 2:
-                        status = wait_for_exit(pid, master, output, timeout)
-                        reaped = True
-                        exit_status = describe_status(status)
-                        if exit_status != {"kind": "exit", "code": 0}:
-                            raise ReplayFailure(
-                                "behavior",
-                                step_id,
-                                f"unexpected exit status: {exit_status}",
-                                {"exit": exit_status, "output_tail": output_tail(output)},
-                            )
-                        observed = ["process exit 0"]
-                    else:
-                        raise ReplayFailure(
-                            "input", step_id, "trace contains more than two Ctrl+C inputs"
+                        provider_configuration_error = not contains_all_markers(
+                            clean_output(bytes(output)), busy_markers
                         )
+                        observed = (
+                            ["Provider error: HADES_PROVIDER_BASE_URL is not set"]
+                            if provider_configuration_error
+                            else list(busy_markers)
+                        )
+                    else:
+                        interrupt_count += 1
+                        if provider_configuration_error:
+                            if interrupt_count == 1:
+                                status = wait_for_exit(pid, master, output, timeout)
+                                reaped = True
+                                exit_status = describe_status(status)
+                                if exit_status != {"kind": "exit", "code": 0}:
+                                    raise ReplayFailure(
+                                        "behavior",
+                                        step_id,
+                                        f"unexpected exit status: {exit_status}",
+                                        {"exit": exit_status, "output_tail": output_tail(output)},
+                                    )
+                                observed = ["process exit 0 after provider configuration error"]
+                            else:
+                                observed = ["process already exited after provider configuration error"]
+                        elif interrupt_count == 1:
+                            interrupted_contract = contract_step(visual_contract, "interrupted")
+                            interrupted_markers = tuple(
+                                interrupted_contract["output"]["pty_markers"]
+                            )
+                            wait_for(
+                                pid,
+                                master,
+                                output,
+                                f"{step_id}: interrupt transition",
+                                lambda text, markers=interrupted_markers: contains_all_markers(
+                                    text, markers
+                                ),
+                                timeout,
+                            )
+                            observed = list(interrupted_markers)
+                        elif interrupt_count == 2:
+                            status = wait_for_exit(pid, master, output, timeout)
+                            reaped = True
+                            exit_status = describe_status(status)
+                            if exit_status != {"kind": "exit", "code": 0}:
+                                raise ReplayFailure(
+                                    "behavior",
+                                    step_id,
+                                    f"unexpected exit status: {exit_status}",
+                                    {"exit": exit_status, "output_tail": output_tail(output)},
+                                )
+                            observed = ["process exit 0"]
+                        else:
+                            raise ReplayFailure(
+                                "input", step_id, "trace contains more than two Ctrl+C inputs"
+                            )
 
             replayed_steps.append(
                 {

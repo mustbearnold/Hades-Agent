@@ -10,7 +10,9 @@ import shlex
 import subprocess
 import sys
 import tempfile
+import threading
 import time
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, Callable
 
@@ -21,6 +23,55 @@ DEFAULT_BINARY = ROOT / "target/debug/hades"
 SNAPSHOT_COLUMNS = 120
 SNAPSHOT_ROWS = 40
 Predicate = Callable[[str], bool]
+
+
+class HoldProviderServer(ThreadingHTTPServer):
+    """Hold an accepted provider request so PTY contracts can test Busy."""
+
+    daemon_threads = True
+    allow_reuse_address = True
+
+    def __init__(self) -> None:
+        self.request_seen = threading.Event()
+        self.release_response = threading.Event()
+        super().__init__(("127.0.0.1", 0), self._handler())
+
+    def _handler(self) -> type[BaseHTTPRequestHandler]:
+        owner = self
+
+        class Handler(BaseHTTPRequestHandler):
+            def log_message(self, *_args: object) -> None:
+                return
+
+            def do_POST(self) -> None:  # noqa: N802 - stdlib handler API
+                length = int(self.headers.get("Content-Length", "0"))
+                self.rfile.read(length)
+                owner.request_seen.set()
+                owner.release_response.wait(timeout=3.0)
+
+        return Handler
+
+
+def start_hold_provider() -> tuple[HoldProviderServer, threading.Thread]:
+    server = HoldProviderServer()
+    thread = threading.Thread(target=server.serve_forever, name="hades-replay-provider", daemon=True)
+    thread.start()
+    return server, thread
+
+
+def finish_hold_provider(server: HoldProviderServer, thread: threading.Thread) -> None:
+    server.release_response.set()
+    server.shutdown()
+    server.server_close()
+    thread.join(timeout=2.0)
+
+
+def hold_provider_environment(server: HoldProviderServer) -> dict[str, str]:
+    return {
+        "HADES_PROVIDER_BASE_URL": f"http://127.0.0.1:{server.server_port}/v1",
+        "HADES_MODEL": "palette-model",
+        "HADES_PROVIDER_API_KEY": "",
+    }
 
 
 class ComposerReplayFailure(RuntimeError):
@@ -222,13 +273,15 @@ def run_case(
     case_id = case["id"]
     session = f"{session_prefix}-{ordinal}-{int(time.time() * 1000)}"
     owned_history_home: Path | None = None
-    effective_environment = dict(environment or {})
-    if "HERMES_HOME" not in effective_environment:
-        owned_history_home = Path(tempfile.mkdtemp(prefix=f"{session_prefix}-history-"))
-        effective_environment["HERMES_HOME"] = str(owned_history_home)
-    start_session(binary, session, effective_environment)
+    hold_provider, hold_provider_thread = start_hold_provider()
+    effective_environment = hold_provider_environment(hold_provider)
+    effective_environment.update(environment or {})
     replayed_steps: list[dict[str, Any]] = []
     try:
+        if "HERMES_HOME" not in effective_environment:
+            owned_history_home = Path(tempfile.mkdtemp(prefix=f"{session_prefix}-history-"))
+            effective_environment["HERMES_HOME"] = str(owned_history_home)
+        start_session(binary, session, effective_environment)
         startup_markers = ("Hermes Agent", "Nous Research", "Available Tools", "Available Skills")
         wait_for_screen(
             session,
@@ -291,6 +344,7 @@ def run_case(
             tmux_run("kill-session", "-t", session)
         if owned_history_home is not None:
             shutil.rmtree(owned_history_home, ignore_errors=True)
+        finish_hold_provider(hold_provider, hold_provider_thread)
 
 
 def emit_report(report: dict[str, Any], report_path: Path | None) -> None:

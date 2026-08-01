@@ -10,6 +10,8 @@ use std::{
     io::{self, Write},
     path::PathBuf,
     process::Command,
+    sync::mpsc::{self, Receiver, Sender, TryRecvError},
+    thread,
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
@@ -22,9 +24,26 @@ use crossterm::{
     },
 };
 use hades_app::{App, DispatchOutcome};
-use hades_core::{InputEvent, Key, PRODUCT_NAME, TurnState};
+use hades_core::{InputEvent, Key, PRODUCT_NAME, ProviderEvent, Role, TurnState};
+use hades_provider::{ChatMessage, ChatRequest, LocalOpenAiTransport, StreamEvent};
 use hades_tui::{draw, snapshot};
 use ratatui::{Terminal, backend::CrosstermBackend};
+
+const DEFAULT_PROVIDER_MODEL: &str = "palette-model";
+const PROVIDER_BASE_URL_ENV: &str = "HADES_PROVIDER_BASE_URL";
+const PROVIDER_MODEL_ENV: &str = "HADES_MODEL";
+const PROVIDER_API_KEY_ENV: &str = "HADES_PROVIDER_API_KEY";
+const PROVIDER_SYSTEM_PROMPT: &str = "You are Hades Agent. Respond concisely to the user.";
+
+struct ProviderConfig {
+    base_url: String,
+    model: String,
+    api_key: Option<String>,
+}
+
+struct ProviderRuntime {
+    events: Receiver<ProviderEvent>,
+}
 
 fn main() -> Result<(), Box<dyn Error>> {
     match cli_command(env::args().nth(1).as_deref()) {
@@ -89,8 +108,10 @@ fn restore_terminal(
 
 fn event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> Result<(), Box<dyn Error>> {
     let mut app = configured_app();
+    let mut provider_runtime = None;
     let mut last_size = size()?;
     loop {
+        drain_provider_events(&mut app, &mut provider_runtime);
         let current_size = size()?;
         if current_size != last_size {
             app.handle(InputEvent::Resize { width: current_size.0, height: current_size.1 });
@@ -105,7 +126,12 @@ fn event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> Result<(
             match event::read()? {
                 Event::Key(key) if key.kind == KeyEventKind::Press => {
                     if let Some(mapped) = map_key(key) {
-                        dispatch_input(terminal, &mut app, InputEvent::Key(mapped))?;
+                        dispatch_input(
+                            terminal,
+                            &mut app,
+                            &mut provider_runtime,
+                            InputEvent::Key(mapped),
+                        )?;
                     }
                 }
                 Event::Resize(width, height) => {
@@ -113,7 +139,12 @@ fn event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> Result<(
                     app.handle(InputEvent::Resize { width, height });
                 }
                 Event::Paste(text) => {
-                    dispatch_input(terminal, &mut app, InputEvent::Paste(text))?;
+                    dispatch_input(
+                        terminal,
+                        &mut app,
+                        &mut provider_runtime,
+                        InputEvent::Paste(text),
+                    )?;
                 }
                 _ => {}
             }
@@ -155,13 +186,156 @@ fn configured_editor_from(visual: Option<&str>, editor: Option<&str>) -> Option<
 fn dispatch_input(
     terminal: &mut Terminal<CrosstermBackend<io::Stdout>>,
     app: &mut App,
+    provider_runtime: &mut Option<ProviderRuntime>,
     event: InputEvent,
 ) -> Result<(), Box<dyn Error>> {
     let event = resolve_clipboard_event(terminal, app, event);
-    if let DispatchOutcome::EditorRequested(draft) = app.handle(event) {
-        run_editor(terminal, app, draft)?;
+    match app.handle(event) {
+        DispatchOutcome::Submitted(content) => start_provider(app, provider_runtime, content),
+        DispatchOutcome::Interrupted => {
+            provider_runtime.take();
+        }
+        DispatchOutcome::EditorRequested(draft) => {
+            run_editor(terminal, app, draft)?;
+            start_provider_from_latest_user(app, provider_runtime);
+        }
+        DispatchOutcome::Continue | DispatchOutcome::Quit => {}
     }
     Ok(())
+}
+
+fn provider_config() -> Result<Option<ProviderConfig>, String> {
+    let base_url = env::var(PROVIDER_BASE_URL_ENV).ok();
+    let model = env::var(PROVIDER_MODEL_ENV).ok();
+    let api_key = env::var(PROVIDER_API_KEY_ENV).ok();
+    provider_config_from(base_url.as_deref(), model.as_deref(), api_key.as_deref())
+}
+
+fn provider_config_from(
+    base_url: Option<&str>,
+    model: Option<&str>,
+    api_key: Option<&str>,
+) -> Result<Option<ProviderConfig>, String> {
+    let Some(base_url) = base_url.map(str::trim).filter(|value| !value.is_empty()) else {
+        return Ok(None);
+    };
+    let model =
+        model.map(str::trim).filter(|value| !value.is_empty()).unwrap_or(DEFAULT_PROVIDER_MODEL);
+    let api_key = api_key.filter(|value| !value.is_empty()).map(str::to_owned);
+    Ok(Some(ProviderConfig { base_url: base_url.to_owned(), model: model.to_owned(), api_key }))
+}
+
+fn start_provider_from_latest_user(app: &mut App, provider_runtime: &mut Option<ProviderRuntime>) {
+    if app.state().turn != TurnState::Busy {
+        return;
+    }
+    let Some(content) = app
+        .state()
+        .messages
+        .last()
+        .filter(|message| message.role == Role::User)
+        .map(|message| message.content.clone())
+    else {
+        app.handle(InputEvent::Provider(ProviderEvent::Failed(
+            "provider request has no user message".to_owned(),
+        )));
+        return;
+    };
+    start_provider(app, provider_runtime, content);
+}
+
+fn start_provider(app: &mut App, provider_runtime: &mut Option<ProviderRuntime>, content: String) {
+    provider_runtime.take();
+    let config = match provider_config() {
+        Ok(Some(config)) => config,
+        Ok(None) => {
+            app.handle(InputEvent::Provider(ProviderEvent::Failed(format!(
+                "{PROVIDER_BASE_URL_ENV} is not set"
+            ))));
+            return;
+        }
+        Err(error) => {
+            app.handle(InputEvent::Provider(ProviderEvent::Failed(error)));
+            return;
+        }
+    };
+
+    let transport = match LocalOpenAiTransport::new(&config.base_url, config.api_key) {
+        Ok(transport) => transport,
+        Err(error) => {
+            app.handle(InputEvent::Provider(ProviderEvent::Failed(error.to_string())));
+            return;
+        }
+    };
+    let request = ChatRequest::new(
+        config.model,
+        vec![ChatMessage::new("system", PROVIDER_SYSTEM_PROMPT), ChatMessage::new("user", content)],
+        Vec::new(),
+    );
+    let (sender, receiver) = mpsc::channel();
+    thread::spawn(move || run_provider_worker(transport, request, sender));
+    *provider_runtime = Some(ProviderRuntime { events: receiver });
+}
+
+fn run_provider_worker(
+    transport: LocalOpenAiTransport,
+    request: ChatRequest,
+    sender: Sender<ProviderEvent>,
+) {
+    if sender.send(ProviderEvent::Started).is_err() {
+        return;
+    }
+    let events = match transport.stream_chat(&request) {
+        Ok(events) => events,
+        Err(error) => {
+            let _ = sender.send(ProviderEvent::Failed(error.to_string()));
+            return;
+        }
+    };
+    for event in events {
+        let event = translate_stream_event(event);
+        if sender.send(event).is_err() {
+            return;
+        }
+    }
+}
+
+fn translate_stream_event(event: StreamEvent) -> ProviderEvent {
+    match event {
+        StreamEvent::TextDelta(text) => ProviderEvent::TextDelta(text),
+        StreamEvent::Done => ProviderEvent::Completed,
+    }
+}
+
+fn drain_provider_events(app: &mut App, provider_runtime: &mut Option<ProviderRuntime>) {
+    let Some(runtime) = provider_runtime.as_ref() else {
+        return;
+    };
+    loop {
+        match runtime.events.try_recv() {
+            Ok(event) => {
+                let terminal = matches!(
+                    event,
+                    ProviderEvent::Completed | ProviderEvent::Failed(_) | ProviderEvent::Cancelled
+                );
+                app.handle(InputEvent::Provider(event));
+                if terminal && app.state().turn == TurnState::Ready {
+                    provider_runtime.take();
+                    return;
+                }
+            }
+            Err(TryRecvError::Empty) => return,
+            Err(TryRecvError::Disconnected) => {
+                provider_runtime.take();
+                if app.state().turn == TurnState::Busy {
+                    app.handle(InputEvent::Provider(ProviderEvent::Failed(
+                        "provider worker stopped unexpectedly".to_owned(),
+                    )));
+                }
+                return;
+            }
+        }
+    }
 }
 
 fn resolve_clipboard_event(
@@ -297,6 +471,49 @@ mod tests {
         assert_eq!(cli_command(Some("--version")), Ok(CliCommand::Version));
         assert_eq!(cli_command(Some("--snapshot")), Ok(CliCommand::Snapshot));
         assert_eq!(cli_command(Some("wat")), Err("wat"));
+    }
+
+    #[test]
+    fn provider_config_is_opt_in_and_defaults_the_model_without_logging_key_material() {
+        assert!(provider_config_from(None, None, None).unwrap().is_none());
+
+        let config = provider_config_from(
+            Some(" http://127.0.0.1:8765/v1 "),
+            Some("  "),
+            Some("synthetic-key"),
+        )
+        .unwrap()
+        .unwrap();
+        assert_eq!(config.base_url, "http://127.0.0.1:8765/v1");
+        assert_eq!(config.model, DEFAULT_PROVIDER_MODEL);
+        assert_eq!(config.api_key.as_deref(), Some("synthetic-key"));
+    }
+
+    #[test]
+    fn stream_events_translate_to_core_provider_events() {
+        assert_eq!(
+            translate_stream_event(StreamEvent::TextDelta("hello".to_owned())),
+            ProviderEvent::TextDelta("hello".to_owned())
+        );
+        assert_eq!(translate_stream_event(StreamEvent::Done), ProviderEvent::Completed);
+    }
+
+    #[test]
+    fn provider_channel_drains_a_turn_and_drops_the_runtime_on_completion() {
+        let mut app = App::new();
+        app.handle(InputEvent::Key(Key::Char('h')));
+        app.handle(InputEvent::Key(Key::Enter));
+        let (sender, receiver) = mpsc::channel();
+        let mut runtime = Some(ProviderRuntime { events: receiver });
+        sender.send(ProviderEvent::Started).unwrap();
+        sender.send(ProviderEvent::TextDelta("hello".to_owned())).unwrap();
+        sender.send(ProviderEvent::Completed).unwrap();
+
+        drain_provider_events(&mut app, &mut runtime);
+
+        assert!(runtime.is_none());
+        assert_eq!(app.state().turn, TurnState::Ready);
+        assert_eq!(app.state().messages.last().unwrap().content, "hello");
     }
 
     #[test]

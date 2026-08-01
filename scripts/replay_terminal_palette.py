@@ -20,6 +20,7 @@ import time
 from pathlib import Path
 from typing import Any, Callable
 
+from replay_composer import finish_hold_provider, hold_provider_environment, start_hold_provider
 from probe_hermes_terminal_palette import (
     COLUMNS,
     ROWS,
@@ -116,7 +117,7 @@ def drain(pid: int, fd: int, buffer: bytes, duration: float = 0.12) -> bytes:
     return buffer
 
 
-def spawn(binary: Path, home: Path) -> tuple[int, int]:
+def spawn(binary: Path, home: Path, provider_environment: dict[str, str]) -> tuple[int, int]:
     pid, fd = pty.fork()
     if pid == 0:
         environment = os.environ.copy()
@@ -127,6 +128,7 @@ def spawn(binary: Path, home: Path) -> tuple[int, int]:
                 "LINES": str(ROWS),
                 "HERMES_HOME": str(home),
                 "HOME": str(home),
+                **provider_environment,
             }
         )
         os.execve(str(binary), [str(binary)], environment)
@@ -210,7 +212,8 @@ def assert_surface(case: str, step_id: str, observed: dict[str, Any], expected: 
 def run_ready_sequence(binary: Path, steps: dict[str, dict[str, Any]], timeout: float) -> dict[str, Any]:
     case = "ready-palette"
     home = Path(tempfile.mkdtemp(prefix="had035-ready-"))
-    pid, fd = spawn(binary, home)
+    provider, provider_thread = start_hold_provider()
+    pid, fd = spawn(binary, home, hold_provider_environment(provider))
     buffer = b""
     try:
         buffer = wait_for(
@@ -266,13 +269,15 @@ def run_ready_sequence(binary: Path, steps: dict[str, dict[str, Any]], timeout: 
         }
     finally:
         stop(pid, fd)
+        finish_hold_provider(provider, provider_thread)
         shutil.rmtree(home, ignore_errors=True)
 
 
 def run_setup_case(binary: Path, steps: dict[str, dict[str, Any]], timeout: float) -> dict[str, Any]:
     case = "setup-required-palette"
     home = Path(tempfile.mkdtemp(prefix="had035-setup-"))
-    pid, fd = spawn(binary, home)
+    provider, provider_thread = start_hold_provider()
+    pid, fd = spawn(binary, home, hold_provider_environment(provider))
     buffer = b""
     try:
         buffer = wait_for(pid, fd, buffer, case, "startup", lambda current: contains_marker(current, "Hermes Agent"), timeout)
@@ -295,6 +300,7 @@ def run_setup_case(binary: Path, steps: dict[str, dict[str, Any]], timeout: floa
         }
     finally:
         stop(pid, fd)
+        finish_hold_provider(provider, provider_thread)
         shutil.rmtree(home, ignore_errors=True)
 
 

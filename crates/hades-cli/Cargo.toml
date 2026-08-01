@@ -14,6 +14,7 @@ base64.workspace = true
 crossterm.workspace = true
 hades-app = { path = "../hades-app" }
 hades-core = { path = "../hades-core" }
+hades-provider = { path = "../hades-provider" }
 hades-tui = { path = "../hades-tui" }
 ratatui.workspace = true
 

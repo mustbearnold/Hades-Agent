@@ -111,6 +111,7 @@ just replay-terminal-palette   # Hades SGR palette and cell-style parity replay
 just replay-osc52-timing-limits # Hades OSC52 timing and bounded-size parity replay
 just replay-osc52-st-termination # Hades ST-terminated OSC52 parity replay
 just replay-osc52-multiplexer # Hades TMUX/STY OSC52 wrapper parity replay
+just replay-local-provider   # loopback provider worker PTY replay
 just agent validate           # validate task/control-plane invariants
 just agent next               # choose the highest-priority ready task
 just agent claim HAD-001 bot  # claim a task with an agent identity
@@ -120,8 +121,17 @@ The repository intentionally has no external service or credential requirement
 for its bootstrap path.
 
 The first provider protocol seam lives in the `hades-provider` crate. It is
-deliberately loopback-only (`http://127.0.0.1:<port>/...`). The app reducer and
-120x40 TUI can now consume typed provider lifecycle events and render streamed
-assistant text, while the live CLI worker that connects the transport to those
-events remains a separate verified task. No credentials or external provider
-service are required for the deterministic bootstrap path.
+deliberately loopback-only (`http://127.0.0.1:<port>/...`). To connect a local
+OpenAI-compatible server, set the endpoint before launching:
+
+```bash
+export HADES_PROVIDER_BASE_URL=http://127.0.0.1:8765/v1
+export HADES_MODEL=palette-model              # optional
+# export HADES_PROVIDER_API_KEY=...            # optional; never logged by Hades
+hades tui
+```
+
+The CLI worker translates the local SSE response into typed reducer events and
+renders the assistant response. Without `HADES_PROVIDER_BASE_URL`, a submitted
+prompt now produces a visible configuration error instead of remaining busy.
+No external provider service is required for the deterministic bootstrap path.

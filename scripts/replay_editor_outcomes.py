@@ -17,7 +17,10 @@ from replay_composer import (
     capture_screen,
     contains_marker,
     emit_report,
+    finish_hold_provider,
+    hold_provider_environment,
     session_exists,
+    start_hold_provider,
     start_session,
     tmux_run,
     wait_for_screen,
@@ -73,7 +76,13 @@ def load_contract(path: Path) -> dict[str, Any]:
     return contract
 
 
-def run_case(binary: Path, case: dict[str, Any], timeout: float, ordinal: int) -> dict[str, Any]:
+def run_case(
+    binary: Path,
+    case: dict[str, Any],
+    timeout: float,
+    ordinal: int,
+    provider_environment: dict[str, str],
+) -> dict[str, Any]:
     case_id = case["id"]
     session = f"had019-editor-{ordinal}-{int(time.time() * 1000)}"
     history_home = Path(tempfile.mkdtemp(prefix=f"had019-editor-{case_id}-"))
@@ -82,7 +91,12 @@ def run_case(binary: Path, case: dict[str, Any], timeout: float, ordinal: int) -
         start_session(
             binary,
             session,
-            {"HERMES_HOME": str(history_home), "VISUAL": "", "EDITOR": case["editor"]},
+            {
+                **provider_environment,
+                "HERMES_HOME": str(history_home),
+                "VISUAL": "",
+                "EDITOR": case["editor"],
+            },
         )
         startup_markers = ("Hermes Agent", "Nous Research", "Available Tools", "Available Skills")
         wait_for_screen(
@@ -173,7 +187,19 @@ def main() -> int:
         report["reference_observation"] = contract.get("reference_observation")
         report["dimensions"] = contract["terminal"]
         for ordinal, case in enumerate(contract["cases"], start=1):
-            report["checks"].append(run_case(binary, case, arguments.timeout, ordinal))
+            provider, provider_thread = start_hold_provider()
+            try:
+                report["checks"].append(
+                    run_case(
+                        binary,
+                        case,
+                        arguments.timeout,
+                        ordinal,
+                        hold_provider_environment(provider),
+                    )
+                )
+            finally:
+                finish_hold_provider(provider, provider_thread)
         report["passed"] = True
     except ComposerReplayFailure as error:
         report["failure"] = error.as_dict()

@@ -17,8 +17,11 @@ from replay_composer import (
     capture_screen,
     contains_marker,
     emit_report,
+    finish_hold_provider,
+    hold_provider_environment,
     send_input,
     session_exists,
+    start_hold_provider,
     start_session,
     tmux_run,
     wait_for_screen,
@@ -50,8 +53,15 @@ def load_contract(path: Path) -> dict[str, Any]:
     return contract
 
 
-def start_history_session(binary: Path, session: str, history_home: Path, timeout: float) -> None:
-    start_session(binary, session, {"HERMES_HOME": str(history_home)})
+def start_history_session(
+    binary: Path,
+    session: str,
+    history_home: Path,
+    timeout: float,
+    provider_environment: dict[str, str],
+) -> None:
+    environment = {**provider_environment, "HERMES_HOME": str(history_home)}
+    start_session(binary, session, environment)
     wait_for_screen(
         session,
         "startup",
@@ -105,14 +115,18 @@ def submit_draft(
 
 
 def run_restart_case(
-    binary: Path, case: dict[str, Any], timeout: float, history_home: Path
+    binary: Path,
+    case: dict[str, Any],
+    timeout: float,
+    history_home: Path,
+    provider_environment: dict[str, str],
 ) -> dict[str, Any]:
     session_a = f"had017-history-a-{int(time.time() * 1000)}"
     session_b = f"had017-history-b-{int(time.time() * 1000)}"
     steps: list[dict[str, Any]] = []
     draft = str(case["draft"])
     try:
-        start_history_session(binary, session_a, history_home, timeout)
+        start_history_session(binary, session_a, history_home, timeout, provider_environment)
         submit_draft(session_a, draft, timeout, steps)
         interrupt_and_exit(session_a, timeout, "restart-recall", steps)
         history_path = history_home / ".hermes_history"
@@ -121,7 +135,7 @@ def run_restart_case(
         if expected_entry not in history_text:
             raise ComposerReplayFailure("restart-recall", "history-write", f"missing history record {expected_entry}")
 
-        start_history_session(binary, session_b, history_home, timeout)
+        start_history_session(binary, session_b, history_home, timeout, provider_environment)
         send_input(session_b, {"kind": "key", "value": "Up"})
         recalled = str(case["expected_recalled_draft"])
         wait_for_screen(session_b, "history-up", lambda screen: contains_marker(screen, recalled), timeout)
@@ -141,12 +155,16 @@ def run_restart_case(
 
 
 def run_duplicate_case(
-    binary: Path, case: dict[str, Any], timeout: float, history_home: Path
+    binary: Path,
+    case: dict[str, Any],
+    timeout: float,
+    history_home: Path,
+    provider_environment: dict[str, str],
 ) -> dict[str, Any]:
     session = f"had017-history-dup-{int(time.time() * 1000)}"
     steps: list[dict[str, Any]] = []
     try:
-        start_history_session(binary, session, history_home, timeout)
+        start_history_session(binary, session, history_home, timeout, provider_environment)
         history_path = history_home / ".hermes_history"
         before = history_path.read_bytes()
         submit_draft(session, str(case["draft"]), timeout, steps)
@@ -166,12 +184,16 @@ def run_duplicate_case(
 
 
 def run_multiline_case(
-    binary: Path, case: dict[str, Any], timeout: float, history_home: Path
+    binary: Path,
+    case: dict[str, Any],
+    timeout: float,
+    history_home: Path,
+    provider_environment: dict[str, str],
 ) -> dict[str, Any]:
     session = f"had017-history-multi-{int(time.time() * 1000)}"
     steps: list[dict[str, Any]] = []
     try:
-        start_history_session(binary, session, history_home, timeout)
+        start_history_session(binary, session, history_home, timeout, provider_environment)
         lines = [str(line) for line in case["lines"]]
         submit_draft(session, "\n".join(lines), timeout, steps, paste=True)
         interrupt_and_exit(session, timeout, "multiline-readback", steps)
@@ -186,7 +208,13 @@ def run_multiline_case(
             tmux_run("kill-session", "-t", session)
 
 
-def run_cap_case(binary: Path, case: dict[str, Any], timeout: float, history_home: Path) -> dict[str, Any]:
+def run_cap_case(
+    binary: Path,
+    case: dict[str, Any],
+    timeout: float,
+    history_home: Path,
+    provider_environment: dict[str, str],
+) -> dict[str, Any]:
     session = f"had017-history-cap-{int(time.time() * 1000)}"
     steps: list[dict[str, Any]] = []
     history_path = history_home / ".hermes_history"
@@ -196,7 +224,7 @@ def run_cap_case(binary: Path, case: dict[str, Any], timeout: float, history_hom
         encoding="utf-8",
     )
     try:
-        start_history_session(binary, session, history_home, timeout)
+        start_history_session(binary, session, history_home, timeout, provider_environment)
         send_input(session, {"kind": "key", "value": "Up"})
         newest = str(case["newest_entry"])
         wait_for_screen(session, "cap-newest", lambda screen: contains_marker(screen, newest), timeout)
@@ -246,12 +274,49 @@ def main() -> int:
         checks = report["checks"]
         with tempfile.TemporaryDirectory(prefix="had017-history-") as root:
             root_path = Path(root)
-            checks.append(run_restart_case(binary, next(case for case in contract["cases"] if case["id"] == "restart-recall"), arguments.timeout, root_path / "restart"))
-            checks.append(run_duplicate_case(binary, next(case for case in contract["cases"] if case["id"] == "duplicate-suppression"), arguments.timeout, root_path / "restart"))
-            checks.append(run_multiline_case(binary, next(case for case in contract["cases"] if case["id"] == "multiline-readback"), arguments.timeout, root_path / "multiline"))
-            cap_home = root_path / "cap"
-            cap_home.mkdir(parents=True, exist_ok=True)
-            checks.append(run_cap_case(binary, next(case for case in contract["cases"] if case["id"] == "load-cap"), arguments.timeout, cap_home))
+            provider, provider_thread = start_hold_provider()
+            provider_environment = hold_provider_environment(provider)
+            try:
+                checks.append(
+                    run_restart_case(
+                        binary,
+                        next(case for case in contract["cases"] if case["id"] == "restart-recall"),
+                        arguments.timeout,
+                        root_path / "restart",
+                        provider_environment,
+                    )
+                )
+                checks.append(
+                    run_duplicate_case(
+                        binary,
+                        next(case for case in contract["cases"] if case["id"] == "duplicate-suppression"),
+                        arguments.timeout,
+                        root_path / "restart",
+                        provider_environment,
+                    )
+                )
+                checks.append(
+                    run_multiline_case(
+                        binary,
+                        next(case for case in contract["cases"] if case["id"] == "multiline-readback"),
+                        arguments.timeout,
+                        root_path / "multiline",
+                        provider_environment,
+                    )
+                )
+                cap_home = root_path / "cap"
+                cap_home.mkdir(parents=True, exist_ok=True)
+                checks.append(
+                    run_cap_case(
+                        binary,
+                        next(case for case in contract["cases"] if case["id"] == "load-cap"),
+                        arguments.timeout,
+                        cap_home,
+                        provider_environment,
+                    )
+                )
+            finally:
+                finish_hold_provider(provider, provider_thread)
         report["passed"] = True
     except (ComposerReplayFailure, OSError, ValueError, KeyError, TypeError) as error:
         if isinstance(error, ComposerReplayFailure):

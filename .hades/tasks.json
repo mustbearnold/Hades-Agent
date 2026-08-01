@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T15:07:27Z",
+  "updated_at": "2026-08-01T15:43:48Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -2721,6 +2721,76 @@
           "CONTEXT.md",
           "docs/parity/MATRIX.md",
           ".hades/runtime/had054-pre-completion-verify-20260801T152000Z.log"
+        ]
+      }
+    },
+    {
+      "id": "HAD-055",
+      "title": "Wire the loopback provider transport into the live CLI event loop",
+      "status": "complete",
+      "priority": 28,
+      "lane": "product",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-054"
+      ],
+      "risk": "high",
+      "oracle": [
+        "cli_tests",
+        "local_http_pty_replay",
+        "core_app_tests",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Add an explicit opt-in CLI provider configuration: HADES_PROVIDER_BASE_URL must be a loopback HTTP endpoint, HADES_MODEL defaults to palette-model, and HADES_PROVIDER_API_KEY is optional and never logged; absent configuration must produce a visible provider error instead of leaving the TUI indefinitely busy.",
+        "Run the synchronous hades-provider transport on a worker thread and deliver Started, text-delta, Completed, Failed, and cancellation-compatible events through a channel without blocking terminal redraw/input; replace the active receiver on a new request and drop it on Ctrl+C so late events cannot affect a later turn.",
+        "Add a deterministic local HTTP/SSE direct-PTY replay that asserts the request path/body, visible streamed assistant response, ready transition, missing-endpoint error, Ctrl+C cleanup, and no credential or external-network access.",
+        "Document the local-only runtime contract, add focused CLI/config/translation tests and a sanitized OBS-0051 Hades fixture, wire the replay into just verify, and pass complete no-skip verification before completion."
+      ],
+      "evidence": [
+        "crates/hades-cli/Cargo.toml",
+        "crates/hades-cli/src/main.rs",
+        "scripts/replay_local_provider.py",
+        "scripts/replay_composer.py",
+        "scripts/replay_history.py",
+        "scripts/replay_modified_enter.py",
+        "scripts/replay_editor_outcomes.py",
+        "scripts/replay_terminal_palette.py",
+        "tests/fixtures/parity/OBS-0051-hades-local-provider-stream.json",
+        "docs/parity/observations/OBS-0051-hades-local-provider-stream-2026-08-01.md",
+        "docs/decisions/ADR-0006-live-loopback-provider-worker.md",
+        "README.md",
+        "CONTEXT.md",
+        "docs/parity/MATRIX.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/had055-pre-completion-verify-retry4-20260801T164500Z.log"
+      ],
+      "ready_at": "2026-08-01T15:00:00Z",
+      "attempts": 1,
+      "claimed_by": "live-loopback-worker",
+      "claimed_at": "2026-08-01T15:17:58Z",
+      "result": {
+        "summary": "Wired the opt-in loopback OpenAI-compatible transport into the live CLI event loop with a worker/channel bridge, typed provider lifecycle delivery, visible missing-configuration errors, cancellation-safe receiver replacement, and sanitized direct-PTY request/response/missing-config/interruption evidence. Updated legacy PTY busy replays to use deterministic held loopback fixtures; focused checks and the complete no-skip just verify gate passed.",
+        "completed_at": "2026-08-01T15:43:48Z",
+        "evidence": [
+          "crates/hades-cli/Cargo.toml",
+          "crates/hades-cli/src/main.rs",
+          "scripts/replay_local_provider.py",
+          "scripts/replay_composer.py",
+          "scripts/replay_history.py",
+          "scripts/replay_modified_enter.py",
+          "scripts/replay_editor_outcomes.py",
+          "scripts/replay_terminal_palette.py",
+          "tests/fixtures/parity/OBS-0051-hades-local-provider-stream.json",
+          "docs/parity/observations/OBS-0051-hades-local-provider-stream-2026-08-01.md",
+          "docs/decisions/ADR-0006-live-loopback-provider-worker.md",
+          "README.md",
+          "CONTEXT.md",
+          "docs/parity/MATRIX.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/had055-pre-completion-verify-retry4-20260801T164500Z.log"
         ]
       }
     }

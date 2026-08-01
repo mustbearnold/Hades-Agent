@@ -236,6 +236,12 @@ progress from August 1, 2026 through 2027.
   deltas, and bounded 120x40 rendering for streamed responses and provider
   terminal notices. The live CLI worker that translates transport output into
   those events is still separate and intentionally unimplemented.
+- HAD-055 wires the loopback-only transport into the live CLI through a worker
+  thread and channel. `HADES_PROVIDER_BASE_URL` is explicit, `HADES_MODEL`
+  defaults to `palette-model`, and an optional API key is passed without being
+  logged. A missing endpoint becomes a visible provider error; the local PTY
+  replay verifies the request shape, response rendering, ready transition,
+  active-turn Ctrl+C cleanup, and no external-network path.
 
 ## Unknown until observed
 
@@ -246,11 +252,11 @@ progress from August 1, 2026 through 2027.
 - Which Hermes behaviors are stable contracts versus implementation details;
   session recovery remains unobserved beyond input-history persistence.
 - Hades provider/model streaming and tool calls beyond the bounded HAD-053 /
-  HAD-054 seams; the live CLI worker, request ownership, active-stream
-  cancellation, retries, and tool execution remain unimplemented. Hermes
-  subsequent chat-request purpose, provider errors, malformed/delayed streams,
-  and terminal-dependent surfaces beyond the captured observations remain
-  unknown.
+  HAD-054 / HAD-055 seams; true incremental socket cancellation, retries,
+  tool execution, non-loopback providers, HTTPS, and provider discovery remain
+  unimplemented. Hermes subsequent chat-request purpose, provider errors,
+  malformed/delayed streams, and terminal-dependent surfaces beyond the
+  captured observations remain unknown.
 - The complete slash-command catalog and argument semantics, provider/model
   discovery details, setup wizard continuation, numbered-fallback choices,
   terminal-backend selection and cancellation after deeper navigation, provider

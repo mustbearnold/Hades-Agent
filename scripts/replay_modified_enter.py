@@ -21,6 +21,8 @@ import time
 from pathlib import Path
 from typing import Any
 
+from replay_composer import finish_hold_provider, hold_provider_environment, start_hold_provider
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONTRACT = ROOT / "tests/fixtures/parity/OBS-0021-hades-modified-enter.json"
@@ -146,7 +148,7 @@ def write_bytes(fd: int, payload: bytes) -> None:
         offset += os.write(fd, payload[offset:])
 
 
-def spawn(binary: Path, home: Path) -> tuple[int, int]:
+def spawn(binary: Path, home: Path, provider_environment: dict[str, str]) -> tuple[int, int]:
     pid, fd = pty.fork()
     if pid == 0:
         environment = os.environ.copy()
@@ -157,6 +159,7 @@ def spawn(binary: Path, home: Path) -> tuple[int, int]:
                 "HOME": str(home),
                 "VISUAL": "",
                 "EDITOR": "",
+                **provider_environment,
             }
         )
         os.execve(str(binary), [str(binary)], environment)
@@ -211,8 +214,9 @@ def run_case(binary: Path, case: dict[str, Any], timeout: float, ordinal: int) -
     pid: int | None = None
     fd: int | None = None
     buffer = b""
+    provider, provider_thread = start_hold_provider()
     try:
-        pid, fd = spawn(binary, home)
+        pid, fd = spawn(binary, home, hold_provider_environment(provider))
         startup_markers = ("Hermes Agent", "Nous Research", "Available Tools", "Available Skills")
         buffer = wait_for(
             pid,
@@ -300,6 +304,7 @@ def run_case(binary: Path, case: dict[str, Any], timeout: float, ordinal: int) -
     finally:
         if pid is not None and fd is not None:
             stop_child(pid, fd)
+        finish_hold_provider(provider, provider_thread)
         shutil.rmtree(home, ignore_errors=True)
 
 

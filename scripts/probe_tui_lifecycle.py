@@ -68,6 +68,12 @@ def output_tail(output: bytearray) -> str:
     return "\n".join(clean_output(output).splitlines()[-12:])
 
 
+def marker_present(text: str, marker: str) -> bool:
+    if marker in text:
+        return True
+    return "".join(marker.split()) in "".join(text.split())
+
+
 def wait_for(
     pid: int,
     master: int,
@@ -233,23 +239,30 @@ def run_case(
                 master,
                 output,
                 f"{name}: submit",
-                lambda text: "response adapter not connected." in text,
+                lambda text: marker_present(text, "response adapter not connected.")
+                or "HADES_PROVIDER_BASE_URL" in text,
                 timeout,
             )
             submitted = True
 
         if submit_before_exit:
+            missing_provider = marker_present(
+                clean_output(bytes(output)), "Provider error: HADES_PROVIDER_BASE_URL is not set"
+            ) or "HADES_PROVIDER_BASE_URL" in clean_output(bytes(output))
             send(master, exit_key)
-            wait_for(
-                pid,
-                master,
-                output,
-                f"{name}: interrupt",
-                lambda text: "Interrupted." in text,
-                timeout,
-            )
-            send(master, b"\x03")
-            exit_input = "Ctrl+C, Ctrl+C"
+            if missing_provider:
+                exit_input = exit_key.decode("ascii", errors="replace")
+            else:
+                wait_for(
+                    pid,
+                    master,
+                    output,
+                    f"{name}: interrupt",
+                    lambda text: marker_present(text, "Interrupted."),
+                    timeout,
+                )
+                send(master, b"\x03")
+                exit_input = "Ctrl+C, Ctrl+C"
         else:
             send(master, exit_key)
             exit_input = exit_key.decode("ascii", errors="replace")

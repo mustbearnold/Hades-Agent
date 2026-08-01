@@ -454,6 +454,7 @@ dependencies = [
  "crossterm",
  "hades-app",
  "hades-core",
+ "hades-provider",
  "hades-tui",
  "ratatui",
  "rustix",
