@@ -18,6 +18,7 @@ const HERMES_BUSY_FOOTER: &str = " ─ musing… │ mulling… │ mock model �
 const HERMES_INTERRUPT_PROMPT: &str = " ❯ Ctrl+C to interrupt…";
 const HERMES_INTERRUPTED_MARKER: &str = " │ interrupted";
 const HERMES_INTERRUPTED_FOOTER: &str = " ─ ready │ mock model │ ✓ <seconds>s │ voice off │ 1 session                                      ─ <reference-cwd> (main)";
+const HERMES_CLIPBOARD_MISS: &str = "No image found in clipboard";
 
 pub fn draw(frame: &mut Frame<'_>, app: &App) {
     if frame.area().width == HERMES_STARTUP_WIDTH && frame.area().height == HERMES_STARTUP_HEIGHT {
@@ -50,6 +51,9 @@ fn draw_hermes_startup(frame: &mut Frame<'_>, app: &App) {
 
     if app.state().completion.is_visible() {
         draw_hermes_completion(&mut rows, app.state().completion.items());
+    }
+    if app.state().status == HERMES_CLIPBOARD_MISS {
+        rows[37] = Line::raw(format!(" │ {HERMES_CLIPBOARD_MISS}"));
     }
 
     frame.render_widget(Paragraph::new(Text::from(rows)), frame.area());
@@ -361,6 +365,18 @@ mod tests {
         let rendered = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
         assert!(rendered.contains("paste-one"));
         assert!(rendered.contains("paste-two"));
+        assert!(!rendered.contains("musing…"));
+    }
+
+    #[test]
+    fn hermes_startup_surface_renders_empty_clipboard_message() {
+        let mut app = App::new();
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Char('x')));
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Ctrl('v')));
+
+        let rendered = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        assert!(rendered.contains("x"));
+        assert!(rendered.contains("No image found in clipboard"));
         assert!(!rendered.contains("musing…"));
     }
 

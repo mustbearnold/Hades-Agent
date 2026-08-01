@@ -151,6 +151,7 @@ def key_payload(value: str) -> str:
         "Ctrl+C": "C-c",
         "Ctrl+G": "C-g",
         "Ctrl+K": "C-k",
+        "Ctrl+V": "C-v",
         "Backspace": "BSpace",
         "Up": "Up",
         "Down": "Down",

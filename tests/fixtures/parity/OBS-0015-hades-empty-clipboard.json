@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0015",
+  "reference_observation": "OBS-0010",
+  "surface": "hades-tui",
+  "reference_contract": {
+    "precondition": "no readable clipboard text or image provider",
+    "draft": "clipboard-probe",
+    "trigger": "Ctrl+V",
+    "message": "No image found in clipboard",
+    "draft_behavior": "unchanged"
+  },
+  "terminal": {
+    "columns": 120,
+    "rows": 40,
+    "emulator": "tmux-backed PTY"
+  },
+  "normalization": [
+    "Capture stable screen text with tmux capture-pane -p after each redraw.",
+    "Ignore ANSI sequences, cursor placement, colors, and trailing spaces.",
+    "Each case runs in a fresh Hades process with the same 120x40 terminal size.",
+    "The contract covers only the empty-clipboard miss path; no clipboard provider is queried by this implementation slice.",
+    "The draft marker is asserted both before and after Ctrl+V, alongside the observed miss message."
+  ],
+  "cases": [
+    {
+      "id": "empty-clipboard-miss",
+      "steps": [
+        {
+          "id": "type-draft",
+          "input": {
+            "kind": "text",
+            "value": "clipboard-probe"
+          },
+          "output": {
+            "pty_markers": [
+              "clipboard-probe"
+            ]
+          }
+        },
+        {
+          "id": "request-clipboard",
+          "input": {
+            "kind": "key",
+            "value": "Ctrl+V"
+          },
+          "output": {
+            "pty_markers": [
+              "clipboard-probe",
+              "No image found in clipboard"
+            ],
+            "pty_absent_markers": [
+              "musing",
+              "Ctrl+C to interrupt"
+            ]
+          }
+        },
+        {
+          "id": "exit",
+          "input": {
+            "kind": "key",
+            "value": "Ctrl+C"
+          },
+          "output": {
+            "pty_markers": [
+              "process exit"
+            ],
+            "process_exit": true
+          }
+        }
+      ]
+    }
+  ]
+}

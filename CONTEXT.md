@@ -54,6 +54,9 @@ progress from August 1, 2026 through 2027.
   Ctrl+G request, temporary draft file, configured EDITOR invocation, terminal
   suspension/restoration, and busy submission after a clean exit. Modified,
   cancelled, multiline, and unavailable-editor behavior remain unknown.
+- HAD-015 implements the observed empty-clipboard Ctrl+V fallback with the
+  exact miss message and unchanged draft. Successful clipboard reads, image or
+  path paste, provider discovery, and overlay/busy behavior remain unknown.
 
 ## Unknown until observed
 

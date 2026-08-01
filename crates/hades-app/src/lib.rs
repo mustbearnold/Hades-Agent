@@ -161,6 +161,11 @@ impl App {
                 self.clear_completion();
                 DispatchOutcome::EditorRequested(draft)
             }
+            Key::Ctrl('v') if self.state.turn == TurnState::Ready => {
+                self.clear_completion();
+                self.state.status = "No image found in clipboard".to_owned();
+                DispatchOutcome::Continue
+            }
             Key::Ctrl(_) => DispatchOutcome::Continue,
         }
     }
@@ -433,5 +438,18 @@ mod tests {
             DispatchOutcome::Submitted("editor-probe".to_owned())
         );
         assert_eq!(app.state().turn, TurnState::Busy);
+    }
+
+    #[test]
+    fn ctrl_v_reports_empty_clipboard_without_changing_the_draft() {
+        let mut app = App::new();
+        for character in "clipboard-probe".chars() {
+            app.handle(InputEvent::Key(Key::Char(character)));
+        }
+
+        assert_eq!(app.handle(InputEvent::Key(Key::Ctrl('v'))), DispatchOutcome::Continue);
+        assert_eq!(app.state().composer.text(), "clipboard-probe");
+        assert_eq!(app.state().status, "No image found in clipboard");
+        assert_eq!(app.state().turn, TurnState::Ready);
     }
 }

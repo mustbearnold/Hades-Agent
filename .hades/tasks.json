@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T03:50:23Z",
+  "updated_at": "2026-08-01T03:54:42Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -645,6 +645,60 @@
           "tests/fixtures/parity/OBS-0014-hades-editor-handoff.json",
           "docs/parity/observations/OBS-0014-hades-editor-handoff-2026-08-01.md",
           "scripts/replay_editor.py",
+          "scripts/replay_composer.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-015",
+      "title": "Implement the observed empty-clipboard fallback",
+      "status": "complete",
+      "priority": 68,
+      "lane": "interaction",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-014"
+      ],
+      "risk": "low",
+      "oracle": [
+        "unit_test",
+        "snapshot_test",
+        "replay_trace"
+      ],
+      "acceptance": [
+        "Handle Ctrl+V in the ready composer when no readable clipboard provider is available by reporting No image found in clipboard and leaving the draft unchanged.",
+        "Render the observed miss message in the 120x40 Hermes surface without claiming successful text, image, or path clipboard reads.",
+        "Prove the path with reducer and snapshot tests plus an isolated PTY replay integrated into the full verification gate."
+      ],
+      "evidence": [
+        "crates/hades-app/src/lib.rs",
+        "crates/hades-tui/src/lib.rs",
+        "crates/hades-cli/src/main.rs",
+        "tests/fixtures/parity/OBS-0015-hades-empty-clipboard.json",
+        "docs/parity/observations/OBS-0015-hades-empty-clipboard-2026-08-01.md",
+        "scripts/replay_clipboard.py",
+        "scripts/replay_composer.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "ready_at": "2026-08-01T03:51:20Z",
+      "attempts": 1,
+      "claimed_by": "hermes-implementer",
+      "claimed_at": "2026-08-01T03:52:10Z",
+      "result": {
+        "summary": "Implemented the observed empty-clipboard Ctrl+V fallback with the exact miss message, unchanged draft semantics, 120x40 rendering, focused tests, and isolated tmux replay integrated into verification.",
+        "completed_at": "2026-08-01T03:54:42Z",
+        "evidence": [
+          "crates/hades-app/src/lib.rs",
+          "crates/hades-tui/src/lib.rs",
+          "crates/hades-cli/src/main.rs",
+          "tests/fixtures/parity/OBS-0015-hades-empty-clipboard.json",
+          "docs/parity/observations/OBS-0015-hades-empty-clipboard-2026-08-01.md",
+          "scripts/replay_clipboard.py",
           "scripts/replay_composer.py",
           "justfile",
           "scripts/verify.sh",
