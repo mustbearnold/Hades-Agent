@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0055",
+  "surface": "hermes-provider-setup-persistence",
+  "reference": {
+    "product": "Hermes Agent",
+    "version": "0.19.1 (2026.7.30)",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "direct PTY with ANSI screen model"
+    },
+    "capture": "fresh direct PTY with synthetic-home configured loopback provider and bounded cancellation/commit readback"
+  },
+  "normalization": [
+    "Reference checkout, synthetic HOME/HERMES_HOME paths, loopback URL, credentials, session identifiers, timestamps, config contents, hashes, and animated redraw bytes are omitted or replaced by placeholders.",
+    "The only submitted setup values are the displayed Full setup branch, the active synthetic loopback provider, the displayed palette-model default, and the displayed Keep current (local) backend; no endpoint, API key, secret, OAuth action, external network, or later backend-specific input is entered.",
+    "Config persistence is represented by changed/unchanged boundaries and a fresh-process ready readback, not by reproducing config contents.",
+    "Artifact names are reduced to stable classes such as config.yaml.bak.<timestamp>; dynamic and unrelated files are not treated as product behavior."
+  ],
+  "steps": [
+    {
+      "id": "cancel-at-terminal-backend",
+      "precondition": "Fresh Hermes process at 120x40 with an isolated synthetic home and configured synthetic loopback provider.",
+      "input_sequence": [
+        {"kind": "text", "value": "/setup", "bytes_hex": "2f 73 65 74 75 70"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "key", "value": "j", "bytes_hex": "6a"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d", "meaning": "accept displayed palette-model default"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03"}
+      ],
+      "output": {
+        "status": "passed",
+        "terminal_backend_markers": [
+          "Select terminal backend:",
+          "Local - run directly on this machine (default)",
+          "Docker - isolated container with configurable resources",
+          "Modal - serverless cloud sandbox",
+          "SSH - run on a remote machine",
+          "Daytona - persistent cloud development environment",
+          "Vercel Sandbox - cloud microVM with snapshot filesystem persistence",
+          "Singularity/Apptainer - HPC-friendly container",
+          "Keep current (local)",
+          "ENTER/SPACE select",
+          "ESC cancel"
+        ],
+        "config_changed_before_backend_cancel": true,
+        "config_changed_on_backend_cancel": false,
+        "new_artifact_classes_before_backend": [
+          ".hermes_history",
+          ".update_check",
+          "config.yaml.bak.<timestamp>",
+          "<other-file>"
+        ],
+        "new_artifact_classes_on_backend_cancel": [],
+        "clean_exit": true,
+        "outcome": "Ctrl+C cancels from the selected Keep current (local) backend without an additional backend action."
+      }
+    },
+    {
+      "id": "accept-keep-current-and-read-back",
+      "precondition": "Fresh Hermes process at 120x40 with the same isolated synthetic home setup.",
+      "input_sequence": [
+        {"kind": "text", "value": "/setup", "bytes_hex": "2f 73 65 74 75 70"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "key", "value": "j", "bytes_hex": "6a"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d", "meaning": "accept displayed palette-model default"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d", "meaning": "accept displayed Keep current (local) backend"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "bounded cleanup if platform setup remains open"}
+      ],
+      "output": {
+        "status": "passed",
+        "screen_after_selection_markers": [
+          "Select platforms to configure:",
+          "SPACE toggle",
+          "ENTER confirm",
+          "ESC cancel",
+          "Mattermost",
+          "Signal",
+          "(not configured)"
+        ],
+        "config_changed_before_backend_selection": true,
+        "config_changed_on_backend_selection": true,
+        "new_artifact_classes_before_backend": [
+          ".hermes_history",
+          ".update_check",
+          "config.yaml.bak.<timestamp>",
+          "<other-file>"
+        ],
+        "new_artifact_classes_on_backend_selection": [],
+        "process_clean_exit": true,
+        "fresh_process_ready": true,
+        "fresh_process_clean_exit": true,
+        "outcome": "Accepting the displayed backend advances to platform selection and the changed configuration is readable by a fresh process that returns to ready."
+      }
+    }
+  ],
+  "unknowns": [
+    "The exact config delta and the identity of the normalized <other-file> artifact remain unclaimed.",
+    "Platform selection, provider credentials, OAuth, endpoint editing, model discovery, backend-specific setup, save errors, and later wizard continuation remain unobserved.",
+    "The probe does not claim that every setup cancellation path is non-mutating; accepting the model default already changes config before the backend picker is reached.",
+    "The fresh-process readback proves this bounded synthetic configuration is loadable, not that all Hermes setup choices persist identically."
+  ],
+  "passed": true
+}

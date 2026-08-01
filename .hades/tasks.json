@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T16:24:14Z",
+  "updated_at": "2026-08-01T16:47:20Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -2966,6 +2966,62 @@
           ".hades/runtime/had058-reference-probe.log",
           ".hades/runtime/hermes-provider-errors-probe.json",
           ".hades/runtime/had058-pre-completion-verify.log"
+        ]
+      }
+    },
+    {
+      "id": "HAD-059",
+      "title": "Capture Hermes provider setup commit and cancellation persistence",
+      "status": "complete",
+      "priority": 24,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-058"
+      ],
+      "risk": "high",
+      "oracle": [
+        "reference_observation",
+        "synthetic_home_artifact_trace",
+        "direct_pty_setup_capture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Observe the pinned Hermes reference at 120x40 in isolated synthetic HOME/HERMES_HOME directories while entering Full setup, accepting only the displayed loopback provider/model defaults, and navigating the terminal-backend continuation without credentials, OAuth, external network, or secret material.",
+        "Capture separate cancellation and bounded commit paths, recording visible setup surfaces, config bytes before/after, normalized backup/artifact classes, process exit, and terminal cleanup; do not infer that a changed file means a durable provider configuration until a fresh-process readback proves it.",
+        "Add a provenance-bearing observation, sanitized fixture, and repeatable direct-PTY probe that preserves the exact safe input sequence, redacts paths and dynamic values, and names any continuation or persistence behavior that remains unknown.",
+        "Wire the deterministic probe and fixture validation into the complete no-skip just verify gate; leave Hades configuration persistence unimplemented until the reference boundary is explicit."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_provider_setup_persistence.py",
+        "tests/fixtures/parity/OBS-0055-hermes-provider-setup-persistence.json",
+        "docs/parity/observations/OBS-0055-hermes-provider-setup-persistence-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hermes-provider-setup-persistence-probe.json",
+        ".hades/runtime/had059-reference-probe-retry1.log",
+        ".hades/runtime/had059-pre-completion-verify-retry3.log"
+      ],
+      "ready_at": "2026-08-01T16:27:21Z",
+      "attempts": 1,
+      "claimed_by": "hermes-setup-persistence",
+      "claimed_at": "2026-08-01T16:27:38Z",
+      "result": {
+        "summary": "Captured Hermes Full setup persistence boundaries in isolated synthetic homes: accepting the displayed model default mutates config before the terminal-backend picker, cancellation there adds no further mutation, accepting the highlighted Keep current (local) row advances to platform selection and mutates config again, and a fresh process returns ready. The direct-PTY probe, sanitized fixture, observation, gate wiring, and successful complete verification are recorded; Hades configuration persistence remains unimplemented.",
+        "completed_at": "2026-08-01T16:47:20Z",
+        "evidence": [
+          "scripts/probe_hermes_provider_setup_persistence.py",
+          "tests/fixtures/parity/OBS-0055-hermes-provider-setup-persistence.json",
+          "docs/parity/observations/OBS-0055-hermes-provider-setup-persistence-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hermes-provider-setup-persistence-probe.json",
+          ".hades/runtime/had059-reference-probe-retry1.log",
+          ".hades/runtime/had059-pre-completion-verify-retry3.log"
         ]
       }
     }

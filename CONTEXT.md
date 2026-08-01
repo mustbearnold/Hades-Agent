@@ -260,6 +260,13 @@ progress from August 1, 2026 through 2027.
   four observed chat requests with growing assistant/user role sequences before
   a ready marker. The follow-up purpose, retry policy, and exact error copy are
   intentionally unknown; Hades error/retry behavior remains unimplemented.
+- HAD-059 captures a bounded Hermes Full setup persistence boundary in a
+  synthetic home: accepting the displayed model default changes config before
+  the terminal-backend picker, cancelling there adds no further config change,
+  accepting the highlighted Keep current (local) row advances to platform
+  selection and changes config again, and a fresh process returns to ready.
+  Exact config contents, one non-contract artifact class, platform/provider
+  configuration, and Hades persistence remain unimplemented or unknown.
 
 ## Unknown until observed
 
@@ -278,7 +285,8 @@ progress from August 1, 2026 through 2027.
 - The complete slash-command catalog and argument semantics, provider/model
   discovery details, setup wizard continuation, numbered-fallback choices,
   terminal-backend selection and cancellation after deeper navigation, provider
-  configuration, backup semantics, and persistence, configured command
+  configuration beyond the bounded OBS-0055 readback, backup semantics, and
+  Hades persistence, configured command
   behavior with a reachable provider, and model-picker behavior beyond the
   bounded deterministic provider/model seam.
 - OSC52 behavior outside the OBS-0032 timing controls and bounded payload
