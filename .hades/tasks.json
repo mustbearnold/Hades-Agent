@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T13:58:52Z",
+  "updated_at": "2026-08-01T14:35:05Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -2561,6 +2561,60 @@
           "docs/parity/MATRIX.md",
           "CONTEXT.md",
           ".hades/runtime/had051-pre-completion-verify-20260801T135609Z.log"
+        ]
+      }
+    },
+    {
+      "id": "HAD-052",
+      "title": "Capture Hermes local-provider request and stream boundary",
+      "status": "complete",
+      "priority": 31,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-049",
+        "HAD-051"
+      ],
+      "risk": "high",
+      "oracle": [
+        "reference_observation",
+        "provenance_record",
+        "direct_pty_probe",
+        "fixture_validator",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Observe the pinned Hermes reference in a fresh 120x40 direct PTY with a synthetic home and an intentionally local loopback provider; use a deterministic local HTTP/SSE fixture only and do not read credentials or contact external services.",
+        "Capture the first bounded request/response boundary after submitting a sanitized prompt, including normalized method/path, stable request-shape markers, response-stream landmarks, visible TUI state, and Ctrl+C cleanup; do not claim unobserved tool calls, retries, persistence, or successful external-provider behavior.",
+        "Add a sanitized OBS-0050 fixture, provenance observation, and repeatable direct-PTY/local-server probe with explicit normalization and unknowns; do not change Hades runtime behavior in this research task.",
+        "Run the targeted probe and complete no-skip verification before marking the task complete."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_local_provider_stream.py",
+        "tests/fixtures/parity/OBS-0050-hermes-local-provider-stream.json",
+        "docs/parity/observations/OBS-0050-hermes-local-provider-stream-2026-08-01.md",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        ".hades/runtime/had052-pre-completion-verify-retry2-20260801T143500Z.log"
+      ],
+      "ready_at": "2026-08-01T14:12:00Z",
+      "claimed_by": "hermes-local-stream-probe",
+      "claimed_at": "2026-08-01T14:10:56Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Captured Hermes' first local-provider request and SSE stream boundary through a fresh 120x40 PTY and deterministic loopback HTTP fixture; normalized the OpenAI-compatible streaming request, response landmarks, visible ready/interrupt state, and cleanup while preserving subsequent-request and provider-behavior unknowns. Targeted replay and complete no-skip verification passed.",
+        "completed_at": "2026-08-01T14:35:05Z",
+        "evidence": [
+          "scripts/probe_hermes_local_provider_stream.py",
+          "tests/fixtures/parity/OBS-0050-hermes-local-provider-stream.json",
+          "docs/parity/observations/OBS-0050-hermes-local-provider-stream-2026-08-01.md",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          ".hades/runtime/had052-pre-completion-verify-retry2-20260801T143500Z.log"
         ]
       }
     }

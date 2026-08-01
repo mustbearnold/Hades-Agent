@@ -35,7 +35,7 @@ observation, contract, implementation, and oracle are all linked from a task.
 | Persistent input history | Verified | [OBS-0016](observations/OBS-0016-hermes-input-history-persistence-2026-08-01.md) | [OBS-0017 history replay + focused tests](observations/OBS-0017-hades-input-history-persistence-2026-08-01.md) | HAD-016 / HAD-017 |
 | Submission behavior | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [submit/interrupt trace](../../tests/fixtures/parity/OBS-0003-submit-interrupt.json) | HAD-001 / HAD-004 |
 | Busy/interrupt visual state | Verified | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [visual contract + differential replay](../../tests/fixtures/parity/OBS-0006-busy-interrupt-visual.json) | HAD-007 |
-| Streaming behavior | Unknown | — | — | Future task |
+| Streaming behavior (Hermes local-provider boundary) | Observed | [OBS-0050](observations/OBS-0050-hermes-local-provider-stream-2026-08-01.md) | — (reference-only; Hades adapter remains unimplemented) | HAD-052 / Future task |
 | Setup-required error path | Verified | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [setup contract + differential replay](../../tests/fixtures/parity/OBS-0008-setup-required.json) | HAD-009 |
 | Errors and retries | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) (setup-required path only) | [lifecycle trace](../../tests/fixtures/parity/OBS-0001-lifecycle.json) | Future task |
 | Resize behavior | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [lifecycle probe](../../scripts/probe_tui_lifecycle.py) | HAD-003 / Future task |

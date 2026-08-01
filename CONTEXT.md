@@ -221,6 +221,12 @@ progress from August 1, 2026 through 2027.
   SSH, Daytona, Vercel Sandbox, Singularity/Apptainer, and Keep current rows
   with their controls, preserves sanitized provider/model context, and exits
   cleanly on Ctrl+C; backend selection and later setup behavior remain unknown.
+- HAD-052 captures the first Hermes local-provider request/stream boundary with
+  a fresh direct PTY and a deterministic loopback HTTP/SSE fixture. Hermes sends
+  an authenticated streaming `POST /v1/chat/completions` with system/user
+  messages and tools, renders the normalized response, returns to `ready`, and
+  exits cleanly on Ctrl+C. Hades provider adapters, model responses, tool turns,
+  and the purpose of subsequent chat requests remain unimplemented or unknown.
 
 ## Unknown until observed
 
@@ -230,8 +236,10 @@ progress from August 1, 2026 through 2027.
   deterministic palette subset.
 - Which Hermes behaviors are stable contracts versus implementation details;
   session recovery remains unobserved beyond input-history persistence.
-- Successful provider/model streaming, tool calls, and the exact behavior of
-  terminal-dependent surfaces beyond the captured observations.
+- Hades provider/model streaming and tool calls; Hermes subsequent chat-request
+  purpose, provider errors, malformed/delayed streams, cancellation during an
+  active stream, and terminal-dependent surfaces beyond the captured
+  observations.
 - The complete slash-command catalog and argument semantics, provider/model
   discovery details, setup wizard continuation, numbered-fallback choices,
   terminal-backend selection and cancellation after deeper navigation, provider
