@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T02:22:27Z",
+  "updated_at": "2026-08-01T02:30:28Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -295,7 +295,7 @@
     {
       "id": "HAD-008",
       "title": "Implement the observed Ctrl+X session switcher overlay",
-      "status": "in_progress",
+      "status": "complete",
       "priority": 78,
       "lane": "interaction",
       "owner_role": "implementer",
@@ -313,11 +313,32 @@
         "Expose the observed current/live/resumable/new and keyboard-control landmarks at 120x40.",
         "Close the modal with Esc and prove that composer input resumes without changing unobserved session semantics."
       ],
-      "evidence": [],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-app/src/lib.rs",
+        "crates/hades-tui/src/lib.rs",
+        "tests/fixtures/parity/OBS-0007-session-switcher.json",
+        "docs/parity/observations/OBS-0007-hades-session-switcher-2026-08-01.md",
+        "scripts/differential_replay.py",
+        "docs/parity/MATRIX.md"
+      ],
       "ready_at": "2026-08-01T02:22:00Z",
       "claimed_by": "hermes-implementer",
       "claimed_at": "2026-08-01T02:22:27Z",
-      "attempts": 1
+      "attempts": 1,
+      "result": {
+        "summary": "Implemented typed Sessions overlay state with Ctrl+X open and Esc close behavior, added the normalized 120x40 overlay projection and contract fixture, and extended differential replay to prove modal landmarks, post-close composer input, and terminal cleanup.",
+        "completed_at": "2026-08-01T02:30:28Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-app/src/lib.rs",
+          "crates/hades-tui/src/lib.rs",
+          "tests/fixtures/parity/OBS-0007-session-switcher.json",
+          "docs/parity/observations/OBS-0007-hades-session-switcher-2026-08-01.md",
+          "scripts/differential_replay.py",
+          "docs/parity/MATRIX.md"
+        ]
+      }
     }
   ]
 }
