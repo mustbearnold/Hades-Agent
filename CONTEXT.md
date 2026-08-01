@@ -200,6 +200,12 @@ progress from August 1, 2026 through 2027.
   clean Ctrl+C, and a normalized config-backup artifact; model-name entry,
   credentials, OAuth, save, model discovery, network behavior, and later setup
   sections remain unknown.
+- HAD-048 implements the bounded Hades model-name prompt boundary: Enter on the
+  active loopback provider row retains sanitized provider/model context and
+  renders `Model name [palette-model]:`, while Ctrl+C exits without model input,
+  validation, persistence, credentials, OAuth, save, model requests, or
+  network behavior. The 120x40 replay and focused core/app/TUI tests are wired
+  through `just verify`; all post-prompt behavior remains unknown.
 
 ## Unknown until observed
 

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T12:43:25Z",
+  "updated_at": "2026-08-01T13:04:28Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -2345,6 +2345,63 @@
           "tests/fixtures/parity/OBS-0046-hermes-provider-selection.json",
           "docs/parity/observations/OBS-0046-hermes-provider-selection-2026-08-01.md",
           "scripts/probe_hermes_full_setup_provider_selection.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-048",
+      "title": "Implement bounded model-name prompt boundary",
+      "status": "complete",
+      "priority": 35,
+      "lane": "behavior",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-046",
+        "HAD-047"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "typed_core_transition",
+        "focused_renderer_test",
+        "direct_pty_replay",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Extend typed Hades setup state so Enter on the active bounded palette-loopback row reaches a display-only Model name [palette-model]: prompt boundary while retaining the sanitized provider context.",
+        "Render the stable 120x40 model-name prompt and preserve the active palette-loopback/palette-model context; do not invent dynamic provider inventory, model validation, default acceptance, config persistence, credential, OAuth, save, model request, or network behavior.",
+        "Keep provider-menu navigation reversible and make Ctrl+C from the model-name boundary cleanly quit without submitting or persisting a model name; preserve all prior setup, model picker, launcher, history, and lifecycle behavior.",
+        "Add focused core/app/TUI tests plus sanitized OBS-0047 Hades replay derived from OBS-0046, wire validation/replay through just verify, run the complete no-skip gate, and document all post-prompt behavior as unknown."
+      ],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-app/src/lib.rs",
+        "crates/hades-tui/src/lib.rs",
+        "tests/fixtures/parity/OBS-0047-hades-provider-selection-model-prompt.json",
+        "docs/parity/observations/OBS-0047-hades-provider-selection-model-prompt-2026-08-01.md",
+        "scripts/replay_setup_provider_model_prompt.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md"
+      ],
+      "ready_at": "2026-08-01T12:55:50Z",
+      "attempts": 1,
+      "claimed_by": "hades-model-name-prompt",
+      "claimed_at": "2026-08-01T12:56:07Z",
+      "result": {
+        "summary": "Implemented the bounded display-only Hades model-name prompt after active provider selection, preserving sanitized provider/model context and clean Ctrl+C cleanup; focused core/app/TUI tests and OBS-0047 tmux replay pass while model editing, validation, persistence, credentials, OAuth, save, model requests, and network behavior remain outside the claim.",
+        "completed_at": "2026-08-01T13:04:28Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-app/src/lib.rs",
+          "crates/hades-tui/src/lib.rs",
+          "tests/fixtures/parity/OBS-0047-hades-provider-selection-model-prompt.json",
+          "docs/parity/observations/OBS-0047-hades-provider-selection-model-prompt-2026-08-01.md",
+          "scripts/replay_setup_provider_model_prompt.py",
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md",

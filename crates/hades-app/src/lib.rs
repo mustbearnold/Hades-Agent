@@ -466,6 +466,10 @@ impl App {
                 self.state.status = "Select provider:".to_owned();
                 DispatchOutcome::Continue
             }
+            SetupWizardAction::EnteredModelNamePrompt => {
+                self.state.status = "Model name [palette-model]:".to_owned();
+                DispatchOutcome::Continue
+            }
             SetupWizardAction::Moved => {
                 self.state.status = if wizard.is_provider_menu() {
                     "Provider menu navigation.".to_owned()
@@ -746,6 +750,26 @@ mod tests {
 
         app.handle(InputEvent::Key(Key::Down));
         assert_eq!(app.state().setup_wizard.as_ref().unwrap().provider_cursor(), 1);
+        assert_eq!(app.handle(InputEvent::Key(Key::Ctrl('c'))), DispatchOutcome::Quit);
+        assert!(app.state().setup_wizard.is_none());
+    }
+
+    #[test]
+    fn full_setup_active_provider_reaches_display_only_model_name_prompt() {
+        let mut app = App::new();
+        for character in "/setup".chars() {
+            app.handle(InputEvent::Key(Key::Char(character)));
+        }
+        app.handle(InputEvent::Key(Key::Enter));
+        app.handle(InputEvent::Key(Key::Enter));
+        app.handle(InputEvent::Key(Key::Down));
+        app.handle(InputEvent::Key(Key::Enter));
+
+        assert_eq!(app.handle(InputEvent::Key(Key::Enter)), DispatchOutcome::Continue);
+        let wizard = app.state().setup_wizard.as_ref().unwrap();
+        assert!(wizard.is_model_name_prompt());
+        assert_eq!(wizard.provider_cursor(), 0);
+        assert_eq!(app.state().status, "Model name [palette-model]:");
         assert_eq!(app.handle(InputEvent::Key(Key::Ctrl('c'))), DispatchOutcome::Quit);
         assert!(app.state().setup_wizard.is_none());
     }

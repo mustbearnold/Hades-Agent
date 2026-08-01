@@ -100,6 +100,7 @@ pub const SETUP_WIZARD_CHOICES: [&str; 3] = [
 
 pub const SETUP_PROVIDER_CURRENT_MODEL: &str = "palette-model";
 pub const SETUP_PROVIDER_ACTIVE_PROVIDER: &str = "palette-loopback";
+pub const SETUP_PROVIDER_MODEL_NAME: &str = "Model name [palette-model]:";
 pub const SETUP_PROVIDER_MENU_ROWS: [&str; 5] = [
     "palette-loopback (loopback) — palette-model  ← currently active",
     "Custom endpoint (enter URL manually)",
@@ -114,6 +115,7 @@ pub enum SetupWizardSurface {
     Choices,
     NumberedFallback,
     FullSetupProviderMenu,
+    ModelNamePrompt,
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
@@ -122,6 +124,7 @@ pub enum SetupWizardAction {
     Moved,
     EnteredFallback,
     EnteredProviderMenu,
+    EnteredModelNamePrompt,
     Quit,
 }
 
@@ -162,6 +165,10 @@ impl SetupWizardState {
         self.surface == SetupWizardSurface::FullSetupProviderMenu
     }
 
+    pub fn is_model_name_prompt(&self) -> bool {
+        self.surface == SetupWizardSurface::ModelNamePrompt
+    }
+
     pub fn provider_cursor(&self) -> usize {
         self.provider_cursor
     }
@@ -198,6 +205,10 @@ impl SetupWizardState {
                 _ => SetupWizardAction::Continue,
             },
             SetupWizardSurface::FullSetupProviderMenu => match key {
+                Key::Enter | Key::Char(' ') if self.provider_cursor == 0 => {
+                    self.surface = SetupWizardSurface::ModelNamePrompt;
+                    SetupWizardAction::EnteredModelNamePrompt
+                }
                 Key::Down => {
                     self.provider_cursor =
                         (self.provider_cursor + 1).min(SETUP_PROVIDER_MENU_ROWS.len() - 1);
@@ -207,6 +218,10 @@ impl SetupWizardState {
                     self.provider_cursor = self.provider_cursor.saturating_sub(1);
                     SetupWizardAction::Moved
                 }
+                Key::Ctrl('c') => SetupWizardAction::Quit,
+                _ => SetupWizardAction::Continue,
+            },
+            SetupWizardSurface::ModelNamePrompt => match key {
                 Key::Ctrl('c') => SetupWizardAction::Quit,
                 _ => SetupWizardAction::Continue,
             },
@@ -815,6 +830,8 @@ mod tests {
         assert_eq!(wizard.provider_cursor(), 1);
         assert_eq!(wizard.handle_key(Key::Up), SetupWizardAction::Moved);
         assert_eq!(wizard.provider_cursor(), 0);
+        assert_eq!(wizard.handle_key(Key::Enter), SetupWizardAction::EnteredModelNamePrompt);
+        assert!(wizard.is_model_name_prompt());
         assert_eq!(wizard.handle_key(Key::Ctrl('c')), SetupWizardAction::Quit);
     }
 }
