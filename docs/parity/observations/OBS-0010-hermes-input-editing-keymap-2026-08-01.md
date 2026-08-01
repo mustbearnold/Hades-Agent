@@ -61,8 +61,9 @@ terminal harness.
   scrolling, and click behavior remain unknown.
 - Only the empty-clipboard miss path was available. Successful text/image/path
   paste was not observed.
-- History persistence across process restart, duplicate suppression, truncation,
-  and multiline history encoding remain unknown beyond the one recalled entry.
+- This observation only covered one in-process recalled entry. Persistent
+  history across process restart, duplicate suppression, the load cap, and
+  multiline history encoding are captured separately in [OBS-0016](OBS-0016-hermes-input-history-persistence-2026-08-01.md).
 - Modified word movement, queue-edit precedence, editor cancellation or edited
   content, and completion behavior in multiline/busy contexts remain unknown.
 

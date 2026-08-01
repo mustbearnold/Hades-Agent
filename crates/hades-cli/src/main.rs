@@ -62,7 +62,7 @@ fn restore_terminal(
 }
 
 fn event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> Result<(), Box<dyn Error>> {
-    let mut app = App::new();
+    let mut app = configured_app();
     loop {
         terminal.draw(|frame| draw(frame, &app))?;
         if app.state().should_quit {
@@ -86,6 +86,24 @@ fn event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> Result<(
             }
         }
     }
+}
+
+fn configured_app() -> App {
+    history_path().map_or_else(App::new, App::with_history_path)
+}
+
+fn history_path() -> Option<PathBuf> {
+    history_path_from(
+        env::var_os("HERMES_HOME").map(PathBuf::from),
+        env::var_os("HOME").map(|home| PathBuf::from(home).join(".hermes")),
+    )
+}
+
+fn history_path_from(
+    hermes_home: Option<PathBuf>,
+    home_hermes_dir: Option<PathBuf>,
+) -> Option<PathBuf> {
+    hermes_home.or(home_hermes_dir).map(|home| home.join(".hermes_history"))
 }
 
 fn dispatch_input(
@@ -185,5 +203,21 @@ mod tests {
         assert_eq!(map_key(KeyEvent::new(KeyCode::Home, KeyModifiers::NONE)), Some(Key::Home));
         assert_eq!(map_key(KeyEvent::new(KeyCode::End, KeyModifiers::NONE)), Some(Key::End));
         assert_eq!(map_key(KeyEvent::new(KeyCode::Tab, KeyModifiers::NONE)), Some(Key::Tab));
+    }
+
+    #[test]
+    fn history_path_prefers_hermes_home_and_falls_back_to_home() {
+        assert_eq!(
+            history_path_from(
+                Some(PathBuf::from("/tmp/hermes")),
+                Some(PathBuf::from("/tmp/home/.hermes"))
+            ),
+            Some(PathBuf::from("/tmp/hermes/.hermes_history"))
+        );
+        assert_eq!(
+            history_path_from(None, Some(PathBuf::from("/tmp/home/.hermes"))),
+            Some(PathBuf::from("/tmp/home/.hermes/.hermes_history"))
+        );
+        assert_eq!(history_path_from(None, None), None);
     }
 }

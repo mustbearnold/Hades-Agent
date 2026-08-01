@@ -1,8 +1,110 @@
 #![forbid(unsafe_code)]
 
-use hades_core::{
-    CompletionState, EnterAction, InputEvent, Key, Message, Overlay, SessionState, TurnState,
+use std::{
+    fs::{self, OpenOptions},
+    io::Write,
+    path::{Path, PathBuf},
+    time::{SystemTime, UNIX_EPOCH},
 };
+
+use hades_core::{
+    CompletionState, Composer, EnterAction, InputEvent, Key, MAX_INPUT_HISTORY, Message, Overlay,
+    SessionState, TurnState,
+};
+
+#[derive(Clone, Debug)]
+struct HistoryStore {
+    path: PathBuf,
+    entries: Vec<String>,
+}
+
+impl HistoryStore {
+    fn open(path: PathBuf) -> Self {
+        let entries = Self::load(&path);
+        Self { path, entries }
+    }
+
+    fn load(path: &Path) -> Vec<String> {
+        let Ok(contents) = fs::read_to_string(path) else {
+            return Vec::new();
+        };
+
+        let mut entries = Vec::new();
+        let mut current = Vec::new();
+        for line in contents.split('\n') {
+            if let Some(rest) = line.strip_prefix('+') {
+                current.push(rest.to_owned());
+            } else if !current.is_empty() {
+                entries.push(current.join("\n"));
+                current.clear();
+            }
+        }
+        if !current.is_empty() {
+            entries.push(current.join("\n"));
+        }
+
+        let start = entries.len().saturating_sub(MAX_INPUT_HISTORY);
+        entries.into_iter().skip(start).collect()
+    }
+
+    fn append(&mut self, text: &str) {
+        let trimmed = text.trim();
+        if trimmed.is_empty() || self.entries.last().is_some_and(|last| last == trimmed) {
+            return;
+        }
+
+        self.entries.push(trimmed.to_owned());
+        if self.entries.len() > MAX_INPUT_HISTORY {
+            let excess = self.entries.len() - MAX_INPUT_HISTORY;
+            self.entries.drain(..excess);
+        }
+
+        let Some(parent) = self.path.parent() else {
+            return;
+        };
+        if fs::create_dir_all(parent).is_err() {
+            return;
+        }
+
+        let encoded =
+            trimmed.split('\n').map(|line| format!("+{line}")).collect::<Vec<_>>().join("\n");
+        let record = format!("\n# {}\n{encoded}\n", history_timestamp());
+        let Ok(mut file) = OpenOptions::new().create(true).append(true).open(&self.path) else {
+            return;
+        };
+        let _ = file.write_all(record.as_bytes());
+    }
+}
+
+fn history_timestamp() -> String {
+    let elapsed = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or_default();
+    let seconds = elapsed.as_secs();
+    let days = (seconds / 86_400) as i64;
+    let seconds_today = seconds % 86_400;
+    let hour = seconds_today / 3_600;
+    let minute = seconds_today / 60 % 60;
+    let second = seconds_today % 60;
+    let millis = elapsed.subsec_millis();
+    let (year, month, day) = civil_date_from_days(days);
+
+    format!("{year:04}-{month:02}-{day:02} {hour:02}:{minute:02}:{second:02}.{millis:03}")
+}
+
+fn civil_date_from_days(days_since_epoch: i64) -> (i64, u32, u32) {
+    let adjusted = days_since_epoch + 719_468;
+    let era = if adjusted >= 0 { adjusted } else { adjusted - 146_096 } / 146_097;
+    let day_of_era = adjusted - era * 146_097;
+    let year_of_era =
+        (day_of_era - day_of_era / 1_460 + day_of_era / 36_524 - day_of_era / 146_096) / 365;
+    let year = year_of_era + era * 400;
+    let day_of_year = day_of_era - (365 * year_of_era + year_of_era / 4 - year_of_era / 100);
+    let month_part = (5 * day_of_year + 2) / 153;
+    let day = day_of_year - (153 * month_part + 2) / 5 + 1;
+    let month = month_part + if month_part < 10 { 3 } else { -9 };
+    let year = year + i64::from(month <= 2);
+
+    (year, month as u32, day as u32)
+}
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum DispatchOutcome {
@@ -16,6 +118,7 @@ pub enum DispatchOutcome {
 #[derive(Clone, Debug)]
 pub struct App {
     state: SessionState,
+    history_store: Option<HistoryStore>,
 }
 
 impl App {
@@ -24,7 +127,15 @@ impl App {
         state.messages.push(Message::system(
             "Hades Agent bootstrap shell. Reference-backed behavior is not implemented yet.",
         ));
-        Self { state }
+        Self { state, history_store: None }
+    }
+
+    pub fn with_history_path(path: impl Into<PathBuf>) -> Self {
+        let history_store = HistoryStore::open(path.into());
+        let mut app = Self::new();
+        app.state.composer = Composer::with_history(history_store.entries.clone());
+        app.history_store = Some(history_store);
+        app
     }
 
     pub fn state(&self) -> &SessionState {
@@ -178,13 +289,17 @@ impl App {
             return DispatchOutcome::Continue;
         }
 
+        self.state.composer.record_submission(content.clone());
+        if let Some(history_store) = &mut self.history_store {
+            history_store.append(&content);
+        }
+
         if content == "/help" {
             self.state.overlay = Some(Overlay::SetupRequired);
             self.state.status = "Setup required.".to_owned();
             return DispatchOutcome::Continue;
         }
 
-        self.state.composer.record_submission(content.clone());
         self.state.messages.push(Message::user(&content));
         self.state.composer.clear();
         self.state.turn = TurnState::Busy;
@@ -248,8 +363,22 @@ impl Default for App {
 
 #[cfg(test)]
 mod tests {
+    use std::{
+        env, fs,
+        time::{SystemTime, UNIX_EPOCH},
+    };
+
     use super::*;
     use hades_core::{InputEvent, Key, Surface};
+
+    fn test_history_path(label: &str) -> PathBuf {
+        let stamp = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
+        env::temp_dir().join(format!("hades-history-{label}-{}-{stamp}.log", std::process::id()))
+    }
+
+    fn remove_test_history(path: &Path) {
+        let _ = fs::remove_file(path);
+    }
 
     #[test]
     fn input_submission_is_deterministic_and_recorded() {
@@ -451,5 +580,61 @@ mod tests {
         assert_eq!(app.state().composer.text(), "clipboard-probe");
         assert_eq!(app.state().status, "No image found in clipboard");
         assert_eq!(app.state().turn, TurnState::Ready);
+    }
+
+    #[test]
+    fn history_store_round_trips_multiline_and_suppresses_consecutive_duplicates() {
+        let path = test_history_path("round-trip");
+        let mut store = HistoryStore::open(path.clone());
+
+        store.append("  alpha  ");
+        let first_write = fs::read(&path).unwrap();
+        store.append("alpha");
+        assert_eq!(fs::read(&path).unwrap(), first_write);
+
+        store.append("one\ntwo");
+        let contents = fs::read_to_string(&path).unwrap();
+        assert!(contents.contains("+alpha\n"));
+        assert!(contents.contains("+one\n+two\n"));
+        assert_eq!(HistoryStore::load(&path), vec!["alpha", "one\ntwo"]);
+
+        remove_test_history(&path);
+    }
+
+    #[test]
+    fn history_store_loads_only_the_newest_thousand_entries() {
+        let path = test_history_path("cap");
+        let contents =
+            (1..=1001).map(|index| format!("\n# timestamp\n+cap-{index:04}\n")).collect::<String>();
+        fs::write(&path, contents).unwrap();
+
+        let entries = HistoryStore::load(&path);
+        assert_eq!(entries.len(), MAX_INPUT_HISTORY);
+        assert_eq!(entries.first().map(String::as_str), Some("cap-0002"));
+        assert_eq!(entries.last().map(String::as_str), Some("cap-1001"));
+
+        remove_test_history(&path);
+    }
+
+    #[test]
+    fn app_history_survives_a_new_process_boundary() {
+        let path = test_history_path("process-boundary");
+        let mut first = App::with_history_path(path.clone());
+        for character in "restart-alpha".chars() {
+            first.handle(InputEvent::Key(Key::Char(character)));
+        }
+        assert_eq!(
+            first.handle(InputEvent::Key(Key::Enter)),
+            DispatchOutcome::Submitted("restart-alpha".to_owned())
+        );
+        assert_eq!(first.handle(InputEvent::Key(Key::Ctrl('c'))), DispatchOutcome::Interrupted);
+
+        let mut second = App::with_history_path(path.clone());
+        second.handle(InputEvent::Key(Key::Up));
+        assert_eq!(second.state().composer.text(), "restart-alpha");
+        second.handle(InputEvent::Key(Key::Down));
+        assert_eq!(second.state().composer.text(), "");
+
+        remove_test_history(&path);
     }
 }

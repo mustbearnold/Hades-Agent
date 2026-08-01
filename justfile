@@ -39,6 +39,10 @@ replay-clipboard:
     cargo build --locked --package hades-cli
     python3 scripts/replay_clipboard.py --binary target/debug/hades --report .hades/runtime/clipboard-replay.json
 
+replay-history:
+    cargo build --locked --package hades-cli
+    python3 scripts/replay_history.py --binary target/debug/hades --report .hades/runtime/history-replay.json
+
 validate-reference:
     python3 scripts/validate_reference_fixture.py
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0016-hermes-input-history-persistence.json

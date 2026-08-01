@@ -11,10 +11,12 @@ import os
 import pty
 import re
 import select
+import shutil
 import signal
 import struct
 import sys
 import termios
+import tempfile
 import time
 from pathlib import Path
 from typing import Callable
@@ -116,7 +118,8 @@ def send(master: int, payload: bytes) -> None:
         view = view[written:]
 
 
-def spawn(binary: Path, columns: int, rows: int) -> tuple[int, int, str]:
+def spawn(binary: Path, columns: int, rows: int) -> tuple[int, int, str, Path]:
+    history_home = Path(tempfile.mkdtemp(prefix="hades-pty-history-"))
     pid, master = pty.fork()
     if pid == 0:
         try:
@@ -124,13 +127,14 @@ def spawn(binary: Path, columns: int, rows: int) -> tuple[int, int, str]:
             os.environ["TERM"] = "xterm-256color"
             os.environ["COLUMNS"] = str(columns)
             os.environ["LINES"] = str(rows)
+            os.environ["HERMES_HOME"] = str(history_home)
             os.execv(str(binary), [str(binary)])
         except BaseException as error:
             os.write(2, f"probe child failed to start: {error}\n".encode())
             os._exit(127)
 
     set_window_size(master, columns, rows)
-    return pid, master, os.readlink(f"/proc/{pid}/fd/0")
+    return pid, master, os.readlink(f"/proc/{pid}/fd/0"), history_home
 
 
 def terminal_flags(slave_path: str) -> dict[str, bool]:
@@ -163,7 +167,7 @@ def run_case(
     resize_before_exit: bool,
     timeout: float,
 ) -> dict[str, object]:
-    pid, master, slave_path = spawn(binary, 80, 24)
+    pid, master, slave_path, history_home = spawn(binary, 80, 24)
     output = bytearray()
     reaped = False
     try:
@@ -301,6 +305,7 @@ def run_case(
             except ChildProcessError:
                 pass
         os.close(master)
+        shutil.rmtree(history_home, ignore_errors=True)
 
 
 def parse_args() -> argparse.Namespace:

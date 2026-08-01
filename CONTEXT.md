@@ -59,8 +59,11 @@ progress from August 1, 2026 through 2027.
   path paste, provider discovery, and overlay/busy behavior remain unknown.
 - HAD-016 captures persistent Hermes input history against the exact pinned
   commit: restart recall, consecutive duplicate suppression, multiline `+`
-  encoding, and the newest-1,000 load cap. Hades disk-history implementation
-  and session recovery remain pending.
+  encoding, and the newest-1,000 load cap.
+- HAD-017 implements the observed disk-history slice with injected core state,
+  HERMES_HOME/HOME path resolution, fail-open file I/O, and a two-process PTY
+  oracle. History clearing, malformed files, concurrent writers, and session
+  recovery remain unimplemented.
 
 ## Unknown until observed
 

@@ -3,6 +3,7 @@
 use serde::{Deserialize, Serialize};
 
 pub const PRODUCT_NAME: &str = "Hades Agent";
+pub const MAX_INPUT_HISTORY: usize = 1000;
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub enum Surface {
@@ -130,6 +131,12 @@ pub enum EnterAction {
 }
 
 impl Composer {
+    pub fn with_history(history: Vec<String>) -> Self {
+        let start = history.len().saturating_sub(MAX_INPUT_HISTORY);
+
+        Self { history: history.into_iter().skip(start).collect(), ..Self::default() }
+    }
+
     pub fn text(&self) -> &str {
         &self.text
     }
@@ -196,9 +203,13 @@ impl Composer {
     }
 
     pub fn record_submission(&mut self, text: impl Into<String>) {
-        let text = text.into();
-        if !text.trim().is_empty() {
+        let text = text.into().trim().to_owned();
+        if !text.is_empty() && self.history.last() != Some(&text) {
             self.history.push(text);
+            if self.history.len() > MAX_INPUT_HISTORY {
+                let excess = self.history.len() - MAX_INPUT_HISTORY;
+                self.history.drain(..excess);
+            }
         }
         self.reset_history_navigation();
     }
@@ -394,6 +405,40 @@ mod tests {
         assert_eq!(composer.text(), "alpha");
         assert!(composer.history_down());
         assert_eq!(composer.text(), "");
+    }
+
+    #[test]
+    fn composer_history_keeps_the_newest_thousand_entries() {
+        let history = (1..=1001).map(|index| format!("cap-{index:04}")).collect();
+        let mut composer = Composer::with_history(history);
+
+        assert!(composer.history_up());
+        assert_eq!(composer.text(), "cap-1001");
+        for _ in 0..999 {
+            composer.history_up();
+        }
+        assert_eq!(composer.text(), "cap-0002");
+        assert!(!composer.history_up());
+        assert_eq!(composer.text(), "cap-0002");
+    }
+
+    #[test]
+    fn composer_history_trims_and_suppresses_consecutive_duplicates() {
+        let mut composer = Composer::default();
+
+        composer.record_submission("  alpha  ");
+        composer.record_submission("alpha");
+        composer.record_submission("beta");
+        composer.record_submission("alpha");
+
+        assert!(composer.history_up());
+        assert_eq!(composer.text(), "alpha");
+        assert!(composer.history_down());
+        assert_eq!(composer.text(), "");
+        assert!(composer.history_up());
+        assert_eq!(composer.text(), "alpha");
+        assert!(composer.history_up());
+        assert_eq!(composer.text(), "beta");
     }
 
     #[test]

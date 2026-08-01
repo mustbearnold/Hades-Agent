@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0017",
+  "reference_observation": "OBS-0016",
+  "surface": "hades-tui-input-history",
+  "terminal": {
+    "columns": 120,
+    "rows": 40,
+    "emulator": "tmux-backed PTY"
+  },
+  "normalization": [
+    "The replay checks stable composer/status markers and history-file bytes, not cursor placement, colors, or terminal-cell styling.",
+    "The restart case uses one synthetic HERMES_HOME for two Hades processes; other cases use fresh homes.",
+    "History timestamps are ignored; leading + records, newline reconstruction, duplicate byte stability, and the loaded-entry boundary are asserted.",
+    "The cap case sends repeated Up keys at a controlled interval and records the representative key byte once."
+  ],
+  "cases": [
+    {
+      "id": "restart-recall",
+      "draft": "hades-history-017",
+      "expected_history_entry": "+hades-history-017",
+      "expected_recalled_draft": "hades-history-017",
+      "expected_empty_draft_marker": "<prompt-placeholder>"
+    },
+    {
+      "id": "duplicate-suppression",
+      "draft": "hades-history-017",
+      "expected_file_unchanged": true
+    },
+    {
+      "id": "multiline-readback",
+      "lines": [
+        "history-one",
+        "history-two"
+      ],
+      "expected_history_records": [
+        "+history-one",
+        "+history-two"
+      ]
+    },
+    {
+      "id": "load-cap",
+      "seed_count": 1001,
+      "retained_count": 1000,
+      "newest_entry": "cap-1001",
+      "oldest_retained_entry": "cap-0002"
+    }
+  ]
+}

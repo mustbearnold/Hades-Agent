@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shutil
 import signal
 import subprocess
 import sys
@@ -243,7 +244,7 @@ def contract_step(contract: dict[str, Any], step_id: str) -> dict[str, Any]:
 def run_behavior(
     binary: Path, trace: dict[str, Any], visual_contract: dict[str, Any], timeout: float
 ) -> dict[str, Any]:
-    pid, master, slave_path = spawn(binary, SNAPSHOT_COLUMNS, SNAPSHOT_ROWS)
+    pid, master, slave_path, history_home = spawn(binary, SNAPSHOT_COLUMNS, SNAPSHOT_ROWS)
     output = bytearray()
     reaped = False
     replayed_steps: list[dict[str, Any]] = []
@@ -419,12 +420,13 @@ def run_behavior(
             os.close(master)
         except OSError:
             pass
+        shutil.rmtree(history_home, ignore_errors=True)
 
 
 def run_session_overlay(
     binary: Path, trace: dict[str, Any], contract: dict[str, Any], timeout: float
 ) -> dict[str, Any]:
-    pid, master, slave_path = spawn(binary, SNAPSHOT_COLUMNS, SNAPSHOT_ROWS)
+    pid, master, slave_path, history_home = spawn(binary, SNAPSHOT_COLUMNS, SNAPSHOT_ROWS)
     output = bytearray()
     reaped = False
     replayed_steps: list[dict[str, Any]] = []
@@ -594,12 +596,13 @@ def run_session_overlay(
             os.close(master)
         except OSError:
             pass
+        shutil.rmtree(history_home, ignore_errors=True)
 
 
 def run_setup_required(
     binary: Path, trace: dict[str, Any], contract: dict[str, Any], timeout: float
 ) -> dict[str, Any]:
-    pid, master, slave_path = spawn(binary, SNAPSHOT_COLUMNS, SNAPSHOT_ROWS)
+    pid, master, slave_path, history_home = spawn(binary, SNAPSHOT_COLUMNS, SNAPSHOT_ROWS)
     output = bytearray()
     reaped = False
     replayed_steps: list[dict[str, Any]] = []
@@ -775,6 +778,7 @@ def run_setup_required(
             os.close(master)
         except OSError:
             pass
+        shutil.rmtree(history_home, ignore_errors=True)
 
 
 def emit_report(report: dict[str, Any], report_path: Path | None) -> None:

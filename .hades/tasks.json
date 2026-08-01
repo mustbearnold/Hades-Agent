@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T04:09:15Z",
+  "updated_at": "2026-08-01T04:22:24Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -745,6 +745,58 @@
           "tests/fixtures/parity/OBS-0016-hermes-input-history-persistence.json",
           "docs/parity/observations/OBS-0016-hermes-input-history-persistence-2026-08-01.md",
           "scripts/validate_reference_fixture.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-017",
+      "title": "Implement persistent input history parity",
+      "status": "complete",
+      "priority": 66,
+      "lane": "storage",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-016"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "unit_test",
+        "process_restart_replay",
+        "fixture_readback"
+      ],
+      "acceptance": [
+        "Load and persist ordinary submitted drafts through HERMES_HOME/.hermes_history, falling back to HOME/.hermes/.hermes_history when HERMES_HOME is unset, while keeping startup and write failures non-fatal.",
+        "Match the observed Hermes semantics: trim outer whitespace, suppress only a consecutive newest duplicate, preserve multiline entries as + records, and navigate only the newest 1,000 loaded entries without breaking the existing in-process Up/Down draft behavior.",
+        "Keep the core reducer deterministic through injected history state and prove the storage/parser rules with focused tests plus a real two-process PTY replay covering restart recall, duplicate byte stability, multiline readback, and the 1,000-entry load cap.",
+        "Update the Hades implementation contract, provenance note, parity matrix, replay command, fixture documentation, and full verification gate; do not claim history clearing, malformed-file recovery, concurrent writers, or session recovery."
+      ],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-app/src/lib.rs",
+        "crates/hades-cli/src/main.rs",
+        "tests/fixtures/parity/OBS-0017-hades-input-history-persistence.json",
+        "docs/parity/observations/OBS-0017-hades-input-history-persistence-2026-08-01.md",
+        "scripts/replay_history.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "claimed_by": "hermes-implementer",
+      "claimed_at": "2026-08-01T04:11:24Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Implemented Hermes-compatible persistent input history with deterministic core injection, fail-open disk storage, restart recall, duplicate suppression, multiline records, newest-1000 cap, isolated PTY replay, and verification-gate integration.",
+        "completed_at": "2026-08-01T04:22:24Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-app/src/lib.rs",
+          "crates/hades-cli/src/main.rs",
+          "tests/fixtures/parity/OBS-0017-hades-input-history-persistence.json",
+          "docs/parity/observations/OBS-0017-hades-input-history-persistence-2026-08-01.md",
+          "scripts/replay_history.py",
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md"

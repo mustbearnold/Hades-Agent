@@ -28,7 +28,9 @@ that embedded newlines remain in the draft without submitting it. `just
 replay-editor` replays the configured `EDITOR=/bin/true` handoff and verifies
 the unchanged draft enters the busy state.
 `just replay-clipboard` replays the empty-clipboard Ctrl+V fallback and checks
-that the draft is unchanged.
+that the draft is unchanged. `just replay-history` proves persistent history
+across two Hades processes, multiline file encoding, duplicate byte stability,
+and the newest-1,000 load cap.
 The current work queue is in
 `.hades/tasks.json`; use `just agent next` to select the next evidence-backed
 task.

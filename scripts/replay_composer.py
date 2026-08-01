@@ -5,9 +5,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import shlex
 import subprocess
 import sys
+import tempfile
 import time
 from pathlib import Path
 from typing import Any, Callable
@@ -219,7 +221,12 @@ def run_case(
 ) -> dict[str, Any]:
     case_id = case["id"]
     session = f"{session_prefix}-{ordinal}-{int(time.time() * 1000)}"
-    start_session(binary, session, environment)
+    owned_history_home: Path | None = None
+    effective_environment = dict(environment or {})
+    if "HERMES_HOME" not in effective_environment:
+        owned_history_home = Path(tempfile.mkdtemp(prefix=f"{session_prefix}-history-"))
+        effective_environment["HERMES_HOME"] = str(owned_history_home)
+    start_session(binary, session, effective_environment)
     replayed_steps: list[dict[str, Any]] = []
     try:
         startup_markers = ("Hermes Agent", "Nous Research", "Available Tools", "Available Skills")
@@ -282,6 +289,8 @@ def run_case(
     finally:
         if session_exists(session):
             tmux_run("kill-session", "-t", session)
+        if owned_history_home is not None:
+            shutil.rmtree(owned_history_home, ignore_errors=True)
 
 
 def emit_report(report: dict[str, Any], report_path: Path | None) -> None:

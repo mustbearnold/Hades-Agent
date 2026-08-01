@@ -20,6 +20,7 @@ python3 scripts/replay_completion.py --binary target/debug/hades --report .hades
 python3 scripts/replay_paste.py --binary target/debug/hades --report .hades/runtime/paste-replay.json
 python3 scripts/replay_editor.py --binary target/debug/hades --report .hades/runtime/editor-replay.json
 python3 scripts/replay_clipboard.py --binary target/debug/hades --report .hades/runtime/clipboard-replay.json
+python3 scripts/replay_history.py --binary target/debug/hades --report .hades/runtime/history-replay.json
 git diff --check
 
 echo "verification: PASS"

@@ -24,3 +24,5 @@ and is consumed by `scripts/replay_clipboard.py`.
 OBS-0016 is the reference-only persistent input-history contract derived from
 the pinned Hermes executable and is consumed by the fixture validator. It does
 not imply that Hades has implemented disk history yet.
+OBS-0017 is the Hades implementation contract derived from OBS-0016 and is
+consumed by `scripts/replay_history.py`.
