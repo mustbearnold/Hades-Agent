@@ -139,6 +139,7 @@ launch stays on the reference-backed `starting agent…` boundary and does not
 start a provider worker or deliver prompts; the bounded clone still accepts a
 visible draft during startup. Hermes also remains on that boundary for a
 bounded 15-second window after `/setup` or `/model`, so those commands are not
-yet a configuration escape in Hades. Configure the loopback endpoint before
-expecting a model response. No external provider service is required for the
-deterministic bootstrap path.
+yet a configuration escape in Hades. The reference's separate `/help` to
+`Setup Required` transition is captured but not yet wired into Hades. Configure
+the loopback endpoint before expecting a model response. No external provider
+service is required for the deterministic bootstrap path.

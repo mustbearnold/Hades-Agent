@@ -319,6 +319,12 @@ progress from August 1, 2026 through 2027.
   ready surface, setup/model surface, provider error, or config change. The
   no-input case exits on one Ctrl+C; command cases exit on two. Behavior beyond
   the window and any configured startup route remain unknown.
+- HAD-070 reconciles the older setup-required observation with the current
+  no-provider captures: `/help` is distinct. In fresh direct-PTY and tmux
+  cases, `/help` transitions from `starting agent` to `setup required` within
+  the 15-second window, exposing `/model`, `/setup`, and Ctrl+C without changing
+  config. Direct `/setup` and `/model` remain bounded startup input under
+  OBS-0063/0064; Hades' delayed `/help` setup-required route is not yet wired.
 
 ## Unknown until observed
 

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T19:48:58Z",
+  "updated_at": "2026-08-01T20:11:03Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -3627,6 +3627,61 @@
           "scripts/replay_unconfigured_input.py",
           ".hades/runtime/installed-cli-launch-replay.json",
           ".hades/runtime/installed-unconfigured-input-replay.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-070",
+      "title": "Reconcile Hermes setup-required and starting-agent boundaries",
+      "status": "complete",
+      "priority": 15,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-069"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "hermes_direct_pty",
+        "hermes_tmux_or_equivalent",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Reproduce the current pinned Hermes checkout's no-provider startup under the OBS-0001 setup-required conditions and the OBS-0059/OBS-0064 direct-PTY conditions using fresh synthetic homes and no credentials or external provider.",
+        "Vary only documented runtime dimensions needed to explain the discrepancy, such as terminal wrapper, startup timeout, config presence/absence, and observation timing; record exact environment dimensions, visible startup transitions, setup-required markers, config/artifact changes, and terminal cleanup.",
+        "Do not enter credentials, OAuth, external network, provider values, or later setup/model choices; if the older setup-required result cannot be reproduced, preserve it as an explicit unresolved historical observation rather than rewriting it.",
+        "Add provenance, a sanitized OBS-0065 fixture, a repeatable reference probe, and an observation document; update the parity matrix/context and wire fixture validation and the probe into just verify.",
+        "Run the complete no-skip just verify gate and record implementation, reference, fixture, and verification evidence before completion."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_setup_required_reconciliation.py",
+        "tests/fixtures/parity/OBS-0065-hermes-setup-required-reconciliation.json",
+        "docs/parity/observations/OBS-0065-hermes-setup-required-reconciliation-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hermes-setup-required-reconciliation-probe.json"
+      ],
+      "ready_at": "2026-08-02T00:00:00Z",
+      "claimed_by": "hermes-setup-required-reconciliation",
+      "claimed_at": "2026-08-01T19:50:14Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Reconciled the historical setup-required observation with the current no-provider boundary. In fresh pinned Hermes direct-PTY and tmux cases, /help plus Enter transitions from starting agent to setup required within a bounded 15-second window, exposing /model, /setup, and Ctrl+C without changing config; direct /setup and /model remain separate bounded startup input per OBS-0063/0064. Focused probe and full just verify passed.",
+        "completed_at": "2026-08-01T20:11:03Z",
+        "evidence": [
+          "scripts/probe_hermes_setup_required_reconciliation.py",
+          "tests/fixtures/parity/OBS-0065-hermes-setup-required-reconciliation.json",
+          "docs/parity/observations/OBS-0065-hermes-setup-required-reconciliation-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hermes-setup-required-reconciliation-probe.json"
         ]
       }
     }

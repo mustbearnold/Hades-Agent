@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0065",
+  "surface": "hermes-unconfigured-help-setup-required-reconciliation",
+  "reference": {
+    "product": "Hermes Agent",
+    "version": "0.19.1 (2026.7.30)",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "direct PTY and tmux capture-pane"
+    },
+    "capture": "fresh synthetic homes with no provider endpoint and early/stable /help timing variants"
+  },
+  "normalization": [
+    "Reference checkout, synthetic HOME/HERMES_HOME paths, provider endpoints, credentials, session identifiers, timestamps, and raw redraw bytes are omitted or replaced by placeholders.",
+    "All cases start with no config and no Hades/OpenAI provider environment; only /help plus Enter is sent, with no credentials, OAuth, external network, provider value, or model request.",
+    "The early variant sends /help after the first Hermes Agent banner marker; the stable variant waits for repeated starting-agent surface samples. Both observe for 15 seconds after submission.",
+    "Direct PTY cleanup verifies canonical input and echo restoration; tmux cleanup is represented by clean session exit."
+  ],
+  "steps": [
+    {
+      "id": "direct-early-help",
+      "precondition": "Fresh pinned Hermes direct PTY at 120x40 with no config/provider; send /help immediately after the first Hermes Agent banner marker.",
+      "input_sequence": [
+        {"kind": "text", "value": "/help", "bytes_hex": "2f 68 65 6c 70"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "wait", "value": "15-second bounded observation"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "clear setup-required input"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "exit cleanly"}
+      ],
+      "output": {
+        "capture": "direct PTY",
+        "outcome": "setup-required",
+        "status_sequence": ["starting agent", "setup required"],
+        "setup_required_visible": true,
+        "actions_visible": ["/model", "/setup", "Ctrl+C"],
+        "config_changed": false,
+        "ctrl_c_presses": 2,
+        "exit": {"kind": "exit", "code": 0},
+        "terminal_restored": true
+      }
+    },
+    {
+      "id": "direct-stable-help",
+      "precondition": "Fresh pinned Hermes direct PTY at 120x40 with no config/provider; wait for repeated stable starting-agent samples before /help.",
+      "input_sequence": [
+        {"kind": "text", "value": "/help", "bytes_hex": "2f 68 65 6c 70"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "wait", "value": "15-second bounded observation"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "clear setup-required input"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "exit cleanly"}
+      ],
+      "output": {
+        "capture": "direct PTY",
+        "outcome": "setup-required",
+        "status_sequence": ["starting agent", "setup required"],
+        "setup_required_visible": true,
+        "actions_visible": ["/model", "/setup", "Ctrl+C"],
+        "config_changed": false,
+        "ctrl_c_presses": 2,
+        "exit": {"kind": "exit", "code": 0},
+        "terminal_restored": true
+      }
+    },
+    {
+      "id": "tmux-early-help",
+      "precondition": "Fresh pinned Hermes tmux session at 120x40 with no config/provider; send /help after the first Hermes Agent banner marker.",
+      "input_sequence": [
+        {"kind": "text", "value": "/help", "bytes_hex": "2f 68 65 6c 70"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "wait", "value": "15-second bounded observation"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03"}
+      ],
+      "output": {
+        "capture": "tmux capture-pane -p",
+        "outcome": "setup-required",
+        "setup_required_visible": true,
+        "actions_visible": ["/model", "/setup"],
+        "config_changed": false,
+        "ctrl_c_presses": 2,
+        "tmux_session_exited": true
+      }
+    },
+    {
+      "id": "tmux-stable-help",
+      "precondition": "Fresh pinned Hermes tmux session at 120x40 with no config/provider; wait for repeated stable starting-agent samples before /help.",
+      "input_sequence": [
+        {"kind": "text", "value": "/help", "bytes_hex": "2f 68 65 6c 70"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "wait", "value": "15-second bounded observation"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03"}
+      ],
+      "output": {
+        "capture": "tmux capture-pane -p",
+        "outcome": "setup-required",
+        "setup_required_visible": true,
+        "actions_visible": ["/model", "/setup"],
+        "config_changed": false,
+        "ctrl_c_presses": 2,
+        "tmux_session_exited": true
+      }
+    }
+  ],
+  "unknowns": [
+    "The exact elapsed transition time and any timeout policy are not generalized beyond this bounded run.",
+    "The setup-required follow-up actions, provider/model configuration, credentials, OAuth, and eventual queue behavior were not entered.",
+    "The separate /setup and /model startup cases remain bounded starting-agent input as recorded by OBS-0063 and OBS-0064; this fixture covers only /help."
+  ],
+  "passed": true
+}
