@@ -17,6 +17,9 @@ machine-readable JSON report for each case.
 This lifecycle contract was first captured before HAD-004 added the typed busy
 transition. The interrupt-exit case in the current probe now sends Ctrl+C once
 to interrupt the busy turn and a second time to exit from the ready state.
+Resize delivery uses bounded retries for the host PTY's signal boundary; every
+attempt still requires the exact 100x30 application status and no assertion is
+skipped.
 
 | State | Input/action | Required observable result |
 | --- | --- | --- |

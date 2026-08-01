@@ -189,16 +189,28 @@ def run_case(
 
         resized = False
         if resize_before_exit:
-            set_slave_window_size(slave_path, 100, 30)
-            wait_for(
-                pid,
-                master,
-                output,
-                f"{name}: resize",
-                lambda text: "Terminal size: 100x30." in text,
-                timeout,
-            )
-            resized = True
+            resize_error: ProbeError | None = None
+            for _ in range(3):
+                set_window_size(master, 100, 30)
+                set_slave_window_size(slave_path, 100, 30)
+                os.kill(pid, signal.SIGWINCH)
+                try:
+                    wait_for(
+                        pid,
+                        master,
+                        output,
+                        f"{name}: resize",
+                        lambda text: "Terminal size: 100x30." in text,
+                        timeout / 3,
+                    )
+                    resized = True
+                    break
+                except ProbeError as error:
+                    resize_error = error
+            if not resized:
+                if resize_error is not None:
+                    raise resize_error
+                raise ProbeError(f"{name}: resize did not produce an observable event")
 
         submitted = False
         if submit_before_exit:
