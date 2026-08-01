@@ -2,7 +2,7 @@
 
 use hades_app::App;
 use hades_core::{
-    MODEL_PICKER_MODEL, MODEL_PICKER_PROVIDER, ModelPickerStage, Notice, Overlay,
+    MODEL_PICKER_MODEL, MODEL_PICKER_PROVIDER, ModelPickerStage, Notice, Overlay, Role,
     SETUP_PROVIDER_ACTIVE_PROVIDER, SETUP_PROVIDER_CURRENT_MODEL, SETUP_PROVIDER_MENU_ROWS,
     SETUP_PROVIDER_MODEL_NAME, SETUP_TERMINAL_BACKEND_CONTROLS, SETUP_TERMINAL_BACKEND_ROWS,
     SETUP_TERMINAL_BACKEND_TITLE, SETUP_WIZARD_CHOICES, SetupWizardSurface, TurnState,
@@ -83,6 +83,8 @@ fn draw_hermes_startup(frame: &mut Frame<'_>, app: &App) {
         rows[39] = " ❯ <prompt-placeholder>".to_owned();
     }
 
+    draw_hermes_response(&mut rows, app);
+
     if app.state().completion.is_visible() {
         draw_hermes_completion(&mut rows, app.state().completion.items());
     }
@@ -93,10 +95,38 @@ fn draw_hermes_startup(frame: &mut Frame<'_>, app: &App) {
         rows[36] = format!(" Unknown command: {command}");
         rows[37] = " Type /help for available commands".to_owned();
     }
+    match &app.state().notice {
+        Some(Notice::ProviderError { message }) => {
+            rows[36] = format!(" Provider error: {}", bounded_composer_line(message));
+        }
+        Some(Notice::ProviderCancelled) => {
+            rows[36] = " Provider response cancelled".to_owned();
+        }
+        _ => {}
+    }
 
     let styled_rows =
         rows.iter().enumerate().map(|(row, line)| style_hermes_line(row, line)).collect::<Vec<_>>();
     frame.render_widget(Paragraph::new(Text::from(styled_rows)), frame.area());
+}
+
+fn draw_hermes_response(rows: &mut [String], app: &App) {
+    let Some(message) =
+        app.state().messages.iter().rev().find(|message| message.role == Role::Assistant)
+    else {
+        return;
+    };
+
+    let lines = message.content.split('\n').collect::<Vec<_>>();
+    let end = 37usize.min(rows.len().saturating_sub(1));
+    let available = end.saturating_sub(32) + 1;
+    let start = lines.len().saturating_sub(available);
+    for (offset, line) in lines[start..].iter().enumerate() {
+        let row = 32 + offset;
+        if row <= end {
+            rows[row] = format!(" {}", bounded_composer_line(line));
+        }
+    }
 }
 
 fn draw_hermes_composer(rows: &mut [String], input: &str) {
@@ -677,6 +707,51 @@ mod tests {
         let interrupted = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
         assert!(interrupted.contains("interrupted"));
         assert!(interrupted.contains("✓ <seconds>s"));
+    }
+
+    #[test]
+    fn hermes_startup_surface_renders_streamed_assistant_response() {
+        let mut app = App::new();
+        for character in "hello".chars() {
+            app.handle(hades_core::InputEvent::Key(hades_core::Key::Char(character)));
+        }
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
+        app.handle(hades_core::InputEvent::Provider(hades_core::ProviderEvent::Started));
+        app.handle(hades_core::InputEvent::Provider(hades_core::ProviderEvent::TextDelta(
+            "Synthetic ".to_owned(),
+        )));
+        app.handle(hades_core::InputEvent::Provider(hades_core::ProviderEvent::TextDelta(
+            "response.".to_owned(),
+        )));
+        app.handle(hades_core::InputEvent::Provider(hades_core::ProviderEvent::Completed));
+
+        let rendered = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        assert!(rendered.contains("Synthetic response."));
+        assert!(!rendered.contains("musing…"));
+        assert_eq!(app.state().turn, TurnState::Ready);
+    }
+
+    #[test]
+    fn hermes_startup_surface_renders_provider_failure_and_cancellation() {
+        let mut failed = App::new();
+        failed.handle(hades_core::InputEvent::Key(hades_core::Key::Char('x')));
+        failed.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
+        failed.handle(hades_core::InputEvent::Provider(hades_core::ProviderEvent::Failed(
+            "loopback offline".to_owned(),
+        )));
+        assert!(
+            snapshot(&failed, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT)
+                .contains("Provider error: loopback offline")
+        );
+
+        let mut cancelled = App::new();
+        cancelled.handle(hades_core::InputEvent::Key(hades_core::Key::Char('x')));
+        cancelled.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
+        cancelled.handle(hades_core::InputEvent::Provider(hades_core::ProviderEvent::Cancelled));
+        assert!(
+            snapshot(&cancelled, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT)
+                .contains("Provider response cancelled")
+        );
     }
 
     #[test]

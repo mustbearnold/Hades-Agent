@@ -316,6 +316,8 @@ fn matches_filter(value: &str, filter: &str) -> bool {
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum Notice {
     UnknownCommand { command: String },
+    ProviderError { message: String },
+    ProviderCancelled,
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
@@ -335,6 +337,10 @@ impl Message {
 
     pub fn user(content: impl Into<String>) -> Self {
         Self::new(Role::User, content)
+    }
+
+    pub fn assistant(content: impl Into<String>) -> Self {
+        Self::new(Role::Assistant, content)
     }
 }
 
@@ -612,10 +618,20 @@ pub enum Key {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub enum ProviderEvent {
+    Started,
+    TextDelta(String),
+    Completed,
+    Failed(String),
+    Cancelled,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum InputEvent {
     Key(Key),
     Paste(String),
     Resize { width: u16, height: u16 },
+    Provider(ProviderEvent),
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]

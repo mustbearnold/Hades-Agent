@@ -120,6 +120,8 @@ The repository intentionally has no external service or credential requirement
 for its bootstrap path.
 
 The first provider protocol seam lives in the `hades-provider` crate. It is
-deliberately loopback-only (`http://127.0.0.1:<port>/...`) and is not yet wired
-into the interactive TUI; the bootstrap continues to use its deterministic
-state shell until the reducer integration is separately verified.
+deliberately loopback-only (`http://127.0.0.1:<port>/...`). The app reducer and
+120x40 TUI can now consume typed provider lifecycle events and render streamed
+assistant text, while the live CLI worker that connects the transport to those
+events remains a separate verified task. No credentials or external provider
+service are required for the deterministic bootstrap path.

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T14:50:00Z",
+  "updated_at": "2026-08-01T15:07:27Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -2669,6 +2669,58 @@
           "CONTEXT.md",
           "docs/parity/MATRIX.md",
           ".hades/runtime/had053-pre-completion-verify-20260801T145000Z.log"
+        ]
+      }
+    },
+    {
+      "id": "HAD-054",
+      "title": "Implement typed provider-event lifecycle and assistant response rendering",
+      "status": "complete",
+      "priority": 29,
+      "lane": "product",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-053"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "core_tests",
+        "app_tests",
+        "tui_snapshot",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Add a serializable typed provider-event lifecycle at the core/app boundary for response start, text deltas, completion, failure, and cancellation without coupling the reducer to HTTP or the provider crate.",
+        "Have the reducer accept provider events only for the active busy turn, accumulate assistant text as deltas arrive, return to Ready on completion/failure/cancellation, and expose deterministic status text for each terminal outcome.",
+        "Render the accumulated assistant response and provider failure/cancellation landmarks in the 120x40 Hermes surface without changing the untouched startup golden frame; keep the existing input, slash-command, and interrupt behavior intact.",
+        "Add focused core/app/TUI assertions, document that the event seam is ready for the CLI adapter while the live event loop remains a later task, and pass complete no-skip verification before completion."
+      ],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-app/src/lib.rs",
+        "crates/hades-tui/src/lib.rs",
+        "docs/decisions/ADR-0005-provider-event-reducer-seam.md",
+        "README.md",
+        "CONTEXT.md",
+        "docs/parity/MATRIX.md",
+        ".hades/runtime/had054-pre-completion-verify-20260801T152000Z.log"
+      ],
+      "ready_at": "2026-08-01T15:30:00Z",
+      "attempts": 1,
+      "claimed_by": "provider-event-reducer",
+      "claimed_at": "2026-08-01T15:00:27Z",
+      "result": {
+        "summary": "Added the serializable provider lifecycle seam: core events now cross InputEvent, the reducer accumulates assistant deltas and handles completion, failure, and cancellation only during a busy turn, and the 120x40 Hermes renderer shows streamed responses and bounded provider notices. Focused core/app/TUI tests, strict Clippy, formatting, and complete no-skip verification passed; the live CLI worker remains a separate task.",
+        "completed_at": "2026-08-01T15:07:27Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-app/src/lib.rs",
+          "crates/hades-tui/src/lib.rs",
+          "docs/decisions/ADR-0005-provider-event-reducer-seam.md",
+          "README.md",
+          "CONTEXT.md",
+          "docs/parity/MATRIX.md",
+          ".hades/runtime/had054-pre-completion-verify-20260801T152000Z.log"
         ]
       }
     }

@@ -9,8 +9,8 @@ use std::{
 
 use hades_core::{
     CompletionState, Composer, EnterAction, InputEvent, Key, MAX_INPUT_HISTORY, Message,
-    ModelPickerAction, ModelPickerStage, Notice, Overlay, SessionState, SetupWizardAction,
-    SetupWizardState, TurnState,
+    ModelPickerAction, ModelPickerStage, Notice, Overlay, ProviderEvent, SessionState,
+    SetupWizardAction, SetupWizardState, TurnState,
 };
 
 #[derive(Clone, Debug)]
@@ -163,7 +163,57 @@ impl App {
             }
             InputEvent::Key(key) => self.handle_key(key),
             InputEvent::Paste(text) => self.handle_paste(text),
+            InputEvent::Provider(event) => self.handle_provider_event(event),
         }
+    }
+
+    fn handle_provider_event(&mut self, event: ProviderEvent) -> DispatchOutcome {
+        if self.state.turn != TurnState::Busy {
+            return DispatchOutcome::Continue;
+        }
+
+        match event {
+            ProviderEvent::Started => {
+                self.state.status = "Provider started.".to_owned();
+            }
+            ProviderEvent::TextDelta(text) => {
+                if text.is_empty() {
+                    return DispatchOutcome::Continue;
+                }
+
+                if let Some(message) = self
+                    .state
+                    .messages
+                    .last_mut()
+                    .filter(|message| message.role == hades_core::Role::Assistant)
+                {
+                    message.content.push_str(&text);
+                } else {
+                    self.state.messages.push(Message::assistant(text));
+                }
+                self.state.status = "Receiving response.".to_owned();
+            }
+            ProviderEvent::Completed => {
+                self.state.turn = TurnState::Ready;
+                self.state.status = "Response complete.".to_owned();
+            }
+            ProviderEvent::Failed(message) => {
+                self.state.turn = TurnState::Ready;
+                self.state.status = if message.is_empty() {
+                    "Provider error.".to_owned()
+                } else {
+                    format!("Provider error: {message}")
+                };
+                self.state.notice = Some(Notice::ProviderError { message });
+            }
+            ProviderEvent::Cancelled => {
+                self.state.turn = TurnState::Ready;
+                self.state.status = "Provider cancelled.".to_owned();
+                self.state.notice = Some(Notice::ProviderCancelled);
+            }
+        }
+
+        DispatchOutcome::Continue
     }
 
     fn handle_key(&mut self, key: Key) -> DispatchOutcome {
@@ -555,6 +605,59 @@ mod tests {
         assert_eq!(app.state().turn, TurnState::Busy);
         assert_eq!(app.state().status, "Busy; response adapter not connected.");
         assert_eq!(app.state().messages.last().unwrap().content, "hello");
+    }
+
+    #[test]
+    fn provider_deltas_accumulate_into_an_assistant_message_until_completion() {
+        let mut app = App::new();
+        for character in "hello".chars() {
+            app.handle(InputEvent::Key(Key::Char(character)));
+        }
+        assert!(matches!(
+            app.handle(InputEvent::Key(Key::Enter)),
+            DispatchOutcome::Submitted(content) if content == "hello"
+        ));
+
+        app.handle(InputEvent::Provider(ProviderEvent::Started));
+        app.handle(InputEvent::Provider(ProviderEvent::TextDelta("Synthetic ".to_owned())));
+        app.handle(InputEvent::Provider(ProviderEvent::TextDelta("response.".to_owned())));
+        assert_eq!(app.state().turn, TurnState::Busy);
+        assert_eq!(app.state().status, "Receiving response.");
+        assert_eq!(app.state().messages.last().unwrap().role, hades_core::Role::Assistant);
+        assert_eq!(app.state().messages.last().unwrap().content, "Synthetic response.");
+
+        app.handle(InputEvent::Provider(ProviderEvent::Completed));
+        assert_eq!(app.state().turn, TurnState::Ready);
+        assert_eq!(app.state().status, "Response complete.");
+    }
+
+    #[test]
+    fn provider_failure_and_cancellation_are_terminal_and_ignored_when_ready() {
+        let mut app = App::new();
+        app.handle(InputEvent::Provider(ProviderEvent::Failed("offline".to_owned())));
+        assert_eq!(app.state().status, "Reference behavior pending capture.");
+        assert_eq!(app.state().notice, None);
+
+        for character in "hello".chars() {
+            app.handle(InputEvent::Key(Key::Char(character)));
+        }
+        app.handle(InputEvent::Key(Key::Enter));
+        app.handle(InputEvent::Provider(ProviderEvent::Failed("offline".to_owned())));
+        assert_eq!(app.state().turn, TurnState::Ready);
+        assert_eq!(app.state().status, "Provider error: offline");
+        assert_eq!(
+            app.state().notice,
+            Some(Notice::ProviderError { message: "offline".to_owned() })
+        );
+
+        for character in "again".chars() {
+            app.handle(InputEvent::Key(Key::Char(character)));
+        }
+        app.handle(InputEvent::Key(Key::Enter));
+        app.handle(InputEvent::Provider(ProviderEvent::Cancelled));
+        assert_eq!(app.state().turn, TurnState::Ready);
+        assert_eq!(app.state().status, "Provider cancelled.");
+        assert_eq!(app.state().notice, Some(Notice::ProviderCancelled));
     }
 
     #[test]

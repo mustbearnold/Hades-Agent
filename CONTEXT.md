@@ -231,8 +231,11 @@ progress from August 1, 2026 through 2027.
   The loopback-only Rust transport serializes the normalized request, parses
   OpenAI-compatible SSE text deltas and `[DONE]`, and rejects HTTPS,
   non-loopback hosts, malformed streams, incomplete streams, and non-stream
-  responses. It is tested against an in-process TCP fixture but is not wired
-  into the Hades reducer or interactive TUI yet.
+  responses. It is tested against an in-process TCP fixture. HAD-054 adds the
+  serializable core provider event lifecycle, reducer accumulation of assistant
+  deltas, and bounded 120x40 rendering for streamed responses and provider
+  terminal notices. The live CLI worker that translates transport output into
+  those events is still separate and intentionally unimplemented.
 
 ## Unknown until observed
 
@@ -242,11 +245,12 @@ progress from August 1, 2026 through 2027.
   deterministic palette subset.
 - Which Hermes behaviors are stable contracts versus implementation details;
   session recovery remains unobserved beyond input-history persistence.
-- Hades provider/model streaming and tool calls; the HAD-053 transport is not
-  yet wired into the reducer or interactive TUI; Hermes subsequent chat-request
-  purpose, provider errors, malformed/delayed streams, cancellation during an
-  active stream, and terminal-dependent surfaces beyond the captured
-  observations.
+- Hades provider/model streaming and tool calls beyond the bounded HAD-053 /
+  HAD-054 seams; the live CLI worker, request ownership, active-stream
+  cancellation, retries, and tool execution remain unimplemented. Hermes
+  subsequent chat-request purpose, provider errors, malformed/delayed streams,
+  and terminal-dependent surfaces beyond the captured observations remain
+  unknown.
 - The complete slash-command catalog and argument semantics, provider/model
   discovery details, setup wizard continuation, numbered-fallback choices,
   terminal-backend selection and cancellation after deeper navigation, provider
