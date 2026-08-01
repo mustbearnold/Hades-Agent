@@ -32,11 +32,17 @@ progress from August 1, 2026 through 2027.
 - HAD-009 adds the observed `/help` setup-required path with retained-input
   rendering, first-Ctrl+C clearing, and second-Ctrl+C clean exit; provider setup
   and model selection remain unimplemented.
+- HAD-010 captures the pinned Hermes input-editing/keymap subset: persistent
+  history recall, cursor editing, multiline fallback, slash completion, Ctrl+G
+  editor return, bracketed paste, and the empty-clipboard miss path. Native
+  modified Enter, mouse input, successful clipboard flows, and persistence
+  across process restart remain explicit unknowns.
 
 ## Unknown until observed
 
-- Hermes TUI color palette, typography, complete keymap, focus model, copy,
-  error states, timing, persistence, and the remaining interaction surfaces.
+- Hermes TUI color palette, typography, the unobserved keymap/focus surfaces,
+  copy, error states, timing, persistence, and the remaining interaction
+  surfaces.
 - Which Hermes behaviors are stable contracts versus implementation details.
 - Successful provider/model streaming, tool calls, and the exact behavior of
   terminal-dependent surfaces beyond the captured observations.

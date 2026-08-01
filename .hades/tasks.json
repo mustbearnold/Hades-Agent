@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T02:35:23Z",
+  "updated_at": "2026-08-01T03:05:19Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -384,6 +384,52 @@
           "tests/fixtures/parity/OBS-0008-setup-required.json",
           "docs/parity/observations/OBS-0008-hades-setup-required-2026-08-01.md",
           "scripts/differential_replay.py",
+          "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-010",
+      "title": "Capture the extended Hermes editing and keymap contract",
+      "status": "complete",
+      "priority": 74,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-009"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "reference_observation",
+        "replay_trace",
+        "provenance_record"
+      ],
+      "acceptance": [
+        "Capture deterministic reference behavior for history navigation, multiline or editing keys, and slash completion where the pinned Hermes runtime exposes it.",
+        "Record environment-sensitive interactions such as Ctrl+G, paste, and mouse as observed, unavailable, or unknown without filling gaps with guesses.",
+        "Add a sanitized trace and provenance document that preserves exact input bytes, terminal dimensions, normalization, and the reference commit."
+      ],
+      "evidence": [
+        "tests/fixtures/parity/OBS-0010-input-editing-keymap.json",
+        "docs/parity/observations/OBS-0010-hermes-input-editing-keymap-2026-08-01.md",
+        "scripts/validate_reference_fixture.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "ready_at": "2026-08-01T02:55:15Z",
+      "attempts": 1,
+      "claimed_by": "hermes-research",
+      "claimed_at": "2026-08-01T02:55:27Z",
+      "result": {
+        "summary": "Captured the pinned Hermes input-editing and keymap contract with fresh synthetic PTY probes: history recall, cursor editing, multiline fallback, slash completion, Ctrl+G editor return, bracketed paste, and the empty-clipboard miss path. Added exact input-byte provenance, explicit environment-sensitive unknowns, a sanitized fixture validator, and wired it into the required verification gate.",
+        "completed_at": "2026-08-01T03:05:19Z",
+        "evidence": [
+          "tests/fixtures/parity/OBS-0010-input-editing-keymap.json",
+          "docs/parity/observations/OBS-0010-hermes-input-editing-keymap-2026-08-01.md",
+          "scripts/validate_reference_fixture.py",
+          "justfile",
+          "scripts/verify.sh",
           "docs/parity/MATRIX.md"
         ]
       }

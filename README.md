@@ -18,7 +18,9 @@ without requiring an interactive terminal. `just run` launches the TUI.
 resize, exit, and terminal restoration. `just replay-differential` compares
 the normalized startup frame and replays the checked-in submit/interrupt,
 session-switcher, and setup-required traces against the actual binary, writing
-its generated report under `.hades/runtime/`.
+its generated report under `.hades/runtime/`. `just validate-reference` checks
+the provenance and sanitization contract for the reference-only input-editing
+fixture.
 The current work queue is in
 `.hades/tasks.json`; use `just agent next` to select the next evidence-backed
 task.

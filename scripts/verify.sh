@@ -6,6 +6,7 @@ project_root="$(cd -- "$script_dir/.." && pwd)"
 cd "$project_root"
 
 python3 scripts/agent/control_plane.py validate
+python3 scripts/validate_reference_fixture.py
 cargo fmt --all -- --check
 cargo check --workspace --all-targets --locked
 cargo clippy --workspace --all-targets --locked -- -D warnings

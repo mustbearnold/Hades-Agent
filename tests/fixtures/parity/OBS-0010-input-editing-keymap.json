@@ -1,0 +1,228 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0010",
+  "reference_observation": "OBS-0001",
+  "surface": "hermes-tui",
+  "reference": {
+    "product": "Hermes TUI",
+    "version": "0.19.1",
+    "display_build": "2026.7.30",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "tmux-backed PTY"
+    },
+    "capture": "tmux capture-pane -p after each stable redraw",
+    "runtime": {
+      "node": "22.22.2",
+      "npm": "10.9.7",
+      "python": "3.11.14",
+      "uv": "0.12.1"
+    }
+  },
+  "normalization": [
+    "Capture only stable terminal text and interaction markers; ANSI sequences, cursor placement, colors, and trailing spaces are not part of this contract.",
+    "Each scenario uses a fresh synthetic HERMES_HOME with a loopback custom provider and no listening model endpoint; no provider response or private state is copied.",
+    "Dynamic session IDs, elapsed seconds, temporary checkout paths, and rotating prompt suggestions are omitted or represented by placeholders.",
+    "The rotating busy face is normalized to the busy state; the interrupt affordance is the stable busy marker.",
+    "Input bytes are recorded in hexadecimal after tmux key translation; wait events represent the debounce or redraw window and have no input bytes.",
+    "The contract records observed reference behavior only. It does not imply that Hades implements any of these interactions yet."
+  ],
+  "steps": [
+    {
+      "id": "history-seed",
+      "precondition": "Fresh synthetic HERMES_HOME with an empty .hermes_history.",
+      "input_sequence": [
+        {"kind": "text", "value": "alpha", "bytes_hex": "61 6c 70 68 61"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03"}
+      ],
+      "output": {
+        "status": "ready",
+        "composer": "",
+        "transcript_markers": ["interrupted"],
+        "completion_marker": "✓ <seconds>s",
+        "history_effect": "submitted text is recallable after the interrupted turn"
+      }
+    },
+    {
+      "id": "history-up",
+      "input_sequence": [
+        {"kind": "key", "value": "Up", "bytes_hex": "1b 5b 41"}
+      ],
+      "output": {
+        "status": "ready",
+        "composer": "alpha",
+        "history_index": "most recent entry"
+      }
+    },
+    {
+      "id": "history-down",
+      "input_sequence": [
+        {"kind": "key", "value": "Down", "bytes_hex": "1b 5b 42"}
+      ],
+      "output": {
+        "status": "ready",
+        "composer": "",
+        "history_index": "draft after the newest entry"
+      }
+    },
+    {
+      "id": "cursor-insert",
+      "precondition": "Fresh ready composer.",
+      "input_sequence": [
+        {"kind": "text", "value": "abc", "bytes_hex": "61 62 63"},
+        {"kind": "key", "value": "Left", "bytes_hex": "1b 5b 44"},
+        {"kind": "text", "value": "X", "bytes_hex": "58"}
+      ],
+      "output": {
+        "status": "ready",
+        "composer": "abXc"
+      }
+    },
+    {
+      "id": "backspace",
+      "input_sequence": [
+        {"kind": "key", "value": "Backspace", "bytes_hex": "7f"}
+      ],
+      "output": {
+        "status": "ready",
+        "composer": "abc"
+      }
+    },
+    {
+      "id": "home-end",
+      "input_sequence": [
+        {"kind": "key", "value": "Home", "bytes_hex": "1b 5b 48"},
+        {"kind": "text", "value": "z", "bytes_hex": "7a"},
+        {"kind": "key", "value": "End", "bytes_hex": "1b 5b 46"},
+        {"kind": "text", "value": "!", "bytes_hex": "21"}
+      ],
+      "output": {
+        "status": "ready",
+        "composer": "zabc!"
+      }
+    },
+    {
+      "id": "kill-to-end",
+      "input_sequence": [
+        {"kind": "key", "value": "Ctrl+A", "bytes_hex": "01"},
+        {"kind": "key", "value": "Ctrl+K", "bytes_hex": "0b"}
+      ],
+      "output": {
+        "status": "ready",
+        "composer": "",
+        "placeholder": "rotating prompt suggestion returned"
+      }
+    },
+    {
+      "id": "multiline-fallback",
+      "precondition": "Fresh ready composer.",
+      "input_sequence": [
+        {"kind": "text", "value": "line-one", "bytes_hex": "6c 69 6e 65 2d 6f 6e 65"},
+        {"kind": "text", "value": "\\", "bytes_hex": "5c"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "text", "value": "line-two", "bytes_hex": "6c 69 6e 65 2d 74 77 6f"}
+      ],
+      "output": {
+        "status": "ready",
+        "composer": "line-one\\nline-two",
+        "submission": "not submitted"
+      }
+    },
+    {
+      "id": "slash-completion",
+      "precondition": "Fresh ready composer with the normal local completion gateway.",
+      "input_sequence": [
+        {"kind": "text", "value": "/he", "bytes_hex": "2f 68 65"},
+        {"kind": "wait", "value": "completion debounce and gateway response settled (>60 ms)"}
+      ],
+      "output": {
+        "status": "ready",
+        "composer": "/he",
+        "completion_items": ["/help", "/hermes-agent", "/hermes-agent-skill-authoring"],
+        "completion_panel": "visible"
+      }
+    },
+    {
+      "id": "slash-completion-tab",
+      "input_sequence": [
+        {"kind": "key", "value": "Tab", "bytes_hex": "09"}
+      ],
+      "output": {
+        "status": "ready",
+        "composer": "/help",
+        "completion_panel": "collapsed to the applied item"
+      }
+    },
+    {
+      "id": "editor-submit",
+      "precondition": "Fresh ready composer with EDITOR=/bin/true; the external editor exits cleanly without modifying the draft.",
+      "input_sequence": [
+        {"kind": "text", "value": "editor-probe", "bytes_hex": "65 64 69 74 6f 72 2d 70 72 6f 62 65"},
+        {"kind": "key", "value": "Ctrl+G", "bytes_hex": "07"}
+      ],
+      "output": {
+        "status": "busy",
+        "submitted_text": "editor-probe",
+        "busy_markers": ["Ctrl+C to interrupt…"]
+      }
+    },
+    {
+      "id": "bracketed-paste",
+      "precondition": "Fresh ready composer; bracketed-paste bytes are sent as one terminal paste event.",
+      "input_sequence": [
+        {
+          "kind": "bracketed_paste",
+          "value": "paste-one\\npaste-two",
+          "bytes_hex": "1b 5b 32 30 30 7e 70 61 73 74 65 2d 6f 6e 65 0a 70 61 73 74 65 2d 74 77 6f 1b 5b 32 30 31 7e"
+        }
+      ],
+      "output": {
+        "status": "ready",
+        "composer": "paste-one\\npaste-two",
+        "newline_behavior": "preserved inline; not flattened and not submitted"
+      }
+    },
+    {
+      "id": "clipboard-miss",
+      "precondition": "Fresh ready composer with no readable clipboard text or image provider in the tmux environment.",
+      "input_sequence": [
+        {"kind": "key", "value": "Ctrl+V", "bytes_hex": "16"}
+      ],
+      "output": {
+        "status": "ready",
+        "composer": "",
+        "message": "No image found in clipboard",
+        "clipboard_success": "not observed"
+      }
+    }
+  ],
+  "environment_sensitive": [
+    {
+      "surface": "Shift+Enter",
+      "status": "unknown",
+      "reason": "tmux send-keys S-Enter did not expose a distinguishable modified Enter sequence in this capture harness; the probe submitted the draft as ordinary Enter."
+    },
+    {
+      "surface": "mouse input",
+      "status": "unknown",
+      "reason": "The tmux capture method did not provide a stable pointer-injection path for this observation."
+    },
+    {
+      "surface": "clipboard success",
+      "status": "unknown",
+      "reason": "Only the empty-clipboard miss path was available in the isolated environment."
+    }
+  ],
+  "unknowns": [
+    "Whether history survives a fresh process restart or session switch.",
+    "History truncation, duplicate suppression, and multiline history file encoding beyond the single observed entry.",
+    "Modified Left/Right, Meta word movement, Ctrl+W, Ctrl+U, Delete, and queue-edit precedence.",
+    "Native Shift+Enter and Alt+Enter sequences in terminal emulators that support modified-key reporting.",
+    "Ctrl+G behavior with an interactive editor that modifies the temporary draft, editor cancellation, and multiline editor round-trips.",
+    "Successful text, image, and path paste behavior; mouse selection, scrolling, and click semantics.",
+    "Completion ordering, debounce races, path completion, skill-only inline completion, and completion behavior while busy or multiline."
+  ]
+}
