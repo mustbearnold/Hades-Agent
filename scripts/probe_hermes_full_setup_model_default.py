@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Capture the first Hermes provider-selection continuation boundary."""
+"""Capture the first Hermes continuation after accepting the model default."""
 
 from __future__ import annotations
 
@@ -12,11 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from probe_hermes_full_setup import full_setup_cursor, rendered_lines
-from probe_hermes_full_setup_provider import (
-    PROVIDER_MARKERS,
-    provider_surface,
-    wait_for_provider_boundary,
-)
+from probe_hermes_full_setup_provider import PROVIDER_MARKERS, wait_for_provider_boundary
 from probe_hermes_slash_commands import (
     COLUMNS,
     DEFAULT_REFERENCE,
@@ -34,7 +30,17 @@ from probe_hermes_slash_commands import (
 from probe_hermes_terminal_palette import drain
 
 
-SELECTION_MARKERS = ("Model name [palette-model]:",)
+MODEL_PROMPT = "Model name [palette-model]:"
+DEFAULT_CONTINUATION_MARKERS = (
+    "Provider: palette-loopback",
+    "URL:",
+    "Current: palette-model",
+    "Fetching available models...",
+    "Could not fetch models from endpoint.",
+    "Model name [palette-model]:",
+    "Select terminal backend:",
+    "Keep current (local)",
+)
 
 
 def normalized_tail(raw: bytes) -> str:
@@ -57,25 +63,24 @@ def safe_failure(error: BaseException) -> Any:
         return str(error)
     details = dict(error.details)
     if "screen_tail" in details:
-        details["screen_tail"] = safe_tail(str(details["screen_tail"]).encode())
+        details["screen_tail"] = normalized_tail(str(details["screen_tail"]).encode())
     return {"case": error.case, "step": error.step, "message": error.message, **details}
 
 
-def selection_surface(raw: bytes) -> str:
+def surface(raw: bytes) -> str:
     return "\n".join(rendered_lines(raw))
 
 
 def wait_for_model_prompt(
     pid: int, fd: int, buffer: bytes, case: str, timeout: float
 ) -> tuple[bytes, bool]:
-    """Wait for the first model prompt, retrying only while the provider menu remains visible."""
+    """Wait for the model prompt, retrying only if the active row is still visible."""
 
-    prompt = "Model name [palette-model]:"
     deadline = time.monotonic() + timeout
     retry_at = time.monotonic() + 2.0
     retried = False
     while time.monotonic() < deadline:
-        if contains_marker(buffer, prompt):
+        if contains_marker(buffer, MODEL_PROMPT):
             return buffer, retried
         if not retried and time.monotonic() >= retry_at:
             if all(contains_marker(buffer, marker) for marker in PROVIDER_MARKERS):
@@ -84,15 +89,15 @@ def wait_for_model_prompt(
         buffer = drain(pid, fd, buffer, 0.05)
     raise ProbeFailure(
         case,
-        "provider-selection",
+        "model-prompt",
         f"timed out after {timeout:.1f}s",
-        {"screen_tail": provider_surface(buffer)[-2400:]},
+        {"screen_tail": surface(buffer)[-2400:]},
     )
 
 
 def run_case(reference: Path, timeout: float) -> dict[str, Any]:
-    case = "setup-full-provider-selection"
-    root = Path(tempfile.mkdtemp(prefix="hades-hermes-full-provider-selection-"))
+    case = "setup-full-model-default"
+    root = Path(tempfile.mkdtemp(prefix="hades-hermes-full-model-default-"))
     home = root / "home"
     home.mkdir()
     pid = fd = -1
@@ -136,25 +141,26 @@ def run_case(reference: Path, timeout: float) -> dict[str, Any]:
                 case,
                 "provider-menu",
                 "provider menu did not expose all stable markers",
-                {"screen_tail": provider_surface(buffer)[-2400:]},
+                {"screen_tail": surface(buffer)[-2400:]},
             )
 
-        # Submit only the already-active provider row. Do not send any further
-        # input until the first continuation surface has been recorded.
         time.sleep(0.4)
-        selection_start = len(buffer)
         write_bytes(fd, b"\r")
         buffer, model_prompt_retried = wait_for_model_prompt(pid, fd, buffer, case, timeout)
         buffer = drain(pid, fd, buffer, 0.5)
-        selection_delta = buffer[selection_start:]
-        selected_screen = selection_surface(buffer)
-        selection_delta_screen = selection_surface(selection_delta)
-        selected_lines = [line for line in selected_screen.splitlines() if line.strip()]
-        delta_lines = [line for line in selection_delta_screen.splitlines() if line.strip()]
-        selected_markers = [marker for marker in SELECTION_MARKERS if contains_marker(selection_delta, marker)]
-        selection_opened = all(
-            contains_marker(selection_delta, marker) for marker in SELECTION_MARKERS
-        )
+
+        default_start = len(buffer)
+        write_bytes(fd, b"\r")
+        time.sleep(0.2)
+        buffer = drain(pid, fd, buffer, 0.8)
+        default_delta = buffer[default_start:]
+        default_screen = surface(buffer)
+        default_delta_screen = surface(default_delta)
+        default_lines = [line for line in default_screen.splitlines() if line.strip()]
+        delta_lines = [line for line in default_delta_screen.splitlines() if line.strip()]
+        continuation_markers = [
+            marker for marker in DEFAULT_CONTINUATION_MARKERS if contains_marker(default_delta, marker)
+        ]
 
         buffer, exited = clean_exit(pid, fd, buffer, case, timeout)
         config_after = config_path.read_bytes() if config_path.exists() else b""
@@ -170,25 +176,24 @@ def run_case(reference: Path, timeout: float) -> dict[str, Any]:
                 {"kind": "key", "value": "j", "bytes_hex": "6a"},
                 {"kind": "key", "value": "Enter"},
                 {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+                {"kind": "key", "value": "Enter", "bytes_hex": "0d", "meaning": "accept displayed palette-model default"},
                 {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03"},
             ],
-            "selected_path": "Full setup via j then Enter, then active loopback provider Enter",
+            "selected_path": "Full setup via active loopback provider, then default model acceptance",
             "full_selection_retried": full_selection_retried,
             "provider_selection_submitted": True,
             "model_prompt_retried": model_prompt_retried,
-            "selection_opened_continuation": selection_opened,
-            "selection_markers": selected_markers,
-            "selection_screen_tail": normalized_tail("\n".join(selected_lines).encode()),
-            "selection_delta_tail": normalized_tail("\n".join(delta_lines).encode()),
-            "selection_prompt_stable": selection_opened,
+            "model_default_submitted": True,
+            "continuation_markers": continuation_markers,
+            "continuation_screen_tail": normalized_tail("\n".join(default_lines).encode()),
+            "continuation_delta_tail": normalized_tail("\n".join(delta_lines).encode()),
             "config_yaml_unchanged": config_after == config_before,
-            "config_changed_after_selection": config_after != config_before,
             "new_files": sorted(new_files),
             "new_config_backup_files": sorted(
                 name for name in new_files if name.startswith("config.yaml.bak.")
             ),
             "clean_exit": exited,
-            "cleanup": "Ctrl+C was sent immediately after the first post-selection surface capture",
+            "cleanup": "Ctrl+C was sent immediately after the first default-acceptance continuation capture",
         }
     finally:
         if pid != -1:
@@ -205,20 +210,20 @@ def main() -> int:
     reference = args.reference.resolve()
     report: dict[str, Any] = {
         "schema_version": 1,
-        "observation_id": "OBS-0046",
+        "observation_id": "OBS-0048",
         "reference": {
             "path": "<reference-checkout>",
             "source_commit": SOURCE_COMMIT,
             "terminal": {
                 "columns": COLUMNS,
                 "rows": ROWS,
-                "capture": "direct PTY with normalized first provider-selection continuation and synthetic-home artifact check",
+                "capture": "direct PTY with normalized model-default continuation and synthetic-home artifact check",
             },
         },
         "normalization": [
-            "Reference checkout, synthetic HOME/HERMES_HOME paths, loopback URL, credentials, session IDs, timestamps, and animated redraw bytes are omitted or replaced by placeholders.",
-            "The configured provider is an intentionally absent loopback endpoint; the probe stops after one active-provider Enter and does not enter an endpoint, secret, OAuth action, save action, model request, or network-dependent behavior.",
-            "Selection output is retained only as redacted screen-tail diagnostics until stable labels are reviewed and normalized into the checked-in fixture.",
+            "Reference checkout, synthetic HOME/HERMES_HOME paths, loopback URL, credentials, session IDs, timestamps, dynamic inventory, and animated redraw bytes are omitted or replaced by placeholders.",
+            "Only Enter is sent at Model name [palette-model]: to accept the displayed default; no endpoint, API key, secret, OAuth action, save action, model request, or network-dependent behavior is entered.",
+            "The first continuation is retained as redacted screen-tail diagnostics until stable labels are reviewed and normalized into the checked-in fixture.",
             "The probe compares config bytes before and after cleanup and records only normalized artifact classes; temporary synthetic-home contents are removed after each case.",
         ],
         "cases": [],

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T13:04:28Z",
+  "updated_at": "2026-08-01T13:22:16Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -2402,6 +2402,59 @@
           "tests/fixtures/parity/OBS-0047-hades-provider-selection-model-prompt.json",
           "docs/parity/observations/OBS-0047-hades-provider-selection-model-prompt-2026-08-01.md",
           "scripts/replay_setup_provider_model_prompt.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-049",
+      "title": "Capture Hermes model-name default continuation",
+      "status": "complete",
+      "priority": 34,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-047"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "reference_observation",
+        "provenance_record",
+        "fixture_validator",
+        "direct_pty_probe"
+      ],
+      "acceptance": [
+        "Observe the pinned Hermes reference in a fresh 120x40 direct PTY using the sanitized loopback custom-provider configuration, synthetic home, and no credentials or private runtime state.",
+        "Reach the observed Model name [palette-model]: prompt through the existing /setup, Full setup, and active-provider selection path, then submit only Enter to accept the displayed default model name.",
+        "Capture the first safe continuation after default acceptance and stop before entering an endpoint, API key, secret, OAuth action, save action, model request, or network-dependent behavior; use Ctrl+C at the first safe cancellation boundary.",
+        "Normalize provider names, URLs, paths, model values, runtime identifiers, timestamps, animated redraw bytes, and dynamic inventory; compare config bytes and synthetic-home artifact classes before and after cleanup.",
+        "Add sanitized OBS-0048 fixture, provenance observation, and repeatable direct-PTY probe; wire validation and the probe through just verify without changing Hades runtime behavior."
+      ],
+      "evidence": [
+        "tests/fixtures/parity/OBS-0048-hermes-model-default-terminal-backend.json",
+        "docs/parity/observations/OBS-0048-hermes-model-default-terminal-backend-2026-08-01.md",
+        "scripts/probe_hermes_full_setup_model_default.py",
+        "scripts/probe_hermes_full_setup_provider_selection.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md"
+      ],
+      "ready_at": "2026-08-01T13:10:03Z",
+      "attempts": 1,
+      "claimed_by": "hermes-research-model-default",
+      "claimed_at": "2026-08-01T13:10:23Z",
+      "result": {
+        "summary": "Captured Hermes default model acceptance: Enter on Model name [palette-model] reaches the terminal-backend picker with Local, Docker, Modal, SSH, Daytona, Vercel Sandbox, Singularity/Apptainer, and Keep current rows; config bytes and a normalized backup change, and Ctrl+C exits before backend selection. Hardened the preceding provider-selection probe with a guarded redraw retry.",
+        "completed_at": "2026-08-01T13:22:16Z",
+        "evidence": [
+          "tests/fixtures/parity/OBS-0048-hermes-model-default-terminal-backend.json",
+          "docs/parity/observations/OBS-0048-hermes-model-default-terminal-backend-2026-08-01.md",
+          "scripts/probe_hermes_full_setup_model_default.py",
+          "scripts/probe_hermes_full_setup_provider_selection.py",
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md",

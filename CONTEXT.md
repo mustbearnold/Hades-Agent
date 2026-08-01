@@ -206,6 +206,12 @@ progress from August 1, 2026 through 2027.
   validation, persistence, credentials, OAuth, save, model requests, or
   network behavior. The 120x40 replay and focused core/app/TUI tests are wired
   through `just verify`; all post-prompt behavior remains unknown.
+- HAD-049 captures Hermes default model acceptance: Enter on
+  `Model name [palette-model]:` reaches a terminal-backend picker with Local,
+  Docker, Modal, SSH, cloud, Singularity/Apptainer, and Keep current rows.
+  Three fresh captures show a config-byte change, normalized config backup, and
+  clean Ctrl+C before backend selection; backend-specific setup and later
+  behavior remain unknown.
 
 ## Unknown until observed
 
