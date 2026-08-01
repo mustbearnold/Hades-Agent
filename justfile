@@ -143,6 +143,9 @@ probe-provider-setup-persistence:
 probe-setup-config-shape:
     python3 scripts/probe_hermes_setup_config_shape.py --report .hades/runtime/hermes-setup-config-shape-probe.json --timeout 30
 
+probe-empty-platform-confirmation:
+    python3 scripts/probe_hermes_empty_platform_confirmation.py --report .hades/runtime/hermes-empty-platform-confirmation-probe.json --timeout 30
+
 replay-terminal-palette:
     cargo build --locked --package hades-cli
     python3 scripts/replay_terminal_palette.py --binary target/debug/hades --report .hades/runtime/hades-terminal-palette-replay.json
@@ -208,6 +211,7 @@ validate-reference:
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0055-hermes-provider-setup-persistence.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0056-hermes-setup-config-shape.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0057-hades-setup-platform-picker.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0058-hermes-empty-platform-confirmation.json
 
 agent command *args:
     python3 scripts/agent/control_plane.py {{command}} {{args}}

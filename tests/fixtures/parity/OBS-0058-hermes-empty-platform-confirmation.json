@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0058",
+  "surface": "hermes-empty-platform-confirmation",
+  "reference": {
+    "product": "Hermes Agent",
+    "version": "0.19.1 (2026.7.30)",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "direct PTY with redacted ANSI screen model"
+    },
+    "capture": "fresh direct PTY with synthetic-home empty-platform confirmation and repeated stable-surface readback"
+  },
+  "normalization": [
+    "Reference checkout, synthetic HOME/HERMES_HOME paths, loopback URL, credentials, session identifiers, timestamps, raw config values, hashes, and animated redraw bytes are omitted or replaced by placeholders.",
+    "Only the displayed Full setup branch, synthetic loopback provider, palette-model default, and Keep current (local) backend are accepted; no platform is toggled, no credential or OAuth action is entered, and no external network is used.",
+    "Config evidence contains normalized key paths, scalar/container kinds, and byte counts only; artifact evidence is reduced to stable classes.",
+    "The empty-confirmation outcome is bounded by repeated identical rendered picker markers during a finite observation window and does not infer later setup behavior."
+  ],
+  "steps": [
+    {
+      "id": "confirm-empty-platform-selection",
+      "precondition": "Fresh Hermes process at 120x40 with an isolated synthetic home and configured synthetic loopback provider, navigated to the platform picker with every platform unselected.",
+      "input_sequence": [
+        {"kind": "text", "value": "/setup", "bytes_hex": "2f 73 65 74 75 70"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "key", "value": "j", "bytes_hex": "6a"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d", "meaning": "accept displayed palette-model default"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d", "meaning": "accept displayed Keep current (local) backend"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d", "meaning": "confirm with no platform selected"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "clean exit from the unchanged platform picker"}
+      ],
+      "output": {
+        "status": "passed",
+        "post_confirmation_markers": [
+          "Select platforms to configure:",
+          "SPACE toggle",
+          "ENTER confirm",
+          "ESC cancel",
+          "Mattermost",
+          "Signal",
+          "(not configured)"
+        ],
+        "post_confirmation_surface_unchanged": true,
+        "ready_after_empty_confirmation": false,
+        "process_alive_after_empty_confirmation": true,
+        "config_changed_on_empty_confirmation": false,
+        "artifact_classes_on_empty_confirmation": [],
+        "clean_exit": true,
+        "fresh_process_ready": true,
+        "fresh_process_clean_exit": true,
+        "outcome": "With no platform selected, Enter leaves Hermes on the same platform picker during the bounded observation window; no ready transition, error marker, config change, or new artifact class is observed."
+      }
+    }
+  ],
+  "unknowns": [
+    "Whether Hermes treats an empty platform confirmation as a deliberate no-op indefinitely or eventually emits another status remains unobserved beyond the bounded observation window.",
+    "Platform cursor navigation, toggling, confirmation with one or more platforms, provider credentials, OAuth, endpoint editing, backend-specific setup, and later wizard continuation remain unobserved.",
+    "Config scalar values, YAML ordering/formatting, backup contents, and the identity of the normalized <other-file> artifact remain outside the claim.",
+    "The fresh-process readback proves only that the previously committed synthetic setup shape remains loadable after cleanup."
+  ],
+  "passed": true
+}

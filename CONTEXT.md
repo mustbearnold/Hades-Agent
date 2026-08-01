@@ -279,6 +279,11 @@ progress from August 1, 2026 through 2027.
   platform title, controls, and unconfigured platform rows, while Ctrl+C exits
   cleanly. Platform toggling/confirmation, config writes, credentials, and
   later setup behavior remain unimplemented.
+- HAD-062 captures the next Hermes boundary with no platform selected: Enter
+  leaves the same platform picker stable during the bounded observation window,
+  without a ready/error surface, config change, or new artifact class. Ctrl+C
+  exits cleanly and a fresh process remains ready. Hades empty-platform
+  confirmation remains unimplemented.
 
 ## Unknown until observed
 

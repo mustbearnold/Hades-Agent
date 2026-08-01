@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T17:05:50Z",
+  "updated_at": "2026-08-01T17:26:09Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -3140,6 +3140,52 @@
           ".hades/runtime/setup-platform-picker-replay.json",
           ".hades/runtime/had061-platform-picker-focused.log",
           ".hades/runtime/had061-pre-completion-verify.log"
+        ]
+      }
+    },
+    {
+      "id": "HAD-062",
+      "title": "Capture Hermes empty-platform confirmation boundary",
+      "status": "complete",
+      "priority": 21,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-061"
+      ],
+      "risk": "high",
+      "oracle": [
+        "reference_observation",
+        "direct_pty_platform_confirmation",
+        "synthetic_home_readback",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Observe the pinned Hermes reference at 120x40 in a fresh synthetic home through the safe OBS-0056 path, stop at the platform picker, and press Enter with no platform selected; do not toggle a platform, enter credentials, invoke OAuth, access external network, or select a later setup value.",
+        "Record the first stable post-confirmation surface or bounded terminal outcome, visible status/ready/cleanup markers, config byte/change boundary, normalized artifact classes, and whether a fresh process remains loadable; do not infer completion from a transient redraw.",
+        "Add a provenance-bearing observation, sanitized fixture, and repeatable direct-PTY probe with explicit stop conditions and unknowns; preserve any later setup surface only as stable redacted markers.",
+        "Wire the deterministic probe and fixture validation into the complete no-skip just verify gate and leave Hades empty-platform confirmation behavior unimplemented until the reference result is known."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_empty_platform_confirmation.py",
+        "tests/fixtures/parity/OBS-0058-hermes-empty-platform-confirmation.json",
+        "docs/parity/observations/OBS-0058-hermes-empty-platform-confirmation-2026-08-02.md",
+        ".hades/runtime/hermes-empty-platform-confirmation-probe.json",
+        ".hades/runtime/had062-pre-completion-verify-final.log"
+      ],
+      "ready_at": "2026-08-01T17:06:18Z",
+      "attempts": 1,
+      "claimed_by": "hermes-empty-platform-confirm",
+      "claimed_at": "2026-08-01T17:06:37Z",
+      "result": {
+        "summary": "Captured the pinned Hermes empty-platform confirmation boundary: Enter with no selected platform leaves the same picker stable during a bounded observation window, keeps the process alive, changes neither config nor artifacts, and cleanly returns a fresh process to ready. Added sanitized direct-PTY probe/fixture/observation and wired both into validation and just verify.",
+        "completed_at": "2026-08-01T17:26:09Z",
+        "evidence": [
+          "scripts/probe_hermes_empty_platform_confirmation.py",
+          "tests/fixtures/parity/OBS-0058-hermes-empty-platform-confirmation.json",
+          "docs/parity/observations/OBS-0058-hermes-empty-platform-confirmation-2026-08-02.md",
+          ".hades/runtime/hermes-empty-platform-confirmation-probe.json",
+          ".hades/runtime/had062-pre-completion-verify-final.log"
         ]
       }
     }
