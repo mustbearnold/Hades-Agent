@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T14:35:05Z",
+  "updated_at": "2026-08-01T14:50:00Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -2615,6 +2615,60 @@
           "docs/parity/MATRIX.md",
           "CONTEXT.md",
           ".hades/runtime/had052-pre-completion-verify-retry2-20260801T143500Z.log"
+        ]
+      }
+    },
+    {
+      "id": "HAD-053",
+      "title": "Build the local OpenAI-compatible stream transport seam",
+      "status": "complete",
+      "priority": 30,
+      "lane": "product",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-052"
+      ],
+      "risk": "high",
+      "oracle": [
+        "reference_observation",
+        "typed_transport_tests",
+        "loopback_request_probe",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Add an explicit Rust provider transport seam that can build the OBS-0050 OpenAI-compatible request shape without coupling HTTP or stream parsing to the TUI reducer.",
+        "Implement a bounded local HTTP/1.1 SSE transport for the configured loopback endpoint: emit the selected model, system/user messages, stream=true, stream_options, tools, and optional authorization presence; parse assistant text deltas and [DONE] into typed events; return clear errors for unsupported URLs, HTTP failures, malformed SSE, and missing completion data.",
+        "Use a deterministic in-process loopback TCP fixture to assert the normalized request path/body shape and a three-chunk SSE response, with no credentials, external network, HTTPS, tool execution, persistence, or Hades runtime wiring claimed.",
+        "Add the crate/module to the workspace, document the seam and explicit local-only boundary, run focused transport tests, and pass complete no-skip verification before completion."
+      ],
+      "evidence": [
+        "crates/hades-provider/Cargo.toml",
+        "crates/hades-provider/src/lib.rs",
+        "Cargo.toml",
+        "Cargo.lock",
+        "docs/decisions/ADR-0004-local-provider-transport-seam.md",
+        "README.md",
+        "CONTEXT.md",
+        "docs/parity/MATRIX.md",
+        ".hades/runtime/had053-pre-completion-verify-20260801T145000Z.log"
+      ],
+      "ready_at": "2026-08-01T14:40:00Z",
+      "attempts": 1,
+      "claimed_by": "local-openai-transport",
+      "claimed_at": "2026-08-01T14:41:09Z",
+      "result": {
+        "summary": "Added the isolated hades-provider loopback transport seam: it serializes the OBS-0050 OpenAI-compatible streaming request, enforces http://127.0.0.1 URL policy, parses text deltas and [DONE], and reports malformed, incomplete, HTTP, and unsupported-boundary errors. In-process TCP tests assert the normalized request and three-chunk SSE response; the reducer/TUI remains intentionally unwired. Focused tests and complete no-skip verification passed.",
+        "completed_at": "2026-08-01T14:50:00Z",
+        "evidence": [
+          "crates/hades-provider/Cargo.toml",
+          "crates/hades-provider/src/lib.rs",
+          "Cargo.toml",
+          "Cargo.lock",
+          "docs/decisions/ADR-0004-local-provider-transport-seam.md",
+          "README.md",
+          "CONTEXT.md",
+          "docs/parity/MATRIX.md",
+          ".hades/runtime/had053-pre-completion-verify-20260801T145000Z.log"
         ]
       }
     }

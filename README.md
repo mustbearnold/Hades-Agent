@@ -118,3 +118,8 @@ just agent claim HAD-001 bot  # claim a task with an agent identity
 
 The repository intentionally has no external service or credential requirement
 for its bootstrap path.
+
+The first provider protocol seam lives in the `hades-provider` crate. It is
+deliberately loopback-only (`http://127.0.0.1:<port>/...`) and is not yet wired
+into the interactive TUI; the bootstrap continues to use its deterministic
+state shell until the reducer integration is separately verified.

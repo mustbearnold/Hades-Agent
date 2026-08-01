@@ -4,12 +4,14 @@ members = [
     "crates/hades-app",
     "crates/hades-tui",
     "crates/hades-cli",
+    "crates/hades-provider",
 ]
 default-members = [
     "crates/hades-core",
     "crates/hades-app",
     "crates/hades-tui",
     "crates/hades-cli",
+    "crates/hades-provider",
 ]
 resolver = "3"
 

@@ -227,6 +227,12 @@ progress from August 1, 2026 through 2027.
   messages and tools, renders the normalized response, returns to `ready`, and
   exits cleanly on Ctrl+C. Hades provider adapters, model responses, tool turns,
   and the purpose of subsequent chat requests remain unimplemented or unknown.
+- HAD-053 adds the isolated `hades-provider` transport seam for that boundary.
+  The loopback-only Rust transport serializes the normalized request, parses
+  OpenAI-compatible SSE text deltas and `[DONE]`, and rejects HTTPS,
+  non-loopback hosts, malformed streams, incomplete streams, and non-stream
+  responses. It is tested against an in-process TCP fixture but is not wired
+  into the Hades reducer or interactive TUI yet.
 
 ## Unknown until observed
 
@@ -236,7 +242,8 @@ progress from August 1, 2026 through 2027.
   deterministic palette subset.
 - Which Hermes behaviors are stable contracts versus implementation details;
   session recovery remains unobserved beyond input-history persistence.
-- Hades provider/model streaming and tool calls; Hermes subsequent chat-request
+- Hades provider/model streaming and tool calls; the HAD-053 transport is not
+  yet wired into the reducer or interactive TUI; Hermes subsequent chat-request
   purpose, provider errors, malformed/delayed streams, cancellation during an
   active stream, and terminal-dependent surfaces beyond the captured
   observations.
