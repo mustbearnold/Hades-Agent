@@ -87,7 +87,9 @@ progress from August 1, 2026 through 2027.
   preserves internal newlines and meaningful spaces, removes trailing newlines,
   and leaves the draft ready without submission. HAD-023 implements the native
   WSL/Wayland/xclip text path and preserves the empty-provider image-miss
-  fallback; image attachments, path paste, and OSC52 precedence remain unknown.
+  fallback; image attachments and path paste remain unknown. HAD-024 captures
+  Hermes remote `SSH_TTY` OSC52-first precedence and the native-provider
+  timeout fallback; tmux/STY wrapping and Hades OSC52 behavior remain unknown.
 
 ## Unknown until observed
 

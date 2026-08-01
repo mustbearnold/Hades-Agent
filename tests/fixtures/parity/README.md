@@ -44,3 +44,6 @@ the empty-provider control. OBS-0023 is the Hades implementation contract for
 the native text path and is consumed by the direct-PTY
 `scripts/replay_clipboard_text.py` oracle; image/path/OSC52 behavior remains
 outside the contract.
+OBS-0024 captures Hermes research-only remote `SSH_TTY` OSC52 precedence and
+the native xclip timeout fallback with explicit query/DA1 bytes. It does not
+imply Hades OSC52 implementation parity or tmux/STY passthrough coverage.

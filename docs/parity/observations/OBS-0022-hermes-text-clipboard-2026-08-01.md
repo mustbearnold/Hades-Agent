@@ -36,7 +36,8 @@ claim.
 
 ## Explicitly unknown or environment-sensitive
 
-- Remote/SSH OSC52 precedence versus native providers.
+- TMUX/STY OSC52 passthrough wrapping and invalid/empty remote response behavior;
+  bare `SSH_TTY` precedence is captured in OBS-0024.
 - Image-only clipboard attachment, path paste, and gateway-backed image tokens.
 - Provider failures, binary-looking text, and size-limit behavior.
 - Hades implementation parity, which remains a separate task.

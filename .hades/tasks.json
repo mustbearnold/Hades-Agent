@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T05:23:40Z",
+  "updated_at": "2026-08-01T05:31:23Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -1100,6 +1100,56 @@
           "tests/fixtures/parity/OBS-0023-hades-text-clipboard.json",
           "docs/parity/observations/OBS-0023-hades-text-clipboard-2026-08-01.md",
           "scripts/replay_clipboard_text.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-024",
+      "title": "Capture Hermes remote OSC52 clipboard precedence",
+      "status": "complete",
+      "priority": 59,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-023"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "reference_observation",
+        "provenance_record",
+        "fixture_validator"
+      ],
+      "acceptance": [
+        "Use the pinned Hermes reference in a direct 120x40 PTY with SSH remote-shell markers and a synthetic xclip provider to capture raw Ctrl+V OSC52 query behavior.",
+        "Respond to the observed OSC52 query with a controlled base64 text payload and record exact query/response bytes, inserted composer text, provider invocation order, and ready versus submitted state.",
+        "Capture a no-OSC52-response control showing the timeout/fallback boundary and whether Hermes then reads the native provider, without claiming image or gateway behavior.",
+        "Add a sanitized provenance observation and machine-validated fixture, update clipboard unknowns and the parity matrix, and wire the fixture into the reference verification gate.",
+        "Keep this task research-only: do not implement OSC52 handling or change Hades clipboard behavior until the direct-PTY contract is stable and reviewable."
+      ],
+      "evidence": [
+        "tests/fixtures/parity/OBS-0024-hermes-osc52-clipboard.json",
+        "docs/parity/observations/OBS-0024-hermes-osc52-clipboard-2026-08-01.md",
+        "scripts/probe_hermes_osc52_clipboard.py",
+        "scripts/validate_reference_fixture.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "ready_at": "2026-08-01T05:25:00Z",
+      "claimed_by": "hermes-research",
+      "claimed_at": "2026-08-01T05:25:29Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Captured Hermes remote-shell OSC52 clipboard precedence in a direct 120x40 PTY with SSH_TTY set and TMUX/STY absent. Raw Ctrl+V emits ESC]52;c;?BEL; a controlled base64 OSC52 response is decoded with trailing newlines removed, inserted into the ready composer, and suppresses native xclip. A no-response control observes Hermes flushing the OSC52 request with DA1 barriers, then invoking xclip -selection clipboard -out and inserting the native fallback without submission. This remains research-only; tmux/STY wrapping, invalid/empty OSC52 responses, Hades OSC52 behavior, and image/path gateway behavior remain unknown.",
+        "completed_at": "2026-08-01T05:31:23Z",
+        "evidence": [
+          "tests/fixtures/parity/OBS-0024-hermes-osc52-clipboard.json",
+          "docs/parity/observations/OBS-0024-hermes-osc52-clipboard-2026-08-01.md",
+          "scripts/probe_hermes_osc52_clipboard.py",
+          "scripts/validate_reference_fixture.py",
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md"
