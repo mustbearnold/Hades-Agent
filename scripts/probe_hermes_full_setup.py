@@ -25,7 +25,7 @@ from probe_hermes_slash_commands import (
     wait_for,
     write_bytes,
 )
-from probe_hermes_terminal_palette import Screen, drain
+from probe_hermes_terminal_palette import Screen, child_status, drain, read_available
 
 
 SETUP_MARKERS = (
@@ -55,6 +55,46 @@ def rendered_lines(raw: bytes) -> list[str]:
 
 def full_setup_cursor(raw: bytes) -> bool:
     return any("Full setup" in line and "→" in line for line in rendered_lines(raw))
+
+
+def continuation_surface(raw: bytes) -> str:
+    return "\n".join(rendered_lines(raw))
+
+
+def wait_for_continuation_boundary(
+    pid: int, fd: int, buffer: bytes, case: str, timeout: float
+) -> tuple[bytes, bool]:
+    """Wait for Full setup to advance, retrying only while its cursor remains visible."""
+
+    deadline = time.monotonic() + timeout
+    retry_at = time.monotonic() + 2.0
+    retried = False
+    while time.monotonic() < deadline:
+        if all(contains_marker(buffer, marker) for marker in CONTINUATION_MARKERS):
+            return buffer, retried
+        exited, status = child_status(pid)
+        if exited:
+            buffer += read_available(fd)
+            raise ProbeFailure(
+                case,
+                "continuation-surface",
+                "Hermes exited before the Full setup continuation surface",
+                {"exit_status": status, "screen_tail": continuation_surface(buffer)[-2400:]},
+            )
+        if not retried and time.monotonic() >= retry_at:
+            if full_setup_cursor(buffer):
+                write_bytes(fd, b"\r")
+                retried = True
+            # The first Enter can be consumed while Ink is repainting the
+            # radio list. Never send a duplicate unless Full is still visibly
+            # selected and the continuation surface has not appeared.
+        buffer = drain(pid, fd, buffer, 0.05)
+    raise ProbeFailure(
+        case,
+        "continuation-surface",
+        f"timed out after {timeout:.1f}s",
+        {"screen_tail": continuation_surface(buffer)[-2400:]},
+    )
 
 
 def emit_report(report: dict[str, Any], path: Path | None) -> None:
@@ -109,14 +149,8 @@ def run_case(reference: Path, timeout: float) -> dict[str, Any]:
         buffer = drain(pid, fd, buffer, 0.3)
         time.sleep(0.15)
         write_bytes(fd, b"\r")
-        buffer = wait_for(
-            pid,
-            fd,
-            buffer,
-            case,
-            "continuation-surface",
-            lambda current: all(contains_marker(current, marker) for marker in CONTINUATION_MARKERS),
-            timeout,
+        buffer, full_selection_retried = wait_for_continuation_boundary(
+            pid, fd, buffer, case, timeout
         )
         buffer = drain(pid, fd, buffer, 0.5)
 
@@ -151,6 +185,7 @@ def run_case(reference: Path, timeout: float) -> dict[str, Any]:
             "secrets_file_created": secrets_path.exists() and not secrets_before,
             "new_config_backup_created": new_config_backup,
             "new_synthetic_files_count": len(new_files),
+            "full_selection_retried": full_selection_retried,
             "cleanup": "Ctrl+C interrupted the first provider boundary and exited cleanly",
             "clean_exit": exited,
         }

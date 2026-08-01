@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T13:22:16Z",
+  "updated_at": "2026-08-01T13:44:20Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -2459,6 +2459,50 @@
           "scripts/verify.sh",
           "docs/parity/MATRIX.md",
           "CONTEXT.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-050",
+      "title": "Harden Hermes Full setup continuation probe",
+      "status": "complete",
+      "priority": 33,
+      "lane": "verification",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-043",
+        "HAD-049"
+      ],
+      "risk": "low",
+      "oracle": [
+        "direct_pty_probe",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Add a guarded, state-aware retry to the Hermes Full setup continuation probe so it resubmits Enter only when the Full setup cursor is still visibly selected and the continuation surface has not appeared.",
+        "Preserve the probe's existing fresh synthetic-home, no-credential, no-network, normalization, artifact, and clean-cancellation boundaries; do not weaken assertions or add unconditional duplicate input.",
+        "Run the targeted Full setup probe and the complete no-skip just verify gate, document the timing-boundary hardening, and keep the checked-in reference fixture semantics unchanged."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_full_setup.py",
+        "CONTEXT.md",
+        "tests/fixtures/parity/OBS-0042-hermes-full-setup-continuation.json",
+        "docs/parity/observations/OBS-0042-hermes-full-setup-continuation-2026-08-01.md",
+        ".hades/runtime/had050-pre-completion-verify-retry-20260801T134135Z.log"
+      ],
+      "ready_at": "2026-08-01T13:37:07Z",
+      "attempts": 1,
+      "claimed_by": "hermes-probe-stability",
+      "claimed_at": "2026-08-01T13:37:23Z",
+      "result": {
+        "summary": "Added a state-aware Hermes Full setup continuation retry that resubmits Enter at most once and only while the Full setup cursor remains visible; targeted probe and complete no-skip verification passed, with fixture semantics unchanged.",
+        "completed_at": "2026-08-01T13:44:20Z",
+        "evidence": [
+          "scripts/probe_hermes_full_setup.py",
+          "CONTEXT.md",
+          "tests/fixtures/parity/OBS-0042-hermes-full-setup-continuation.json",
+          "docs/parity/observations/OBS-0042-hermes-full-setup-continuation-2026-08-01.md",
+          ".hades/runtime/had050-pre-completion-verify-retry-20260801T134135Z.log"
         ]
       }
     }

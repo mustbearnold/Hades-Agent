@@ -212,6 +212,10 @@ progress from August 1, 2026 through 2027.
   Three fresh captures show a config-byte change, normalized config backup, and
   clean Ctrl+C before backend selection; backend-specific setup and later
   behavior remain unknown.
+- HAD-050 hardens the Hermes Full setup direct-PTY continuation probe with a
+  guarded retry only while Full remains visibly selected; it preserves the
+  fresh synthetic-home, no-credential, no-network boundary and keeps the
+  checked-in fixture semantics unchanged.
 
 ## Unknown until observed
 
