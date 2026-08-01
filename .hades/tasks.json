@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T11:49:17Z",
+  "updated_at": "2026-08-01T12:11:15Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -2188,6 +2188,57 @@
           "justfile",
           "scripts/verify.sh",
           "README.md",
+          "CONTEXT.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-045",
+      "title": "Capture Hermes Full setup provider menu boundary",
+      "status": "complete",
+      "priority": 38,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-043"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "reference_observation",
+        "provenance_record",
+        "fixture_validator",
+        "direct_pty_probe"
+      ],
+      "acceptance": [
+        "Observe the pinned Hermes reference in a fresh 120x40 direct PTY using the sanitized loopback custom provider configuration, synthetic home, and no credentials or private runtime state.",
+        "Reach the Full setup Inference Provider surface through the already observed /setup completion, j navigation, and initial Full selection sequence, then capture only the pre-selection provider menu and stable navigation/cancellation landmarks.",
+        "Normalize provider names, URLs, paths, model values, runtime identifiers, timestamps, and animated redraw bytes; stop before selecting a provider, entering a secret, OAuth, persistence, model request, or network behavior.",
+        "Verify the bounded Ctrl+C cleanup path from the provider menu and record whether opening the menu creates any new synthetic-home artifact beyond the previously observed config backup.",
+        "Add sanitized OBS-0044 fixture, provenance observation, and repeatable direct-PTY probe; wire validation and the probe through just verify without changing Hades runtime behavior."
+      ],
+      "evidence": [
+        "tests/fixtures/parity/OBS-0044-hermes-full-setup-provider-menu.json",
+        "docs/parity/observations/OBS-0044-hermes-full-setup-provider-menu-2026-08-01.md",
+        "scripts/probe_hermes_full_setup_provider.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md"
+      ],
+      "ready_at": "2026-08-01T11:54:23Z",
+      "attempts": 1,
+      "claimed_by": "hermes-research-provider-menu",
+      "claimed_at": "2026-08-01T11:54:49Z",
+      "result": {
+        "summary": "Captured the bounded Hermes Full setup provider menu before selection: stable current-model/active-provider and visible custom-provider landmarks, guarded reversible navigation, clean Ctrl+C, unchanged config bytes, and normalized backup/history/update-check artifact classes.",
+        "completed_at": "2026-08-01T12:11:15Z",
+        "evidence": [
+          "tests/fixtures/parity/OBS-0044-hermes-full-setup-provider-menu.json",
+          "docs/parity/observations/OBS-0044-hermes-full-setup-provider-menu-2026-08-01.md",
+          "scripts/probe_hermes_full_setup_provider.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md",
           "CONTEXT.md"
         ]
       }

@@ -181,6 +181,12 @@ progress from August 1, 2026 through 2027.
   terminal restoration. The user-local release artifact still requires an
   explicit `just install-user` refresh, and an existing shell must have
   `~/.local/bin` on `PATH`.
+- HAD-045 captures the bounded Hermes Full setup provider menu before any
+  provider selection: current model/active provider, visible loopback and
+  custom rows, reversible Down navigation, clean Ctrl+C, unchanged config
+  bytes, and normalized backup/history/update-check artifact classes. Provider
+  selection, credentials, OAuth, model discovery, network behavior, and later
+  setup sections remain unknown.
 
 ## Unknown until observed
 

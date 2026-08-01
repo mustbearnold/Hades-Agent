@@ -103,6 +103,9 @@ probe-setup-wizard:
 probe-full-setup:
     python3 scripts/probe_hermes_full_setup.py --report .hades/runtime/hermes-full-setup-probe.json --timeout 30
 
+probe-full-setup-provider:
+    python3 scripts/probe_hermes_full_setup_provider.py --report .hades/runtime/hermes-full-setup-provider-probe.json --timeout 30
+
 replay-terminal-palette:
     cargo build --locked --package hades-cli
     python3 scripts/replay_terminal_palette.py --binary target/debug/hades --report .hades/runtime/hades-terminal-palette-replay.json

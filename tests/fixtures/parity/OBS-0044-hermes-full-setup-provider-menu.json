@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0044",
+  "reference_observation": "OBS-0042",
+  "surface": "hermes-full-setup-inference-provider-pre-selection",
+  "reference": {
+    "product": "Hermes Agent",
+    "version": "0.19.1 (2026.7.30)",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "direct PTY with ANSI screen model"
+    },
+    "capture": "fresh direct PTY with sanitized loopback custom provider and synthetic-home artifact comparison"
+  },
+  "terminal": {
+    "columns": 120,
+    "rows": 40,
+    "emulator": "direct PTY with ANSI screen model"
+  },
+  "normalization": [
+    "Reference checkout, synthetic HOME/HERMES_HOME paths, loopback URL, credentials, session identifiers, timestamps, and animated redraw bytes are omitted or replaced by placeholders.",
+    "The configured provider is an intentionally absent loopback endpoint; no external provider, OAuth flow, credential, model response, or network request is exercised.",
+    "Only stable provider-picker labels visible in the 120x40 viewport are asserted; the complete provider inventory, scroll behavior, and redraw ordering remain outside the claim.",
+    "Timestamped config backup names are represented by the config.yaml.bak.* class. History and update-check artifacts were observed with timing-dependent presence and are not attributed causally to provider selection."
+  ],
+  "steps": [
+    {
+      "id": "full-setup-provider-menu",
+      "precondition": "Fresh Hermes process at 120x40 with an isolated synthetic home and configured loopback custom provider.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "/setup",
+          "bytes_hex": "2f 73 65 74 75 70"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "key",
+          "value": "j",
+          "bytes_hex": "6a"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "key",
+          "value": "Down",
+          "bytes_hex": "1b 5b 42"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+C",
+          "bytes_hex": "03"
+        }
+      ],
+      "output": {
+        "status": "passed",
+        "pty_markers": [
+          "Configuration Location",
+          "Inference Provider",
+          "Current model:",
+          "Active provider:",
+          "Select provider:",
+          "palette-loopback",
+          "palette-model",
+          "Custom endpoint (enter URL manually)",
+          "Remove a saved custom provider"
+        ],
+        "pty_absent_markers": [
+          "Provider setup skipped.",
+          "API key",
+          "OAuth"
+        ],
+        "outcome": "The Full setup path reaches the provider picker, one Down navigation is sent without Enter, and Ctrl+C exits cleanly. No provider, secret, OAuth, model, save, or network action is entered."
+      }
+    }
+  ],
+  "artifacts": {
+    "config_yaml_unchanged": true,
+    "provider_selection_submitted": false,
+    "clean_exit": true,
+    "observed_new_file_classes": [
+      "config.yaml.bak.<timestamp>",
+      ".hermes_history",
+      ".update_check"
+    ],
+    "artifact_boundary": "The config backup was observed in every bounded capture; history and update-check files varied with cleanup/update timing and are recorded without causal attribution to the provider menu."
+  },
+  "unknowns": [
+    "The complete provider inventory, ordering beyond the visible viewport, scrolling, grouped-provider member menus, and exact cursor placement remain unknown outside the asserted labels.",
+    "Provider selection, custom endpoint entry, API-key or secret prompts, OAuth, model discovery, model selection, persistence after a provider action, and network behavior remain unobserved.",
+    "The source and retention semantics of .hermes_history, .update_check, and timestamped config backups remain separate unknowns.",
+    "Later Full setup sections, terminal backend, agent settings, messaging, tools, successful setup, and cancellation after provider selection remain unknown."
+  ],
+  "passed": true
+}
