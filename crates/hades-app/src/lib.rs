@@ -8,8 +8,8 @@ use std::{
 };
 
 use hades_core::{
-    CompletionState, Composer, EnterAction, InputEvent, Key, MAX_INPUT_HISTORY, Message, Notice,
-    Overlay, SessionState, TurnState,
+    CompletionState, Composer, EnterAction, InputEvent, Key, MAX_INPUT_HISTORY, Message,
+    ModelPickerAction, ModelPickerStage, Notice, Overlay, SessionState, TurnState,
 };
 
 #[derive(Clone, Debug)]
@@ -176,6 +176,7 @@ impl App {
                     }
                     _ => DispatchOutcome::Continue,
                 },
+                Overlay::ModelPicker => self.handle_model_picker_key(key),
                 Overlay::SetupRequired => match key {
                     Key::Ctrl('c') if !self.state.composer.text().is_empty() => {
                         self.state.composer.clear();
@@ -208,6 +209,10 @@ impl App {
                 self.clear_notice();
                 self.state.composer.backspace();
                 self.refresh_completion();
+                DispatchOutcome::Continue
+            }
+            Key::Enter if self.state.completion.first_item() == Some("/model") => {
+                self.apply_completion();
                 DispatchOutcome::Continue
             }
             Key::Enter => match self.state.composer.enter() {
@@ -333,6 +338,16 @@ impl App {
             return DispatchOutcome::Continue;
         }
 
+        if content == "/model" {
+            self.clear_notice();
+            self.state.model_picker = Some(Default::default());
+            self.state.overlay = Some(Overlay::ModelPicker);
+            self.state.composer.clear();
+            self.state.turn = TurnState::Ready;
+            self.state.status = "Select provider (step 1/2).".to_owned();
+            return DispatchOutcome::Continue;
+        }
+
         if content.starts_with('/') {
             self.state.messages.push(Message::user(&content));
             self.state.messages.push(Message::system(format!(
@@ -375,6 +390,41 @@ impl App {
         self.state.composer.insert_text(&text);
         self.clear_completion();
         self.state.status = "Pasted input.".to_owned();
+        DispatchOutcome::Continue
+    }
+
+    fn handle_model_picker_key(&mut self, key: Key) -> DispatchOutcome {
+        let Some(picker) = &mut self.state.model_picker else {
+            self.state.overlay = None;
+            return DispatchOutcome::Continue;
+        };
+        let action = picker.handle_key(key);
+        let stage = picker.stage();
+        let filter = picker.filter().to_owned();
+
+        match action {
+            ModelPickerAction::Closed => {
+                self.state.overlay = None;
+                self.state.model_picker = None;
+                self.state.status = "Model picker closed.".to_owned();
+            }
+            ModelPickerAction::ClearedFilter => {
+                self.state.status = format!("{} filter cleared.", stage.label());
+            }
+            ModelPickerAction::ReturnedToProvider => {
+                self.state.status = "Select provider (step 1/2).".to_owned();
+            }
+            ModelPickerAction::Continue => {
+                self.state.status = match (stage, filter.is_empty()) {
+                    (ModelPickerStage::Provider, true) => "Select provider (step 1/2).".to_owned(),
+                    (ModelPickerStage::Provider, false) => {
+                        format!("Filtering providers: {filter}.")
+                    }
+                    (ModelPickerStage::Model, true) => "Select model (step 2/2).".to_owned(),
+                    (ModelPickerStage::Model, false) => format!("Filtering models: {filter}."),
+                };
+            }
+        }
         DispatchOutcome::Continue
     }
 
@@ -548,6 +598,47 @@ mod tests {
             Some("Unknown command: /not-a-real-hermes-command\nType /help for available commands")
         );
         assert_eq!(app.state().status, "Unknown command: /not-a-real-hermes-command");
+    }
+
+    #[test]
+    fn model_picker_follows_the_two_step_entry_and_escape_contract() {
+        let mut app = App::new();
+        for character in "/model".chars() {
+            app.handle(InputEvent::Key(Key::Char(character)));
+        }
+        assert_eq!(app.state().completion.items(), &vec!["/model".to_owned()]);
+
+        assert_eq!(app.handle(InputEvent::Key(Key::Enter)), DispatchOutcome::Continue);
+        assert_eq!(app.state().overlay, None);
+        assert_eq!(app.state().composer.text(), "/model");
+
+        assert_eq!(app.handle(InputEvent::Key(Key::Enter)), DispatchOutcome::Continue);
+        assert_eq!(app.state().overlay, Some(Overlay::ModelPicker));
+        assert_eq!(app.state().model_picker.as_ref().unwrap().stage(), ModelPickerStage::Provider);
+        assert_eq!(app.state().turn, TurnState::Ready);
+        assert_eq!(app.state().composer.text(), "");
+
+        for character in "palette".chars() {
+            app.handle(InputEvent::Key(Key::Char(character)));
+        }
+        assert_eq!(app.state().model_picker.as_ref().unwrap().filter(), "palette");
+        app.handle(InputEvent::Key(Key::Enter));
+        assert_eq!(app.state().model_picker.as_ref().unwrap().stage(), ModelPickerStage::Model);
+        assert_eq!(app.state().model_picker.as_ref().unwrap().filter(), "");
+
+        for character in "palette".chars() {
+            app.handle(InputEvent::Key(Key::Char(character)));
+        }
+        app.handle(InputEvent::Key(Key::Escape));
+        assert_eq!(app.state().model_picker.as_ref().unwrap().stage(), ModelPickerStage::Model);
+        assert_eq!(app.state().model_picker.as_ref().unwrap().filter(), "");
+        app.handle(InputEvent::Key(Key::Escape));
+        assert_eq!(app.state().model_picker.as_ref().unwrap().stage(), ModelPickerStage::Provider);
+        app.handle(InputEvent::Key(Key::Char('q')));
+        assert_eq!(app.state().overlay, None);
+        assert!(app.state().model_picker.is_none());
+        assert!(!app.state().should_quit);
+        assert_eq!(app.state().turn, TurnState::Ready);
     }
 
     #[test]

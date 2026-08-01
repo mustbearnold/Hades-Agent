@@ -60,7 +60,93 @@ pub enum TurnState {
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum Overlay {
     Sessions,
+    ModelPicker,
     SetupRequired,
+}
+
+#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub enum ModelPickerStage {
+    #[default]
+    Provider,
+    Model,
+}
+
+impl ModelPickerStage {
+    pub const fn label(self) -> &'static str {
+        match self {
+            Self::Provider => "Provider",
+            Self::Model => "Model",
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub enum ModelPickerAction {
+    Continue,
+    ClearedFilter,
+    ReturnedToProvider,
+    Closed,
+}
+
+pub const MODEL_PICKER_PROVIDER: &str = "palette-loopback";
+pub const MODEL_PICKER_MODEL: &str = "palette-model";
+
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub struct ModelPickerState {
+    stage: ModelPickerStage,
+    filter: String,
+}
+
+impl ModelPickerState {
+    pub fn stage(&self) -> ModelPickerStage {
+        self.stage
+    }
+
+    pub fn filter(&self) -> &str {
+        &self.filter
+    }
+
+    pub fn provider_matches(&self) -> bool {
+        matches_filter(MODEL_PICKER_PROVIDER, &self.filter)
+    }
+
+    pub fn model_matches(&self) -> bool {
+        matches_filter(MODEL_PICKER_MODEL, &self.filter)
+    }
+
+    pub fn handle_key(&mut self, key: Key) -> ModelPickerAction {
+        match key {
+            Key::Char('q') if self.filter.is_empty() => ModelPickerAction::Closed,
+            Key::Char(character) if !character.is_control() => {
+                self.filter.push(character);
+                ModelPickerAction::Continue
+            }
+            Key::Backspace => {
+                self.filter.pop();
+                ModelPickerAction::Continue
+            }
+            Key::Enter if self.stage == ModelPickerStage::Provider && self.provider_matches() => {
+                self.stage = ModelPickerStage::Model;
+                self.filter.clear();
+                ModelPickerAction::Continue
+            }
+            Key::Escape if !self.filter.is_empty() => {
+                self.filter.clear();
+                ModelPickerAction::ClearedFilter
+            }
+            Key::Escape if self.stage == ModelPickerStage::Model => {
+                self.stage = ModelPickerStage::Provider;
+                self.filter.clear();
+                ModelPickerAction::ReturnedToProvider
+            }
+            Key::Escape => ModelPickerAction::Closed,
+            _ => ModelPickerAction::Continue,
+        }
+    }
+}
+
+fn matches_filter(value: &str, filter: &str) -> bool {
+    filter.is_empty() || value.to_ascii_lowercase().contains(&filter.to_ascii_lowercase())
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
@@ -98,6 +184,10 @@ pub struct CompletionState {
 
 impl CompletionState {
     pub fn for_draft(draft: &str) -> Self {
+        if draft == "/model" {
+            return Self { items: vec!["/model".to_owned()] };
+        }
+
         if draft == "/he" {
             return Self {
                 items: OBSERVED_SLASH_COMPLETIONS.iter().map(|item| (*item).to_owned()).collect(),
@@ -308,6 +398,7 @@ pub struct SessionState {
     pub surface: Surface,
     pub turn: TurnState,
     pub overlay: Option<Overlay>,
+    pub model_picker: Option<ModelPickerState>,
     pub notice: Option<Notice>,
     pub composer: Composer,
     pub completion: CompletionState,
@@ -322,6 +413,7 @@ impl Default for SessionState {
             surface: Surface::Home,
             turn: TurnState::Ready,
             overlay: None,
+            model_picker: None,
             notice: None,
             composer: Composer::default(),
             completion: CompletionState::default(),
@@ -538,5 +630,30 @@ mod tests {
             Message::user("hello"),
             Message { role: Role::User, content: "hello".to_owned() }
         );
+    }
+
+    #[test]
+    fn model_picker_filters_then_escapes_back_through_typed_stages() {
+        let mut picker = ModelPickerState::default();
+        for character in "palette".chars() {
+            assert_eq!(picker.handle_key(Key::Char(character)), ModelPickerAction::Continue);
+        }
+        assert_eq!(picker.filter(), "palette");
+        assert!(picker.provider_matches());
+
+        assert_eq!(picker.handle_key(Key::Enter), ModelPickerAction::Continue);
+        assert_eq!(picker.stage(), ModelPickerStage::Model);
+        assert_eq!(picker.filter(), "");
+
+        for character in "palette".chars() {
+            picker.handle_key(Key::Char(character));
+        }
+        assert!(picker.model_matches());
+        assert_eq!(picker.handle_key(Key::Escape), ModelPickerAction::ClearedFilter);
+        assert_eq!(picker.stage(), ModelPickerStage::Model);
+        assert_eq!(picker.filter(), "");
+        assert_eq!(picker.handle_key(Key::Escape), ModelPickerAction::ReturnedToProvider);
+        assert_eq!(picker.stage(), ModelPickerStage::Provider);
+        assert_eq!(picker.handle_key(Key::Escape), ModelPickerAction::Closed);
     }
 }

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T09:54:36Z",
+  "updated_at": "2026-08-01T10:10:33Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -1922,6 +1922,64 @@
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-040",
+      "title": "Implement the bounded Hermes model picker",
+      "status": "complete",
+      "priority": 43,
+      "lane": "behavior",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-038",
+        "HAD-039"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "typed_core_transition",
+        "focused_renderer_test",
+        "direct_pty_replay",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Add typed model-picker state for the observed provider and model stages, filtered selection, active provider/model labels, and overlay close/back transitions; keep the catalog deterministic and independent of provider networking.",
+        "Route the bounded /model entry surface through the observed two-step submission sequence and render the synthetic palette-loopback provider with palette-model while preserving existing /help, unknown-command, ordinary submission, history, and lifecycle behavior.",
+        "Match the observed stable 120x40 landmarks for provider/model titles, Current/model labels, type-to-filter and filter text, persist: session, Esc clear/back, and q close; send printable filtering through typed state rather than stringly renderer logic.",
+        "Prove model-stage filtering, first Escape clearing the active filter, second Escape returning to providers, q returning to ready, and no Busy/model request through focused core/TUI tests and an isolated direct-PTY replay derived from OBS-0038.",
+        "Add a sanitized OBS-0039 Hades implementation fixture and observation, wire its replay through just verify, run the complete no-skip gate, and record all remaining provider/network/model-selection unknowns explicitly."
+      ],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-app/src/lib.rs",
+        "crates/hades-tui/src/lib.rs",
+        "tests/fixtures/parity/OBS-0039-hades-model-picker-model-stage.json",
+        "scripts/replay_model_picker.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/observations/OBS-0039-hades-model-picker-model-stage-2026-08-01.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md"
+      ],
+      "ready_at": "2026-08-01T09:59:48Z",
+      "attempts": 1,
+      "claimed_by": "hades-implementer",
+      "claimed_at": "2026-08-01T10:00:44Z",
+      "result": {
+        "summary": "Implemented the bounded Hermes model picker with typed provider/model stages, deterministic palette-loopback/palette-model filtering, the observed two-step /model entry, both Escape meanings, q close, focused tests, and a fresh 120x40 replay; the complete just verify gate passes.",
+        "completed_at": "2026-08-01T10:10:33Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-app/src/lib.rs",
+          "crates/hades-tui/src/lib.rs",
+          "tests/fixtures/parity/OBS-0039-hades-model-picker-model-stage.json",
+          "scripts/replay_model_picker.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/observations/OBS-0039-hades-model-picker-model-stage-2026-08-01.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md"
         ]
       }
     }

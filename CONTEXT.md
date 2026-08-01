@@ -152,7 +152,13 @@ progress from August 1, 2026 through 2027.
   current model, filter, session persistence, and close landmarks, and Escape
   first clears the model filter before a second Escape returns to providers.
   The full ANSI stream is replayed through a screen model to account for
-  incremental Ink redraws; Hades model-picker behavior remains unimplemented.
+  incremental Ink redraws; the implementation seam is carried by HAD-040.
+- HAD-040 implements the bounded model-picker seam with typed provider/model
+  stages, deterministic `palette-loopback`/`palette-model` labels, filtering,
+  the observed two-step `/model` entry, and the two Escape meanings. A fresh
+  120x40 replay verifies the stable landmarks, ready-state close, and absence
+  of Busy/network behavior; provider discovery and model switching remain
+  unknown.
 
 ## Unknown until observed
 
@@ -166,7 +172,8 @@ progress from August 1, 2026 through 2027.
   terminal-dependent surfaces beyond the captured observations.
 - The complete slash-command catalog and argument semantics, provider/model
   discovery details, setup wizard continuation and persistence, configured
-  command behavior with a reachable provider, and Hades model-picker behavior.
+  command behavior with a reachable provider, and model-picker behavior beyond
+  the bounded deterministic provider/model seam.
 - OSC52 behavior outside the OBS-0032 timing controls and bounded payload
   sizes, including a universal timeout or maximum-size contract.
 

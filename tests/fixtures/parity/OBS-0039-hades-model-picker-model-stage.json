@@ -1,0 +1,281 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0039",
+  "reference_observation": "OBS-0038",
+  "surface": "hades-tui-bounded-model-picker-model-stage-and-back-controls",
+  "reference": {
+    "product": "Hades Agent",
+    "version": "workspace implementation",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "tmux-backed PTY"
+    },
+    "capture": "isolated Hades replay derived from the pinned Hermes OBS-0038 landmarks"
+  },
+  "terminal": {
+    "columns": 120,
+    "rows": 40,
+    "emulator": "tmux-backed PTY"
+  },
+  "normalization": [
+    "The Hades binary path, synthetic HERMES_HOME, PTY/session identifiers, timestamps, cursor placement, and ANSI styling are omitted.",
+    "The bounded implementation uses a deterministic palette-loopback provider and palette-model catalog; no credentials, provider discovery, network request, model response, or model persistence is exercised.",
+    "The replay asserts stable picker landmarks and state transitions only; dynamic Hermes provider/model inventories remain outside the Hades implementation contract.",
+    "The first Enter accepts the /model completion and the second Enter opens the provider picker, matching the observed two-step entry sequence."
+  ],
+  "steps": [
+    {
+      "id": "model-picker-contract",
+      "precondition": "Fresh Hades process at 120x40 with an isolated HERMES_HOME history directory.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "/model",
+          "bytes_hex": "2f 6d 6f 64 65 6c"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "text",
+          "value": "palette",
+          "bytes_hex": "70 61 6c 65 74 74 65"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "text",
+          "value": "palette",
+          "bytes_hex": "70 61 6c 65 74 74 65"
+        },
+        {
+          "kind": "key",
+          "value": "Escape",
+          "bytes_hex": "1b"
+        },
+        {
+          "kind": "key",
+          "value": "Escape",
+          "bytes_hex": "1b"
+        },
+        {
+          "kind": "key",
+          "value": "q",
+          "bytes_hex": "71"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+C",
+          "bytes_hex": "03"
+        }
+      ],
+      "output": {
+        "status": "passed",
+        "pty_markers": [
+          "Select provider (step 1/2)",
+          "filter: palette",
+          "palette-loopback",
+          "Select model (step 2/2)",
+          "palette-model",
+          "persist: session",
+          "Esc clear/back",
+          "q close",
+          "─ ready │ mock model"
+        ],
+        "pty_absent_markers": [
+          "musing…",
+          "Ctrl+C to interrupt"
+        ],
+        "outcome": "Provider filtering, model-stage filtering, first-Escape filter clearing, second-Escape provider navigation, q close, and clean Ctrl+C exit all passed without Busy or a model request."
+      }
+    }
+  ],
+  "cases": [
+    {
+      "id": "model-picker-model-stage",
+      "steps": [
+        {
+          "id": "type-model",
+          "input": {
+            "kind": "text",
+            "value": "/model"
+          },
+          "output": {
+            "pty_markers": [
+              "completions",
+              "/model"
+            ],
+            "pty_absent_markers": []
+          }
+        },
+        {
+          "id": "accept-model-completion",
+          "input": {
+            "kind": "key",
+            "value": "Enter"
+          },
+          "output": {
+            "pty_markers": [
+              "❯ /model"
+            ],
+            "pty_absent_markers": [
+              "completions"
+            ]
+          }
+        },
+        {
+          "id": "open-provider-picker",
+          "input": {
+            "kind": "key",
+            "value": "Enter"
+          },
+          "output": {
+            "pty_markers": [
+              "Select provider (step 1/2)",
+              "Current: palette-model",
+              "type to filter",
+              "persist: session",
+              "Esc clear/back",
+              "q close"
+            ],
+            "pty_absent_markers": [
+              "musing…",
+              "Ctrl+C to interrupt"
+            ]
+          }
+        },
+        {
+          "id": "filter-provider",
+          "input": {
+            "kind": "text",
+            "value": "palette"
+          },
+          "output": {
+            "pty_markers": [
+              "filter: palette",
+              "palette-loopback"
+            ],
+            "pty_absent_markers": []
+          }
+        },
+        {
+          "id": "open-model-stage",
+          "input": {
+            "kind": "key",
+            "value": "Enter"
+          },
+          "output": {
+            "pty_markers": [
+              "Select model (step 2/2)",
+              "palette-loopback",
+              "type to filter",
+              "palette-model",
+              "persist: session",
+              "Esc clear/back",
+              "q close"
+            ],
+            "pty_absent_markers": [
+              "musing…",
+              "Ctrl+C to interrupt"
+            ]
+          }
+        },
+        {
+          "id": "filter-model",
+          "input": {
+            "kind": "text",
+            "value": "palette"
+          },
+          "output": {
+            "pty_markers": [
+              "Select model (step 2/2)",
+              "filter: palette",
+              "palette-model"
+            ],
+            "pty_absent_markers": []
+          }
+        },
+        {
+          "id": "clear-model-filter",
+          "input": {
+            "kind": "key",
+            "value": "Escape"
+          },
+          "output": {
+            "pty_markers": [
+              "Select model (step 2/2)",
+              "type to filter"
+            ],
+            "pty_absent_markers": [
+              "filter: palette"
+            ]
+          }
+        },
+        {
+          "id": "back-to-provider-picker",
+          "input": {
+            "kind": "key",
+            "value": "Escape"
+          },
+          "output": {
+            "pty_markers": [
+              "Select provider (step 1/2)",
+              "type to filter"
+            ],
+            "pty_absent_markers": [
+              "Select model (step 2/2)"
+            ]
+          }
+        },
+        {
+          "id": "close-picker",
+          "input": {
+            "kind": "text",
+            "value": "q"
+          },
+          "output": {
+            "pty_markers": [
+              "─ ready │ mock model"
+            ],
+            "pty_absent_markers": [
+              "Select provider (step 1/2)",
+              "Select model (step 2/2)",
+              "musing…",
+              "Ctrl+C to interrupt"
+            ]
+          }
+        },
+        {
+          "id": "exit",
+          "input": {
+            "kind": "key",
+            "value": "Ctrl+C"
+          },
+          "output": {
+            "pty_markers": [],
+            "pty_absent_markers": [],
+            "process_exit": true
+          }
+        }
+      ]
+    }
+  ],
+  "unknowns": [
+    "Provider discovery, credentials, network requests, model inventory refresh, model selection persistence, Enter switch behavior, and model responses are not implemented or exercised.",
+    "The deterministic catalog is a bounded parity seam, not a claim about the complete Hermes provider/model universe.",
+    "Alternate terminal sizes/themes, empty provider/model lists, setup/key entry, disconnect, and concurrent input remain unknown."
+  ],
+  "passed": true
+}

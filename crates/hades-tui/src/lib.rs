@@ -1,7 +1,9 @@
 #![forbid(unsafe_code)]
 
 use hades_app::App;
-use hades_core::{Notice, Overlay, TurnState};
+use hades_core::{
+    MODEL_PICKER_MODEL, MODEL_PICKER_PROVIDER, ModelPickerStage, Notice, Overlay, TurnState,
+};
 use ratatui::{
     Frame, Terminal,
     backend::TestBackend,
@@ -57,6 +59,7 @@ pub fn draw(frame: &mut Frame<'_>, app: &App) {
 
     match app.state().overlay {
         Some(Overlay::Sessions) => draw_sessions_overlay(frame),
+        Some(Overlay::ModelPicker) => draw_model_picker_overlay(frame, app),
         Some(Overlay::SetupRequired) => draw_setup_required_overlay(frame, app),
         None => {}
     }
@@ -229,6 +232,86 @@ fn draw_setup_required_overlay(frame: &mut Frame<'_>, app: &App) {
             .title_style(HERMES_PALETTE.brand())
             .title(" Setup Required "),
     );
+    frame.render_widget(Clear, area);
+    frame.render_widget(panel, area);
+}
+
+fn draw_model_picker_overlay(frame: &mut Frame<'_>, app: &App) {
+    let Some(picker) = app.state().model_picker.as_ref() else {
+        return;
+    };
+    let area = centered_rect(frame.area(), 92, 18);
+    let filter_line = if picker.filter().is_empty() {
+        " type to filter · ↑/↓ select".to_owned()
+    } else {
+        format!(" filter: {}▎", picker.filter())
+    };
+    let mut lines = vec![Line::styled(
+        match picker.stage() {
+            ModelPickerStage::Provider => " Select provider (step 1/2)".to_owned(),
+            ModelPickerStage::Model => " Select model (step 2/2)".to_owned(),
+        },
+        HERMES_PALETTE.brand(),
+    )];
+
+    match picker.stage() {
+        ModelPickerStage::Provider => {
+            lines.extend([
+                Line::styled(
+                    " Full model IDs on the next step · Enter to continue",
+                    HERMES_PALETTE.secondary(),
+                ),
+                Line::styled(" Current: palette-model", HERMES_PALETTE.secondary()),
+                Line::styled(filter_line, HERMES_PALETTE.secondary()),
+                Line::raw(" "),
+            ]);
+            if picker.provider_matches() {
+                lines.push(Line::styled(
+                    format!(" ▸ 1. * {MODEL_PICKER_PROVIDER} · 1 models"),
+                    HERMES_PALETTE.secondary(),
+                ));
+            } else {
+                lines.push(Line::styled(" no providers match", HERMES_PALETTE.secondary()));
+            }
+            lines.extend([
+                Line::raw(" "),
+                Line::styled(" persist: session · ^g toggle", HERMES_PALETTE.secondary()),
+                Line::styled(
+                    " ↑/↓ select · Enter choose · ^d disconnect · Esc clear/back · q close",
+                    HERMES_PALETTE.secondary(),
+                ),
+            ]);
+        }
+        ModelPickerStage::Model => {
+            lines.extend([
+                Line::styled(
+                    format!(" {MODEL_PICKER_PROVIDER} · Esc back"),
+                    HERMES_PALETTE.secondary(),
+                ),
+                Line::styled(filter_line, HERMES_PALETTE.secondary()),
+                Line::raw(" "),
+            ]);
+            if picker.model_matches() {
+                lines.push(Line::styled(
+                    format!(" ▸ 1. * {MODEL_PICKER_MODEL}"),
+                    HERMES_PALETTE.secondary(),
+                ));
+            } else {
+                lines.push(Line::styled(" no models match filter", HERMES_PALETTE.secondary()));
+            }
+            lines.extend([
+                Line::raw(" "),
+                Line::styled(" persist: session · ^g toggle", HERMES_PALETTE.secondary()),
+                Line::styled(
+                    " ↑/↓ select · Enter switch · Esc clear/back · q close",
+                    HERMES_PALETTE.secondary(),
+                ),
+            ]);
+        }
+    }
+
+    let panel = Paragraph::new(Text::from(lines))
+        .block(Block::default().borders(Borders::ALL).title(" Model picker "));
     frame.render_widget(Clear, area);
     frame.render_widget(panel, area);
 }
@@ -491,6 +574,71 @@ mod tests {
         let cleared = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
         assert!(cleared.contains("Setup Required"));
         assert!(!cleared.contains("/help"));
+    }
+
+    #[test]
+    fn hermes_startup_surface_renders_model_picker_stages_and_back_controls() {
+        let mut app = App::new();
+        for character in "/model".chars() {
+            app.handle(hades_core::InputEvent::Key(hades_core::Key::Char(character)));
+        }
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
+
+        let provider = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        for marker in [
+            "Select provider (step 1/2)",
+            "Current: palette-model",
+            "type to filter",
+            "persist: session",
+            "Esc clear/back",
+            "q close",
+        ] {
+            assert!(provider.contains(marker), "missing provider marker: {marker}");
+        }
+
+        for character in "palette".chars() {
+            app.handle(hades_core::InputEvent::Key(hades_core::Key::Char(character)));
+        }
+        assert!(
+            snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT).contains("filter: palette")
+        );
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
+
+        let model = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        for marker in [
+            "Select model (step 2/2)",
+            "palette-loopback",
+            "palette-model",
+            "type to filter",
+            "persist: session",
+            "Esc clear/back",
+            "q close",
+        ] {
+            assert!(model.contains(marker), "missing model marker: {marker}");
+        }
+
+        for character in "palette".chars() {
+            app.handle(hades_core::InputEvent::Key(hades_core::Key::Char(character)));
+        }
+        assert!(
+            snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT).contains("filter: palette")
+        );
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Escape));
+        let cleared = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        assert!(cleared.contains("Select model (step 2/2)"));
+        assert!(cleared.contains("type to filter"));
+        assert!(!cleared.contains("filter: palette"));
+
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Escape));
+        assert!(
+            snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT)
+                .contains("Select provider (step 1/2)")
+        );
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Char('q')));
+        let closed = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        assert!(!closed.contains("Select provider (step 1/2)"));
+        assert!(closed.contains("─ ready │ mock model"));
     }
 
     #[test]
