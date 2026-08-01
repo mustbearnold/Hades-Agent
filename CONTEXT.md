@@ -98,8 +98,11 @@ progress from August 1, 2026 through 2027.
   attachments, and gateway behavior remain unknown. HAD-028 observes Hermes'
   ST-terminated behavior: usable text wins before native xclip, while empty and
   invalid-base64 responses fall back. HAD-029 verifies those three ST controls
-  in Hades through a dedicated direct-PTY replay; delayed/oversized responses,
-  tmux/STY wrapping, image attachments, and gateway behavior remain unknown.
+  in Hades through a dedicated direct-PTY replay. HAD-030 observes Hermes'
+  exact TMUX and STY OSC52 query wrappers plus direct-response/native-fallback
+  boundaries in a synthetic direct PTY. Live multiplexer/outer-terminal
+  forwarding, delayed/oversized responses, image attachments, and gateway
+  behavior remain unknown; Hades wrapper parity is the next implementation task.
 
 ## Unknown until observed
 

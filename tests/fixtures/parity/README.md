@@ -66,3 +66,7 @@ Hades implementation parity.
 OBS-0029 is the Hades implementation contract derived from OBS-0028 and is
 consumed by the direct-PTY ST replay; it proves the same usable-response
 precedence and malformed-response fallback in Hades.
+OBS-0030 captures the reference-only TMUX/STY OSC52 passthrough query wrappers
+and direct raw-response/native-fallback boundaries in a synthetic direct PTY.
+It is consumed by `scripts/probe_hermes_osc52_multiplexer.py` and does not claim
+live multiplexer, outer-terminal forwarding, or Hades implementation parity.

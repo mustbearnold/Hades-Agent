@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T07:14:15Z",
+  "updated_at": "2026-08-01T07:25:58Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -1408,6 +1408,57 @@
           "tests/fixtures/parity/OBS-0029-hades-osc52-st-termination.json",
           "docs/parity/observations/OBS-0029-hades-osc52-st-termination-2026-08-01.md",
           "scripts/replay_osc52_clipboard.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-030",
+      "title": "Capture Hermes TMUX/STY OSC52 passthrough behavior",
+      "status": "complete",
+      "priority": 53,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-029"
+      ],
+      "risk": "high",
+      "oracle": [
+        "reference_observation",
+        "provenance_record",
+        "fixture_validator",
+        "direct_pty_probe"
+      ],
+      "acceptance": [
+        "Observe the pinned Hermes reference at its recorded source revision in fresh direct 120x40 PTYs with sanitized SSH_TTY plus a synthetic TMUX marker and a synthetic STY marker, keeping the bare SSH_TTY control from OBS-0024 as the comparison boundary.",
+        "Capture exact Ctrl+V OSC52 query bytes for TMUX and STY, including DCS/passthrough wrappers and terminators, then record whether a directly supplied usable OSC52 response is consumed, ignored, or requires a modeled wrapper response.",
+        "Capture a bounded no-response/DA1 control for each wrapper when deterministic, recording native-provider fallback order, exact arguments, payload/newline behavior, draft preservation, ready/busy/submission markers, cleanup, and timing.",
+        "Add sanitized OBS-0030 fixture, provenance observation, and deterministic direct-PTY probe; validate the fixture and wire the research probe through just verify without modifying Hades runtime behavior.",
+        "Do not claim a live tmux or GNU Screen server, outer-terminal forwarding, image/path payloads, gateway behavior, delayed/oversized responses, or concurrent-input parity unless directly exercised and separately evidenced."
+      ],
+      "evidence": [
+        "tests/fixtures/parity/OBS-0030-hermes-osc52-multiplexer-passthrough.json",
+        "docs/parity/observations/OBS-0030-hermes-osc52-multiplexer-passthrough-2026-08-01.md",
+        "scripts/probe_hermes_osc52_multiplexer.py",
+        "scripts/validate_reference_fixture.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "ready_at": "2026-08-01T07:15:37Z",
+      "attempts": 1,
+      "claimed_by": "hermes-research",
+      "claimed_at": "2026-08-01T07:16:07Z",
+      "result": {
+        "summary": "captured-hermes-tmux-sty-osc52-wrapper-and-fallback-boundaries-with-direct-pty-evidence-and-full-verify",
+        "completed_at": "2026-08-01T07:25:58Z",
+        "evidence": [
+          "tests/fixtures/parity/OBS-0030-hermes-osc52-multiplexer-passthrough.json",
+          "docs/parity/observations/OBS-0030-hermes-osc52-multiplexer-passthrough-2026-08-01.md",
+          "scripts/probe_hermes_osc52_multiplexer.py",
+          "scripts/validate_reference_fixture.py",
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md"

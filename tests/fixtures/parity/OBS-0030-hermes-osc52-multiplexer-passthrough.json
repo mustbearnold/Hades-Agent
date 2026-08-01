@@ -1,0 +1,209 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0030",
+  "reference_observation": "OBS-0024",
+  "surface": "hermes-tui-remote-osc52-multiplexer-passthrough",
+  "reference": {
+    "product": "Hermes TUI",
+    "version": "0.19.1",
+    "display_build": "2026.7.30",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "direct PTY with raw byte writes"
+    },
+    "capture": "direct PTY with synthetic SSH_TTY, synthetic TMUX or STY marker, synthetic xclip provider, and raw OSC52/DA1 bytes",
+    "runtime": {
+      "node": "22.22.2",
+      "npm": "10.9.7",
+      "python": "3.11.14",
+      "uv": "0.12.1"
+    }
+  },
+  "normalization": [
+    "Temporary checkout, synthetic HERMES_HOME, HOME, xclip, and PTY paths are represented by placeholders.",
+    "SSH_TTY is set to a synthetic remote marker; each fresh case sets exactly one synthetic TMUX or STY marker and removes the other.",
+    "ANSI control sequences, cursor placement, colors, timestamps, session IDs, prompt faces, offsets, dynamic working-directory text, and wall-clock durations are not part of this contract.",
+    "The PTY window is explicitly set to 120 columns by 40 rows before process launch.",
+    "Ctrl+V is sent as raw byte 0x16. The wrapped query, direct raw OSC52 response, DA1 sentinel, and DA1 response are written and asserted as exact PTY bytes.",
+    "The synthetic xclip provider records -selection clipboard -out and returns a case-specific native payload with one trailing newline.",
+    "The direct-response timing boundary is response supplied after the wrapped query and before the DA1 response; the fallback boundary is two observed DA1 barriers answered before native xclip. No wall-clock latency contract is claimed.",
+    "A response boundary is considered ready when the expected OSC52 or native payload is inserted and the busy interrupt marker is absent; no agent submission is allowed in these controls.",
+    "The PTY writes a raw OSC52 response directly after the wrapped query. No live tmux or GNU Screen daemon, outer-terminal forwarding, or multiplexer server is part of this model."
+  ],
+  "steps": [
+    {
+      "id": "tmux-direct-response",
+      "precondition": "SSH_TTY and the synthetic TMUX marker are present, STY is absent, and Hermes emits the TMUX passthrough wrapper.",
+      "draft": "mux-boundary-tmux-direct-response",
+      "native_payload": "native-tmux-direct-response\n",
+      "expected_outcome": "osc52-response",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "mux-boundary-tmux-direct-response",
+          "bytes_hex": "6d 75 78 2d 62 6f 75 6e 64 61 72 79 2d 74 6d 75 78 2d 64 69 72 65 63 74 2d 72 65 73 70 6f 6e 73 65"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+V",
+          "bytes_hex": "16"
+        }
+      ],
+      "terminal_response": {
+        "multiplexer_marker": "TMUX",
+        "osc52_query_bytes_hex": "1b 5d 35 32 3b 63 3b 3f 07",
+        "wrapped_query_bytes_hex": "1b 50 74 6d 75 78 3b 1b 1b 5d 35 32 3b 63 3b 3f 07 1b 5c",
+        "osc52_response_bytes_hex": "1b 5d 35 32 3b 63 3b 62 58 56 34 4c 58 4a 6c 62 57 39 30 5a 53 41 67 43 6d 78 70 62 6d 55 74 64 48 64 76 43 67 6f 3d 07",
+        "da1_sentinel_bytes_hex": "1b 5b 63",
+        "da1_response_bytes_hex": "1b 5b 3f 36 32 63",
+        "da1_barriers_answered": 2
+      },
+      "output": {
+        "status": "ready",
+        "outcome": "osc52-response",
+        "osc52_text": "mux-remote  \nline-two",
+        "submission": "not submitted",
+        "provider_order": "direct OSC52 response before native provider",
+        "timing_boundary": "wrapped query observed before direct response; direct response supplied before DA1 response",
+        "native_provider": "not invoked",
+        "native_provider_arguments": "",
+        "trailing_newlines": "removed from the OSC52 payload",
+        "screen_markers": ["mux-boundary-tmux-direct-response", "mux-remote", "line-two"],
+        "screen_absent_markers": ["Ctrl+C to interrupt"],
+        "cleanup": "clean exit after bounded probe"
+      }
+    },
+    {
+      "id": "tmux-da1-fallback",
+      "precondition": "SSH_TTY and the synthetic TMUX marker are present, STY is absent, Hermes emits the TMUX passthrough wrapper, and no OSC52 response is supplied.",
+      "draft": "mux-boundary-tmux-da1-fallback",
+      "native_payload": "native-tmux-da1-fallback\n",
+      "expected_outcome": "native-fallback",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "mux-boundary-tmux-da1-fallback",
+          "bytes_hex": "6d 75 78 2d 62 6f 75 6e 64 61 72 79 2d 74 6d 75 78 2d 64 61 31 2d 66 61 6c 6c 62 61 63 6b"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+V",
+          "bytes_hex": "16"
+        }
+      ],
+      "terminal_response": {
+        "multiplexer_marker": "TMUX",
+        "osc52_query_bytes_hex": "1b 5d 35 32 3b 63 3b 3f 07",
+        "wrapped_query_bytes_hex": "1b 50 74 6d 75 78 3b 1b 1b 5d 35 32 3b 63 3b 3f 07 1b 5c",
+        "osc52_response": "not sent",
+        "da1_sentinel_bytes_hex": "1b 5b 63",
+        "da1_response_bytes_hex": "1b 5b 3f 36 32 63",
+        "da1_barriers_answered": 2
+      },
+      "output": {
+        "status": "ready",
+        "outcome": "native-fallback",
+        "submission": "not submitted",
+        "provider_order": "native provider after wrapped OSC52 query and DA1 barrier",
+        "timing_boundary": "wrapped query observed; two DA1 barriers answered before native provider",
+        "native_provider": "xclip",
+        "native_provider_arguments": "-selection clipboard -out",
+        "trailing_newlines": "removed from the native payload",
+        "screen_markers": ["mux-boundary-tmux-da1-fallback", "native-tmux-da1-fallback"],
+        "screen_absent_markers": ["mux-remote", "Ctrl+C to interrupt"],
+        "cleanup": "clean exit after bounded probe"
+      }
+    },
+    {
+      "id": "sty-direct-response",
+      "precondition": "SSH_TTY and the synthetic STY marker are present, TMUX is absent, and Hermes emits the GNU Screen passthrough wrapper.",
+      "draft": "mux-boundary-sty-direct-response",
+      "native_payload": "native-sty-direct-response\n",
+      "expected_outcome": "osc52-response",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "mux-boundary-sty-direct-response",
+          "bytes_hex": "6d 75 78 2d 62 6f 75 6e 64 61 72 79 2d 73 74 79 2d 64 69 72 65 63 74 2d 72 65 73 70 6f 6e 73 65"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+V",
+          "bytes_hex": "16"
+        }
+      ],
+      "terminal_response": {
+        "multiplexer_marker": "STY",
+        "osc52_query_bytes_hex": "1b 5d 35 32 3b 63 3b 3f 07",
+        "wrapped_query_bytes_hex": "1b 50 1b 5d 35 32 3b 63 3b 3f 07 1b 5c",
+        "osc52_response_bytes_hex": "1b 5d 35 32 3b 63 3b 62 58 56 34 4c 58 4a 6c 62 57 39 30 5a 53 41 67 43 6d 78 70 62 6d 55 74 64 48 64 76 43 67 6f 3d 07",
+        "da1_sentinel_bytes_hex": "1b 5b 63",
+        "da1_response_bytes_hex": "1b 5b 3f 36 32 63",
+        "da1_barriers_answered": 2
+      },
+      "output": {
+        "status": "ready",
+        "outcome": "osc52-response",
+        "osc52_text": "mux-remote  \nline-two",
+        "submission": "not submitted",
+        "provider_order": "direct OSC52 response before native provider",
+        "timing_boundary": "wrapped query observed before direct response; direct response supplied before DA1 response",
+        "native_provider": "not invoked",
+        "native_provider_arguments": "",
+        "trailing_newlines": "removed from the OSC52 payload",
+        "screen_markers": ["mux-boundary-sty-direct-response", "mux-remote", "line-two"],
+        "screen_absent_markers": ["Ctrl+C to interrupt"],
+        "cleanup": "clean exit after bounded probe"
+      }
+    },
+    {
+      "id": "sty-da1-fallback",
+      "precondition": "SSH_TTY and the synthetic STY marker are present, TMUX is absent, Hermes emits the GNU Screen passthrough wrapper, and no OSC52 response is supplied.",
+      "draft": "mux-boundary-sty-da1-fallback",
+      "native_payload": "native-sty-da1-fallback\n",
+      "expected_outcome": "native-fallback",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "mux-boundary-sty-da1-fallback",
+          "bytes_hex": "6d 75 78 2d 62 6f 75 6e 64 61 72 79 2d 73 74 79 2d 64 61 31 2d 66 61 6c 6c 62 61 63 6b"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+V",
+          "bytes_hex": "16"
+        }
+      ],
+      "terminal_response": {
+        "multiplexer_marker": "STY",
+        "osc52_query_bytes_hex": "1b 5d 35 32 3b 63 3b 3f 07",
+        "wrapped_query_bytes_hex": "1b 50 1b 5d 35 32 3b 63 3b 3f 07 1b 5c",
+        "osc52_response": "not sent",
+        "da1_sentinel_bytes_hex": "1b 5b 63",
+        "da1_response_bytes_hex": "1b 5b 3f 36 32 63",
+        "da1_barriers_answered": 2
+      },
+      "output": {
+        "status": "ready",
+        "outcome": "native-fallback",
+        "submission": "not submitted",
+        "provider_order": "native provider after wrapped OSC52 query and DA1 barrier",
+        "timing_boundary": "wrapped query observed; two DA1 barriers answered before native provider",
+        "native_provider": "xclip",
+        "native_provider_arguments": "-selection clipboard -out",
+        "trailing_newlines": "removed from the native payload",
+        "screen_markers": ["mux-boundary-sty-da1-fallback", "native-sty-da1-fallback"],
+        "screen_absent_markers": ["mux-remote", "Ctrl+C to interrupt"],
+        "cleanup": "clean exit after bounded probe"
+      }
+    }
+  ],
+  "unknowns": [
+    "The direct response model writes a raw OSC52 response after Hermes emits its wrapped query; it does not exercise a live tmux or GNU Screen server or outer-terminal forwarding.",
+    "Whether a real multiplexer forwards, transforms, delays, filters, or wraps the response remains unknown.",
+    "Image/path payloads, gateway behavior, delayed or oversized responses, and concurrent input remain unknown.",
+    "Hades implementation parity is a separate follow-up task; this fixture is research-only."
+  ]
+}
