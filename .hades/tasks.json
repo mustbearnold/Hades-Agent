@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T16:47:20Z",
+  "updated_at": "2026-08-01T16:55:52Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -3022,6 +3022,62 @@
           ".hades/runtime/hermes-provider-setup-persistence-probe.json",
           ".hades/runtime/had059-reference-probe-retry1.log",
           ".hades/runtime/had059-pre-completion-verify-retry3.log"
+        ]
+      }
+    },
+    {
+      "id": "HAD-060",
+      "title": "Capture sanitized Hermes setup config shape and platform continuation",
+      "status": "complete",
+      "priority": 23,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-059"
+      ],
+      "risk": "high",
+      "oracle": [
+        "reference_observation",
+        "redacted_config_shape_trace",
+        "direct_pty_platform_capture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Observe the pinned Hermes reference in a fresh synthetic home through the safe OBS-0055 setup path, accepting only the displayed loopback/model/backend defaults and stopping at the platform picker without credentials, OAuth, external network, or platform selection.",
+        "Record only normalized config key paths, scalar/container type classes, byte-count/change boundaries, artifact filename classes, and stable platform-picker markers; never persist raw config values, API keys, session IDs, paths, or dynamic screen bytes.",
+        "Add a provenance-bearing observation, sanitized fixture, and repeatable direct-PTY probe that distinguishes the pre-backend mutation from the Keep current (local) mutation and confirms clean cancellation plus fresh-process readiness.",
+        "Wire the deterministic probe and fixture validation into the complete no-skip just verify gate and leave Hades config file persistence and platform implementation unclaimed until the normalized reference shape is reviewed."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_setup_config_shape.py",
+        "tests/fixtures/parity/OBS-0056-hermes-setup-config-shape.json",
+        "docs/parity/observations/OBS-0056-hermes-setup-config-shape-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hermes-setup-config-shape-probe.json",
+        ".hades/runtime/had060-reference-probe.log",
+        ".hades/runtime/had060-pre-completion-verify.log"
+      ],
+      "ready_at": "2026-08-01T16:48:14Z",
+      "attempts": 1,
+      "claimed_by": "hermes-setup-config-shape",
+      "claimed_at": "2026-08-01T16:48:28Z",
+      "result": {
+        "summary": "Captured the normalized Hermes setup config shape and platform continuation without persisting values: model/custom-provider structure is present initially, _config_version appears after accepting the model default, agent.max_turns/display.tool_progress/session_reset.mode appear after Keep current (local), platform cancellation is non-mutating, and a fresh process returns ready. The sanitized fixture, redacted direct-PTY probe, gate wiring, and complete verification evidence are recorded; Hades persistence/platform behavior remains unclaimed.",
+        "completed_at": "2026-08-01T16:55:52Z",
+        "evidence": [
+          "scripts/probe_hermes_setup_config_shape.py",
+          "tests/fixtures/parity/OBS-0056-hermes-setup-config-shape.json",
+          "docs/parity/observations/OBS-0056-hermes-setup-config-shape-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hermes-setup-config-shape-probe.json",
+          ".hades/runtime/had060-reference-probe.log",
+          ".hades/runtime/had060-pre-completion-verify.log"
         ]
       }
     }

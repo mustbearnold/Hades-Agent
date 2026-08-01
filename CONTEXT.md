@@ -267,6 +267,13 @@ progress from August 1, 2026 through 2027.
   selection and changes config again, and a fresh process returns to ready.
   Exact config contents, one non-contract artifact class, platform/provider
   configuration, and Hades persistence remain unimplemented or unknown.
+- HAD-060 captures the normalized shape of that Hermes config without recording
+  values: the initial model/custom-provider paths, `_config_version` after the
+  model-default boundary, and `agent.max_turns`, `display.tool_progress`, and
+  `session_reset.mode` after Keep current (local). The next surface is the
+  platform picker; cancellation preserves the shape and a fresh process is
+  ready. Hades config-file persistence, credential handling, and platform
+  implementation remain unclaimed.
 
 ## Unknown until observed
 
@@ -285,8 +292,9 @@ progress from August 1, 2026 through 2027.
 - The complete slash-command catalog and argument semantics, provider/model
   discovery details, setup wizard continuation, numbered-fallback choices,
   terminal-backend selection and cancellation after deeper navigation, provider
-  configuration beyond the bounded OBS-0055 readback, backup semantics, and
-  Hades persistence, configured command
+  configuration beyond the bounded OBS-0055/OBS-0056 readbacks, backup
+  semantics, and Hades persistence, credential handling, platform setup,
+  configured command
   behavior with a reachable provider, and model-picker behavior beyond the
   bounded deterministic provider/model seam.
 - OSC52 behavior outside the OBS-0032 timing controls and bounded payload
