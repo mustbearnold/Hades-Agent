@@ -173,6 +173,10 @@ replay-unconfigured-startup:
     cargo build --locked --package hades-cli
     python3 scripts/replay_unconfigured_startup.py --binary target/debug/hades --report .hades/runtime/had064-unconfigured-startup-replay.json
 
+replay-unconfigured-input:
+    cargo build --locked --package hades-cli
+    python3 scripts/replay_unconfigured_input.py --binary target/debug/hades --report .hades/runtime/had066-unconfigured-input-replay.json --timeout 5
+
 probe-hermes-unconfigured-input-queue:
     python3 scripts/probe_hermes_unconfigured_input_queue.py --report .hades/runtime/hermes-unconfigured-input-queue-probe.json --timeout 30
 
@@ -225,6 +229,7 @@ validate-reference:
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0059-hermes-unconfigured-startup.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0061-hermes-unconfigured-input-queue.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0060-hades-unconfigured-startup.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0062-hades-unconfigured-input.json
 
 agent command *args:
     python3 scripts/agent/control_plane.py {{command}} {{args}}

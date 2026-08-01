@@ -40,6 +40,7 @@ cargo build --locked --package hades-cli
 python3 scripts/probe_tui_lifecycle.py --binary target/debug/hades
 python3 scripts/replay_cli_launch.py --binary target/debug/hades --report .hades/runtime/cli-launch-replay.json
 python3 scripts/replay_unconfigured_startup.py --binary target/debug/hades --report .hades/runtime/had064-unconfigured-startup-replay.json
+python3 scripts/replay_unconfigured_input.py --binary target/debug/hades --report .hades/runtime/had066-unconfigured-input-replay.json --timeout 5
 python3 scripts/differential_replay.py --binary target/debug/hades --report .hades/runtime/differential-replay.json
 python3 scripts/replay_composer.py --binary target/debug/hades --report .hades/runtime/composer-replay.json
 python3 scripts/replay_completion.py --binary target/debug/hades --report .hades/runtime/completion-replay.json
@@ -83,6 +84,7 @@ python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0058-her
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0059-hermes-unconfigured-startup.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0061-hermes-unconfigured-input-queue.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0060-hades-unconfigured-startup.json
+python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0062-hades-unconfigured-input.json
 python3 scripts/probe_hermes_full_setup_provider_selection.py --report .hades/runtime/hermes-full-setup-provider-selection-probe.json --timeout 30
 python3 scripts/probe_hermes_full_setup_model_default.py --report .hades/runtime/hermes-full-setup-model-default-probe.json --timeout 30
 python3 scripts/probe_hermes_local_provider_stream.py --report .hades/runtime/hermes-local-provider-stream-probe.json --timeout 30

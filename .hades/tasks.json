@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T18:46:16Z",
+  "updated_at": "2026-08-01T19:06:49Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -3400,6 +3400,79 @@
           ".hades/runtime/hermes-unconfigured-input-queue-probe.json",
           ".hades/runtime/had065-terminal-palette-focused.json",
           ".hades/runtime/had065-pre-completion-verify-3.log"
+        ]
+      }
+    },
+    {
+      "id": "HAD-066",
+      "title": "Implement Hades input queue during unconfigured startup",
+      "status": "complete",
+      "priority": 17,
+      "lane": "implementation",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-065"
+      ],
+      "risk": "high",
+      "oracle": [
+        "typed_startup_state",
+        "unconfigured_composer_render",
+        "direct_pty_replay",
+        "full_verify"
+      ],
+      "acceptance": [
+        "In the typed Hades unconfigured startup state, accept printable composer input and Enter without starting a provider worker or adding a user message; preserve the starting-agent footer and render the visible draft with the Hermes composer marker.",
+        "When a non-empty unconfigured draft receives Ctrl+C, clear the draft and remain on the starting-agent surface; a subsequent Ctrl+C exits with status zero. With an empty unconfigured draft, the existing single Ctrl+C clean exit remains intact.",
+        "Add focused app/core/TUI coverage for draft/edit/submit/clear transitions, add a sanitized direct-PTY Hades fixture and replay for both input and empty-startup cleanup, and update existing lifecycle/differential/local-provider harnesses for the observed two-press input cleanup.",
+        "Update the parity matrix/context and keep provider setup, persistence, credentials, eventual startup resolution, and actual queue delivery outside this slice; no behavior may be inferred beyond OBS-0061.",
+        "Run the complete no-skip just verify gate and record implementation, replay, fixture, and verification evidence before completion."
+      ],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-app/src/lib.rs",
+        "crates/hades-tui/src/lib.rs",
+        "scripts/replay_unconfigured_input.py",
+        "tests/fixtures/parity/OBS-0062-hades-unconfigured-input.json",
+        "docs/parity/observations/OBS-0062-hades-unconfigured-input-2026-08-02.md",
+        "scripts/probe_tui_lifecycle.py",
+        "scripts/differential_replay.py",
+        "scripts/replay_local_provider.py",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "docs/decisions/ADR-0006-live-loopback-provider-worker.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/had066-unconfigured-input-replay.json",
+        ".hades/runtime/had066-differential-check.json",
+        ".hades/runtime/had066-local-provider-check.json"
+      ],
+      "ready_at": "2026-08-01T18:47:20Z",
+      "claimed_by": "unconfigured-input-implementation",
+      "claimed_at": "2026-08-01T18:47:41Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Implemented the bounded Hermes-matching unconfigured input boundary: printable input and Enter retain a visible composer draft without a user message or provider request; the first Ctrl+C clears a non-empty draft and the second exits, while empty startup still exits on one Ctrl+C. Added core/app/TUI regression coverage, sanitized direct-PTY replay and fixture OBS-0062, updated lifecycle/differential/local-provider harnesses, docs/matrix/context, and verification wiring. Complete no-skip just verify passed with verification: PASS.",
+        "completed_at": "2026-08-01T19:06:49Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-app/src/lib.rs",
+          "crates/hades-tui/src/lib.rs",
+          "scripts/replay_unconfigured_input.py",
+          "tests/fixtures/parity/OBS-0062-hades-unconfigured-input.json",
+          "docs/parity/observations/OBS-0062-hades-unconfigured-input-2026-08-02.md",
+          "scripts/probe_tui_lifecycle.py",
+          "scripts/differential_replay.py",
+          "scripts/replay_local_provider.py",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "docs/decisions/ADR-0006-live-loopback-provider-worker.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/had066-unconfigured-input-replay.json",
+          ".hades/runtime/had066-differential-check.json",
+          ".hades/runtime/had066-local-provider-check.json"
         ]
       }
     }

@@ -32,9 +32,10 @@ than reaching this provider error guard.
 
 `hades tui` is no longer a silent submission shell when a local endpoint is
 configured. A fresh no-endpoint launch follows the separately captured
-Hermes starting-agent boundary and is intentionally not yet a setup or queued
-input flow. The initial HAD-055 transport buffered the complete HTTP response
-before returning its parsed event vector; ADR-0007 supersedes that
-implementation limitation with incremental parsing and cooperative socket
-cancellation. This decision does not add HTTPS, cloud providers, credentials
-discovery, persistence, retries, or tool execution.
+Hermes starting-agent boundary and now retains a bounded visible draft without
+delivering it to a provider. It is not yet a setup or eventual queue-drain
+flow. The initial HAD-055 transport buffered the complete HTTP response before
+returning its parsed event vector; ADR-0007 supersedes that implementation
+limitation with incremental parsing and cooperative socket cancellation. This
+decision does not add HTTPS, cloud providers, credentials discovery,
+persistence, retries, or tool execution.

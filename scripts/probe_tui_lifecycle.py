@@ -233,7 +233,16 @@ def run_case(
         submitted = False
         if submit_before_exit:
             send(master, b"hello")
-            if not unconfigured:
+            if unconfigured:
+                wait_for(
+                    pid,
+                    master,
+                    output,
+                    f"{name}: text input",
+                    lambda text: "Editing input." in text,
+                    timeout,
+                )
+            else:
                 wait_for(
                     pid,
                     master,
@@ -258,10 +267,16 @@ def run_case(
             missing_provider = unconfigured or marker_present(
                 clean_output(bytes(output)), "Provider error: HADES_PROVIDER_BASE_URL is not set"
             ) or "HADES_PROVIDER_BASE_URL" in clean_output(bytes(output))
-            send(master, exit_key)
-            if missing_provider:
+            if unconfigured:
+                send(master, exit_key)
+                time.sleep(0.25)
+                send(master, exit_key)
+                exit_input = "Ctrl+C, Ctrl+C"
+            elif missing_provider:
+                send(master, exit_key)
                 exit_input = exit_key.decode("ascii", errors="replace")
             else:
+                send(master, exit_key)
                 wait_for(
                     pid,
                     master,
@@ -273,8 +288,12 @@ def run_case(
                 send(master, b"\x03")
                 exit_input = "Ctrl+C, Ctrl+C"
         else:
-            send(master, exit_key)
-            exit_input = exit_key.decode("ascii", errors="replace")
+            if unconfigured:
+                send(master, b"\x03")
+                exit_input = "Ctrl+C"
+            else:
+                send(master, exit_key)
+                exit_input = exit_key.decode("ascii", errors="replace")
 
         status = wait_for_exit(pid, master, output, timeout)
         reaped = True

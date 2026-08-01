@@ -79,7 +79,11 @@ fn draw_hermes_startup(frame: &mut Frame<'_>, app: &App) {
     if app.state().startup == StartupState::Unconfigured {
         rows[26] = HERMES_UNCONFIGURED_MODEL.to_owned();
         rows[38] = HERMES_UNCONFIGURED_FOOTER.to_owned();
-        rows[39].clear();
+        if app.state().composer.text().is_empty() {
+            rows[39].clear();
+        } else {
+            draw_hermes_composer(&mut rows, app.state().composer.text());
+        }
     } else if app.state().turn == TurnState::Busy {
         rows[38] = HERMES_BUSY_FOOTER.to_owned();
         rows[39] = HERMES_INTERRUPT_PROMPT.to_owned();
@@ -734,6 +738,25 @@ mod tests {
         assert!(rendered.contains("starting agent…"));
         assert!(!rendered.contains("─ ready │"));
         assert!(!rendered.contains("<prompt-placeholder>"));
+    }
+
+    #[test]
+    fn hermes_startup_surface_renders_an_unconfigured_draft_without_ready_state() {
+        let mut app = App::with_startup_state(StartupState::Unconfigured);
+        for character in "queued hello".chars() {
+            app.handle(hades_core::InputEvent::Key(hades_core::Key::Char(character)));
+        }
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
+
+        let with_draft = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        assert!(with_draft.contains("❯ queued hello"));
+        assert!(with_draft.contains("starting agent…"));
+        assert!(!with_draft.contains("─ ready │"));
+
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Ctrl('c')));
+        let after_clear = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        assert!(!after_clear.contains("❯ queued hello"));
+        assert!(after_clear.contains("starting agent…"));
     }
 
     #[test]

@@ -816,6 +816,19 @@ mod tests {
     }
 
     #[test]
+    fn composer_submit_and_clear_keep_the_draft_boundary_explicit() {
+        let mut composer = Composer::default();
+        composer.insert_text("queued hello");
+
+        assert_eq!(composer.enter(), EnterAction::Submit("queued hello".to_owned()));
+        assert_eq!(composer.text(), "queued hello");
+
+        composer.clear();
+        assert_eq!(composer.text(), "");
+        assert_eq!(composer.cursor(), 0);
+    }
+
+    #[test]
     fn completion_state_is_exactly_scoped_to_observed_slash_prefix() {
         let completion = CompletionState::for_draft("/he");
 

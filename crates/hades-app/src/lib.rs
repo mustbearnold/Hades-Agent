@@ -228,12 +228,14 @@ impl App {
     }
 
     fn handle_key(&mut self, key: Key) -> DispatchOutcome {
-        if self.state.startup == StartupState::Unconfigured {
-            return match key {
-                Key::Ctrl('c') | Key::Ctrl('q') => self.quit(),
-                Key::Char('q') => self.quit(),
-                _ => DispatchOutcome::Continue,
-            };
+        if self.state.startup == StartupState::Unconfigured
+            && matches!(key, Key::Ctrl('c'))
+            && !self.state.composer.text().is_empty()
+        {
+            self.state.composer.clear();
+            self.clear_completion();
+            self.state.status = "starting agent".to_owned();
+            return DispatchOutcome::Continue;
         }
 
         if let Some(overlay) = self.state.overlay {
@@ -268,7 +270,12 @@ impl App {
                 self.state.status = "Sessions.".to_owned();
                 DispatchOutcome::Continue
             }
-            Key::Char('q') if self.state.composer.text().is_empty() => self.quit(),
+            Key::Char('q')
+                if self.state.composer.text().is_empty()
+                    && self.state.startup != StartupState::Unconfigured =>
+            {
+                self.quit()
+            }
             Key::Char(character) => {
                 self.clear_notice();
                 self.state.composer.insert(character);
@@ -638,7 +645,7 @@ mod tests {
     }
 
     #[test]
-    fn unconfigured_startup_blocks_input_and_exits_cleanly() {
+    fn unconfigured_startup_keeps_draft_and_clears_before_exit() {
         let mut app = App::with_startup_state(StartupState::Unconfigured);
 
         assert_eq!(app.state().startup, StartupState::Unconfigured);
@@ -646,9 +653,12 @@ mod tests {
         assert_eq!(app.handle(InputEvent::Key(Key::Char('h'))), DispatchOutcome::Continue);
         assert_eq!(app.handle(InputEvent::Key(Key::Enter)), DispatchOutcome::Continue);
         assert_eq!(app.handle(InputEvent::Paste("ignored".to_owned())), DispatchOutcome::Continue);
-        assert_eq!(app.state().composer.text(), "");
+        assert_eq!(app.state().composer.text(), "h");
         assert!(app.state().messages.iter().all(|message| message.role != hades_core::Role::User));
-        assert_eq!(app.handle(InputEvent::Key(Key::Char('q'))), DispatchOutcome::Quit);
+        assert_eq!(app.handle(InputEvent::Key(Key::Ctrl('c'))), DispatchOutcome::Continue);
+        assert_eq!(app.state().composer.text(), "");
+        assert!(!app.state().should_quit);
+        assert_eq!(app.handle(InputEvent::Key(Key::Ctrl('c'))), DispatchOutcome::Quit);
         assert!(app.state().should_quit);
     }
 

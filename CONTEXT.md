@@ -301,7 +301,13 @@ progress from August 1, 2026 through 2027.
   remains active, with no ready/provider-error/assistant transition or config
   change. The first Ctrl+C clears the draft and the second exits cleanly.
   Whether the draft is queued, how startup eventually resolves, and Hades input
-  queue behavior remain unimplemented or unknown.
+  queue delivery remain unimplemented or unknown.
+- HAD-066 implements the bounded Hades side of that input boundary: the typed
+  unconfigured state renders `❯ queued hello`, keeps the startup footer, does
+  not start a provider request or add a user message, clears the draft on the
+  first Ctrl+C, and exits on the second. Empty startup still exits on one
+  Ctrl+C; provider setup, persistence, and actual queue delivery remain out of
+  scope.
 
 ## Unknown until observed
 

@@ -349,9 +349,21 @@ def run_missing_config_case(binary: Path, timeout: float) -> dict[str, Any]:
             timeout,
         )
         send(fd, b"missing endpoint\r")
-        time.sleep(0.05)
-        if marker_present(clean_output(bytes(output)), "Provider error"):
+        wait_for(
+            pid,
+            fd,
+            output,
+            case,
+            "draft",
+            lambda text: marker_present(text, "missing endpoint"),
+            timeout,
+        )
+        visible_text = clean_output(bytes(output))
+        if marker_present(visible_text, "Provider error"):
             raise ReplayFailure(case, "input", "unconfigured startup rendered a provider error", bytes(output))
+        prompt_visible = marker_present(visible_text, "missing endpoint")
+        send(fd, b"\x03")
+        time.sleep(0.05)
         send(fd, b"\x03")
         status = wait_for_exit(pid, fd, output, timeout)
         reaped = True
@@ -361,9 +373,10 @@ def run_missing_config_case(binary: Path, timeout: float) -> dict[str, Any]:
             "status": "passed",
             "visible_state": {
                 "unconfigured_startup": True,
-                "prompt_ignored": True,
+                "prompt_visible": prompt_visible,
+                "prompt_ignored": False,
                 "provider_request_started": False,
-                "cleanup": "Ctrl+C exited cleanly",
+                "cleanup": "two Ctrl+C presses exited cleanly",
             },
         }
     finally:

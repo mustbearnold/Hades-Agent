@@ -10,6 +10,7 @@ import shutil
 import signal
 import subprocess
 import sys
+import time
 from pathlib import Path
 from typing import Any
 
@@ -292,7 +293,11 @@ def run_behavior(
                 pass
 
         if unconfigured:
-            send(master, b"hello\r\x03")
+            send(master, b"hello\r")
+            time.sleep(0.1)
+            send(master, b"\x03")
+            time.sleep(0.1)
+            send(master, b"\x03")
             status = wait_for_exit(pid, master, output, timeout)
             reaped = True
             exit_status = describe_status(status)
@@ -331,7 +336,7 @@ def run_behavior(
                     "status": "starting agent",
                 },
                 "interaction": {
-                    "input": "hello + Enter ignored before Ctrl+C",
+                    "input": "hello + Enter retained during startup; two Ctrl+C presses clear and exit",
                     "provider_started": False,
                 },
                 "exit": exit_status,
