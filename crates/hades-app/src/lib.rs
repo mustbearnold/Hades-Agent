@@ -1,11 +1,12 @@
 #![forbid(unsafe_code)]
 
-use hades_core::{InputEvent, Key, Message, SessionState};
+use hades_core::{InputEvent, Key, Message, SessionState, TurnState};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum DispatchOutcome {
     Continue,
     Submitted(String),
+    Interrupted,
     Quit,
 }
 
@@ -39,6 +40,7 @@ impl App {
 
     fn handle_key(&mut self, key: Key) -> DispatchOutcome {
         match key {
+            Key::Ctrl('c') if self.state.turn == TurnState::Busy => self.interrupt(),
             Key::Ctrl('c') | Key::Ctrl('q') => self.quit(),
             Key::Char('q') if self.state.input.is_empty() => self.quit(),
             Key::Char(character) => {
@@ -75,8 +77,15 @@ impl App {
 
         self.state.messages.push(Message::user(&content));
         self.state.input.clear();
-        self.state.status = "Submitted; response adapter not connected.".to_owned();
+        self.state.turn = TurnState::Busy;
+        self.state.status = "Busy; response adapter not connected.".to_owned();
         DispatchOutcome::Submitted(content)
+    }
+
+    fn interrupt(&mut self) -> DispatchOutcome {
+        self.state.turn = TurnState::Ready;
+        self.state.status = "Interrupted.".to_owned();
+        DispatchOutcome::Interrupted
     }
 
     fn quit(&mut self) -> DispatchOutcome {
@@ -99,15 +108,37 @@ mod tests {
     #[test]
     fn input_submission_is_deterministic_and_recorded() {
         let mut app = App::new();
-        app.handle(InputEvent::Key(Key::Char('h')));
-        app.handle(InputEvent::Key(Key::Char('i')));
+        for character in "hello".chars() {
+            app.handle(InputEvent::Key(Key::Char(character)));
+        }
 
         assert_eq!(
             app.handle(InputEvent::Key(Key::Enter)),
-            DispatchOutcome::Submitted("hi".to_owned())
+            DispatchOutcome::Submitted("hello".to_owned())
         );
         assert_eq!(app.state().input, "");
-        assert_eq!(app.state().messages.last().unwrap().content, "hi");
+        assert_eq!(app.state().turn, TurnState::Busy);
+        assert_eq!(app.state().status, "Busy; response adapter not connected.");
+        assert_eq!(app.state().messages.last().unwrap().content, "hello");
+    }
+
+    #[test]
+    fn ctrl_c_interrupts_busy_turn_before_quitting() {
+        let mut app = App::new();
+        for character in "hello".chars() {
+            app.handle(InputEvent::Key(Key::Char(character)));
+        }
+        assert_eq!(
+            app.handle(InputEvent::Key(Key::Enter)),
+            DispatchOutcome::Submitted("hello".to_owned())
+        );
+
+        assert_eq!(app.handle(InputEvent::Key(Key::Ctrl('c'))), DispatchOutcome::Interrupted);
+        assert_eq!(app.state().turn, TurnState::Ready);
+        assert_eq!(app.state().status, "Interrupted.");
+        assert!(!app.state().should_quit);
+        assert_eq!(app.handle(InputEvent::Key(Key::Ctrl('c'))), DispatchOutcome::Quit);
+        assert!(app.state().should_quit);
     }
 
     #[test]

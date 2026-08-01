@@ -14,6 +14,10 @@ The lifecycle oracle launches the actual Hades binary in a pseudo-terminal and
 fails with a nonzero exit code when any required state is missing. It emits a
 machine-readable JSON report for each case.
 
+This lifecycle contract was first captured before HAD-004 added the typed busy
+transition. The interrupt-exit case in the current probe now sends Ctrl+C once
+to interrupt the busy turn and a second time to exit from the ready state.
+
 | State | Input/action | Required observable result |
 | --- | --- | --- |
 | Startup | Launch in an 80x24 PTY | Hades is alive; the frame contains HADES AGENT, session, transcript, and input; alternate-screen entry is observed; termios is raw (canonical=false, echo=false). |
@@ -29,11 +33,11 @@ terminal in raw mode or the alternate screen.
 
 ## Reference boundary
 
-The current Hades bootstrap has no model adapter or distinct in-flight turn.
-Therefore its interrupt case proves process interruption after submission, not
-Hermes's active-turn cancellation behavior. The active-turn busy/interrupt
-contract remains the reference behavior captured in OBS-0001 and is intentionally
-left for a later interaction task.
+At capture time the Hades bootstrap had no model adapter or distinct in-flight
+turn. HAD-004 now adds the deterministic busy/interrupt state transition, while
+the model boundary remains absent. The active-turn contract is therefore
+partially implemented at the core seam and remains open for provider, timing,
+and rendering parity.
 
 The probe does not claim visual parity, model streaming, or full keymap parity.
 It establishes terminal ownership and cleanup as a verified executable seam for

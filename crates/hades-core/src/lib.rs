@@ -49,6 +49,13 @@ impl Role {
     }
 }
 
+#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub enum TurnState {
+    #[default]
+    Ready,
+    Busy,
+}
+
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Message {
     pub role: Role,
@@ -72,6 +79,7 @@ impl Message {
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct SessionState {
     pub surface: Surface,
+    pub turn: TurnState,
     pub input: String,
     pub messages: Vec<Message>,
     pub status: String,
@@ -82,6 +90,7 @@ impl Default for SessionState {
     fn default() -> Self {
         Self {
             surface: Surface::Home,
+            turn: TurnState::Ready,
             input: String::new(),
             messages: Vec::new(),
             status: "Reference behavior pending capture.".to_owned(),

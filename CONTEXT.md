@@ -15,14 +15,22 @@ progress from August 1, 2026 through 2027.
 - The initial scaffold is a Cargo workspace with core state, application
   transitions, a Ratatui view, and a CLI entry point.
 - The autonomous development control plane lives in `.hades/` and `.agents/`.
+- The Hermes reference is pinned to commit
+  `e444d165807f489b5c1ab8e4a612c8d09c2e67a2`; the provenance and sanitized
+  startup/lifecycle artifacts are in `docs/parity/observations/OBS-0001*`.
+- HAD-003 established a real-PTY lifecycle oracle in
+  `scripts/probe_tui_lifecycle.py`.
+- HAD-004 implements the first reference-backed core transition:
+  submit text, enter a typed busy state, interrupt with Ctrl+C, then exit with
+  Ctrl+C from ready.
 
 ## Unknown until observed
 
-- Hermes TUI startup sequence, terminal dimensions, color palette, typography,
-  keymap, focus model, copy, error states, timing, persistence, and exit rules.
+- Hermes TUI color palette, typography, complete keymap, focus model, copy,
+  error states, timing, persistence, and the remaining interaction surfaces.
 - Which Hermes behaviors are stable contracts versus implementation details.
-- The reference version, commit, build flags, and environment that define
-  parity for each observation.
+- Successful provider/model streaming, tool calls, and the exact behavior of
+  terminal-dependent surfaces beyond the captured observations.
 
 Unknowns are deliberate. The first product task is to capture the reference
 contract rather than let the scaffold become an accidental specification.
@@ -41,7 +49,7 @@ contract rather than let the scaffold become an accidental specification.
 
 ## Non-goals for the scaffold
 
-The scaffold does not pretend to implement Hermes behavior that has not been
-captured. It provides the seams needed to add that behavior safely: typed
-events, a reducer, deterministic rendering, snapshot output, task dependencies,
-and proof-required task completion.
+The bootstrap application still does not pretend to implement Hermes behavior
+that has not been captured. It provides the seams needed to add that behavior
+safely: typed events, a reducer, deterministic rendering, snapshot output, task
+dependencies, and proof-required task completion.

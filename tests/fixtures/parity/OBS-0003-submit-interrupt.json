@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0003",
+  "reference_observation": "OBS-0001",
+  "surface": "hades-app",
+  "normalization": [
+    "The trace records typed state and dispatch outcomes, not terminal escape sequences.",
+    "No model payload, timing, or assistant response is included."
+  ],
+  "steps": [
+    {
+      "id": "type-text",
+      "input": {
+        "kind": "text",
+        "value": "hello"
+      },
+      "output": {
+        "turn_state": "ready",
+        "input": "hello",
+        "should_quit": false
+      }
+    },
+    {
+      "id": "submit",
+      "input": {
+        "kind": "key",
+        "value": "Enter"
+      },
+      "output": {
+        "outcome": {
+          "kind": "submitted",
+          "content": "hello"
+        },
+        "turn_state": "busy",
+        "input": "",
+        "status": "Busy; response adapter not connected.",
+        "last_message": {
+          "role": "user",
+          "content": "hello"
+        },
+        "should_quit": false
+      }
+    },
+    {
+      "id": "interrupt",
+      "input": {
+        "kind": "key",
+        "value": "Ctrl+C"
+      },
+      "output": {
+        "outcome": {
+          "kind": "interrupted"
+        },
+        "turn_state": "ready",
+        "status": "Interrupted.",
+        "should_quit": false
+      }
+    },
+    {
+      "id": "exit-after-interrupt",
+      "input": {
+        "kind": "key",
+        "value": "Ctrl+C"
+      },
+      "output": {
+        "outcome": {
+          "kind": "quit"
+        },
+        "should_quit": true
+      }
+    }
+  ]
+}

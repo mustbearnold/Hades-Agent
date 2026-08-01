@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T01:16:12Z",
+  "updated_at": "2026-08-01T01:25:27Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -121,7 +121,7 @@
     {
       "id": "HAD-004",
       "title": "Implement the first reference-backed state transition",
-      "status": "ready",
+      "status": "complete",
       "priority": 80,
       "lane": "core",
       "owner_role": "implementer",
@@ -139,13 +139,33 @@
         "Keep the transition deterministic and independent of terminal rendering.",
         "Prove the transition with a focused regression test and replay evidence."
       ],
-      "evidence": [],
-      "ready_at": "2026-08-01T01:16:12Z"
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-app/src/lib.rs",
+        "tests/fixtures/parity/OBS-0003-submit-interrupt.json",
+        "docs/parity/observations/OBS-0003-hades-submit-interrupt-2026-08-01.md",
+        "scripts/probe_tui_lifecycle.py"
+      ],
+      "ready_at": "2026-08-01T01:16:12Z",
+      "claimed_by": "hermes-implementer",
+      "claimed_at": "2026-08-01T01:22:16Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Implemented the first trace-backed submit -> busy -> Ctrl+C interrupt transition with typed core state, focused reducer tests, a sanitized replay fixture, and a passing PTY integration oracle.",
+        "completed_at": "2026-08-01T01:25:27Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-app/src/lib.rs",
+          "tests/fixtures/parity/OBS-0003-submit-interrupt.json",
+          "docs/parity/observations/OBS-0003-hades-submit-interrupt-2026-08-01.md",
+          "scripts/probe_tui_lifecycle.py"
+        ]
+      }
     },
     {
       "id": "HAD-005",
       "title": "Implement the first golden-frame-backed visual surface",
-      "status": "queued",
+      "status": "ready",
       "priority": 75,
       "lane": "visual",
       "owner_role": "implementer",
@@ -162,7 +182,8 @@
         "Compare normalized cells rather than a human eyeball check.",
         "Record intentional terminal-dependent differences explicitly."
       ],
-      "evidence": []
+      "evidence": [],
+      "ready_at": "2026-08-01T01:25:27Z"
     },
     {
       "id": "HAD-006",

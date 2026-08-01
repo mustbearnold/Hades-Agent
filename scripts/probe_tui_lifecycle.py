@@ -222,7 +222,22 @@ def run_case(
             )
             submitted = True
 
-        send(master, exit_key)
+        if submit_before_exit:
+            send(master, exit_key)
+            wait_for(
+                pid,
+                master,
+                output,
+                f"{name}: interrupt",
+                lambda text: "Interrupted." in text,
+                timeout,
+            )
+            send(master, b"\x03")
+            exit_input = "Ctrl+C, Ctrl+C"
+        else:
+            send(master, exit_key)
+            exit_input = exit_key.decode("ascii", errors="replace")
+
         status = wait_for_exit(pid, master, output, timeout)
         reaped = True
         exit_status = describe_status(status)
@@ -254,7 +269,7 @@ def run_case(
             "interaction": {
                 "resized": resized,
                 "submitted": submitted,
-                "exit_input": exit_key.decode("ascii", errors="replace"),
+                "exit_input": exit_input,
             },
             "exit": exit_status,
             "cleanup": {
