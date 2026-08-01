@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T02:17:06Z",
+  "updated_at": "2026-08-01T02:20:42Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -251,7 +251,7 @@
     {
       "id": "HAD-007",
       "title": "Match the observed busy and interrupted visual states",
-      "status": "in_progress",
+      "status": "complete",
       "priority": 80,
       "lane": "visual",
       "owner_role": "implementer",
@@ -269,11 +269,28 @@
         "Render an interrupted ready state with the observed completion marker without changing the core transition contract.",
         "Add executable visual/replay assertions and document normalization boundaries and intentional differences."
       ],
-      "evidence": [],
+      "evidence": [
+        "crates/hades-tui/src/lib.rs",
+        "tests/fixtures/parity/OBS-0006-busy-interrupt-visual.json",
+        "docs/parity/observations/OBS-0006-hades-busy-interrupt-visual-2026-08-01.md",
+        "scripts/differential_replay.py",
+        "docs/parity/MATRIX.md"
+      ],
       "ready_at": "2026-08-01T02:16:51Z",
       "claimed_by": "hermes-visual",
       "claimed_at": "2026-08-01T02:17:06Z",
-      "attempts": 1
+      "attempts": 1,
+      "result": {
+        "summary": "Aligned the 120x40 busy and interrupted projection with the observed Hermes markers, added the OBS-0006 normalized visual contract, and made differential replay consume the contract while preserving the typed core transition.",
+        "completed_at": "2026-08-01T02:20:42Z",
+        "evidence": [
+          "crates/hades-tui/src/lib.rs",
+          "tests/fixtures/parity/OBS-0006-busy-interrupt-visual.json",
+          "docs/parity/observations/OBS-0006-hades-busy-interrupt-visual-2026-08-01.md",
+          "scripts/differential_replay.py",
+          "docs/parity/MATRIX.md"
+        ]
+      }
     }
   ]
 }
