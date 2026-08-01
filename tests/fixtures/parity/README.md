@@ -63,3 +63,6 @@ OBS-0028 captures Hermes ST-terminated OSC52 response handling in a direct PTY;
 it proves a usable ST response wins before native xclip while empty and
 invalid-base64 ST responses fall back. It is research-only and does not claim
 Hades implementation parity.
+OBS-0029 is the Hades implementation contract derived from OBS-0028 and is
+consumed by the direct-PTY ST replay; it proves the same usable-response
+precedence and malformed-response fallback in Hades.

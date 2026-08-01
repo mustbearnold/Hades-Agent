@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0029",
+  "reference_observation": "OBS-0028",
+  "surface": "hades-tui-remote-osc52-st-termination",
+  "reference": {
+    "product": "Hades Agent implementation of Hermes ST-terminated OSC52 response handling",
+    "version": "0.1.0",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "direct PTY with raw byte writes"
+    },
+    "capture": "Hades direct PTY replay with synthetic SSH_TTY, ST-terminated OSC52 responder, and synthetic xclip provider"
+  },
+  "normalization": [
+    "Each case runs in a fresh Hades process with synthetic HERMES_HOME, HOME, SSH_TTY, payload, log, and xclip paths.",
+    "TMUX, STY, SSH_CONNECTION, SSH_CLIENT, Wayland, and WSL markers are removed so the bare SSH_TTY path is isolated.",
+    "ANSI control sequences, cursor placement, colors, timestamps, prompt faces, and dynamic working-directory text are not asserted.",
+    "The PTY window is explicitly set to 120 columns by 40 rows before input is sent.",
+    "Ctrl+V is written as raw byte 0x16; the Hades OSC52 query, ST response, and DA1 barrier bytes are asserted as raw PTY output/input bytes.",
+    "The synthetic xclip provider records exact arguments and returns a case-specific native payload with one trailing newline.",
+    "Ready behavior is identified by the expected OSC52/native markers and the absence of the busy interrupt marker; cleanup sends Ctrl+C without submitting a turn."
+  ],
+  "steps": [
+    {
+      "id": "osc52-valid-st-response",
+      "draft": "st-boundary-valid-st-response",
+      "native_payload": "native-valid-st-response\n",
+      "osc52_response_bytes_hex": "1b 5d 35 32 3b 63 3b 63 33 51 74 63 6d 56 74 62 33 52 6c 49 43 41 4b 62 47 6c 75 5a 53 31 30 64 32 38 4b 43 67 3d 3d 1b 5c",
+      "expected_outcome": "osc52-response",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "st-boundary-valid-st-response",
+          "bytes_hex": "73 74 2d 62 6f 75 6e 64 61 72 79 2d 76 61 6c 69 64 2d 73 74 2d 72 65 73 70 6f 6e 73 65"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+V",
+          "bytes_hex": "16"
+        }
+      ],
+      "screen_markers": ["st-boundary-valid-st-response", "st-remote", "line-two"],
+      "screen_absent_markers": ["Ctrl+C to interrupt"],
+      "output": {
+        "status": "ready",
+        "submission": "not submitted",
+        "provider_order": "OSC52 response before native provider",
+        "native_provider": "not invoked",
+        "native_provider_arguments": "",
+        "trailing_newlines": "removed from the OSC52 payload",
+        "osc52_query_bytes_hex": "1b 5d 35 32 3b 63 3b 3f 07",
+        "da1_query_bytes_hex": "1b 5b 63",
+        "da1_response_bytes_hex": "1b 5b 3f 36 32 63",
+        "cleanup": "Ctrl+C exits from ready without submission"
+      }
+    },
+    {
+      "id": "osc52-empty-st-response",
+      "draft": "st-boundary-empty-st-response",
+      "native_payload": "native-empty-st-response\n",
+      "osc52_response_bytes_hex": "1b 5d 35 32 3b 63 3b 1b 5c",
+      "expected_outcome": "native-fallback",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "st-boundary-empty-st-response",
+          "bytes_hex": "73 74 2d 62 6f 75 6e 64 61 72 79 2d 65 6d 70 74 79 2d 73 74 2d 72 65 73 70 6f 6e 73 65"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+V",
+          "bytes_hex": "16"
+        }
+      ],
+      "screen_markers": ["st-boundary-empty-st-response", "native-empty-st-response"],
+      "screen_absent_markers": ["Ctrl+C to interrupt"],
+      "output": {
+        "status": "ready",
+        "submission": "not submitted",
+        "provider_order": "native xclip after empty ST OSC52 response",
+        "native_provider": "xclip",
+        "native_provider_arguments": "-selection clipboard -out",
+        "trailing_newlines": "removed from the native payload",
+        "osc52_query_bytes_hex": "1b 5d 35 32 3b 63 3b 3f 07",
+        "da1_query_bytes_hex": "1b 5b 63",
+        "da1_response_bytes_hex": "1b 5b 3f 36 32 63",
+        "cleanup": "Ctrl+C exits from ready without submission"
+      }
+    },
+    {
+      "id": "osc52-invalid-base64-st-response",
+      "draft": "st-boundary-invalid-base64-st-response",
+      "native_payload": "native-invalid-base64-st-response\n",
+      "osc52_response_bytes_hex": "1b 5d 35 32 3b 63 3b 25 25 25 6e 6f 74 2d 62 61 73 65 36 34 25 25 25 1b 5c",
+      "expected_outcome": "native-fallback",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "st-boundary-invalid-base64-st-response",
+          "bytes_hex": "73 74 2d 62 6f 75 6e 64 61 72 79 2d 69 6e 76 61 6c 69 64 2d 62 61 73 65 36 34 2d 73 74 2d 72 65 73 70 6f 6e 73 65"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+V",
+          "bytes_hex": "16"
+        }
+      ],
+      "screen_markers": ["st-boundary-invalid-base64-st-response", "native-invalid-base64-st-response"],
+      "screen_absent_markers": ["Ctrl+C to interrupt"],
+      "output": {
+        "status": "ready",
+        "submission": "not submitted",
+        "provider_order": "native xclip after invalid-base64 ST OSC52 response",
+        "native_provider": "xclip",
+        "native_provider_arguments": "-selection clipboard -out",
+        "trailing_newlines": "removed from the native payload",
+        "osc52_query_bytes_hex": "1b 5d 35 32 3b 63 3b 3f 07",
+        "da1_query_bytes_hex": "1b 5b 63",
+        "da1_response_bytes_hex": "1b 5b 3f 36 32 63",
+        "cleanup": "Ctrl+C exits from ready without submission"
+      }
+    }
+  ],
+  "unknowns": [
+    "Delayed or oversized responses, BEL variants beyond OBS-0027, TMUX/STY passthrough, image/path payloads, gateway behavior, concurrent input, and other unobserved terminal wrappers remain unknown.",
+    "This contract claims only the three OBS-0028 ST-terminated response controls in Hades."
+  ]
+}

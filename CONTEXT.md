@@ -97,7 +97,9 @@ progress from August 1, 2026 through 2027.
   responses, ST-terminated responses in Hades, tmux/STY wrapping, image
   attachments, and gateway behavior remain unknown. HAD-028 observes Hermes'
   ST-terminated behavior: usable text wins before native xclip, while empty and
-  invalid-base64 responses fall back; Hades parity is not yet claimed.
+  invalid-base64 responses fall back. HAD-029 verifies those three ST controls
+  in Hades through a dedicated direct-PTY replay; delayed/oversized responses,
+  tmux/STY wrapping, image attachments, and gateway behavior remain unknown.
 
 ## Unknown until observed
 

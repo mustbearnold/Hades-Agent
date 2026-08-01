@@ -43,6 +43,8 @@ the DA1-barrier native-provider timeout control in an isolated direct PTY.
 malformed-response controls against Hades and verifies native fallback order.
 `just probe-osc52-st-termination` replays the pinned Hermes ST-terminated
 response controls and records the reference-only result.
+`just replay-osc52-st-termination` replays the same ST controls against Hades
+and verifies OSC52 precedence plus native fallback.
 `just validate-reference` also checks the deterministic Hermes editor-outcome
 fixture covering modified, multiline, empty, and cancelled editor handoffs,
 plus the direct-PTY modified-Enter reference and Hades implementation fixtures.
@@ -75,6 +77,7 @@ just replay-clipboard-text   # successful text clipboard PTY replay
 just replay-osc52-clipboard  # bare-SSH OSC52 and native fallback PTY replay
 just replay-osc52-response-boundaries # malformed/empty OSC52 fallback replay
 just probe-osc52-st-termination # Hermes ST-terminated OSC52 reference probe
+just replay-osc52-st-termination # Hades ST-terminated OSC52 parity replay
 just agent validate           # validate task/control-plane invariants
 just agent next               # choose the highest-priority ready task
 just agent claim HAD-001 bot  # claim a task with an agent identity

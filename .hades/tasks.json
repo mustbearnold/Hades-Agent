@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T07:09:27Z",
+  "updated_at": "2026-08-01T07:14:15Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -1356,6 +1356,58 @@
           "docs/parity/observations/OBS-0028-hermes-osc52-st-termination-2026-08-01.md",
           "scripts/probe_hermes_osc52_st_termination.py",
           "scripts/validate_reference_fixture.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-029",
+      "title": "Implement Hades ST-terminated OSC52 response parity",
+      "status": "complete",
+      "priority": 54,
+      "lane": "interaction",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-028"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "unit_test",
+        "direct_pty_replay",
+        "process_replay"
+      ],
+      "acceptance": [
+        "Extend the Hades direct 120x40 PTY OSC52 replay to send the exact OBS-0028 ST-terminated valid, empty, and invalid-base64 response bytes after the observed query and DA1 barrier.",
+        "For the valid ST response, Hades must decode and insert the observed multiline payload before any native provider invocation; for empty and invalid-base64 ST responses, Hades must invoke native xclip with -selection clipboard -out after the response boundary.",
+        "Assert exact response/query/barrier bytes, provider order, native arguments, newline removal, draft preservation, ready state, absent busy/submission markers, cleanup, and no native-provider invocation for the valid ST response.",
+        "Add a sanitized OBS-0029 Hades contract and implementation observation derived from OBS-0028, wire a dedicated replay through just verify, and add focused regression tests only at the smallest required seam.",
+        "Do not claim delayed or oversized responses, BEL variants beyond OBS-0027, TMUX/STY passthrough, image/path payloads, gateway behavior, or concurrent-input parity."
+      ],
+      "evidence": [
+        "crates/hades-cli/src/osc52.rs",
+        "crates/hades-cli/src/main.rs",
+        "tests/fixtures/parity/OBS-0029-hades-osc52-st-termination.json",
+        "docs/parity/observations/OBS-0029-hades-osc52-st-termination-2026-08-01.md",
+        "scripts/replay_osc52_clipboard.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "ready_at": "2026-08-01T07:10:39Z",
+      "attempts": 1,
+      "claimed_by": "hades-implementer",
+      "claimed_at": "2026-08-01T07:11:16Z",
+      "result": {
+        "summary": "verified-hades-st-terminated-osc52-precedence-and-fallback-parity-with-direct-pty-replay-and-full-verify",
+        "completed_at": "2026-08-01T07:14:15Z",
+        "evidence": [
+          "crates/hades-cli/src/osc52.rs",
+          "crates/hades-cli/src/main.rs",
+          "tests/fixtures/parity/OBS-0029-hades-osc52-st-termination.json",
+          "docs/parity/observations/OBS-0029-hades-osc52-st-termination-2026-08-01.md",
+          "scripts/replay_osc52_clipboard.py",
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md"
