@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T01:56:03Z",
+  "updated_at": "2026-08-01T02:03:02Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -206,7 +206,7 @@
     {
       "id": "HAD-006",
       "title": "Build the differential replay verification command",
-      "status": "ready",
+      "status": "in_progress",
       "priority": 70,
       "lane": "verification",
       "owner_role": "verifier",
@@ -224,7 +224,10 @@
         "Keep reference artifacts and generated reports separate."
       ],
       "evidence": [],
-      "ready_at": "2026-08-01T01:03:48Z"
+      "ready_at": "2026-08-01T01:03:48Z",
+      "claimed_by": "hermes-verifier",
+      "claimed_at": "2026-08-01T02:03:02Z",
+      "attempts": 1
     }
   ]
 }

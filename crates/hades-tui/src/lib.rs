@@ -35,6 +35,8 @@ fn draw_hermes_startup(frame: &mut Frame<'_>, app: &App) {
         rows[39] = Line::raw(" ❯ Ctrl+C to interrupt…");
     } else if !app.state().input.is_empty() {
         rows[39] = Line::raw(format!(" ❯ {}", app.state().input));
+    } else if app.state().status == "Interrupted." {
+        rows[38] = Line::raw(" ─ interrupted");
     }
 
     frame.render_widget(Paragraph::new(Text::from(rows)), frame.area());
@@ -160,6 +162,10 @@ mod tests {
         assert!(
             snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT)
                 .contains("Ctrl+C to interrupt")
+        );
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Ctrl('c')));
+        assert!(
+            snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT).contains("interrupted")
         );
     }
 }

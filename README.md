@@ -15,7 +15,10 @@ just snapshot
 `just snapshot` renders the normalized Hermes startup surface at 120x40
 without requiring an interactive terminal. `just run` launches the TUI.
 `just probe-lifecycle` runs the actual binary in a PTY and verifies startup,
-resize, exit, and terminal restoration. The current work queue is in
+resize, exit, and terminal restoration. `just replay-differential` compares
+the normalized startup frame and replays the checked-in submit/interrupt trace
+against the actual binary, writing its generated report under `.hades/runtime/`.
+The current work queue is in
 `.hades/tasks.json`; use `just agent next` to select the next evidence-backed
 task.
 
@@ -31,6 +34,7 @@ just check                    # complete local gate
 just run                      # interactive TUI
 just snapshot                 # deterministic terminal snapshot
 just probe-lifecycle          # PTY lifecycle and cleanup oracle
+just replay-differential     # visual + behavioral parity replay
 just agent validate           # validate task/control-plane invariants
 just agent next               # choose the highest-priority ready task
 just agent claim HAD-001 bot  # claim a task with an agent identity
