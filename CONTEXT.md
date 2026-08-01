@@ -130,6 +130,10 @@ progress from August 1, 2026 through 2027.
   forms, color output even when `NO_COLOR=1` is inherited, and clean busy/setup
   cleanup. Complete theme coverage, redraw-stream identity, animation,
   successful responses, alternate themes and terminals remain unknown.
+- HAD-036 adds the user-local `just install-user` release installer. It builds
+  the locked `hades-cli` release binary and creates collision-safe `hades` and
+  `Hades` symlinks in `~/.local/bin` without modifying shell configuration;
+  command-resolution and version checks are verified in Fish and Bash.
 
 ## Unknown until observed
 

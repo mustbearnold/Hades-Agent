@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T08:52:05Z",
+  "updated_at": "2026-08-01T09:03:28Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -1722,6 +1722,51 @@
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-036",
+      "title": "Install user-local Hades launchers on PATH",
+      "status": "complete",
+      "priority": 47,
+      "lane": "packaging",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-035"
+      ],
+      "risk": "low",
+      "oracle": [
+        "release_build",
+        "installer_collision_check",
+        "path_resolution",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Provide one documented just install-user command that builds the locked release binary and installs it without root privileges or shell-config mutation.",
+        "Install both lowercase hades and capitalized Hades launchers into the user-local bin directory already used by the supported shell PATH.",
+        "Refuse to replace an existing unrelated file, directory, or launcher while remaining idempotent for the exact Hades launcher it installed.",
+        "Verify both spellings resolve from clean Bash and Fish command lookup and report the Hades version without entering the interactive TUI.",
+        "Run the complete just verify gate and document that an existing shell must already include the user-local bin directory on PATH."
+      ],
+      "evidence": [
+        "scripts/install_user_launcher.sh",
+        "justfile",
+        "README.md",
+        "CONTEXT.md"
+      ],
+      "ready_at": "2026-08-01T09:00:00Z",
+      "claimed_by": "hades-packager",
+      "claimed_at": "2026-08-01T09:00:49Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Added a locked release install-user workflow that creates collision-safe, idempotent hades and Hades launchers in the user-local bin directory; temporary install, collision, Fish, Bash, and version checks passed, and just verify passed.",
+        "completed_at": "2026-08-01T09:03:28Z",
+        "evidence": [
+          "scripts/install_user_launcher.sh",
+          "justfile",
+          "README.md",
+          "CONTEXT.md"
         ]
       }
     }

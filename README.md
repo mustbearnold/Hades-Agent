@@ -71,6 +71,12 @@ The current work queue is in
 `.hades/tasks.json`; use `just agent next` to select the next evidence-backed
 task.
 
+To install the release binary for direct terminal use, run `just install-user`.
+It builds the locked release binary and creates `hades` and `Hades` symlinks in
+`~/.local/bin`; it does not modify shell configuration and refuses to replace
+an unrelated existing path. The existing shell must already include
+`~/.local/bin` on `PATH`.
+
 The development contract is in [`AGENTS.md`](AGENTS.md). The task ledger and
 bounded execution policy are in [`.hades/`](.hades/), and the role/workflow
 contracts are in [`.agents/`](.agents/). Product requirements live in
@@ -81,6 +87,7 @@ contracts are in [`.agents/`](.agents/). Product requirements live in
 ```bash
 just check                    # complete local gate
 just run                      # interactive TUI
+just install-user             # build and install hades/Hades on user PATH
 just snapshot                 # deterministic terminal snapshot
 just probe-lifecycle          # PTY lifecycle and cleanup oracle
 just replay-differential     # visual + behavioral parity replay

@@ -8,6 +8,10 @@ verify: check
 run *args:
     cargo run --locked --package hades-cli -- {{args}}
 
+install-user:
+    cargo build --locked --release --package hades-cli
+    bash scripts/install_user_launcher.sh
+
 snapshot:
     cargo run --locked --package hades-cli -- --snapshot
 
