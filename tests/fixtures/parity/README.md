@@ -56,3 +56,6 @@ invalid-base64, invalid-target, and unterminated OSC52 responses. It is
 research-only, consumed by `scripts/validate_reference_fixture.py`, and keeps
 delayed/oversized responses, ST termination, multiplexers, and attachments as
 explicit unknowns.
+OBS-0027 is the Hades implementation contract derived from OBS-0026 and is
+consumed by the dedicated direct-PTY response-boundary replay; it proves the
+same five controls fall back to native xclip without submission.

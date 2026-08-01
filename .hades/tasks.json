@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T06:54:59Z",
+  "updated_at": "2026-08-01T07:01:34Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -1253,6 +1253,58 @@
           "docs/parity/observations/OBS-0026-hermes-osc52-response-boundaries-2026-08-01.md",
           "scripts/probe_hermes_osc52_response_boundaries.py",
           "scripts/validate_reference_fixture.py",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-027",
+      "title": "Implement Hermes OSC52 response-boundary fallback parity",
+      "status": "complete",
+      "priority": 56,
+      "lane": "interaction",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-026"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "unit_test",
+        "direct_pty_replay",
+        "process_replay"
+      ],
+      "acceptance": [
+        "Extend the Hades direct 120x40 PTY OSC52 replay to send the OBS-0026 empty, query-marker, invalid-base64, invalid-target, and unterminated response bytes after the observed query and DA1 barrier.",
+        "For every response boundary, Hades must invoke native xclip with -selection clipboard -out only after the OSC52 boundary, insert the native payload after the draft, remain ready, and avoid submission or busy-state markers.",
+        "Assert exact response bytes, query/barrier bytes, provider order, trailing-newline removal, screen markers, cleanup, and no native-provider invocation for the already-covered valid OSC52 response.",
+        "Add a sanitized OBS-0027 Hades contract and observation, wire a dedicated replay through just verify, and add any focused regression tests required by the runtime result without changing out-of-scope tmux/STY, image/path, gateway, or concurrent-input behavior.",
+        "Do not claim delayed, oversized, ST-terminated, multiplexer, image/path, gateway, or concurrent-input parity beyond the explicit reference evidence."
+      ],
+      "evidence": [
+        "crates/hades-cli/src/osc52.rs",
+        "crates/hades-cli/src/main.rs",
+        "tests/fixtures/parity/OBS-0027-hades-osc52-response-boundaries.json",
+        "docs/parity/observations/OBS-0027-hades-osc52-response-boundaries-2026-08-01.md",
+        "scripts/replay_osc52_clipboard.py",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md"
+      ],
+      "ready_at": "2026-08-01T06:56:01Z",
+      "claimed_by": "hades-implementer",
+      "claimed_at": "2026-08-01T06:57:12Z",
+      "attempts": 1,
+      "result": {
+        "summary": "implemented-hades-osc52-response-boundary-fallback-parity-with-direct-pty-replay-and-full-verify",
+        "completed_at": "2026-08-01T07:01:34Z",
+        "evidence": [
+          "crates/hades-cli/src/osc52.rs",
+          "crates/hades-cli/src/main.rs",
+          "tests/fixtures/parity/OBS-0027-hades-osc52-response-boundaries.json",
+          "docs/parity/observations/OBS-0027-hades-osc52-response-boundaries-2026-08-01.md",
+          "scripts/replay_osc52_clipboard.py",
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md"

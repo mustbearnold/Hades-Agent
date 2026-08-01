@@ -92,8 +92,10 @@ progress from August 1, 2026 through 2027.
   timeout fallback. HAD-025 implements the bare SSH_TTY OSC52 query/DA1 barrier
   path with bounded native fallback. HAD-026 captures Hermes empty, query-marker,
   invalid-base64, invalid-target, and unterminated OSC52 responses falling back
-  to native xclip while remaining ready; delayed/oversized responses,
-  tmux/STY wrapping, image attachments, and gateway behavior remain unknown.
+  to native xclip while remaining ready. HAD-027 verifies the same response
+  boundaries in Hades through a dedicated direct-PTY replay; delayed/oversized
+  responses, tmux/STY wrapping, image attachments, and gateway behavior remain
+  unknown.
 
 ## Unknown until observed
 

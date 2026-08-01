@@ -1,0 +1,187 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0027",
+  "reference_observation": "OBS-0026",
+  "surface": "hades-tui-remote-osc52-response-boundaries",
+  "reference": {
+    "product": "Hades Agent implementation of Hermes OSC52 response boundaries",
+    "version": "0.1.0",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "direct PTY with raw byte writes"
+    },
+    "capture": "Hades direct PTY replay with synthetic SSH_TTY, malformed OSC52 responder, and synthetic xclip provider"
+  },
+  "normalization": [
+    "Each case runs in a fresh Hades process with synthetic HERMES_HOME, HOME, SSH_TTY, payload, log, and xclip paths.",
+    "TMUX, STY, SSH_CONNECTION, SSH_CLIENT, Wayland, and WSL markers are removed so the bare SSH_TTY path is isolated.",
+    "ANSI control sequences, cursor placement, colors, timestamps, prompt faces, and dynamic working-directory text are not asserted.",
+    "The PTY window is explicitly set to 120 columns by 40 rows before input is sent.",
+    "Ctrl+V is written as raw byte 0x16; the Hades OSC52 query, response, and DA1 barrier bytes are asserted as raw PTY output/input bytes.",
+    "The synthetic xclip provider records exact arguments and returns a case-specific native payload with one trailing newline.",
+    "Ready behavior is identified by draft/native markers and the absence of the busy interrupt marker; cleanup sends Ctrl+C without submitting a turn."
+  ],
+  "steps": [
+    {
+      "id": "osc52-empty-payload",
+      "draft": "boundary-empty-payload",
+      "native_payload": "native-empty-payload\n",
+      "osc52_response_bytes_hex": "1b 5d 35 32 3b 63 3b 07",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "boundary-empty-payload",
+          "bytes_hex": "62 6f 75 6e 64 61 72 79 2d 65 6d 70 74 79 2d 70 61 79 6c 6f 61 64"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+V",
+          "bytes_hex": "16"
+        }
+      ],
+      "screen_markers": ["boundary-empty-payload", "native-empty-payload"],
+      "screen_absent_markers": ["Ctrl+C to interrupt"],
+      "output": {
+        "status": "ready",
+        "submission": "not submitted",
+        "provider_order": "native xclip after empty OSC52 response",
+        "native_provider_arguments": "-selection clipboard -out",
+        "trailing_newlines": "removed",
+        "osc52_query_bytes_hex": "1b 5d 35 32 3b 63 3b 3f 07",
+        "da1_query_bytes_hex": "1b 5b 63",
+        "da1_response_bytes_hex": "1b 5b 3f 36 32 63",
+        "da1_response_count": 1
+      }
+    },
+    {
+      "id": "osc52-query-marker-payload",
+      "draft": "boundary-query-marker-payload",
+      "native_payload": "native-query-marker-payload\n",
+      "osc52_response_bytes_hex": "1b 5d 35 32 3b 63 3b 3f 07",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "boundary-query-marker-payload",
+          "bytes_hex": "62 6f 75 6e 64 61 72 79 2d 71 75 65 72 79 2d 6d 61 72 6b 65 72 2d 70 61 79 6c 6f 61 64"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+V",
+          "bytes_hex": "16"
+        }
+      ],
+      "screen_markers": ["boundary-query-marker-payload", "native-query-marker-payload"],
+      "screen_absent_markers": ["Ctrl+C to interrupt"],
+      "output": {
+        "status": "ready",
+        "submission": "not submitted",
+        "provider_order": "native xclip after query-marker OSC52 response",
+        "native_provider_arguments": "-selection clipboard -out",
+        "trailing_newlines": "removed",
+        "osc52_query_bytes_hex": "1b 5d 35 32 3b 63 3b 3f 07",
+        "da1_query_bytes_hex": "1b 5b 63",
+        "da1_response_bytes_hex": "1b 5b 3f 36 32 63",
+        "da1_response_count": 1
+      }
+    },
+    {
+      "id": "osc52-invalid-base64",
+      "draft": "boundary-invalid-base64",
+      "native_payload": "native-invalid-base64\n",
+      "osc52_response_bytes_hex": "1b 5d 35 32 3b 63 3b 25 25 25 6e 6f 74 2d 62 61 73 65 36 34 25 25 25 07",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "boundary-invalid-base64",
+          "bytes_hex": "62 6f 75 6e 64 61 72 79 2d 69 6e 76 61 6c 69 64 2d 62 61 73 65 36 34"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+V",
+          "bytes_hex": "16"
+        }
+      ],
+      "screen_markers": ["boundary-invalid-base64", "native-invalid-base64"],
+      "screen_absent_markers": ["Ctrl+C to interrupt"],
+      "output": {
+        "status": "ready",
+        "submission": "not submitted",
+        "provider_order": "native xclip after invalid-base64 OSC52 response",
+        "native_provider_arguments": "-selection clipboard -out",
+        "trailing_newlines": "removed",
+        "osc52_query_bytes_hex": "1b 5d 35 32 3b 63 3b 3f 07",
+        "da1_query_bytes_hex": "1b 5b 63",
+        "da1_response_bytes_hex": "1b 5b 3f 36 32 63",
+        "da1_response_count": 1
+      }
+    },
+    {
+      "id": "osc52-invalid-target",
+      "draft": "boundary-invalid-target",
+      "native_payload": "native-invalid-target\n",
+      "osc52_response_bytes_hex": "1b 5d 35 32 3b 78 3b 64 33 4a 76 62 6d 63 74 63 32 56 73 5a 57 4e 30 61 57 39 75 07",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "boundary-invalid-target",
+          "bytes_hex": "62 6f 75 6e 64 61 72 79 2d 69 6e 76 61 6c 69 64 2d 74 61 72 67 65 74"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+V",
+          "bytes_hex": "16"
+        }
+      ],
+      "screen_markers": ["boundary-invalid-target", "native-invalid-target"],
+      "screen_absent_markers": ["Ctrl+C to interrupt"],
+      "output": {
+        "status": "ready",
+        "submission": "not submitted",
+        "provider_order": "native xclip after invalid-target OSC52 response",
+        "native_provider_arguments": "-selection clipboard -out",
+        "trailing_newlines": "removed",
+        "osc52_query_bytes_hex": "1b 5d 35 32 3b 63 3b 3f 07",
+        "da1_query_bytes_hex": "1b 5b 63",
+        "da1_response_bytes_hex": "1b 5b 3f 36 32 63",
+        "da1_response_count": 1
+      }
+    },
+    {
+      "id": "osc52-unterminated-response",
+      "draft": "boundary-unterminated-response",
+      "native_payload": "native-unterminated-response\n",
+      "osc52_response_bytes_hex": "1b 5d 35 32 3b 63 3b 64 57 35 30 5a 58 4a 74 61 57 35 68 64 47 56 6b",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "boundary-unterminated-response",
+          "bytes_hex": "62 6f 75 6e 64 61 72 79 2d 75 6e 74 65 72 6d 69 6e 61 74 65 64 2d 72 65 73 70 6f 6e 73 65"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+V",
+          "bytes_hex": "16"
+        }
+      ],
+      "screen_markers": ["boundary-unterminated-response", "native-unterminated-response"],
+      "screen_absent_markers": ["Ctrl+C to interrupt"],
+      "output": {
+        "status": "ready",
+        "submission": "not submitted",
+        "provider_order": "native xclip after unterminated OSC52 response",
+        "native_provider_arguments": "-selection clipboard -out",
+        "trailing_newlines": "removed",
+        "osc52_query_bytes_hex": "1b 5d 35 32 3b 63 3b 3f 07",
+        "da1_query_bytes_hex": "1b 5b 63",
+        "da1_response_bytes_hex": "1b 5b 3f 36 32 63",
+        "da1_response_count": 1
+      }
+    }
+  ],
+  "unknowns": [
+    "Delayed, oversized, and ST-terminated response parity remains unclaimed because the reference contract does not cover it.",
+    "TMUX/STY passthrough, image/path clipboard behavior, gateway behavior, and concurrent input remain separate unknowns."
+  ]
+}

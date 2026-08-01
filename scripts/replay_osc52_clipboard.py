@@ -346,10 +346,28 @@ def load_contract(path: Path) -> dict[str, Any]:
     if not isinstance(contract, dict) or contract.get("schema_version") != 1:
         raise Osc52ReplayFailure("contract", "load", "unsupported OSC52 contract")
     steps = contract.get("steps")
-    required = {"osc52-response", "osc52-native-timeout-control"}
-    ids = {step.get("id") for step in steps if isinstance(step, dict)} if isinstance(steps, list) else set()
-    if ids != required:
-        raise Osc52ReplayFailure("contract", "load", f"step ids must be {sorted(required)}")
+    if not isinstance(steps, list) or not steps:
+        raise Osc52ReplayFailure("contract", "load", "steps must be a non-empty array")
+    ids = {step.get("id") for step in steps if isinstance(step, dict)}
+    legacy_ids = {"osc52-response", "osc52-native-timeout-control"}
+    boundary_ids = {
+        "osc52-empty-payload",
+        "osc52-query-marker-payload",
+        "osc52-invalid-base64",
+        "osc52-invalid-target",
+        "osc52-unterminated-response",
+    }
+    if ids == legacy_ids:
+        return contract
+    if ids != boundary_ids or not all(
+        isinstance(step, dict) and isinstance(step.get("osc52_response_bytes_hex"), str)
+        for step in steps
+    ):
+        raise Osc52ReplayFailure(
+            "contract",
+            "load",
+            f"step ids must be {sorted(legacy_ids)} or {sorted(boundary_ids)}",
+        )
     return contract
 
 
@@ -426,6 +444,32 @@ def run_case(binary: Path, case: dict[str, Any], timeout: float, ordinal: int) -
                 "da1_query_bytes_hex": DA1_QUERY.hex(" "),
                 "da1_response_bytes_hex": DA1_RESPONSE.hex(" "),
                 "native_provider": "not invoked",
+            }
+        elif "osc52_response_bytes_hex" in case:
+            response = bytes.fromhex(case["osc52_response_bytes_hex"])
+            write_bytes(fd, response)
+            write_bytes(fd, DA1_RESPONSE)
+            buffer = wait_for(
+                pid,
+                fd,
+                buffer,
+                case_id,
+                "native-fallback",
+                lambda current: all(contains_marker(current, marker) for marker in case["screen_markers"]),
+                timeout,
+            )
+            provider_arguments = log_path.read_text(encoding="utf-8")
+            if provider_arguments != "-selection clipboard -out":
+                raise Osc52ReplayFailure(case_id, "provider-order", f"unexpected native provider log: {provider_arguments!r}")
+            outcome = {
+                "status": "passed",
+                "path": "Malformed or empty OSC52 response fell back to native provider",
+                "osc52_query_bytes_hex": OSC52_QUERY.hex(" "),
+                "osc52_response_bytes_hex": response.hex(" "),
+                "da1_query_bytes_hex": DA1_QUERY.hex(" "),
+                "da1_response_bytes_hex": DA1_RESPONSE.hex(" "),
+                "native_provider": "xclip",
+                "native_provider_arguments": provider_arguments,
             }
         else:
             write_bytes(fd, DA1_RESPONSE)

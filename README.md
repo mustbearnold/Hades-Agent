@@ -39,6 +39,8 @@ and the newest-1,000 load cap.
 synthetic xclip provider plus the empty-provider control.
 `just replay-osc52-clipboard` replays bare-SSH OSC52 response precedence and
 the DA1-barrier native-provider timeout control in an isolated direct PTY.
+`just replay-osc52-response-boundaries` replays the OBS-0026 empty and
+malformed-response controls against Hades and verifies native fallback order.
 `just validate-reference` also checks the deterministic Hermes editor-outcome
 fixture covering modified, multiline, empty, and cancelled editor handoffs,
 plus the direct-PTY modified-Enter reference and Hades implementation fixtures.
@@ -69,6 +71,7 @@ just replay-modified-enter     # native modified-Enter direct-PTY replay
 just replay-clipboard        # empty-clipboard Ctrl+V PTY replay
 just replay-clipboard-text   # successful text clipboard PTY replay
 just replay-osc52-clipboard  # bare-SSH OSC52 and native fallback PTY replay
+just replay-osc52-response-boundaries # malformed/empty OSC52 fallback replay
 just agent validate           # validate task/control-plane invariants
 just agent next               # choose the highest-priority ready task
 just agent claim HAD-001 bot  # claim a task with an agent identity
