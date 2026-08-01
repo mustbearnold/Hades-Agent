@@ -52,6 +52,7 @@ observation, contract, implementation, and oracle are all linked from a task.
 | Post-delay Setup Required actions (`/model`, `/setup`, Ctrl+C) | Observed | [OBS-0068](observations/OBS-0068-hermes-setup-required-actions-2026-08-02.md) | — (Hades action semantics remain unspecified) | HAD-073 / Future task |
 | Standalone `hermes setup` first-run entry | Observed | [OBS-0069](observations/OBS-0069-hermes-standalone-setup-2026-08-02.md) | — (Hades standalone setup command remains unimplemented) | HAD-074 / Future task |
 | Standalone `setup` first-run entry | Verified (bounded) | [OBS-0069](observations/OBS-0069-hermes-standalone-setup-2026-08-02.md) | [OBS-0070 standalone setup replay](observations/OBS-0070-hades-standalone-setup-2026-08-02.md) | HAD-074 / HAD-075 |
+| Standalone `hermes setup` Full continuation | Observed | [OBS-0071](observations/OBS-0071-hermes-standalone-full-setup-2026-08-02.md) | — | HAD-076 / Future task |
 | Setup-required error path | Verified | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [setup contract + differential replay](../../tests/fixtures/parity/OBS-0008-setup-required.json) | HAD-009 |
 | Errors and retries | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) (setup-required path only) | [lifecycle trace](../../tests/fixtures/parity/OBS-0001-lifecycle.json) | Future task |
 | Resize behavior | Observed | [OBS-0001](observations/OBS-0001-hermes-main-2026-08-01.md) | [lifecycle probe](../../scripts/probe_tui_lifecycle.py) | HAD-003 / Future task |

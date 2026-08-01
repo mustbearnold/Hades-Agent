@@ -357,6 +357,12 @@ progress from August 1, 2026 through 2027.
   terminal restoration without config or provider activity. Selected setup
   paths, persistence, credentials, OAuth, and direct initial-surface Ctrl+C
   remain outside the implementation claim.
+- HAD-076 captures the standalone Hermes Full setup continuation in a fresh
+  synthetic home. Choosing Full setup reaches Configuration Location and
+  Inference Provider, creates a normalized config without a secrets file, and
+  then follows the observed three-Ctrl+C chain: provider skip, Terminal Backend
+  fallback, and status-1 exit. Backend selection, later setup pages, and Hades
+  standalone continuation remain unimplemented.
 
 ## Unknown until observed
 

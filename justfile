@@ -210,6 +210,9 @@ probe-hermes-setup-required-actions:
 probe-hermes-standalone-setup:
     python3 scripts/probe_hermes_standalone_setup.py --report .hades/runtime/hermes-standalone-setup-probe.json --timeout 30
 
+probe-hermes-standalone-full-setup:
+    python3 scripts/probe_hermes_standalone_full_setup.py --report .hades/runtime/hermes-standalone-full-setup-probe.json --timeout 30
+
 replay-local-provider:
     cargo build --locked --package hades-cli
     python3 scripts/replay_local_provider.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0051-hades-local-provider-stream.json --report .hades/runtime/local-provider-replay.json

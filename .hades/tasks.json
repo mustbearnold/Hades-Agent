@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T21:54:41Z",
+  "updated_at": "2026-08-01T22:11:41Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -3977,6 +3977,61 @@
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/hades-standalone-setup-replay.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-076",
+      "title": "Capture Hermes standalone Full setup continuation boundary",
+      "status": "complete",
+      "priority": 10,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-075"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "hermes_direct_pty",
+        "sanitized_fixture",
+        "replayable_setup_continuation",
+        "full_verify"
+      ],
+      "acceptance": [
+        "In the pinned Hermes reference, invoke standalone hermes setup from a fresh synthetic home with no credentials, OAuth, external network, provider values, or model selection, choose only the observed Full setup option, and capture the first stable continuation surface.",
+        "Record the exact safe input sequence, visible title/labels/prompts, cursor and selection state, alternate-screen and terminal flags, exit status, and normalized config/artifact changes through the first reversible continuation boundary.",
+        "Exercise only bounded cancellation from that continuation surface; do not submit provider credentials, API keys, OAuth, endpoint values, model values, or any later setup choice, and keep unobserved behavior explicitly unknown.",
+        "Add provenance, a sanitized OBS-0071 fixture, a repeatable direct-PTY probe, and an observation document; update the parity matrix/context/readme and wire fixture validation and the probe into just verify.",
+        "Run the targeted probe and complete no-skip just verify gate, recording the standalone continuation evidence before completion."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_standalone_full_setup.py",
+        "tests/fixtures/parity/OBS-0071-hermes-standalone-full-setup.json",
+        "docs/parity/observations/OBS-0071-hermes-standalone-full-setup-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hermes-standalone-full-setup-probe.json"
+      ],
+      "ready_at": "2026-08-02T00:00:00Z",
+      "attempts": 1,
+      "claimed_by": "standalone-full-setup",
+      "claimed_at": "2026-08-01T21:55:49Z",
+      "result": {
+        "summary": "Captured standalone Hermes Full setup through Configuration Location and Inference Provider, including config creation, provider-skip to Terminal Backend, numbered fallback, status-1 cancellation, sanitized OBS-0071 evidence, targeted probe, and full no-skip verification.",
+        "completed_at": "2026-08-01T22:11:41Z",
+        "evidence": [
+          "scripts/probe_hermes_standalone_full_setup.py",
+          "tests/fixtures/parity/OBS-0071-hermes-standalone-full-setup.json",
+          "docs/parity/observations/OBS-0071-hermes-standalone-full-setup-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hermes-standalone-full-setup-probe.json"
         ]
       }
     }
