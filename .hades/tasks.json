@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T02:31:15Z",
+  "updated_at": "2026-08-01T02:35:23Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -343,7 +343,7 @@
     {
       "id": "HAD-009",
       "title": "Implement the observed setup-required overlay path",
-      "status": "in_progress",
+      "status": "complete",
       "priority": 76,
       "lane": "interaction",
       "owner_role": "implementer",
@@ -361,11 +361,32 @@
         "Clear the retained input on the first Ctrl+C while keeping the setup overlay visible.",
         "Exit cleanly on the second Ctrl+C and document that provider setup/model behavior remains unimplemented."
       ],
-      "evidence": [],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-app/src/lib.rs",
+        "crates/hades-tui/src/lib.rs",
+        "tests/fixtures/parity/OBS-0008-setup-required.json",
+        "docs/parity/observations/OBS-0008-hades-setup-required-2026-08-01.md",
+        "scripts/differential_replay.py",
+        "docs/parity/MATRIX.md"
+      ],
       "ready_at": "2026-08-01T02:31:02Z",
       "claimed_by": "hermes-implementer",
       "claimed_at": "2026-08-01T02:31:15Z",
-      "attempts": 1
+      "attempts": 1,
+      "result": {
+        "summary": "Implemented the observed provider-missing /help path with retained input, a Setup Required overlay, first-Ctrl+C input clearing, second-Ctrl+C clean exit, and contract-driven PTY replay coverage while leaving provider setup unimplemented.",
+        "completed_at": "2026-08-01T02:35:23Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-app/src/lib.rs",
+          "crates/hades-tui/src/lib.rs",
+          "tests/fixtures/parity/OBS-0008-setup-required.json",
+          "docs/parity/observations/OBS-0008-hades-setup-required-2026-08-01.md",
+          "scripts/differential_replay.py",
+          "docs/parity/MATRIX.md"
+        ]
+      }
     }
   ]
 }
