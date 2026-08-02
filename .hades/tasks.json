@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-02T05:16:56Z",
+  "updated_at": "2026-08-02T05:37:37Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -4818,6 +4818,60 @@
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/hades-tool-provider-inventory-navigation-replay.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-090",
+      "title": "Observe provider inventory selection and cancellation semantics",
+      "status": "complete",
+      "priority": 10,
+      "lane": "interaction",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-089"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "pinned_hermes_reference",
+        "direct_pty_probe",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "In fresh pinned Hermes direct PTYs with synthetic homes, repeat the established standalone Full setup route through the first-install Browser Automation provider inventory and observe only bounded provider-surface actions: Enter and Space on the safe default Local Browser row, Enter on the Skip row, and Escape cancellation.",
+        "Record exact input bytes, rendered surface transitions or delayed/no-transition results, cursor and selected-row markers, raw terminal flags, alternate-screen lifecycle, process liveness, normalized config/artifact changes, and any provider subprocess or network-bearing behavior visible within the bounded window.",
+        "Keep credentials, OAuth, external network setup, later provider configuration, and unbounded discovery outside the claim; preserve uncertainty when Hermes does not yield a stable observable result.",
+        "Add provenance, a sanitized OBS-0085 fixture, a repeatable direct-PTY probe, and an observation document; update the parity matrix, context, readme, justfile, and validation gates. Hermes defects, unsafe behavior, and failure cases are reference findings to fix in Hades, never compatibility requirements, and the evidence boundary must not cap Hades performance or safer capabilities.",
+        "Run the targeted probe and complete the no-skip just verify gate before completion."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_tool_provider_inventory_selection.py",
+        "tests/fixtures/parity/OBS-0085-hermes-tool-provider-inventory-selection.json",
+        "docs/parity/observations/OBS-0085-hermes-tool-provider-inventory-selection-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hermes-tool-provider-inventory-selection-probe.json"
+      ],
+      "claimed_by": "provider-inventory-selection-observer",
+      "claimed_at": "2026-08-02T05:19:18Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Captured fresh Hermes OBS-0085 provider-action semantics with four direct-PTY cases: Enter and Space on Local Browser, six Down inputs plus Enter on Skip, and Escape. The provider list leaves, canonical input/echo are restored, and the process remains alive; Escape has no stable transition marker in the bounded delta. Every first action also exposes an unrequested background Computer Use installer with bash/curl descendants and a .cua-driver artifact while normalized config stays unchanged. Hades must not reproduce that implicit network/install side effect or any Hermes defect/failure case, and no capability/performance cap was introduced. Targeted probe, fixture validation, and complete just verify PASS.",
+        "completed_at": "2026-08-02T05:37:37Z",
+        "evidence": [
+          "scripts/probe_hermes_tool_provider_inventory_selection.py",
+          "tests/fixtures/parity/OBS-0085-hermes-tool-provider-inventory-selection.json",
+          "docs/parity/observations/OBS-0085-hermes-tool-provider-inventory-selection-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hermes-tool-provider-inventory-selection-probe.json"
         ]
       }
     }

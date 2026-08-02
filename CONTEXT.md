@@ -459,6 +459,16 @@ progress from August 1, 2026 through 2027.
   Browser selection, stable raw terminal/process state, and unchanged config
   and artifacts. Hades must not inherit any unrelated Hermes defect or failure
   case from this observation.
+- HAD-090 captures four fresh Hermes provider-action cases. Enter and Space on
+  Local Browser leave the inventory with local-mode/no-configuration output;
+  six Down inputs followed by Enter on Skip leave it with a skip message; and
+  Escape leaves no stable transition marker in the bounded delta. All restore
+  canonical input and echo while the process remains alive. Each first action
+  also exposes an unrequested background Computer Use installer with `bash` and
+  `curl` descendants plus a `.cua-driver` artifact, while the normalized config
+  shape remains unchanged. Hades must not reproduce that implicit network or
+  installation side effect; it is a Hermes defect/safety finding, not a parity
+  requirement, and later installer/provider behavior remains unknown.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes

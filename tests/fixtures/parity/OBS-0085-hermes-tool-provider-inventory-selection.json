@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0085",
+  "surface": "hermes-first-install-tool-provider-inventory-selection-cancellation",
+  "reference_observation": "OBS-0083",
+  "reference": {
+    "product": "Hermes Agent",
+    "version": "0.19.1 (2026.7.30)",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "fresh direct PTY cases with retained slave descriptors"
+    },
+    "capture": "fresh synthetic home for each bounded provider action case"
+  },
+  "binary": "<reference-checkout>",
+  "terminal": {
+    "columns": 120,
+    "rows": 40,
+    "capture": "direct PTY with normalized stable markers"
+  },
+  "normalization": [
+    "Reference checkout, synthetic HOME/HERMES_HOME paths, PTY paths, credentials, timestamps, PIDs, URLs, and raw redraw bytes are omitted or replaced by stable markers.",
+    "Each fresh case repeats the established route through the provider inventory, waits one second without input, then sends only the named provider action before a bounded 1.5-second observation window.",
+    "No credential, OAuth, or later setup value is sent. Process names and artifact classes are retained only to expose an unrequested background installer; forced teardown is probe cleanup only."
+  ],
+  "unknowns": [
+    "Behavior after the bounded window, complete provider discovery, credentials, OAuth, durable persistence, and the full installer lifecycle remain unknown.",
+    "The observed background installer and curl descendant are a Hermes safety/defect finding, not a Hades compatibility requirement. Hades must not initiate implicit network or installation work from this surface and must not cap safer capabilities or performance."
+  ],
+  "steps": [
+    {
+      "id": "enter-local-browser",
+      "input_sequence": [
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d", "meaning": "submit the default Local Browser row"}
+      ],
+      "output": {
+        "status": "passed",
+        "route": {
+          "initial_cursor": "Local Browser",
+          "initial_selected": "Local Browser",
+          "provider_inventory_terminal_flags": {"canonical": false, "echo": false},
+          "alternate_screen_entered": true,
+          "alternate_screen_left_before_interaction": true
+        },
+        "pre_action_idle": {
+          "window_ms": 1000,
+          "provider_inventory_remained_visible": true,
+          "process_commands": ["hermes"],
+          "new_artifacts": []
+        },
+        "action": {
+          "provider_inventory_visible_after_action": false,
+          "visible_transition": "Local Browser reports local mode and no configuration needed, then a background Computer Use installer begins.",
+          "process_alive_after_action": true,
+          "terminal_flags_after_action": {"canonical": true, "echo": true},
+          "alternate_screen_left_after_action": true,
+          "new_process_commands": ["bash", "curl"],
+          "new_artifacts": [".cua-driver/packages/.install.lock.d/info"],
+          "config_unchanged": true,
+          "secrets_file_created": false,
+          "implicit_network_or_install_activity_visible": true
+        }
+      }
+    },
+    {
+      "id": "space-local-browser",
+      "input_sequence": [
+        {"kind": "key", "value": "Space", "bytes_hex": "20", "meaning": "submit the default Local Browser row"}
+      ],
+      "output": {
+        "status": "passed",
+        "route": {
+          "initial_cursor": "Local Browser",
+          "initial_selected": "Local Browser",
+          "provider_inventory_terminal_flags": {"canonical": false, "echo": false},
+          "alternate_screen_entered": true,
+          "alternate_screen_left_before_interaction": true
+        },
+        "pre_action_idle": {
+          "window_ms": 1000,
+          "provider_inventory_remained_visible": true,
+          "process_commands": ["hermes"],
+          "new_artifacts": []
+        },
+        "action": {
+          "provider_inventory_visible_after_action": false,
+          "visible_transition": "Space follows the same bounded Local Browser setup path as Enter, followed by the background Computer Use installer.",
+          "process_alive_after_action": true,
+          "terminal_flags_after_action": {"canonical": true, "echo": true},
+          "alternate_screen_left_after_action": true,
+          "new_process_commands": ["bash", "curl"],
+          "new_artifacts": [".cua-driver/packages/.install.lock.d/info"],
+          "config_unchanged": true,
+          "secrets_file_created": false,
+          "implicit_network_or_install_activity_visible": true
+        }
+      }
+    },
+    {
+      "id": "enter-skip",
+      "input_sequence": [
+        {"kind": "key", "value": "Down x6", "repeat": 6, "bytes_hex": "1b 5b 42 1b 5b 42 1b 5b 42 1b 5b 42 1b 5b 42 1b 5b 42", "meaning": "move the cursor from Local Browser to Skip"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d", "meaning": "submit the Skip row"}
+      ],
+      "output": {
+        "status": "passed",
+        "route": {
+          "initial_cursor": "Local Browser",
+          "initial_selected": "Local Browser",
+          "provider_inventory_terminal_flags": {"canonical": false, "echo": false},
+          "alternate_screen_entered": true,
+          "alternate_screen_left_before_interaction": true
+        },
+        "cursor_trace": [
+          "Nous Subscription (Browser Use cloud)",
+          "Camofox [free · local]",
+          "Browser Use [paid]",
+          "Browserbase [paid]",
+          "Firecrawl [paid]",
+          "Skip — keep defaults / configure later"
+        ],
+        "selected_during_navigation": "Local Browser [★ recommended · free]",
+        "pre_action_idle": {
+          "window_ms": 1000,
+          "provider_inventory_remained_visible": true,
+          "process_commands": ["hermes"],
+          "new_artifacts": []
+        },
+        "action": {
+          "provider_inventory_visible_after_action": false,
+          "visible_transition": "Skip reports Browser Automation skipped, then a background Computer Use installer begins.",
+          "process_alive_after_action": true,
+          "terminal_flags_after_action": {"canonical": true, "echo": true},
+          "alternate_screen_left_after_action": true,
+          "new_process_commands": ["bash", "curl"],
+          "new_artifacts": [".cua-driver/packages/.install.lock.d/info"],
+          "config_unchanged": true,
+          "secrets_file_created": false,
+          "implicit_network_or_install_activity_visible": true
+        }
+      }
+    },
+    {
+      "id": "escape-cancel",
+      "input_sequence": [
+        {"kind": "key", "value": "Escape", "bytes_hex": "1b", "meaning": "cancel the provider inventory"}
+      ],
+      "output": {
+        "status": "passed",
+        "route": {
+          "initial_cursor": "Local Browser",
+          "initial_selected": "Local Browser",
+          "provider_inventory_terminal_flags": {"canonical": false, "echo": false},
+          "alternate_screen_entered": true,
+          "alternate_screen_left_before_interaction": true
+        },
+        "pre_action_idle": {
+          "window_ms": 1000,
+          "provider_inventory_remained_visible": true,
+          "process_commands": ["hermes"],
+          "new_artifacts": []
+        },
+        "action": {
+          "provider_inventory_visible_after_action": false,
+          "stable_transition_marker": "none observed in the bounded delta",
+          "process_alive_after_action": true,
+          "terminal_flags_after_action": {"canonical": true, "echo": true},
+          "alternate_screen_left_after_action": true,
+          "new_process_commands": ["bash", "curl"],
+          "new_artifacts": [".cua-driver/packages/.install.lock.d/info"],
+          "config_unchanged": true,
+          "secrets_file_created": false,
+          "implicit_network_or_install_activity_visible": true
+        }
+      }
+    }
+  ],
+  "passed": true
+}
