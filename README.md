@@ -120,6 +120,7 @@ just probe-hermes-standalone-setup # standalone hermes setup first-run probe
 just probe-hermes-standalone-full-setup # standalone Full setup continuation probe
 just probe-hermes-standalone-terminal-platform # standalone backend/platform boundary probe
 just probe-hermes-standalone-tool-configuration # standalone Tool Configuration action probe
+just probe-hermes-tool-configuration-navigation # standalone Tool Configuration navigation probe
 just replay-terminal-palette   # Hades SGR palette and cell-style parity replay
 just replay-osc52-timing-limits # Hades OSC52 timing and bounded-size parity replay
 just replay-osc52-st-termination # Hades ST-terminated OSC52 parity replay
@@ -159,7 +160,9 @@ forms, and `just verify` also refreshes and replays the installed `hades` and
 current bounded slice reaches the observed Full setup continuation, accepts the
 local terminal backend into the unconfigured platform picker, and carries
 platform cancellation through the plain Hermes Tool Configuration boundary.
-Provider credentials, OAuth, platform selection, backend alternatives, and
-later setup remain outside the clone contract. Configure the loopback endpoint
+The bounded reference probe also records the first checklist navigation key
+and the first-install provider handoff without selecting a tool. Provider
+credentials, OAuth, platform selection, backend alternatives, and later setup
+remain outside the clone contract. Configure the loopback endpoint
 before expecting a model response. No external provider service is required
 for the deterministic bootstrap path.

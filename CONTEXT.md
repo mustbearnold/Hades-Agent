@@ -393,6 +393,14 @@ progress from August 1, 2026 through 2027.
   repeated Ctrl+C cleanup exits with status 130 and leaves the normalized
   config unchanged. Hades must not claim later tool/provider configuration
   until it is separately observed.
+- HAD-081 captures one more bounded Hermes navigation step from that raw
+  checklist. The first visible cursor styling is on Web Search & Scraping; a
+  single `j` key produced no changed screen-model snapshot within 100 ms, so
+  delayed cursor semantics remain unknown. The first Ctrl+C restores canonical
+  input and echo while leaving setup alive, then exposes the first-install
+  `Configuring 6 tool(s)` / Browser Automation provider boundary. The probe
+  stops before provider selection and uses harness-only forced teardown; later
+  cancellation, tool toggling, and provider/key behavior remain unknown.
 
 ## Unknown until observed
 

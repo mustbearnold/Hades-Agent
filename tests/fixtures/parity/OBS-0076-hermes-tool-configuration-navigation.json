@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0076",
+  "surface": "hermes-tool-configuration-navigation-boundary",
+  "reference_observation": "OBS-0075",
+  "reference": {
+    "product": "Hermes Agent",
+    "version": "0.19.1 (2026.7.30)",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "direct PTY with bounded screen-model and terminal lifecycle capture"
+    },
+    "capture": "fresh synthetic home with standalone hermes setup and no provider environment"
+  },
+  "binary": "<reference-checkout>",
+  "normalization": [
+    "Reference checkout, synthetic HOME/HERMES_HOME paths, PTY paths, credentials, timestamps, and raw redraw bytes are omitted or replaced by stable markers.",
+    "The safe route enters only Full setup, skips the provider, accepts the displayed local backend, cancels the platform picker, opens the CLI checklist, presses j once, and sends one bounded Ctrl+C without entering a tool or provider value.",
+    "The downstream first-install continuation is retained only as stable plain-text landmarks; the probe stops before provider selection, API keys, OAuth, network submission, or later cancellation."
+  ],
+  "unknowns": [
+    "The visible screen-model snapshot did not change within the bounded 100 ms after j, so the post-key cursor position and any delayed redraw semantics remain unknown.",
+    "Tool toggling, confirmation, provider selection, API-key prompts, platform-specific configuration, credentials, OAuth, network behavior, successful save behavior, and later cancellation status remain unknown."
+  ],
+  "steps": [
+    {
+      "id": "standalone-tool-configuration-navigation-boundary",
+      "input_sequence": [
+        {"kind": "key", "value": "j", "bytes_hex": "6a", "meaning": "move to Full setup"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d", "meaning": "submit Full setup"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "skip the unconfigured provider"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d", "meaning": "accept Keep current (local)"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "cancel the platform picker"},
+        {"kind": "key", "value": "Escape", "bytes_hex": "1b", "meaning": "open the raw CLI tool checklist"},
+        {"kind": "key", "value": "j", "bytes_hex": "6a", "meaning": "one non-mutating navigation step"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "bounded checklist cancellation at the next setup boundary"}
+      ],
+      "output": {
+        "status": "passed",
+        "checklist": {
+          "title": "Tools for 🖥️  CLI",
+          "controls": ["SPACE toggle", "ENTER confirm", "ESC cancel"],
+          "visible_rows": [
+            "Web Search & Scraping",
+            "Browser Automation",
+            "Terminal & Processes",
+            "File Operations"
+          ],
+          "initial_cursor": {
+            "row": "Web Search & Scraping",
+            "style": {"fg": "ansi(2)", "bold": true, "dim": false, "reverse": false}
+          },
+          "terminal_flags": {"canonical": false, "echo": false},
+          "process_still_alive": true
+        },
+        "navigation": {
+          "key": "j",
+          "bytes_hex": "6a",
+          "mutated_selection": false,
+          "confirmed_tool": false,
+          "provider_or_secret_surface_submitted": false,
+          "screen_snapshot_changed_within_ms": 100,
+          "screen_snapshot_changed": false,
+          "cursor_after_key": "unknown"
+        },
+        "after_ctrl_c": {
+          "process_still_alive": true,
+          "terminal_flags": {"canonical": true, "echo": true},
+          "stable_markers": [
+            "Configuring 6 tool(s):",
+            "Browser Automation",
+            "Computer Use (macOS/Windows/Linux)",
+            "Image Generation",
+            "Text-to-Speech",
+            "Vision / Image Analysis",
+            "Web Search & Scraping",
+            "Browser Automation - Choose a provider"
+          ],
+          "safe_screen_tail": "Configuring 6 tool(s): / Browser Automation / Computer Use (macOS/Windows/Linux) / Image Generation / Text-to-Speech / Vision / Image Analysis / Web Search & Scraping / Browser Automation - Choose a provider",
+          "boundary": "first-install tool configuration continuation; later provider selection was not entered"
+        },
+        "terminal_flags": {
+          "initial": {"canonical": false, "echo": false},
+          "continuation": {"canonical": true, "echo": true},
+          "terminal_backend": {"canonical": false, "echo": false},
+          "platform_picker": {"canonical": false, "echo": false},
+          "tool_configuration": {"canonical": true, "echo": true},
+          "checklist": {"canonical": false, "echo": false},
+          "after_ctrl_c": {"canonical": true, "echo": true}
+        },
+        "cancellation": {
+          "first_ctrl_c_left_checklist": true,
+          "later_cancellation_status": "unknown",
+          "alternate_screen_entered": true,
+          "alternate_screen_left": true,
+          "probe_teardown": "forced child/process-group teardown after the bounded evidence window; not a Hermes product outcome",
+          "credentials_entered": false,
+          "oauth_started": false,
+          "network_requested": false
+        },
+        "persistence": {
+          "config_before_exists": false,
+          "config_created_during_setup": true,
+          "config_at_tool_configuration": {
+            "bytes": 2003,
+            "paths": [
+              "_config_version",
+              "agent",
+              "agent.max_turns",
+              "display",
+              "display.tool_progress",
+              "session_reset",
+              "session_reset.mode"
+            ]
+          },
+          "config_at_scope_exit_unchanged": true,
+          "secrets_file_created": false,
+          "artifact_classes_before_tool_configuration": [
+            ".cache/uv/<artifact>",
+            "<other-file>",
+            "SOUL.md",
+            "config.yaml",
+            "logs/<artifact>"
+          ],
+          "artifact_classes_at_scope_exit": []
+        }
+      }
+    }
+  ]
+}

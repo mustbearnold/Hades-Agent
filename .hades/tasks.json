@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-02T00:13:31Z",
+  "updated_at": "2026-08-02T00:38:58Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -4266,6 +4266,61 @@
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/hermes-standalone-tool-configuration-probe.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-081",
+      "title": "Capture Hermes Tool Configuration navigation boundary",
+      "status": "complete",
+      "priority": 10,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-080"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "hermes_direct_pty",
+        "sanitized_fixture",
+        "replayable_tool_configuration_navigation",
+        "full_verify"
+      ],
+      "acceptance": [
+        "In the pinned Hermes reference, repeat the fresh standalone Full setup route from OBS-0075, cancel the unconfigured platform picker, press Escape into the raw Tools for CLI checklist, and perform only one non-mutating navigation key such as Down without toggling or confirming any tool.",
+        "Record the exact checklist title, controls, visible row order and cursor movement that are stable in the bounded 120x40 direct PTY, plus alternate-screen state, terminal flags, process liveness, config/artifact shape, and the precise safe input sequence.",
+        "Cancel the checklist through the first observed reversible boundary and then use bounded Ctrl+C cleanup; stop immediately if navigation opens a provider, platform, secret, tool-configuration, or other unobserved surface, and leave all later behavior explicitly unknown.",
+        "Add provenance, a sanitized OBS-0076 fixture, a repeatable direct-PTY probe, and an observation document; update the parity matrix/context/readme and wire fixture validation and the probe into just verify.",
+        "Run the targeted probe and complete no-skip just verify gate, recording only the bounded navigation evidence before completion; do not select a platform, toggle a tool, enter credentials, start OAuth, or request external network behavior."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_tool_configuration_navigation.py",
+        "tests/fixtures/parity/OBS-0076-hermes-tool-configuration-navigation.json",
+        "docs/parity/observations/OBS-0076-hermes-tool-configuration-navigation-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hermes-tool-configuration-navigation-probe.json"
+      ],
+      "ready_at": "2026-08-02T00:15:50Z",
+      "claimed_by": "tool-configuration-navigation",
+      "claimed_at": "2026-08-02T00:16:19Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Captured Hermes Tool Configuration checklist navigation and the first-install provider handoff; preserved delayed cursor and later cancellation semantics as unknown.",
+        "completed_at": "2026-08-02T00:38:58Z",
+        "evidence": [
+          "scripts/probe_hermes_tool_configuration_navigation.py",
+          "tests/fixtures/parity/OBS-0076-hermes-tool-configuration-navigation.json",
+          "docs/parity/observations/OBS-0076-hermes-tool-configuration-navigation-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hermes-tool-configuration-navigation-probe.json"
         ]
       }
     }
