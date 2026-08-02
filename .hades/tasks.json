@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-02T11:51:13Z",
+  "updated_at": "2026-08-02T22:32:00Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -5433,6 +5433,129 @@
           "tests/fixtures/parity/OBS-0095-hades-installed-model-selection.json",
           "docs/parity/observations/OBS-0095-hades-installed-model-selection-2026-08-02.md",
           ".hades/runtime/installed-model-selection-replay.json",
+          "justfile",
+          "scripts/verify.sh",
+          "README.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-101",
+      "title": "Capture Hermes distinct-model selection effectiveness and persistence",
+      "status": "complete",
+      "priority": 89,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-100",
+        "HAD-098",
+        "HAD-059"
+      ],
+      "risk": "high",
+      "oracle": [
+        "pinned_hermes_reference",
+        "distinct_model_loopback_catalog",
+        "selection_request_trace",
+        "config_diff",
+        "fresh_process_readback",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Against the pinned Hermes reference in a fresh synthetic home, expose two deterministic model rows under the synthetic loopback provider with a distinct alternate-model target and record the exact bounded filter/Enter sequence used to select it.",
+        "Record the rendered selection status, model-stage and provider-stage readback, loopback request paths/body metadata/model markers, exact config changed/unchanged result, normalized artifacts, and clean terminal state without real credentials, external network, host clipboard, or private runtime data.",
+        "If safe and bounded, submit one synthetic prompt after selection and use the isolated request model plus a fresh-process current marker/config diff to classify effective use and persistence; retain unknowns when Hermes does not prove them.",
+        "Treat repeated metadata calls, retries, failures, stuck surfaces, or unsafe reference behavior as diagnostics or defects rather than Hades requirements; do not cap Rust behavior or implement from inference.",
+        "Add a provenance-bearing OBS-0096 fixture, repeatable direct-PTY probe, observation document, matrix/context/readme/just/verify wiring, and complete the no-skip gate."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_distinct_model_selection.py",
+        "tests/fixtures/parity/OBS-0096-hermes-distinct-model-selection.json",
+        "docs/parity/observations/OBS-0096-hermes-distinct-model-selection-2026-08-03.md",
+        ".hades/runtime/hermes-distinct-model-selection-probe.json",
+        "justfile",
+        "scripts/verify.sh",
+        "README.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md"
+      ],
+      "claimed_by": "hermes-distinct-model-researcher",
+      "claimed_at": "2026-08-02T11:53:15Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Captured Hermes distinct-model selection with a fresh loopback-backed model switch, verified the effective alternate-model request and non-persistence, and wired the sanitized probe and fixture into the complete gate.",
+        "completed_at": "2026-08-02T22:19:11Z",
+        "evidence": [
+          "scripts/probe_hermes_distinct_model_selection.py",
+          "tests/fixtures/parity/OBS-0096-hermes-distinct-model-selection.json",
+          "docs/parity/observations/OBS-0096-hermes-distinct-model-selection-2026-08-03.md",
+          ".hades/runtime/hermes-distinct-model-selection-probe.json",
+          "justfile",
+          "scripts/verify.sh",
+          "README.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-102",
+      "title": "Reconcile Hermes empty-platform confirmation divergence",
+      "status": "complete",
+      "priority": 88,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-101",
+        "HAD-062"
+      ],
+      "risk": "high",
+      "oracle": [
+        "pinned_hermes_reference",
+        "frozen_runtime_reobservation",
+        "bounded_later_surface",
+        "historical_fixture_preserved",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Re-run the OBS-0058 empty-platform confirmation route against the pinned Hermes source in a frozen dependency environment and record the first repeated stable outcome without credentials, platform toggles, OAuth, external network, or private runtime data.",
+        "Preserve the earlier OBS-0058 no-op evidence and add a provenance-bearing reconciliation fixture/document that makes any current later-surface divergence explicit rather than silently rewriting history.",
+        "Make the repeatable probe accept and report either bounded same-picker or stable later-setup outcome, with normalized config/artifact/process/terminal evidence and no inferred continuation behavior.",
+        "Keep Hades' safer explicit empty-platform no-op; do not reproduce implicit installers, provider actions, unsafe behavior, retries, or a potentially defective reference transition.",
+        "Wire the reconciliation fixture and probe into just/verify, then run the complete no-skip gate."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_empty_platform_confirmation.py",
+        "tests/fixtures/parity/OBS-0058-hermes-empty-platform-confirmation.json",
+        "tests/fixtures/parity/OBS-0097-hermes-empty-platform-reconciliation.json",
+        "docs/parity/observations/OBS-0058-hermes-empty-platform-confirmation-2026-08-02.md",
+        "docs/parity/observations/OBS-0097-hermes-empty-platform-reconciliation-2026-08-03.md",
+        ".hades/runtime/hermes-empty-platform-confirmation-probe.json",
+        ".hades/runtime/hermes-empty-platform-reconciliation-probe.json",
+        "justfile",
+        "scripts/verify.sh",
+        "README.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md"
+      ],
+      "ready_at": "2026-08-02T22:19:11Z",
+      "claimed_by": "hermes-empty-platform-reconciliation",
+      "claimed_at": "2026-08-02T22:19:19Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Re-observed Hermes empty-platform confirmation in a pinned fresh environment, preserved the historical OBS-0058 same-picker no-op, and recorded the current bounded later-setup divergence without importing it into Hades behavior.",
+        "completed_at": "2026-08-02T22:32:00Z",
+        "evidence": [
+          "scripts/probe_hermes_empty_platform_confirmation.py",
+          "tests/fixtures/parity/OBS-0058-hermes-empty-platform-confirmation.json",
+          "tests/fixtures/parity/OBS-0097-hermes-empty-platform-reconciliation.json",
+          "docs/parity/observations/OBS-0058-hermes-empty-platform-confirmation-2026-08-02.md",
+          "docs/parity/observations/OBS-0097-hermes-empty-platform-reconciliation-2026-08-03.md",
+          ".hades/runtime/hermes-empty-platform-confirmation-probe.json",
+          ".hades/runtime/hermes-empty-platform-reconciliation-probe.json",
           "justfile",
           "scripts/verify.sh",
           "README.md",

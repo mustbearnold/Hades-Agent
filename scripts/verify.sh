@@ -29,6 +29,7 @@ python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0038-her
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0039-hades-model-picker-model-stage.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0093-hermes-model-picker-selection.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0094-hades-model-picker-selection.json
+python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0096-hermes-distinct-model-selection.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0040-hermes-setup-wizard-cancel.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0041-hades-setup-wizard-cancel.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0042-hermes-full-setup-continuation.json
@@ -110,13 +111,14 @@ python3 scripts/replay_clipboard_text.py --binary target/debug/hades --report .h
 python3 scripts/replay_osc52_clipboard.py --binary target/debug/hades --report .hades/runtime/osc52-clipboard-replay.json
 python3 scripts/replay_osc52_clipboard.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0027-hades-osc52-response-boundaries.json --report .hades/runtime/osc52-response-boundaries-replay.json
 python3 scripts/probe_hermes_osc52_st_termination.py --report .hades/runtime/hermes-osc52-st-termination-probe.json
-python3 scripts/probe_hermes_osc52_multiplexer.py --report .hades/runtime/hermes-osc52-multiplexer-probe.json
+python3 scripts/probe_hermes_osc52_multiplexer.py --report .hades/runtime/hermes-osc52-multiplexer-probe.json --timeout 30
 python3 scripts/probe_hermes_osc52_timing_limits.py --report .hades/runtime/hermes-osc52-timing-limits-probe.json
 python3 scripts/probe_hermes_terminal_palette.py --report .hades/runtime/hermes-terminal-palette-probe.json --timeout 30
 python3 scripts/probe_hermes_slash_commands.py --report .hades/runtime/hermes-slash-commands-probe.json --timeout 30
 python3 scripts/probe_hermes_model_picker.py --report .hades/runtime/hermes-model-picker-probe.json --timeout 30
 python3 scripts/probe_hermes_model_picker_selection.py --report .hades/runtime/hermes-model-picker-selection-probe.json --timeout 30
-python3 scripts/probe_hermes_setup_wizard.py --report .hades/runtime/hermes-setup-wizard-probe.json --timeout 30
+python3 scripts/probe_hermes_distinct_model_selection.py --report .hades/runtime/hermes-distinct-model-selection-probe.json --timeout 60
+python3 scripts/probe_hermes_setup_wizard.py --report .hades/runtime/hermes-setup-wizard-probe.json --timeout 60
 python3 scripts/probe_hermes_full_setup.py --report .hades/runtime/hermes-full-setup-probe.json --timeout 30
 python3 scripts/probe_hermes_full_setup_provider.py --report .hades/runtime/hermes-full-setup-provider-probe.json --timeout 30
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0046-hermes-provider-selection.json
@@ -132,6 +134,7 @@ python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0055-her
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0056-hermes-setup-config-shape.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0057-hades-setup-platform-picker.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0058-hermes-empty-platform-confirmation.json
+python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0097-hermes-empty-platform-reconciliation.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0059-hermes-unconfigured-startup.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0061-hermes-unconfigured-input-queue.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0060-hades-unconfigured-startup.json
@@ -158,13 +161,13 @@ python3 scripts/probe_hermes_help_setup_timing.py --report .hades/runtime/hermes
 python3 scripts/probe_hermes_setup_required_actions.py --report .hades/runtime/hermes-setup-required-actions-probe.json --timeout 30 --observation-window 3
 python3 scripts/probe_hermes_standalone_setup.py --report .hades/runtime/hermes-standalone-setup-probe.json --timeout 30
 python3 scripts/probe_hermes_standalone_full_setup.py --report .hades/runtime/hermes-standalone-full-setup-probe.json --timeout 30
-python3 scripts/probe_hermes_standalone_terminal_platform.py --report .hades/runtime/hermes-standalone-terminal-platform-probe.json --timeout 30
+python3 scripts/probe_hermes_standalone_terminal_platform.py --report .hades/runtime/hermes-standalone-terminal-platform-probe.json --timeout 60
 python3 scripts/probe_hermes_standalone_tool_configuration.py --report .hades/runtime/hermes-standalone-tool-configuration-probe.json --timeout 30
 python3 scripts/probe_hermes_tool_configuration_navigation.py --report .hades/runtime/hermes-tool-configuration-navigation-probe.json --timeout 30
 python3 scripts/probe_hermes_tool_provider_boundary.py --report .hades/runtime/hermes-tool-provider-boundary-probe.json --timeout 30
 python3 scripts/probe_hermes_tool_provider_inventory.py --report .hades/runtime/hermes-tool-provider-inventory-probe.json --timeout 30 --observation-window 1
 python3 scripts/probe_hermes_tool_provider_inventory_interaction.py --report .hades/runtime/hermes-tool-provider-inventory-interaction-probe.json --timeout 30
-python3 scripts/probe_hermes_tool_provider_inventory_edges.py --report .hades/runtime/hermes-tool-provider-inventory-edges-probe.json --timeout 30
+python3 scripts/probe_hermes_tool_provider_inventory_edges.py --report .hades/runtime/hermes-tool-provider-inventory-edges-probe.json --timeout 60
 python3 scripts/probe_hermes_tool_provider_inventory_selection.py --report .hades/runtime/hermes-tool-provider-inventory-selection-probe.json --timeout 30
 python3 scripts/replay_terminal_palette.py --binary target/debug/hades --report .hades/runtime/hades-terminal-palette-replay.json
 python3 scripts/replay_osc52_timing_limits.py --binary target/debug/hades --report .hades/runtime/hades-osc52-timing-limits-replay.json

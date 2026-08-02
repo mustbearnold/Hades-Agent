@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0097",
+  "surface": "hermes-empty-platform-confirmation-reconciliation",
+  "reference": {
+    "product": "Hermes TUI",
+    "version": "0.19.1 (2026.7.30)",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "direct PTY with redacted ANSI screen model"
+    },
+    "capture": "fresh frozen-environment re-observation of OBS-0058 with synthetic-home empty-platform confirmation"
+  },
+  "normalization": [
+    "Reference checkout, synthetic HOME/HERMES_HOME paths, session identifiers, timestamps, raw config values, hashes, and animated redraw bytes are omitted or represented by stable markers.",
+    "Only the displayed synthetic loopback/model/backend defaults are accepted; no platform is toggled, no credential or OAuth action is entered, and no external network is used.",
+    "Config evidence contains normalized key paths, scalar/container kinds, and byte counts only; artifact evidence is reduced to stable classes.",
+    "This re-observation preserves the earlier OBS-0058 no-op capture as historical evidence and records the current bounded later-surface outcome without inferring its unobserved continuation."
+  ],
+  "steps": [
+    {
+      "id": "reobserve-empty-platform-confirmation",
+      "precondition": "Fresh Hermes process at 120x40 with an isolated synthetic home and configured synthetic loopback provider, navigated to the platform picker with every platform unselected.",
+      "input_sequence": [
+        {"kind": "text", "value": "/setup", "bytes_hex": "2f 73 65 74 75 70"},
+        {"kind": "key", "value": "Enter twice", "bytes_hex": "0d 0d"},
+        {"kind": "key", "value": "j then Enter", "bytes_hex": "6a 0d"},
+        {"kind": "key", "value": "Enter on displayed palette-model", "bytes_hex": "0d"},
+        {"kind": "key", "value": "Enter on Keep current (local)", "bytes_hex": "0d"},
+        {"kind": "key", "value": "Enter with no platform selected", "bytes_hex": "0d"},
+        {"kind": "key", "value": "Ctrl+C bounded cleanup", "bytes_hex": "03"}
+      ],
+      "output": {
+        "status": "passed",
+        "pre_confirmation_platform_markers": [
+          "Select platforms to configure:",
+          "SPACE toggle",
+          "ENTER confirm",
+          "ESC cancel",
+          "(not configured)"
+        ],
+        "post_confirmation_outcome": "later-setup-surface",
+        "post_confirmation_surface_unchanged": false,
+        "later_setup_surface_detected": true,
+        "later_setup_markers": [
+          "Tools for",
+          "ENTER confirm",
+          "Web Search & Scraping",
+          "Browser Automation"
+        ],
+        "process_alive_after_confirmation": true,
+        "ready_after_confirmation": false,
+        "config_changed_on_confirmation": false,
+        "new_artifact_classes_on_confirmation": [],
+        "fresh_process_ready": true,
+        "clean_terminal_state": true,
+        "outcome": "The current pinned-runtime re-observation leaves the platform picker after empty confirmation and reaches a stable later Tool Configuration surface during the bounded window."
+      }
+    }
+  ],
+  "boundaries": {
+    "provider": "synthetic loopback configuration only",
+    "platform_selection": "no platform toggled",
+    "credentials": false,
+    "oauth": false,
+    "external_network": false,
+    "config_changed_on_confirmation": false,
+    "historical_comparison": "OBS-0058 recorded a stable empty-platform no-op at the same source commit; this record preserves that disagreement rather than rewriting it",
+    "hades_requirement": "Hades keeps the explicit safe no-op until the reference discrepancy and later continuation are separately resolved"
+  },
+  "unknowns": [
+    "Whether the later Tool Configuration transition is a stable Hermes contract, a timing-sensitive reference defect, or an environment-dependent variation remains unresolved.",
+    "Tool checklist confirmation, provider actions, credentials, OAuth, platform toggling, persistence, and later setup continuation remain unobserved in this bounded re-observation.",
+    "This reference transition does not authorize Hades to reproduce unsafe, implicit, or failure-prone behavior."
+  ]
+}

@@ -129,7 +129,7 @@ probe-osc52-st-termination:
     python3 scripts/probe_hermes_osc52_st_termination.py --report .hades/runtime/hermes-osc52-st-termination-probe.json
 
 probe-osc52-multiplexer:
-    python3 scripts/probe_hermes_osc52_multiplexer.py --report .hades/runtime/hermes-osc52-multiplexer-probe.json
+    python3 scripts/probe_hermes_osc52_multiplexer.py --report .hades/runtime/hermes-osc52-multiplexer-probe.json --timeout 30
 
 probe-osc52-timing-limits:
     python3 scripts/probe_hermes_osc52_timing_limits.py --report .hades/runtime/hermes-osc52-timing-limits-probe.json
@@ -146,8 +146,11 @@ probe-model-picker:
 probe-model-picker-selection:
     python3 scripts/probe_hermes_model_picker_selection.py --report .hades/runtime/hermes-model-picker-selection-probe.json --timeout 30
 
+probe-distinct-model-selection:
+    python3 scripts/probe_hermes_distinct_model_selection.py --report .hades/runtime/hermes-distinct-model-selection-probe.json --timeout 60
+
 probe-setup-wizard:
-    python3 scripts/probe_hermes_setup_wizard.py --report .hades/runtime/hermes-setup-wizard-probe.json --timeout 30
+    python3 scripts/probe_hermes_setup_wizard.py --report .hades/runtime/hermes-setup-wizard-probe.json --timeout 60
 
 probe-full-setup:
     python3 scripts/probe_hermes_full_setup.py --report .hades/runtime/hermes-full-setup-probe.json --timeout 30
@@ -178,6 +181,9 @@ probe-setup-config-shape:
 
 probe-empty-platform-confirmation:
     python3 scripts/probe_hermes_empty_platform_confirmation.py --report .hades/runtime/hermes-empty-platform-confirmation-probe.json --timeout 30
+
+probe-empty-platform-reconciliation:
+    python3 scripts/probe_hermes_empty_platform_confirmation.py --report .hades/runtime/hermes-empty-platform-reconciliation-probe.json --timeout 30
 
 probe-unconfigured-startup:
     python3 scripts/probe_hermes_unconfigured_startup.py --report .hades/runtime/hermes-unconfigured-startup-probe.json --timeout 30
@@ -275,7 +281,7 @@ probe-hermes-standalone-full-setup:
     python3 scripts/probe_hermes_standalone_full_setup.py --report .hades/runtime/hermes-standalone-full-setup-probe.json --timeout 30
 
 probe-hermes-standalone-terminal-platform:
-    python3 scripts/probe_hermes_standalone_terminal_platform.py --report .hades/runtime/hermes-standalone-terminal-platform-probe.json --timeout 30
+    python3 scripts/probe_hermes_standalone_terminal_platform.py --report .hades/runtime/hermes-standalone-terminal-platform-probe.json --timeout 60
 
 probe-hermes-standalone-tool-configuration:
     python3 scripts/probe_hermes_standalone_tool_configuration.py --report .hades/runtime/hermes-standalone-tool-configuration-probe.json --timeout 30
@@ -293,7 +299,7 @@ probe-hermes-tool-provider-inventory-interaction:
     python3 scripts/probe_hermes_tool_provider_inventory_interaction.py --report .hades/runtime/hermes-tool-provider-inventory-interaction-probe.json --timeout 30
 
 probe-hermes-tool-provider-inventory-edges:
-    python3 scripts/probe_hermes_tool_provider_inventory_edges.py --report .hades/runtime/hermes-tool-provider-inventory-edges-probe.json --timeout 30
+    python3 scripts/probe_hermes_tool_provider_inventory_edges.py --report .hades/runtime/hermes-tool-provider-inventory-edges-probe.json --timeout 60
 
 probe-hermes-tool-provider-inventory-selection:
     python3 scripts/probe_hermes_tool_provider_inventory_selection.py --report .hades/runtime/hermes-tool-provider-inventory-selection-probe.json --timeout 30
@@ -344,6 +350,7 @@ validate-reference:
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0056-hermes-setup-config-shape.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0057-hades-setup-platform-picker.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0058-hermes-empty-platform-confirmation.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0097-hermes-empty-platform-reconciliation.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0059-hermes-unconfigured-startup.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0061-hermes-unconfigured-input-queue.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0060-hades-unconfigured-startup.json

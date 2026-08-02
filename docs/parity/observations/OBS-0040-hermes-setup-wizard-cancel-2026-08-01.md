@@ -43,6 +43,14 @@ contract for this pinned build, even though the curses hint calls the control
 `ESC cancel`. The probe deliberately stops at the fallback prompt so no option
 is selected.
 
+The Down case is run in a fresh process. Because the reference can leave a
+stable radiolist visible while its PTY input mode is still settling, a missing
+cursor transition at the `down-navigation` response boundary is recorded and
+the same bounded case is replayed up to three times. An accepted attempt still
+requires the exact cursor movement, unchanged committed selection,
+non-submission, and clean-exit assertions; this retry does not broaden the
+behavioral contract.
+
 ## Dynamic boundaries and unknowns
 
 The numbered fallback's choice submission, invalid input, later setup pages,

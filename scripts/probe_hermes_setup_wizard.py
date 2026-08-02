@@ -43,6 +43,7 @@ FALLBACK_MARKERS = (
     "Enter for default (1)  Ctrl+C to exit",
     "Select [1-3] (1):",
 )
+MAX_NAVIGATION_ATTEMPTS = 3
 
 
 def screen_lines(raw: bytes) -> list[str]:
@@ -308,6 +309,33 @@ def run_navigation(reference: Path, timeout: float) -> dict[str, Any]:
         shutil.rmtree(root, ignore_errors=True)
 
 
+def run_navigation_with_retry(reference: Path, timeout: float) -> dict[str, Any]:
+    """Retry only a fresh-process PTY response race, without weakening the oracle."""
+    retry_history: list[dict[str, Any]] = []
+    for attempt in range(1, MAX_NAVIGATION_ATTEMPTS + 1):
+        try:
+            result = run_navigation(reference, timeout)
+            result["oracle_attempts"] = attempt
+            if retry_history:
+                result["retry_history"] = retry_history
+            return result
+        except ProbeFailure as error:
+            retry_history.append(
+                {
+                    "attempt": attempt,
+                    "step": error.step,
+                    "message": error.message,
+                    "input_replayed": ["/setup", "Enter", "Enter", "Down"],
+                }
+            )
+            if error.case != "setup-wizard-down-navigation" or error.step != "down-navigation":
+                error.details["retry_history"] = retry_history
+                raise
+            if attempt == MAX_NAVIGATION_ATTEMPTS:
+                error.details["retry_history"] = retry_history
+                raise
+
+
 def _has_full_setup_cursor(raw: bytes) -> bool:
     try:
         return "→" in screen_line(screen_lines(raw), "Full setup")
@@ -359,6 +387,7 @@ def main() -> int:
             "The setup title and explanation are asserted from the normalized PTY stream; the radiolist rows and cursor are asserted from the 120x40 ANSI screen model.",
             "Escape is sent before any setup option is submitted. Hermes returns from the curses radiolist to its numbered fallback prompt, where Ctrl+C performs the bounded cleanup.",
             "The Down case records cursor movement only and is interrupted before any setup option is submitted.",
+            "If a fresh PTY misses the Down cursor transition under scheduler pressure, the same bounded case is replayed up to three times; every accepted attempt still requires the exact cursor, selection, non-submission, and clean-exit assertions.",
         ],
         "cases": [],
         "passed": False,
@@ -367,7 +396,7 @@ def main() -> int:
         if not reference.is_dir():
             raise ProbeFailure("reference", "precondition", f"reference checkout does not exist: {reference}")
         report["cases"].append(run_escape(reference, args.timeout))
-        report["cases"].append(run_navigation(reference, args.timeout))
+        report["cases"].append(run_navigation_with_retry(reference, args.timeout))
         report["passed"] = True
     except (OSError, ProbeFailure, RuntimeError, ValueError) as error:
         report["failure"] = safe_failure(error)

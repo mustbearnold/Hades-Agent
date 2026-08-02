@@ -99,12 +99,14 @@ just replay-cli-launch        # no-argument and explicit-tui PTY launch replay
 just replay-fresh-shell-launch # fresh Bash/Fish command resolution and installed TUI lifecycle
 just replay-vertical-slice    # setup -> local provider/model -> prompt -> streamed answer
 just replay-model-selection   # session model selection -> effective request -> fresh-process reset
+just probe-distinct-model-selection # Hermes alternate-model effectiveness and persistence probe
 just replay-installed-model-selection # release hades/Hades aliases -> same vertical slice
 just replay-unconfigured-help # delayed /help setup-required PTY replay
 just replay-standalone-setup  # standalone hades setup PTY replay
 just replay-standalone-full-setup # standalone Full setup continuation replay
 just replay-standalone-terminal-platform # standalone platform cancellation replay
 just replay-standalone-empty-platform # bounded empty-platform confirmation replay
+just probe-empty-platform-confirmation # Hermes empty-platform boundary and reconciliation probe
 just replay-standalone-tool-provider # standalone tool checklist/provider boundary replay
 just replay-standalone-tool-provider-inventory # standalone Browser Automation provider inventory replay
 just replay-standalone-tool-provider-inventory-navigation # bounded cyclic provider navigation replay
@@ -208,10 +210,24 @@ proves vertical-model is used again. The selection is deliberately
 session-scoped; Hermes retries, failures, and repeated metadata requests are
 not copied into Hades.
 
+The Hermes distinct-model boundary is captured by
+`just probe-distinct-model-selection`. It exposes deterministic
+`palette-model` and `alternate-model` rows, proves the visible selection and a
+streamed request using the alternate model, then checks the provider-stage
+current marker and config readback in a fresh process. The observed extra
+metadata or chat requests are retained as diagnostics only; Hades does not
+inherit an inferred retry or persistence policy.
+
 The installed command path is covered by just replay-installed-model-selection.
 It resolves both hades and Hades in clean Bash and Fish shells, then runs the
 same model-selection vertical slice through the release artifact behind each
 alias.
+
+The empty-platform reference boundary has an explicit reconciliation record.
+The historical OBS-0058 capture stayed on the platform picker, while the
+current pinned-runtime probe can reach a stable later Tool Configuration
+surface. Both outcomes are retained as evidence; Hades keeps the safer typed
+no-op and does not inherit implicit setup, installer, or network behavior.
 
 Provider failures are covered by `just replay-provider-recovery`. Its local
 HTTP 500, malformed-SSE, and incomplete-stream cases return to a visible Ready

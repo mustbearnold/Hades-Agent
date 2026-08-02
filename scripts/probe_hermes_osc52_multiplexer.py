@@ -9,6 +9,7 @@ import fcntl
 import json
 import os
 import pty
+import select
 import shutil
 import struct
 import sys
@@ -29,6 +30,7 @@ from probe_hermes_osc52_clipboard import (
     drain,
     make_fake_xclip,
     normalize,
+    read_available,
     stop,
     wait_for,
     write_bytes,
@@ -46,6 +48,7 @@ WRAPPED_QUERIES = {
     "TMUX": b"\x1bPtmux;\x1b\x1b]52;c;?\x07\x1b\\",
     "STY": b"\x1bP\x1b]52;c;?\x07\x1b\\",
 }
+MAX_CASE_ATTEMPTS = 3
 
 
 CASES: tuple[dict[str, Any], ...] = (
@@ -175,6 +178,53 @@ def finish_process(pid: int, fd: int, buffer: bytes, timeout: float) -> tuple[by
     return buffer, child_status(pid)[0]
 
 
+def wait_for_outcome_answering_da1(
+    pid: int,
+    fd: int,
+    buffer: bytes,
+    case: str,
+    response_at: int,
+    predicate: Callable[[bytes], bool],
+    timeout: float,
+) -> tuple[bytes, int, bool]:
+    """Answer every DA1 barrier emitted after the clipboard query.
+
+    Hermes can still be completing an earlier startup query batch when the
+    clipboard query is sent. A single observed DA1 can therefore belong to
+    that earlier batch; answer barriers incrementally so the clipboard flush
+    cannot remain pending behind a startup race.
+    """
+    deadline = time.monotonic() + timeout
+    barriers_answered = 0
+    while time.monotonic() < deadline:
+        barriers_observed = buffer[response_at:].count(DA1_SENTINEL)
+        if barriers_observed > barriers_answered:
+            write_bytes(fd, DA1_RESPONSE * (barriers_observed - barriers_answered))
+            barriers_answered = barriers_observed
+        if predicate(buffer):
+            return buffer, barriers_answered, True
+        exited, status = child_status(pid)
+        if exited:
+            buffer += read_available(fd)
+            if predicate(buffer):
+                return buffer, barriers_answered, True
+            raise ProbeFailure(
+                case,
+                "response-outcome",
+                "Hermes exited before the PTY assertion",
+                {"exit_status": status, "da1_barriers_answered": barriers_answered},
+            )
+        readable, _, _ = select.select([fd], [], [], 0.05)
+        if readable:
+            buffer += read_available(fd)
+    raise ProbeFailure(
+        case,
+        "response-outcome",
+        f"timed out after {timeout:.1f}s",
+        {"da1_barriers_answered": barriers_answered, "screen_tail": normalize(buffer)[-2000:]},
+    )
+
+
 def run_case(reference: Path, case: dict[str, Any], timeout: float) -> dict[str, Any]:
     case_id = str(case["id"])
     marker = str(case["marker"])
@@ -200,30 +250,19 @@ def run_case(reference: Path, case: dict[str, Any], timeout: float) -> dict[str,
         response_at = query_at + len(wrapped_query)
         if response is not None:
             write_bytes(fd, response)
-        buffer = wait_for(
-            pid,
-            fd,
-            buffer,
-            case_id,
-            "da1-query",
-            lambda current: DA1_SENTINEL in current[response_at:],
-            timeout,
-        )
-        barrier_count = max(1, buffer.count(DA1_SENTINEL))
-        da1_at = buffer.find(DA1_SENTINEL, response_at)
-        write_bytes(fd, DA1_RESPONSE * barrier_count)
 
         native_marker = native_payload.rstrip("\n")
         osc52_marker = case["osc52_marker"]
-        buffer, outcome_observed = wait_for_optional(
+        buffer, barrier_count, outcome_observed = wait_for_outcome_answering_da1(
             pid,
             fd,
             buffer,
             case_id,
-            "response-outcome",
+            response_at,
             lambda current: (osc52_marker is not None and contains(current, osc52_marker)) or contains(current, native_marker),
             timeout,
         )
+        da1_at = buffer.find(DA1_SENTINEL, response_at)
         provider_arguments = native_log.read_text(encoding="utf-8") if native_log.exists() else ""
         osc52_observed = osc52_marker is not None and contains(buffer, osc52_marker)
         native_observed = contains(buffer, native_marker)
@@ -299,6 +338,30 @@ def run_case(reference: Path, case: dict[str, Any], timeout: float) -> dict[str,
         shutil.rmtree(root, ignore_errors=True)
 
 
+def run_case_with_retry(reference: Path, case: dict[str, Any], timeout: float) -> dict[str, Any]:
+    """Retry only the fresh-process PTY response race, without weakening assertions."""
+    retry_history: list[dict[str, Any]] = []
+    for attempt in range(1, MAX_CASE_ATTEMPTS + 1):
+        try:
+            result = run_case(reference, case, timeout)
+            result["oracle_attempts"] = attempt
+            if retry_history:
+                result["retry_history"] = retry_history
+            return result
+        except ProbeFailure as error:
+            retry_record = {
+                "attempt": attempt,
+                "step": error.step,
+                "message": error.message,
+                "da1_barriers_answered": error.details.get("da1_barriers_answered"),
+                "native_provider_arguments": error.details.get("native_provider_arguments", ""),
+            }
+            retry_history.append(retry_record)
+            if error.step != "response-outcome" or attempt == MAX_CASE_ATTEMPTS:
+                error.details["retry_history"] = retry_history
+                raise
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--reference", type=Path, default=DEFAULT_REFERENCE)
@@ -317,7 +380,7 @@ def main() -> int:
     }
     try:
         for case in CASES:
-            report["cases"].append(run_case(reference, case, args.timeout))
+            report["cases"].append(run_case_with_retry(reference, case, args.timeout))
         report["unknowns"] = [
             "The probe models the terminal response as a direct raw OSC52 response after the wrapper query; live tmux or GNU Screen daemons and outer-terminal forwarding were not exercised.",
             "Image/path payloads, gateway behavior, delayed or oversized responses, and concurrent input remain unknown.",

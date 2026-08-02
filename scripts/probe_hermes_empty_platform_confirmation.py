@@ -67,21 +67,27 @@ def platform_marker_lines(rendered: str) -> tuple[str, ...]:
 
 def stable_platform_surface(
     pid: int, fd: int, buffer: bytes, case: str, timeout: float
-) -> tuple[bytes, str, int]:
-    """Require repeated identical rendered picker surfaces after confirmation."""
+) -> tuple[bytes, str, int, str]:
+    """Capture the first repeated platform or later setup surface."""
     deadline = time.monotonic() + timeout
     previous: str | None = None
     stable_samples = 0
     while time.monotonic() < deadline:
         current = surface(buffer)
-        if all(marker in current for marker in PLATFORM_MARKERS):
+        platform_surface = all(marker in current for marker in PLATFORM_MARKERS)
+        later_setup_surface = all(
+            marker in current
+            for marker in ("Tools for", "ENTER confirm", "Web Search & Scraping")
+        )
+        if platform_surface or later_setup_surface:
             if current == previous:
                 stable_samples += 1
             else:
                 previous = current
                 stable_samples = 1
             if stable_samples >= 3:
-                return buffer, current, stable_samples
+                outcome = "same-platform-picker" if platform_surface else "later-setup-surface"
+                return buffer, current, stable_samples, outcome
         exited, status = child_status(pid)
         if exited:
             buffer += read_available(fd)
@@ -120,7 +126,7 @@ def run_case(reference: Path, timeout: float) -> dict[str, Any]:
 
         write_bytes(fd, b"\r")
         buffer = drain(pid, fd, buffer, 0.8)
-        buffer, platform_surface_after, stable_samples = stable_platform_surface(
+        buffer, platform_surface_after, stable_samples, post_confirmation_outcome = stable_platform_surface(
             pid, fd, buffer, case, timeout
         )
         config_after_confirm = config_shape(config_path)
@@ -164,15 +170,17 @@ def run_case(reference: Path, timeout: float) -> dict[str, Any]:
                     "kind": "key",
                     "value": "Ctrl+C",
                     "bytes_hex": "03",
-                    "meaning": "clean exit from the unchanged platform picker",
+                    "meaning": "bounded cleanup after the observed confirmation outcome",
                 },
             ],
             "backend_markers": list(BACKEND_MARKERS),
             "platform_markers": list(PLATFORM_MARKERS),
             "stable_samples": stable_samples,
+            "post_confirmation_outcome": post_confirmation_outcome,
             "platform_surface_markers_before": list(before_markers),
             "post_confirmation_screen_markers": list(after_markers),
             "post_confirmation_surface_unchanged": before_markers == after_markers,
+            "later_setup_surface_detected": post_confirmation_outcome == "later-setup-surface",
             "ready_after_empty_confirmation": "ready" in platform_surface_after.lower(),
             "process_alive_after_empty_confirmation": process_alive_after_confirm,
             "config_at_platform": config_at_platform,

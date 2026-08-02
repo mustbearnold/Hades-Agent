@@ -177,6 +177,13 @@ progress from August 1, 2026 through 2027.
   and each installed alias completes the OBS-0094 selection, streamed request,
   fresh-process reset, and terminal-cleanup oracle. PATH absence, system-wide
   installation, and shell-profile mutation remain explicit boundaries.
+- HAD-101 captures the missing Hermes distinct-model boundary: a deterministic
+  alternate-model row can be selected, a bounded streamed request uses that
+  alternate model, and a fresh process returns to the default current-model
+  marker. The probe records normalized request metadata, config equality,
+  artifacts, and clean terminal state; repeated metadata or chat requests are
+  diagnostic reference behavior only, and no Hermes retry, failure, or
+  persistence defect is reproduced in Hades.
 - HAD-041 captures the initial Hermes setup wizard in fresh direct PTYs: the
   title, explanation, Quick Setup/Full setup/Blank Slate radio list, initial
   Quick Setup selection, Down navigation to Full setup, and the observed
@@ -539,6 +546,12 @@ progress from August 1, 2026 through 2027.
   Ctrl+C handoff to Tool Configuration and status-130 cleanup remain verified;
   Space, platform toggling, and confirmation with selected platforms remain
   unknown rather than guessed.
+- HAD-102 re-observes the same pinned Hermes source and preserves a reference
+  disagreement: the earlier OBS-0058 run stayed on the empty platform picker,
+  while the current frozen-runtime run reaches a stable Tool Configuration
+  surface without changing config or artifacts. The probe records either
+  bounded outcome, and Hades keeps the safer explicit no-op until the
+  reference variation and later continuation are resolved.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes

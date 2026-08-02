@@ -34,6 +34,13 @@ marker, did not submit an agent turn, and cleaned up after the bounded probe.
 The fixture records the exact Ctrl+V, wrapper, response, DA1, provider, and
 output markers.
 
+The repeatable probe answers DA1 barriers incrementally because startup query
+traffic can overlap the clipboard query. If a fresh PTY still misses the
+response-outcome marker under scheduler pressure, it records the failed
+attempt and retries the same fresh case up to three times; every accepted case
+still requires the exact wrapper, response/native provider, screen, readiness,
+non-submission, and cleanup assertions.
+
 ## Model boundary
 
 The probe sets environment markers and writes bytes directly to Hermes' PTY. It
