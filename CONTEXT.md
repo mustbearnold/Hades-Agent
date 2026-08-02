@@ -159,6 +159,14 @@ progress from August 1, 2026 through 2027.
   120x40 replay verifies the stable landmarks, ready-state close, and absence
   of Busy/network behavior; provider discovery and model switching remain
   unknown.
+- HAD-098 captures the next Hermes model-picker boundary without promoting a
+  redraw into persistence: Enter on the visible `palette-model` row produces
+  the transient `model → palette-model` status marker, while a no-selection
+  control and fresh-process readback show no distinct config or effective-model
+  proof because that model was already current. The local observation records
+  bounded metadata paths and repeated probes as diagnostic reference evidence;
+  Hades must not reproduce any retry or failure behavior, and model selection
+  remains unimplemented until an isolated effective-use contract is proven.
 - HAD-041 captures the initial Hermes setup wizard in fresh direct PTYs: the
   title, explanation, Quick Setup/Full setup/Blank Slate radio list, initial
   Quick Setup selection, Down navigation to Full setup, and the observed

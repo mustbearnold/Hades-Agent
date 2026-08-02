@@ -141,6 +141,7 @@ just replay-osc52-timing-limits # Hades OSC52 timing and bounded-size parity rep
 just replay-osc52-st-termination # Hades ST-terminated OSC52 parity replay
 just replay-osc52-multiplexer # Hades TMUX/STY OSC52 wrapper parity replay
 just replay-local-provider   # loopback provider worker PTY replay
+just probe-model-picker-selection # Hermes model selection side-effect boundary
 just agent validate           # validate task/control-plane invariants
 just agent next               # choose the highest-priority ready task
 just agent claim HAD-001 bot  # claim a task with an agent identity

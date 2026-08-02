@@ -134,6 +134,9 @@ probe-slash-commands:
 probe-model-picker:
     python3 scripts/probe_hermes_model_picker.py --report .hades/runtime/hermes-model-picker-probe.json --timeout 30
 
+probe-model-picker-selection:
+    python3 scripts/probe_hermes_model_picker_selection.py --report .hades/runtime/hermes-model-picker-selection-probe.json --timeout 30
+
 probe-setup-wizard:
     python3 scripts/probe_hermes_setup_wizard.py --report .hades/runtime/hermes-setup-wizard-probe.json --timeout 30
 

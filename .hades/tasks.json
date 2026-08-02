@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-02T10:35:10Z",
+  "updated_at": "2026-08-02T11:08:20Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -5251,6 +5251,63 @@
           "docs/parity/MATRIX.md",
           "CONTEXT.md",
           "README.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-098",
+      "title": "Capture Hermes model-picker selection boundary",
+      "status": "complete",
+      "priority": 92,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-097",
+        "HAD-039"
+      ],
+      "risk": "high",
+      "oracle": [
+        "pinned_hermes_reference",
+        "direct_pty_screen_replay",
+        "config_and_artifact_diff",
+        "selection_side_effect_boundary",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Against the pinned Hermes reference in a fresh synthetic HOME/HERMES_HOME, enter the observed /model provider and model stages, then send only a bounded selection sequence for the visible model row using Enter and the minimum cleanup input required by the resulting surface.",
+        "Record the rendered model-stage selection result, current/active model markers, process liveness, provider request count and shape, exact config bytes before/after, normalized backup/history/update-check artifacts, and terminal cleanup without credentials, OAuth, external network, host clipboard, or real provider access.",
+        "Do not infer that a model was selected, persisted, or made active from a redraw alone; promote those claims only when fresh-process readback or an isolated request/config trace proves them. Preserve selection, persistence, empty-list, and failure unknowns when the bounded reference path cannot safely establish them.",
+        "Treat any Hermes bug, unsafe behavior, repeated request, or stuck surface as a defect/unknown rather than a Hades requirement; the observation must not cap Rust performance or capabilities.",
+        "Add a provenance-bearing OBS-0093 fixture, repeatable direct-PTY probe, observation document, parity matrix/context/readme updates, and wire the probe plus fixture validation into just verify. Run the targeted probe and complete the no-skip just verify gate before completion; leave Hades model selection unimplemented until this evidence is recorded."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_model_picker_selection.py",
+        "tests/fixtures/parity/OBS-0093-hermes-model-picker-selection.json",
+        "docs/parity/observations/OBS-0093-hermes-model-picker-selection-2026-08-02.md",
+        ".hades/runtime/hermes-model-picker-selection-probe.json",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh"
+      ],
+      "claimed_by": "hermes-model-selection-research",
+      "claimed_at": "2026-08-02T10:37:04Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Captured Hermes model-picker selection safely: Enter on the visible palette-model row produces the transient model \u2192 palette-model marker, while a no-selection control, unchanged selection config delta, and fresh-process readback do not prove persistence or distinct effective-model use. Metadata request paths, config hashes, artifact classes, cleanup, and reference unknowns are recorded without making Hermes retries or failures a Hades requirement.",
+        "completed_at": "2026-08-02T11:08:20Z",
+        "evidence": [
+          "scripts/probe_hermes_model_picker_selection.py",
+          "tests/fixtures/parity/OBS-0093-hermes-model-picker-selection.json",
+          "docs/parity/observations/OBS-0093-hermes-model-picker-selection-2026-08-02.md",
+          ".hades/runtime/hermes-model-picker-selection-probe.json",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh"
         ]
       }
     }
