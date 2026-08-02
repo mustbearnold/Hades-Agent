@@ -452,12 +452,13 @@ progress from August 1, 2026 through 2027.
   artifacts. Enter/Space/Escape/Ctrl+C provider semantics and later setup remain
   unknown; the ambiguous Hermes Ctrl+C cross-tool redraw is not reproduced.
 - HAD-088 observes cyclic Hermes provider cursor edges without submitting a
-  provider. Up at Local Browser wraps to Skip; eight Down inputs walk through
-  the observed rows, wrap from Skip to Local Browser, and end at Nous
-  Subscription; Down then Up returns to Local Browser. Local Browser remains
-  selected, raw terminal flags and process liveness remain stable, and config
-  and artifacts are unchanged. Hades must not inherit any unrelated Hermes
-  defect or failure case from this observation.
+  provider. Up at Local Browser wraps to Skip; seven Down inputs walk through
+  the observed rows and wrap from Skip to Local Browser; Down then Up returns
+  to Local Browser. HAD-089 carries that safe edge contract into Hades with
+  typed cyclic state, fresh three-case PTY replay evidence, unchanged Local
+  Browser selection, stable raw terminal/process state, and unchanged config
+  and artifacts. Hades must not inherit any unrelated Hermes defect or failure
+  case from this observation.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes

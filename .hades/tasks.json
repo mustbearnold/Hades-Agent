@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-02T04:53:47Z",
+  "updated_at": "2026-08-02T05:16:56Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -57,6 +57,66 @@
           ".hades/runtime/hermes-tool-provider-inventory-edges-probe.json",
           "scripts/probe_tui_lifecycle.py",
           "crates/hades-provider/src/lib.rs"
+        ]
+      }
+    },
+    {
+      "id": "HAD-089",
+      "title": "Implement cyclic provider inventory navigation",
+      "status": "complete",
+      "priority": 10,
+      "lane": "interaction",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-087",
+        "HAD-088"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "typed_state_tests",
+        "direct_pty_replay",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Implement the fresh OBS-0083 provider-inventory edge contract in Hades: Up from initial Local Browser wraps to Skip, Down from Skip wraps to Local Browser, and Down followed by Up returns to Local Browser.",
+        "Keep cursor movement separate from selection and submission: Local Browser remains selected, no provider is submitted, and Enter/Space/Escape/Ctrl+C, credentials, OAuth, networking, persistence, and later setup remain outside this slice.",
+        "Add typed reducer/core tests and update the direct-PTY replay so each fresh edge case records exact input bytes, cursor and selected-row markers, raw terminal flags, process liveness, alternate-screen lifecycle, and normalized config/artifact invariants.",
+        "Add a sanitized OBS-0084 Hades fixture and observation document; update the parity matrix, context, readme, justfile, and verification gates. Any Hermes bug or failure case remains a defect to fix rather than a compatibility requirement, and this implementation must not cap Hades performance or safer capabilities.",
+        "Run the targeted replay and complete the no-skip just verify gate before completion."
+      ],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-tui/src/lib.rs",
+        "scripts/replay_standalone_tool_provider_inventory_navigation.py",
+        "tests/fixtures/parity/OBS-0084-hades-tool-provider-inventory-navigation-edges.json",
+        "docs/parity/observations/OBS-0084-hades-tool-provider-inventory-navigation-edges-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hades-tool-provider-inventory-navigation-edges-replay.json"
+      ],
+      "ready_at": "2026-08-02T04:54:42Z",
+      "claimed_by": "provider-inventory-cyclic-navigation-implementer",
+      "claimed_at": "2026-08-02T04:55:14Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Implemented cyclic Hades provider inventory cursor navigation from OBS-0083: Up from Local Browser wraps to Skip, seven Down inputs traverse the observed rows and wrap back to Local Browser, and Down then Up returns to Local Browser. Local Browser remains selected; fresh three-case direct-PTY evidence records exact bytes, cursor/selection markers, raw flags, liveness, alternate-screen lifecycle, unchanged config/artifacts, and no provider submission. Hermes defects/failure cases are not reproduced and Hades capability/performance is not capped; complete just verify PASS.",
+        "completed_at": "2026-08-02T05:16:56Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-tui/src/lib.rs",
+          "scripts/replay_standalone_tool_provider_inventory_navigation.py",
+          "tests/fixtures/parity/OBS-0084-hades-tool-provider-inventory-navigation-edges.json",
+          "docs/parity/observations/OBS-0084-hades-tool-provider-inventory-navigation-edges-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hades-tool-provider-inventory-navigation-edges-replay.json"
         ]
       }
     },

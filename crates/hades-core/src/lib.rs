@@ -440,12 +440,16 @@ impl StandaloneSetupState {
             },
             StandaloneSetupSurface::ToolProviderBoundary => match key {
                 Key::Down => {
-                    self.provider_cursor = (self.provider_cursor + 1)
-                        .min(SETUP_STANDALONE_TOOL_PROVIDER_OPTIONS.len() - 1);
+                    self.provider_cursor =
+                        (self.provider_cursor + 1) % SETUP_STANDALONE_TOOL_PROVIDER_OPTIONS.len();
                     StandaloneSetupAction::Moved
                 }
                 Key::Up => {
-                    self.provider_cursor = self.provider_cursor.saturating_sub(1);
+                    self.provider_cursor = if self.provider_cursor == 0 {
+                        SETUP_STANDALONE_TOOL_PROVIDER_OPTIONS.len() - 1
+                    } else {
+                        self.provider_cursor - 1
+                    };
                     StandaloneSetupAction::Moved
                 }
                 _ => StandaloneSetupAction::Continue,
@@ -1387,6 +1391,43 @@ mod tests {
         assert!(setup.is_tool_provider_boundary());
         assert_eq!(setup.handle_key(Key::Enter), StandaloneSetupAction::Continue);
         assert_eq!(setup.provider_cursor(), 1);
+    }
+
+    #[test]
+    fn standalone_tool_provider_cursor_wraps_without_selecting_a_provider() {
+        let mut setup = StandaloneSetupState::default();
+        setup.handle_key(Key::Down);
+        setup.handle_key(Key::Enter);
+        setup.handle_key(Key::Ctrl('c'));
+        setup.handle_key(Key::Enter);
+        setup.handle_key(Key::Ctrl('c'));
+        setup.handle_key(Key::Escape);
+        assert_eq!(
+            setup.handle_key(Key::Ctrl('c')),
+            StandaloneSetupAction::EnteredToolProviderBoundary
+        );
+
+        assert_eq!(setup.provider_cursor(), 0);
+        assert_eq!(setup.selected(), 0);
+        assert_eq!(setup.handle_key(Key::Up), StandaloneSetupAction::Moved);
+        assert_eq!(setup.provider_cursor(), 6);
+        assert_eq!(setup.selected(), 0);
+        assert_eq!(setup.handle_key(Key::Down), StandaloneSetupAction::Moved);
+        assert_eq!(setup.provider_cursor(), 0);
+
+        for expected_cursor in 1..=6 {
+            assert_eq!(setup.handle_key(Key::Down), StandaloneSetupAction::Moved);
+            assert_eq!(setup.provider_cursor(), expected_cursor);
+        }
+        assert_eq!(setup.handle_key(Key::Down), StandaloneSetupAction::Moved);
+        assert_eq!(setup.provider_cursor(), 0);
+
+        assert_eq!(setup.handle_key(Key::Down), StandaloneSetupAction::Moved);
+        assert_eq!(setup.provider_cursor(), 1);
+        assert_eq!(setup.handle_key(Key::Up), StandaloneSetupAction::Moved);
+        assert_eq!(setup.provider_cursor(), 0);
+        assert_eq!(setup.selected(), 0);
+        assert!(setup.is_tool_provider_boundary());
     }
 
     #[test]

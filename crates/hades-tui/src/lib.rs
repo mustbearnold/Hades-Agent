@@ -1139,6 +1139,47 @@ mod tests {
     }
 
     #[test]
+    fn standalone_tool_provider_boundary_renders_cyclic_edges() {
+        let backend = TestBackend::new(HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let mut terminal = Terminal::new(backend).expect("TestBackend construction is infallible");
+        let mut wizard = StandaloneSetupState::default();
+        wizard.handle_key(hades_core::Key::Down);
+        wizard.handle_key(hades_core::Key::Enter);
+        wizard.handle_key(hades_core::Key::Ctrl('c'));
+        wizard.handle_key(hades_core::Key::Enter);
+        wizard.handle_key(hades_core::Key::Ctrl('c'));
+        wizard.handle_key(hades_core::Key::Escape);
+        wizard.handle_key(hades_core::Key::Ctrl('c'));
+
+        wizard.handle_key(hades_core::Key::Up);
+        terminal
+            .draw(|frame| draw_standalone_setup(frame, &wizard))
+            .expect("rendering is infallible");
+        let wrapped_up = terminal
+            .backend()
+            .buffer()
+            .content()
+            .iter()
+            .map(|cell| cell.symbol())
+            .collect::<String>();
+        assert!(wrapped_up.contains("→ (○) Skip — keep defaults / configure later"));
+        assert!(wrapped_up.contains("(●) Local Browser"));
+
+        wizard.handle_key(hades_core::Key::Down);
+        terminal
+            .draw(|frame| draw_standalone_setup(frame, &wizard))
+            .expect("rendering is infallible");
+        let wrapped_down = terminal
+            .backend()
+            .buffer()
+            .content()
+            .iter()
+            .map(|cell| cell.symbol())
+            .collect::<String>();
+        assert!(wrapped_down.contains("→ (●) Local Browser"));
+    }
+
+    #[test]
     fn hermes_startup_surface_matches_normalized_golden_frame() {
         let rendered = snapshot(&App::new(), HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
         let golden = include_str!("../../../tests/fixtures/parity/OBS-0001-startup-120x40.txt");
