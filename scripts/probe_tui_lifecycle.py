@@ -150,12 +150,18 @@ def spawn(
     return pid, master, os.readlink(f"/proc/{pid}/fd/0"), history_home
 
 
+_terminal_fds: dict[str, int] = {}
+
+
 def terminal_flags(slave_path: str) -> dict[str, bool]:
-    slave = os.open(slave_path, os.O_RDWR | os.O_NOCTTY)
-    try:
-        attributes = termios.tcgetattr(slave)
-    finally:
-        os.close(slave)
+    # Keep the first successful slave descriptor open. Once the child exits,
+    # opening the PTY slave by path can return ENOTTY/EIO even though its final
+    # termios state is still the oracle we need to inspect.
+    slave = _terminal_fds.get(slave_path)
+    if slave is None:
+        slave = os.open(slave_path, os.O_RDWR | os.O_NOCTTY)
+        _terminal_fds[slave_path] = slave
+    attributes = termios.tcgetattr(slave)
     local_flags = attributes[3]
     return {
         "canonical": bool(local_flags & termios.ICANON),

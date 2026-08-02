@@ -418,6 +418,20 @@ progress from August 1, 2026 through 2027.
   behavior, later cancellation, and cursor-redraw timing remain outside the
   claim. This evidence boundary does not cap Hades performance or existing
   capabilities.
+- HAD-084 observes the next Hermes-only provider surface without submitting a
+  provider, credential, OAuth action, or network-bearing input. Within a
+  bounded one-second read window Hermes exposes Local Browser, Nous
+  Subscription, Camofox, Browser Use, Browserbase, Firecrawl, and Skip, with
+  `↑↓ navigate`, `ENTER/SPACE select`, and `ESC cancel`. The inventory arrives
+  during a redraw, so the labels are observed but stable frame identity,
+  provider completeness, selection semantics, network behavior, persistence,
+  and later cancellation remain unknown. The evidence boundary does not cap
+  Hades performance or capabilities.
+
+Parity policy: Hermes observations establish the intended compatibility
+contract, not bugs to preserve. Hades must not intentionally rebuild Hermes
+defects, unsafe behavior, or failure cases; fix them and record any deliberate
+evidence-backed deviation.
 
 ## Unknown until observed
 

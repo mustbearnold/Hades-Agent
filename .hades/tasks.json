@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-02T01:24:29Z",
+  "updated_at": "2026-08-02T01:48:02Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -4438,6 +4438,65 @@
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/hades-tool-provider-boundary-replay.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-084",
+      "title": "Capture Hermes Browser Automation provider inventory boundary",
+      "status": "complete",
+      "priority": 10,
+      "lane": "research",
+      "owner_role": "observer",
+      "depends_on": [
+        "HAD-083"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "direct_pty_observation",
+        "sanitized_fixture",
+        "reference_probe",
+        "full_verify"
+      ],
+      "acceptance": [
+        "In the pinned Hermes reference, repeat the safe standalone Full setup route through the raw Tools for CLI checklist and first-install Browser Automation provider boundary, then wait only within a bounded read window to capture the stable provider inventory and selection controls without sending a provider choice, credential, OAuth, or other secret-bearing input.",
+        "Record the observed terminal flags, alternate-screen lifecycle, process liveness, visible provider markers, normalized config/artifact invariants, and the exact bounded observation window. If no stable inventory appears, preserve that as an explicit unknown rather than inferring one.",
+        "Add provenance, a sanitized OBS-0079 fixture, a repeatable direct-PTY probe, and an observation document; update the parity matrix, context, readme, and validation gates. Forced child teardown after the read window must be labeled harness cleanup, not a Hermes product outcome.",
+        "Keep provider selection semantics, API-key prompts, OAuth, network behavior, persistence, and later cancellation outside the claim. This evidence task must not impose a performance or capability ceiling on Hades or intentionally nerf any existing behavior.",
+        "Run the targeted probe and complete the no-skip just verify gate before completion."
+      ],
+      "evidence": [
+        "AGENTS.md",
+        "scripts/probe_tui_lifecycle.py",
+        "scripts/probe_hermes_tool_provider_inventory.py",
+        "tests/fixtures/parity/OBS-0079-hermes-tool-provider-inventory.json",
+        "docs/parity/observations/OBS-0079-hermes-tool-provider-inventory-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hermes-tool-provider-inventory-probe.json"
+      ],
+      "ready_at": "2026-08-02T01:25:00Z",
+      "claimed_by": "provider-inventory-observer",
+      "claimed_at": "2026-08-02T01:28:17Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Captured Hermes OBS-0079 with a bounded one-second read-only PTY observation: the Browser Automation provider surface exposes Local Browser, Nous Subscription, Camofox, Browser Use, Browserbase, Firecrawl, and Skip plus navigation/selection controls. The inventory arrives during a redraw, so stable frame identity and all later selection/provider behavior remain explicit unknowns. Sanitized evidence, gates, and a deterministic PTY terminal-state oracle are complete; the durable project policy now fixes Hermes defects instead of reproducing them and does not cap Hades performance or capabilities.",
+        "completed_at": "2026-08-02T01:48:02Z",
+        "evidence": [
+          "AGENTS.md",
+          "scripts/probe_tui_lifecycle.py",
+          "scripts/probe_hermes_tool_provider_inventory.py",
+          "tests/fixtures/parity/OBS-0079-hermes-tool-provider-inventory.json",
+          "docs/parity/observations/OBS-0079-hermes-tool-provider-inventory-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hermes-tool-provider-inventory-probe.json"
         ]
       }
     }

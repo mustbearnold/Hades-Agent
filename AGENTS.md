@@ -82,6 +82,10 @@ Every run has exactly one terminal outcome: `complete`, `blocked`, or
   explicit test adapter.
 - Reference unknowns stay unknown until observed. Do not infer exact keymaps,
   timings, copy, colors, or error handling from convention.
+- Reference observations define the intended compatibility contract, not a
+  mandate to reproduce defects. Do not intentionally rebuild Hermes bugs,
+  unsafe behavior, or failure cases in Hades; fix them and document any
+  deliberate, evidence-backed deviation from the reference.
 - Do not read `.env`, credentials, captured private data, or ignored runtime
   state as part of repository orientation.
 

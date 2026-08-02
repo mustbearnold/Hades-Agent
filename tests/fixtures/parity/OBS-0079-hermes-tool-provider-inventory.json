@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0079",
+  "surface": "hermes-first-install-tool-provider-inventory",
+  "reference_observation": "OBS-0077",
+  "reference": {
+    "product": "Hermes Agent",
+    "version": "0.19.1 (2026.7.30)",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "direct PTY with bounded read-only provider inventory capture"
+    },
+    "capture": "fresh synthetic home with standalone hermes setup and no provider environment"
+  },
+  "binary": "<reference-checkout>",
+  "normalization": [
+    "Reference checkout, synthetic HOME/HERMES_HOME paths, PTY paths, credentials, timestamps, and raw redraw bytes are omitted or replaced by stable markers.",
+    "The safe route enters only Full setup, skips the provider, accepts the local backend, cancels the platform picker, opens the raw CLI checklist, sends Ctrl+C, and reads the provider boundary without further input.",
+    "The provider inventory is recorded as a bounded rendered observation. Terminal-width clipping and redraw timing are retained as evidence; no provider choice, credential, OAuth action, or network-bearing input is sent."
+  ],
+  "unknowns": [
+    "Provider selection semantics, API-key prompts, OAuth, network behavior, persistence after selection, and later cancellation remain unknown.",
+    "The provider list changes during the one-second read window, so a stable screen-model snapshot is not claimed even though the option labels below are observed.",
+    "Forced child/process-group teardown is probe cleanup only and is not a Hermes product exit or terminal-restoration claim."
+  ],
+  "steps": [
+    {
+      "id": "standalone-first-install-tool-provider-inventory",
+      "input_sequence": [
+        {"kind": "key", "value": "j", "bytes_hex": "6a", "meaning": "move to Full setup"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d", "meaning": "submit Full setup"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "skip the unconfigured provider"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d", "meaning": "accept Keep current (local)"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "cancel the platform picker"},
+        {"kind": "key", "value": "Escape", "bytes_hex": "1b", "meaning": "open the raw CLI checklist"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "reach the first-install provider boundary"},
+        {"kind": "wait", "value": "1.000s", "meaning": "read provider inventory without input"}
+      ],
+      "output": {
+        "status": "passed",
+        "checklist": {
+          "title": "Tools for 🖥️  CLI",
+          "controls": ["SPACE toggle", "ENTER confirm", "ESC cancel"],
+          "terminal_flags": {"canonical": false, "echo": false},
+          "process_still_alive": true
+        },
+        "provider_boundary": {
+          "stable_markers": [
+            "Configuring 6 tool(s):",
+            "Browser Automation",
+            "Browser Automation - Choose a provider"
+          ],
+          "terminal_flags": {"canonical": true, "echo": true},
+          "process_still_alive": true,
+          "provider_choice_submitted": false
+        },
+        "provider_inventory": {
+          "observation_window_ms": 1000,
+          "selection_controls": [
+            "Choose a provider:",
+            "↑↓ navigate",
+            "ENTER/SPACE select",
+            "ESC cancel"
+          ],
+          "selected_option": "Local Browser [★ recommended · free]",
+          "options_observed": [
+            "Local Browser [★ recommended · free] — Headless Chromium, no API key needed",
+            "Nous Subscription (Browser Use cloud) [subscription]",
+            "Camofox [free · local] — Anti-detection browser (Firefox/Camoufox)",
+            "Browser Use [paid] — Cloud browser with remote execution",
+            "Browserbase [paid] — Cloud browser with stealth and proxies",
+            "Firecrawl [paid] — Cloud browser with remote execution",
+            "Skip — keep defaults / configure later"
+          ],
+          "stable_screen_model_observed": false,
+          "inventory_labels_observed_during_redraw": true,
+          "terminal_width_clipping_present": true
+        },
+        "terminal_flags": {
+          "initial": {"canonical": false, "echo": false},
+          "continuation": {"canonical": true, "echo": true},
+          "terminal_backend": {"canonical": false, "echo": false},
+          "platform_picker": {"canonical": false, "echo": false},
+          "tool_configuration": {"canonical": true, "echo": true},
+          "checklist": {"canonical": false, "echo": false},
+          "provider_boundary": {"canonical": true, "echo": true}
+        },
+        "scope": {
+          "credentials_entered": false,
+          "oauth_action_sent": false,
+          "network_bearing_input_sent": false,
+          "later_cancellation_status": "unknown",
+          "probe_teardown": "forced child/process-group teardown after the bounded read window; not a Hermes product outcome",
+          "alternate_screen_entered": true,
+          "alternate_screen_left_before_teardown": true
+        },
+        "persistence": {
+          "config_before_exists": false,
+          "config_created_during_setup": true,
+          "config_bytes_at_tool_configuration": 2003,
+          "config_at_provider_boundary_unchanged": true,
+          "secrets_file_created": false,
+          "artifact_classes_before_tool_configuration": [
+            ".cache/uv/<artifact>",
+            "<other-file>",
+            "SOUL.md",
+            "config.yaml",
+            "logs/<artifact>"
+          ],
+          "artifact_classes_at_provider_boundary": []
+        }
+      }
+    }
+  ]
+}
