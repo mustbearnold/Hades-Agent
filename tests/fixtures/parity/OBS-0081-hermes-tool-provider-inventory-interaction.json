@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0081",
+  "surface": "hermes-first-install-tool-provider-inventory-interaction",
+  "reference_observation": "OBS-0079",
+  "reference": {
+    "product": "Hermes Agent",
+    "version": "0.19.1 (2026.7.30)",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "fresh direct PTY cases with retained slave descriptors"
+    },
+    "capture": "fresh synthetic home for each provider-inventory interaction case"
+  },
+  "binary": "<reference-checkout>",
+  "terminal": {
+    "columns": 120,
+    "rows": 40,
+    "capture": "direct PTY with normalized stable markers"
+  },
+  "normalization": [
+    "Reference checkout, synthetic HOME/HERMES_HOME paths, PTY paths, credentials, timestamps, redraw bytes, and dynamic provider descriptions are omitted or replaced by stable markers.",
+    "Each fresh case repeats the safe Full setup route through the provider inventory, then sends exactly one non-submitting input sequence before a 750 ms read window.",
+    "No provider choice, Enter, Space, credential, OAuth action, network-bearing input, or persistence action is sent. Forced teardown is probe cleanup only."
+  ],
+  "unknowns": [
+    "Provider submission, Enter/Space semantics, credential prompts, OAuth, network behavior, persistence, discovery completeness, and behavior after the bounded window remain unknown.",
+    "The Ctrl+C redraw into a second image-generation provider surface is recorded as an ambiguous reference transition, not as a Hades compatibility requirement; whether it is intentional, a routing defect, or a failure case needs separate product/reference investigation.",
+    "Escape produced no visible transition within 750 ms, but later cancellation and any delayed response remain unknown."
+  ],
+  "steps": [
+    {
+      "id": "provider-inventory-interaction-cases",
+      "input_sequence": [
+        {"kind": "key", "value": "j", "bytes_hex": "6a", "meaning": "move to Full setup"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d", "meaning": "submit Full setup"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "skip the unconfigured provider"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d", "meaning": "accept Keep current (local)"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "cancel the platform picker"},
+        {"kind": "key", "value": "Escape", "bytes_hex": "1b", "meaning": "open the raw CLI checklist"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "reach the provider inventory"}
+      ],
+      "output": {
+        "status": "passed",
+        "route": {
+          "initial_terminal_flags": {"canonical": false, "echo": false},
+          "continuation_terminal_flags": {"canonical": true, "echo": true},
+          "terminal_backend_terminal_flags": {"canonical": false, "echo": false},
+          "platform_picker_terminal_flags": {"canonical": false, "echo": false},
+          "tool_configuration_terminal_flags": {"canonical": true, "echo": true},
+          "checklist_terminal_flags": {"canonical": false, "echo": false},
+          "provider_inventory_terminal_flags": {"canonical": false, "echo": false},
+          "alternate_screen_entered": true,
+          "alternate_screen_left_before_interaction": true,
+          "process_alive_at_provider_inventory": true
+        },
+        "provider_inventory": {
+          "controls": [
+            "Choose a provider:",
+            "↑↓ navigate",
+            "ENTER/SPACE select",
+            "ESC cancel"
+          ],
+          "options_observed": [
+            "Local Browser [★ recommended · free] — Headless Chromium, no API key needed",
+            "Nous Subscription (Browser Use cloud) [subscription]",
+            "Camofox [free · local] — Anti-detection browser (Firefox/Camoufox)",
+            "Browser Use [paid] — Cloud browser with remote execution",
+            "Browserbase [paid] — Cloud browser with stealth and proxies",
+            "Firecrawl [paid] — Cloud browser with remote execution",
+            "Skip — keep defaults / configure later"
+          ],
+          "initial_cursor": "Local Browser",
+          "initial_selected": "Local Browser",
+          "inventory_read_window_ms": 1000
+        },
+        "cases": [
+          {
+            "id": "down-navigation",
+            "input": {"value": "Down", "bytes_hex": "1b 5b 42"},
+            "observation_window_ms": 750,
+            "process_still_alive": true,
+            "terminal_flags": {"canonical": false, "echo": false},
+            "cursor_after": "Nous Subscription (Browser Use cloud)",
+            "selected_after": "Local Browser",
+            "provider_selection_submitted": false,
+            "rendered_delta": [
+              "Choose a provider:",
+              "↑↓ navigate  ENTER/SPACE select  ESC cancel",
+              "Local Browser [★ recommended · free] — Headless Chromium, no API key needed",
+              "Nous Subscription (Browser Use cloud) [subscription]",
+              "Camofox [free · local]",
+              "Browser Use [paid]",
+              "Browserbase [paid]",
+              "Firecrawl [paid]",
+              "Skip — keep defaults / configure later"
+            ]
+          },
+          {
+            "id": "escape-cancellation",
+            "input": {"value": "Escape", "bytes_hex": "1b"},
+            "observation_window_ms": 750,
+            "process_still_alive": true,
+            "terminal_flags": {"canonical": false, "echo": false},
+            "visible_delta": [],
+            "provider_selection_submitted": false,
+            "later_behavior": "unknown"
+          },
+          {
+            "id": "ctrl-c-cancellation",
+            "input": {"value": "Ctrl+C", "bytes_hex": "03"},
+            "observation_window_ms": 750,
+            "process_still_alive": true,
+            "terminal_flags": {"canonical": false, "echo": false},
+            "provider_selection_submitted": false,
+            "reference_transition": "A second Choose a provider surface appeared with Nous Subscription for FAL image generation and Skip; the tool identity transition is not promoted into the Hades contract.",
+            "rendered_delta": [
+              "Choose a provider:",
+              "↑↓ navigate  ENTER/SPACE select  ESC cancel",
+              "Nous Subscription [subscription] — Managed FAL image generation billed to your subscription",
+              "Skip — keep defaults / configure later"
+            ],
+            "later_behavior": "unknown"
+          }
+        ],
+        "persistence": {
+          "config_before_exists": false,
+          "config_at_tool_configuration_exists": true,
+          "config_unchanged_after_each_input": true,
+          "secrets_file_created": false,
+          "new_artifacts_after_each_input": []
+        },
+        "scope": {
+          "credentials_entered": false,
+          "oauth_action_sent": false,
+          "network_bearing_input_sent": false,
+          "forced_teardown": "alive cases were stopped by harness process-group cleanup; not a Hermes product outcome"
+        }
+      }
+    }
+  ],
+  "passed": true
+}

@@ -147,20 +147,27 @@ def spawn(
             os._exit(127)
 
     set_window_size(master, columns, rows)
-    return pid, master, os.readlink(f"/proc/{pid}/fd/0"), history_home
+    slave_path = os.readlink(f"/proc/{pid}/fd/0")
+    retain_slave_descriptor(slave_path)
+    return pid, master, slave_path, history_home
 
 
 _terminal_fds: dict[str, int] = {}
+
+
+def retain_slave_descriptor(slave_path: str) -> int:
+    slave = _terminal_fds.get(slave_path)
+    if slave is None:
+        slave = os.open(slave_path, os.O_RDWR | os.O_NOCTTY)
+        _terminal_fds[slave_path] = slave
+    return slave
 
 
 def terminal_flags(slave_path: str) -> dict[str, bool]:
     # Keep the first successful slave descriptor open. Once the child exits,
     # opening the PTY slave by path can return ENOTTY/EIO even though its final
     # termios state is still the oracle we need to inspect.
-    slave = _terminal_fds.get(slave_path)
-    if slave is None:
-        slave = os.open(slave_path, os.O_RDWR | os.O_NOCTTY)
-        _terminal_fds[slave_path] = slave
+    slave = retain_slave_descriptor(slave_path)
     attributes = termios.tcgetattr(slave)
     local_flags = attributes[3]
     return {

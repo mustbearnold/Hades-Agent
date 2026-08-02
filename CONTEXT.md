@@ -436,6 +436,15 @@ progress from August 1, 2026 through 2027.
   later cancellation remain unknown. Hermes defects and failure cases are not
   compatibility requirements; Hades fixes them rather than intentionally
   reproducing them, and the evidence boundary does not cap Rust performance.
+- HAD-086 observes three fresh Hermes provider-inventory interactions. A Down
+  sequence moves the cursor to Nous Subscription without submitting it; Escape
+  shows no visible transition during the bounded 750 ms window; Ctrl+C keeps
+  Hermes alive but redraws a second FAL/image-generation provider surface.
+  That cross-tool redraw is an explicit ambiguous reference transition, not a
+  Hades requirement. Provider submission, credentials, OAuth, networking,
+  persistence, delayed cancellation, and later behavior remain unknown. Hades
+  must define safe typed semantics and fix defects rather than reproducing
+  Hermes failures, and this observation does not cap Rust performance.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-02T02:07:35Z",
+  "updated_at": "2026-08-02T02:30:25Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -4559,6 +4559,64 @@
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/hades-tool-provider-inventory-replay.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-086",
+      "title": "Observe bounded provider inventory navigation and cancellation",
+      "status": "complete",
+      "priority": 9,
+      "lane": "interaction",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-084",
+        "HAD-085"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "pinned_hermes_reference",
+        "direct_pty_probe",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "In the pinned Hermes reference, repeat the safe standalone Full setup route through the first-install Browser Automation provider inventory, then use only explicitly bounded non-submitting navigation and cancellation inputs in fresh cases to observe what actually happens.",
+        "Record rendered provider markers, cursor/selection changes if any, terminal flags, alternate-screen lifecycle, process liveness, normalized config/artifact invariants, and exact inputs. Keep provider submission, credentials, OAuth, network-bearing input, persistence, and later behavior outside the claim.",
+        "Add provenance, a sanitized OBS-0081 fixture, a repeatable direct-PTY interaction probe, and an observation document; update the parity matrix, context, readme, and validation gates. Preserve unknowns when the surface is asynchronous, line-buffered, or otherwise not safely observable.",
+        "Treat any Hermes bug, unsafe behavior, or failure case found during the observation as a defect to fix in Hades, never as a compatibility requirement. The evidence boundary must not nerf Hades performance, capabilities, or safer behavior.",
+        "Run the targeted probe and complete the no-skip just verify gate before completion."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_tool_provider_inventory_interaction.py",
+        "scripts/probe_tui_lifecycle.py",
+        "tests/fixtures/parity/OBS-0081-hermes-tool-provider-inventory-interaction.json",
+        "docs/parity/observations/OBS-0081-hermes-tool-provider-inventory-interaction-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hermes-tool-provider-inventory-interaction-probe.json"
+      ],
+      "ready_at": "2026-08-02T02:08:00Z",
+      "attempts": 1,
+      "claimed_by": "provider-inventory-interaction-observer",
+      "claimed_at": "2026-08-02T02:08:51Z",
+      "result": {
+        "summary": "Captured bounded Hermes provider inventory interactions with direct PTY evidence and hardened the shared PTY oracle against early-exit descriptor races; complete just verify PASS. The ambiguous Ctrl+C cross-tool redraw remains reference-only and is not copied into Hades; no Hermes defects or failure cases were reproduced and no Hades capabilities were nerfed.",
+        "completed_at": "2026-08-02T02:30:25Z",
+        "evidence": [
+          "scripts/probe_hermes_tool_provider_inventory_interaction.py",
+          "scripts/probe_tui_lifecycle.py",
+          "tests/fixtures/parity/OBS-0081-hermes-tool-provider-inventory-interaction.json",
+          "docs/parity/observations/OBS-0081-hermes-tool-provider-inventory-interaction-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hermes-tool-provider-inventory-interaction-probe.json"
         ]
       }
     }
