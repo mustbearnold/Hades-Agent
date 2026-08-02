@@ -33,7 +33,7 @@ from probe_hermes_terminal_palette import (
     write_bytes,
 )
 from probe_hermes_unconfigured_startup import artifact_classes, stable_surface, surface_state
-from probe_tui_lifecycle import terminal_flags
+from probe_tui_lifecycle import retain_slave_descriptor, slave_path_for_pid, terminal_flags
 
 
 COMMANDS = ("/setup", "/model")
@@ -68,7 +68,9 @@ def spawn_unconfigured(reference: Path, home: Path) -> tuple[int, int, str]:
         os.execvpe("uv", ["uv", "run", "hermes", "--tui"], environment)
     set_window_size(fd, COLUMNS, ROWS)
     os.set_blocking(fd, False)
-    return pid, fd, os.readlink(f"/proc/{pid}/fd/0")
+    slave_path = slave_path_for_pid(pid)
+    retain_slave_descriptor(slave_path)
+    return pid, fd, slave_path
 
 
 def status_value(status: int | None) -> dict[str, int | str]:

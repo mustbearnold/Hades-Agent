@@ -1,7 +1,65 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-02T03:07:12Z",
+  "updated_at": "2026-08-02T04:53:47Z",
   "tasks": [
+    {
+      "id": "HAD-088",
+      "title": "Observe provider inventory cursor edge semantics",
+      "status": "complete",
+      "priority": 9,
+      "lane": "research",
+      "owner_role": "observer",
+      "depends_on": [
+        "HAD-086"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "pinned_hermes_reference",
+        "direct_pty_probe",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "In fresh pinned Hermes provider-inventory cases, send only bounded non-submitting arrow inputs: Up at the initial row, Down enough times to reach the observed list edge, and one bounded reverse movement case.",
+        "Record exact input bytes, rendered cursor and selected-row markers, terminal flags, alternate-screen lifecycle, process liveness, and normalized config/artifact invariants. Keep provider submission, Enter/Space, Escape, Ctrl+C, credentials, OAuth, networking, persistence, and later behavior outside the claim.",
+        "Add provenance, a sanitized OBS-0083 fixture, a repeatable direct-PTY probe, and an observation document; update the parity matrix, context, readme, and validation gates. Preserve unknowns when redraw timing or list completeness is not stable.",
+        "Treat any Hermes bug, unsafe behavior, or failure case as a defect to fix in Hades, never as a compatibility requirement. The observation must not impose a performance or capability ceiling on Hades.",
+        "Run the targeted probe and complete the no-skip just verify gate before completion."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_tool_provider_inventory_edges.py",
+        "tests/fixtures/parity/OBS-0083-hermes-tool-provider-inventory-edges.json",
+        "docs/parity/observations/OBS-0083-hermes-tool-provider-inventory-edges-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hermes-tool-provider-inventory-edges-probe.json",
+        "scripts/probe_tui_lifecycle.py",
+        "crates/hades-provider/src/lib.rs"
+      ],
+      "claimed_by": "provider-inventory-edge-observer",
+      "claimed_at": "2026-08-02T03:08:33Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Captured fresh Hermes OBS-0083 arrow-only edge semantics: Up wraps Local Browser to Skip; Down cycles through all observed rows and wraps Skip to Local Browser; Down+Up returns to Local Browser. All cases stayed raw/alive with config/artifacts unchanged. No provider submission or Hermes bug/failure case was reproduced; PTY evidence harness and coalesced SSE buffering races were fixed without weakening assertions; complete just verify PASS.",
+        "completed_at": "2026-08-02T04:53:47Z",
+        "evidence": [
+          "scripts/probe_hermes_tool_provider_inventory_edges.py",
+          "tests/fixtures/parity/OBS-0083-hermes-tool-provider-inventory-edges.json",
+          "docs/parity/observations/OBS-0083-hermes-tool-provider-inventory-edges-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hermes-tool-provider-inventory-edges-probe.json",
+          "scripts/probe_tui_lifecycle.py",
+          "crates/hades-provider/src/lib.rs"
+        ]
+      }
+    },
     {
       "id": "HAD-001",
       "title": "Capture the Hermes TUI reference contract",

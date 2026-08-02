@@ -451,6 +451,13 @@ progress from August 1, 2026 through 2027.
   Local Browser selected, and remains alive without changing config or creating
   artifacts. Enter/Space/Escape/Ctrl+C provider semantics and later setup remain
   unknown; the ambiguous Hermes Ctrl+C cross-tool redraw is not reproduced.
+- HAD-088 observes cyclic Hermes provider cursor edges without submitting a
+  provider. Up at Local Browser wraps to Skip; eight Down inputs walk through
+  the observed rows, wrap from Skip to Local Browser, and end at Nous
+  Subscription; Down then Up returns to Local Browser. Local Browser remains
+  selected, raw terminal flags and process liveness remain stable, and config
+  and artifacts are unchanged. Hades must not inherit any unrelated Hermes
+  defect or failure case from this observation.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes

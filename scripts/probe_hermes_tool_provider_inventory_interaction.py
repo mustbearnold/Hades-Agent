@@ -37,7 +37,11 @@ from probe_hermes_tool_provider_boundary import (
     read_window,
     wait_for_suffix_markers,
 )
-from probe_tui_lifecycle import describe_status
+from probe_tui_lifecycle import (
+    describe_status,
+    release_slave_descriptor,
+    retain_slave_descriptor,
+)
 
 
 COLUMNS = 120
@@ -89,8 +93,8 @@ def route_to_provider(
     case = "standalone-first-install-tool-provider-inventory-interaction"
     pid, fd, slave_path = spawn_setup(reference, home)
     session.update(pid=pid, fd=fd)
-    terminal_fd = os.open(slave_path, os.O_RDWR | os.O_NOCTTY)
-    session["terminal_fd"] = terminal_fd
+    terminal_fd = retain_slave_descriptor(slave_path)
+    session.update(terminal_fd=terminal_fd, slave_path=slave_path)
     buffer = b""
     files_before = file_inventory(home)
     config_before = config_shape(home / "config.yaml")
@@ -273,6 +277,7 @@ def run_case(reference: Path, interaction: str, timeout: float) -> dict[str, Any
         pid = session["pid"]
         fd = session["fd"]
         terminal_fd = session.get("terminal_fd", -1)
+        slave_path = session.get("slave_path")
         if pid != -1:
             force_teardown(pid)
         if fd != -1:
@@ -280,7 +285,12 @@ def run_case(reference: Path, interaction: str, timeout: float) -> dict[str, Any
                 os.close(fd)
             except OSError:
                 pass
-        if terminal_fd != -1:
+        if isinstance(slave_path, str):
+            try:
+                release_slave_descriptor(slave_path)
+            except OSError:
+                pass
+        elif terminal_fd != -1:
             try:
                 os.close(terminal_fd)
             except OSError:

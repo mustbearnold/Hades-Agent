@@ -33,7 +33,12 @@ from probe_hermes_terminal_palette import (
     stop,
     write_bytes,
 )
-from probe_tui_lifecycle import describe_status, terminal_flags
+from probe_tui_lifecycle import (
+    describe_status,
+    retain_slave_descriptor,
+    slave_path_for_pid,
+    terminal_flags,
+)
 
 
 INITIAL_MARKERS = (
@@ -140,7 +145,9 @@ def spawn_setup(reference: Path, home: Path) -> tuple[int, int, str]:
         os.execvpe("uv", ["uv", "run", "hermes", "setup"], environment)
     set_window_size(fd, COLUMNS, ROWS)
     os.set_blocking(fd, False)
-    return pid, fd, os.readlink(f"/proc/{pid}/fd/0")
+    slave_path = slave_path_for_pid(pid)
+    retain_slave_descriptor(slave_path)
+    return pid, fd, slave_path
 
 
 def spawn_tui(reference: Path, home: Path) -> tuple[int, int]:

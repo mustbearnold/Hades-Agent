@@ -244,10 +244,19 @@ impl LocalOpenAiTransport {
             .and_then(|_| stream.write_all(&body))
             .map_err(|error| TransportError::Io(error.to_string()))?;
 
-        let header_bytes = read_http_headers(&mut stream, cancellation, self.timeout)?;
-        let header = parse_http_header(&header_bytes)?;
+        let response_bytes = read_http_headers(&mut stream, cancellation, self.timeout)?;
+        let header_end = response_bytes
+            .windows(4)
+            .position(|window| window == b"\r\n\r\n")
+            .map(|position| position + 4)
+            .ok_or_else(|| {
+                TransportError::InvalidResponse("missing HTTP header boundary".to_owned())
+            })?;
+        let header = parse_http_header(&response_bytes[..header_end])?;
+        let initial_body = &response_bytes[header_end..];
         if header.status != 200 {
-            let body = read_to_end_with_cancellation(&mut stream, cancellation)?;
+            let mut body = initial_body.to_vec();
+            body.extend(read_to_end_with_cancellation(&mut stream, cancellation)?);
             return Err(TransportError::HttpStatus {
                 status: header.status,
                 body: String::from_utf8_lossy(&body).trim().to_owned(),
@@ -258,7 +267,7 @@ impl LocalOpenAiTransport {
         }
         Ok(OpenAiStream {
             stream,
-            buffer: Vec::new(),
+            buffer: initial_body.to_vec(),
             data_lines: Vec::new(),
             saw_text: false,
             done: false,
@@ -641,13 +650,13 @@ mod tests {
                 "data: {\"choices\":[{\"delta\":{},\"finish_reason\":\"stop\"}]}\n\n",
                 "data: [DONE]\n\n"
             );
-            write!(
-                stream,
+            let response = format!(
                 "HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
                 body.len(),
                 body
-            )
-            .expect("write fixture response");
+            );
+            stream.write_all(response.as_bytes()).expect("write fixture response");
+            stream.flush().expect("flush fixture response");
         });
 
         let transport = LocalOpenAiTransport::new(

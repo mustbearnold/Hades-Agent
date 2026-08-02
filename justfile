@@ -251,6 +251,9 @@ probe-hermes-tool-provider-inventory:
 probe-hermes-tool-provider-inventory-interaction:
     python3 scripts/probe_hermes_tool_provider_inventory_interaction.py --report .hades/runtime/hermes-tool-provider-inventory-interaction-probe.json --timeout 30
 
+probe-hermes-tool-provider-inventory-edges:
+    python3 scripts/probe_hermes_tool_provider_inventory_edges.py --report .hades/runtime/hermes-tool-provider-inventory-edges-probe.json --timeout 30
+
 replay-local-provider:
     cargo build --locked --package hades-cli
     python3 scripts/replay_local_provider.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0051-hades-local-provider-stream.json --report .hades/runtime/local-provider-replay.json
@@ -316,6 +319,7 @@ validate-reference:
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0079-hermes-tool-provider-inventory.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0080-hades-tool-provider-inventory.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0081-hermes-tool-provider-inventory-interaction.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0083-hermes-tool-provider-inventory-edges.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0082-hades-tool-provider-inventory-navigation.json
 
 agent command *args:

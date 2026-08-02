@@ -22,6 +22,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, Callable
 
+from probe_tui_lifecycle import retain_slave_descriptor, slave_path_for_pid
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_BINARY = ROOT / "target/debug/hades"
@@ -186,11 +188,7 @@ def send(fd: int, payload: bytes) -> None:
 
 
 def terminal_flags(slave_path: str) -> dict[str, bool]:
-    slave = os.open(slave_path, os.O_RDWR | os.O_NOCTTY)
-    try:
-        local_flags = termios.tcgetattr(slave)[3]
-    finally:
-        os.close(slave)
+    local_flags = termios.tcgetattr(retain_slave_descriptor(slave_path))[3]
     return {
         "canonical": bool(local_flags & termios.ICANON),
         "echo": bool(local_flags & termios.ECHO),
@@ -220,7 +218,9 @@ def spawn(binary: Path, base_url: str | None) -> tuple[int, int, str, Path]:
         os.execve(str(binary), [str(binary)], environment)
     set_window_size(master)
     os.set_blocking(master, False)
-    return pid, master, os.readlink(f"/proc/{pid}/fd/0"), home
+    slave_path = slave_path_for_pid(pid)
+    retain_slave_descriptor(slave_path)
+    return pid, master, slave_path, home
 
 
 def stop_process(pid: int, fd: int, reaped: bool) -> None:

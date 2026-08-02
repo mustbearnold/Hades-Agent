@@ -17,6 +17,7 @@ from probe_tui_lifecycle import (
     marker_present,
     read_available,
     retain_slave_descriptor,
+    slave_path_for_pid,
     send,
     set_window_size,
     terminal_flags,
@@ -107,7 +108,7 @@ def spawn_setup(binary: Path, home: Path) -> tuple[int, int, str]:
 
     set_window_size(master, COLUMNS, ROWS)
     os.set_blocking(master, False)
-    slave_path = os.readlink(f"/proc/{pid}/fd/0")
+    slave_path = slave_path_for_pid(pid)
     retain_slave_descriptor(slave_path)
     return pid, master, slave_path
 

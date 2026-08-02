@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0083",
+  "surface": "hermes-first-install-tool-provider-inventory-cursor-edges",
+  "reference_observation": "OBS-0081",
+  "reference": {
+    "product": "Hermes Agent",
+    "version": "0.19.1 (2026.7.30)",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "fresh direct PTY cases with retained slave descriptors"
+    },
+    "capture": "fresh synthetic home for each arrow-only provider-inventory edge case"
+  },
+  "binary": "<reference-checkout>",
+  "terminal": {
+    "columns": 120,
+    "rows": 40,
+    "capture": "direct PTY with normalized stable markers"
+  },
+  "normalization": [
+    "Reference checkout, synthetic HOME/HERMES_HOME paths, PTY paths, credentials, timestamps, redraw bytes, and dynamic descriptions are omitted or replaced by stable markers.",
+    "Each fresh case repeats the safe setup route and sends only Up/Down arrow bytes before a 350 ms per-input observation window.",
+    "No provider choice, Enter, Space, Escape, Ctrl+C, credential, OAuth action, network-bearing input, or persistence action is sent. Forced teardown is probe cleanup only."
+  ],
+  "unknowns": [
+    "Provider submission, Enter/Space/Escape/Ctrl+C semantics, credentials, OAuth, network behavior, persistence, discovery completeness, and behavior after the bounded window remain unknown.",
+    "The edge results describe the observed arrow sequence and do not establish provider selection or later setup behavior."
+  ],
+  "steps": [
+    {
+      "id": "provider-inventory-cursor-edge-cases",
+      "input_sequence": [
+        {"kind": "key", "value": "Up", "bytes_hex": "1b 5b 41", "meaning": "probe the initial-row edge"},
+        {"kind": "key", "value": "Down x8", "bytes_hex": "1b 5b 42 1b 5b 42 1b 5b 42 1b 5b 42 1b 5b 42 1b 5b 42 1b 5b 42 1b 5b 42", "meaning": "walk through and past the lower edge one input at a time"},
+        {"kind": "key", "value": "Down then Up", "bytes_hex": "1b 5b 42 1b 5b 41", "meaning": "verify bounded reverse movement"}
+      ],
+      "output": {
+        "status": "passed",
+        "route": {
+          "initial_cursor": "Local Browser",
+          "initial_selected": "Local Browser",
+          "provider_inventory_terminal_flags": {"canonical": false, "echo": false},
+          "alternate_screen_entered": true,
+          "alternate_screen_left_before_interaction": true
+        },
+        "cases": [
+          {
+            "id": "up-at-initial",
+            "input": {"value": "Up", "bytes_hex": "1b 5b 41"},
+            "cursor_after": "Skip — keep defaults / configure later",
+            "selected_after": "Local Browser [★ recommended · free]",
+            "process_alive_after_input": true,
+            "terminal_flags_after_input": {"canonical": false, "echo": false}
+          },
+          {
+            "id": "down-to-edge",
+            "input": {"value": "Down x8", "repeat": 8, "bytes_hex": "1b 5b 42 1b 5b 42 1b 5b 42 1b 5b 42 1b 5b 42 1b 5b 42 1b 5b 42 1b 5b 42"},
+            "cursor_sequence": [
+              "Nous Subscription (Browser Use cloud)",
+              "Camofox [free · local]",
+              "Browser Use [paid]",
+              "Browserbase [paid]",
+              "Firecrawl [paid]",
+              "Skip — keep defaults / configure later",
+              "Local Browser [★ recommended · free]",
+              "Nous Subscription (Browser Use cloud)"
+            ],
+            "cursor_after": "Nous Subscription (Browser Use cloud)",
+            "selected_after": "Local Browser [★ recommended · free]",
+            "process_alive_after_input": true,
+            "terminal_flags_after_input": {"canonical": false, "echo": false}
+          },
+          {
+            "id": "down-then-up",
+            "input": {"value": "Down then Up", "bytes_hex": "1b 5b 42 1b 5b 41"},
+            "cursor_sequence": [
+              "Nous Subscription (Browser Use cloud)",
+              "Local Browser [★ recommended · free]"
+            ],
+            "cursor_after": "Local Browser [★ recommended · free]",
+            "selected_after": "Local Browser [★ recommended · free]",
+            "process_alive_after_input": true,
+            "terminal_flags_after_input": {"canonical": false, "echo": false}
+          }
+        ],
+        "persistence": {
+          "config_unchanged_after_each_case": true,
+          "new_artifacts_after_each_case": [],
+          "secrets_file_created": false
+        },
+        "scope": {
+          "provider_selection_submitted": false,
+          "credentials_entered": false,
+          "oauth_action_sent": false,
+          "network_bearing_input_sent": false,
+          "later_behavior": "unknown",
+          "forced_teardown": "alive cases were stopped by harness cleanup; not a Hermes product outcome"
+        }
+      }
+    }
+  ],
+  "passed": true
+}

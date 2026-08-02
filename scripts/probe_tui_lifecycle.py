@@ -43,6 +43,24 @@ def set_slave_window_size(slave_path: str, columns: int, rows: int) -> None:
         os.close(slave)
 
 
+def slave_path_for_pid(pid: int, timeout: float = 1.0) -> str:
+    """Resolve a child fd 0 to its PTY slave across launcher handoff."""
+    deadline = time.monotonic() + timeout
+    last_path = "<unavailable>"
+    while time.monotonic() < deadline:
+        try:
+            last_path = os.readlink(f"/proc/{pid}/fd/0")
+        except FileNotFoundError:
+            last_path = "<process exited>"
+        if last_path.startswith("/dev/pts/"):
+            return last_path
+        time.sleep(0.005)
+    raise OSError(
+        errno.ENOTTY,
+        f"child fd 0 did not resolve to a PTY slave within {timeout:.1f}s: {last_path}",
+    )
+
+
 def read_available(master: int, output: bytearray) -> None:
     while True:
         readable, _, _ = select.select([master], [], [], 0)
@@ -147,7 +165,7 @@ def spawn(
             os._exit(127)
 
     set_window_size(master, columns, rows)
-    slave_path = os.readlink(f"/proc/{pid}/fd/0")
+    slave_path = slave_path_for_pid(pid)
     retain_slave_descriptor(slave_path)
     return pid, master, slave_path, history_home
 
@@ -161,6 +179,13 @@ def retain_slave_descriptor(slave_path: str) -> int:
         slave = os.open(slave_path, os.O_RDWR | os.O_NOCTTY)
         _terminal_fds[slave_path] = slave
     return slave
+
+
+def release_slave_descriptor(slave_path: str) -> None:
+    """Close and forget a descriptor previously retained for a PTY slave."""
+    slave = _terminal_fds.pop(slave_path, None)
+    if slave is not None:
+        os.close(slave)
 
 
 def terminal_flags(slave_path: str) -> dict[str, bool]:

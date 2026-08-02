@@ -127,6 +127,7 @@ just probe-hermes-tool-configuration-navigation # standalone Tool Configuration 
 just probe-hermes-tool-provider-boundary # first-install provider boundary probe
 just probe-hermes-tool-provider-inventory # bounded Browser Automation provider inventory probe
 just probe-hermes-tool-provider-inventory-interaction # bounded provider navigation/cancellation probe
+just probe-hermes-tool-provider-inventory-edges # bounded provider cursor edge probe
 just replay-terminal-palette   # Hades SGR palette and cell-style parity replay
 just replay-osc52-timing-limits # Hades OSC52 timing and bounded-size parity replay
 just replay-osc52-st-termination # Hades ST-terminated OSC52 parity replay
