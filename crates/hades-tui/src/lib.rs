@@ -24,7 +24,7 @@ use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
     text::{Line, Span, Text},
-    widgets::{Block, Borders, Clear, Paragraph, Wrap},
+    widgets::{Block, BorderType, Borders, Clear, Paragraph, Wrap},
 };
 
 const HERMES_STARTUP_WIDTH: u16 = 120;
@@ -38,6 +38,9 @@ const HERMES_UNCONFIGURED_MODEL: &str = " │ glm-5.2 · Nous Research          
 const HERMES_UNCONFIGURED_FOOTER: &str = " ─ starting agent… │ glm5.2 │ 0s │ voice off │ 1 session                                      ─ <reference-cwd> (main)";
 const HERMES_CLIPBOARD_MISS: &str = "No image found in clipboard";
 const HERMES_COMPOSER_MAX_CHARS: usize = 117;
+const HERMES_HELP_PANEL_WIDTH: u16 = 118;
+const HERMES_HELP_PANEL_HEIGHT: u16 = 3;
+const HERMES_HELP_COMMAND: &str = "/help Show available commands";
 
 pub fn standalone_tool_provider_action_status(
     action: StandaloneToolProviderAction,
@@ -94,6 +97,7 @@ pub fn draw(frame: &mut Frame<'_>, app: &App) {
         Some(Overlay::ModelPicker) => draw_model_picker_overlay(frame, app),
         Some(Overlay::SetupWizard) => draw_setup_wizard_overlay(frame, app),
         Some(Overlay::SetupRequired) => draw_setup_required_overlay(frame, app),
+        Some(Overlay::Help) => draw_help_overlay(frame),
         None => {}
     }
 }
@@ -488,6 +492,14 @@ fn draw_setup_required_overlay(frame: &mut Frame<'_>, app: &App) {
             .title_style(HERMES_PALETTE.brand())
             .title(" Setup Required "),
     );
+    frame.render_widget(Clear, area);
+    frame.render_widget(panel, area);
+}
+
+fn draw_help_overlay(frame: &mut Frame<'_>) {
+    let area = centered_rect(frame.area(), HERMES_HELP_PANEL_WIDTH, HERMES_HELP_PANEL_HEIGHT);
+    let panel = Paragraph::new(Line::raw(HERMES_HELP_COMMAND))
+        .block(Block::default().borders(Borders::ALL).border_type(BorderType::Double));
     frame.render_widget(Clear, area);
     frame.render_widget(panel, area);
 }
@@ -1288,6 +1300,26 @@ mod tests {
     }
 
     #[test]
+    fn hermes_startup_surface_renders_configured_help_panel_and_composer() {
+        let mut app = App::new();
+        for character in "/help".chars() {
+            app.handle(hades_core::InputEvent::Key(hades_core::Key::Char(character)));
+        }
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
+
+        let rendered = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let top_border = format!("╔{}╗", "═".repeat(116));
+        let bottom_border = format!("╚{}╝", "═".repeat(116));
+        assert_eq!(app.state().overlay, Some(Overlay::Help));
+        assert!(rendered.lines().any(|line| line.contains(&top_border)));
+        assert!(rendered.lines().any(|line| line.contains(HERMES_HELP_COMMAND)));
+        assert!(rendered.lines().any(|line| line.contains(&bottom_border)));
+        assert!(rendered.contains("❯ /help"));
+        assert!(rendered.contains("─ ready │"));
+        assert!(!rendered.contains("Setup Required"));
+    }
+
+    #[test]
     fn hermes_startup_surface_reflects_input_and_busy_turn() {
         let mut app = App::new();
         for character in "hello".chars() {
@@ -1414,11 +1446,16 @@ mod tests {
 
     #[test]
     fn hermes_startup_surface_renders_setup_required_overlay_and_clears_input() {
-        let mut app = App::new();
+        let start = Instant::now();
+        let mut app = App::with_startup_state(StartupState::Unconfigured);
         for character in "/help".chars() {
-            app.handle(hades_core::InputEvent::Key(hades_core::Key::Char(character)));
+            app.handle_at(hades_core::InputEvent::Key(hades_core::Key::Char(character)), start);
         }
-        app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
+        app.handle_at(hades_core::InputEvent::Key(hades_core::Key::Enter), start);
+        app.handle_at(
+            hades_core::InputEvent::Tick,
+            start + Duration::from_millis(hades_core::HELP_SETUP_REQUIRED_DELAY_MS),
+        );
 
         let setup = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
         for marker in [

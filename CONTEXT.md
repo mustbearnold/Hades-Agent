@@ -557,6 +557,12 @@ progress from August 1, 2026 through 2027.
   composer, ready state, and clean Ctrl+C cleanup. Dynamic inventories, the
   complete slash-command catalog, aliases, and arguments remain unknown; no
   side-effecting command or provider behavior is inferred or executed.
+- HAD-104 implements the configured Hades `/help` boundary as a typed Help
+  overlay and replays OBS-0098 at 120x40. It preserves the ready state and
+  `/help` composer, renders the exact stable double-border landmarks, performs
+  no provider request, and restores the terminal on Ctrl+C. The unconfigured
+  delayed `/help` Setup Required route remains separately covered; Escape is a
+  safe convenience, not a claimed Hermes observation.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes

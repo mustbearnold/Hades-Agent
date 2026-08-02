@@ -334,6 +334,15 @@ impl App {
                     Key::Ctrl('c') => self.quit(),
                     _ => DispatchOutcome::Continue,
                 },
+                Overlay::Help => match key {
+                    Key::Escape => {
+                        self.state.overlay = None;
+                        self.state.status = "Help closed.".to_owned();
+                        DispatchOutcome::Continue
+                    }
+                    Key::Ctrl('c') => self.quit(),
+                    _ => DispatchOutcome::Continue,
+                },
             };
         }
 
@@ -502,8 +511,9 @@ impl App {
 
         if content == "/help" {
             self.clear_notice();
-            self.state.overlay = Some(Overlay::SetupRequired);
-            self.state.status = "Setup required.".to_owned();
+            self.state.overlay = Some(Overlay::Help);
+            self.state.turn = TurnState::Ready;
+            self.state.status = "Help.".to_owned();
             return DispatchOutcome::Continue;
         }
 
@@ -1012,23 +1022,37 @@ mod tests {
     }
 
     #[test]
-    fn help_opens_setup_overlay_and_requires_two_ctrl_c_presses_to_exit() {
+    fn configured_help_opens_help_overlay_and_exits_with_ctrl_c() {
         let mut app = App::new();
         for character in "/help".chars() {
             app.handle(InputEvent::Key(Key::Char(character)));
         }
 
         assert_eq!(app.handle(InputEvent::Key(Key::Enter)), DispatchOutcome::Continue);
-        assert_eq!(app.state().overlay, Some(Overlay::SetupRequired));
+        assert_eq!(app.state().overlay, Some(Overlay::Help));
+        assert_eq!(app.state().startup, StartupState::Ready);
+        assert_eq!(app.state().turn, TurnState::Ready);
         assert_eq!(app.state().composer.text(), "/help");
-
-        assert_eq!(app.handle(InputEvent::Key(Key::Ctrl('c'))), DispatchOutcome::Continue);
-        assert_eq!(app.state().overlay, Some(Overlay::SetupRequired));
-        assert_eq!(app.state().composer.text(), "");
-        assert!(!app.state().should_quit);
+        assert_eq!(app.state().status, "Help.");
 
         assert_eq!(app.handle(InputEvent::Key(Key::Ctrl('c'))), DispatchOutcome::Quit);
         assert!(app.state().should_quit);
+    }
+
+    #[test]
+    fn configured_help_escape_closes_overlay_without_changing_ready_state() {
+        let mut app = App::new();
+        for character in "/help".chars() {
+            app.handle(InputEvent::Key(Key::Char(character)));
+        }
+        app.handle(InputEvent::Key(Key::Enter));
+
+        assert_eq!(app.handle(InputEvent::Key(Key::Escape)), DispatchOutcome::Continue);
+        assert_eq!(app.state().overlay, None);
+        assert_eq!(app.state().startup, StartupState::Ready);
+        assert_eq!(app.state().turn, TurnState::Ready);
+        assert_eq!(app.state().composer.text(), "/help");
+        assert!(!app.state().should_quit);
     }
 
     #[test]

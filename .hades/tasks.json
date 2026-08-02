@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-02T23:06:15Z",
+  "updated_at": "2026-08-02T23:46:46Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -5610,6 +5610,75 @@
           "tests/fixtures/parity/OBS-0098-hermes-help-catalog.json",
           "docs/parity/observations/OBS-0098-hermes-help-catalog-2026-08-03.md",
           ".hades/runtime/hermes-help-catalog-probe.json",
+          "justfile",
+          "scripts/verify.sh",
+          "README.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-104",
+      "title": "Implement configured /help help panel from OBS-0098",
+      "status": "complete",
+      "priority": 86,
+      "lane": "implementation",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-103"
+      ],
+      "risk": "high",
+      "oracle": [
+        "typed_state_transition",
+        "focused_tui_snapshot",
+        "configured_help_replay",
+        "unconfigured_help_regression",
+        "full_verify"
+      ],
+      "acceptance": [
+        "In a configured App::new() session, submitting /help enters a typed help overlay, remains ready, preserves the observed /help composer, and never opens a provider request or setup-required state.",
+        "Render the stable OBS-0098 landmarks in the 120x40 Hermes startup surface and exit cleanly through the observed safe path without inventing the unobserved complete catalog or side-effecting commands.",
+        "Keep the unconfigured delayed /help setup-required route unchanged, with focused regression coverage for both startup states and exact state transitions.",
+        "Add a sanitized Hades fixture/replay or lifecycle oracle, wire the focused checks into just/verify, run the complete no-skip gate, and record real evidence before completion."
+      ],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-app/src/lib.rs",
+        "crates/hades-tui/src/lib.rs",
+        "scripts/replay_configured_help.py",
+        "tests/fixtures/parity/OBS-0099-hades-configured-help.json",
+        "docs/parity/observations/OBS-0099-hades-configured-help-2026-08-03.md",
+        ".hades/runtime/configured-help-replay.json",
+        "scripts/differential_replay.py",
+        "scripts/replay_terminal_palette.py",
+        ".hades/runtime/differential-replay.json",
+        ".hades/runtime/hades-terminal-palette-replay.json",
+        "justfile",
+        "scripts/verify.sh",
+        "README.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md"
+      ],
+      "ready_at": "2026-08-02T23:08:56Z",
+      "claimed_by": "hades-configured-help-implementer",
+      "claimed_at": "2026-08-02T23:09:17Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Implemented configured /help as a typed Help overlay with the OBS-0098 double-border command row, ready-state preservation, retained /help composer, safe Ctrl+C cleanup, and Escape convenience; preserved the unconfigured delayed Setup Required route and corrected stale differential/palette oracles to launch that route explicitly. Full just verify passes.",
+        "completed_at": "2026-08-02T23:46:46Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-app/src/lib.rs",
+          "crates/hades-tui/src/lib.rs",
+          "scripts/replay_configured_help.py",
+          "tests/fixtures/parity/OBS-0099-hades-configured-help.json",
+          "docs/parity/observations/OBS-0099-hades-configured-help-2026-08-03.md",
+          ".hades/runtime/configured-help-replay.json",
+          "scripts/differential_replay.py",
+          "scripts/replay_terminal_palette.py",
+          ".hades/runtime/differential-replay.json",
+          ".hades/runtime/hades-terminal-palette-replay.json",
           "justfile",
           "scripts/verify.sh",
           "README.md",

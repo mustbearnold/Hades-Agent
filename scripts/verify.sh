@@ -26,6 +26,7 @@ python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0034-her
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0035-hades-terminal-palette.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0036-hermes-slash-command-surfaces.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0098-hermes-help-catalog.json
+python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0099-hades-configured-help.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0038-hermes-model-picker-model-stage.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0039-hades-model-picker-model-stage.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0093-hermes-model-picker-selection.json
@@ -80,6 +81,7 @@ python3 scripts/replay_standalone_tool_provider_inventory_navigation.py --binary
 python3 scripts/replay_standalone_tool_provider_inventory_selection.py --binary target/debug/hades --report .hades/runtime/hades-tool-provider-inventory-selection-replay.json --timeout 5
 python3 scripts/replay_vertical_slice.py --binary target/debug/hades --report .hades/runtime/vertical-slice-replay.json --timeout 8
 python3 scripts/replay_configured_surfaces.py --binary target/debug/hades --report .hades/runtime/configured-surfaces-replay.json --timeout 8
+python3 scripts/replay_configured_help.py --binary target/debug/hades --report .hades/runtime/configured-help-replay.json --timeout 60
 python3 scripts/replay_provider_recovery.py --binary target/debug/hades --report .hades/runtime/provider-recovery-replay.json --timeout 8
 python3 scripts/replay_conversation_context.py --binary target/debug/hades --report .hades/runtime/conversation-context-replay.json --timeout 8
 python3 scripts/replay_model_selection.py --binary target/debug/hades --report .hades/runtime/model-selection-replay.json --timeout 10

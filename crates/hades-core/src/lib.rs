@@ -97,6 +97,7 @@ pub enum Overlay {
     ModelPicker,
     SetupWizard,
     SetupRequired,
+    Help,
 }
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]

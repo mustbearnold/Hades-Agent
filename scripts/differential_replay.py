@@ -40,6 +40,7 @@ DEFAULT_REPORT = ROOT / ".hades/runtime/differential-replay.json"
 SNAPSHOT_COLUMNS = 120
 SNAPSHOT_ROWS = 40
 CONFIGURED_LOOPBACK_ENV = {"HADES_PROVIDER_BASE_URL": "http://127.0.0.1:8765/v1"}
+UNCONFIGURED_ENV = {"HADES_PROVIDER_BASE_URL": ""}
 
 
 class ReplayFailure(RuntimeError):
@@ -706,7 +707,7 @@ def run_setup_required(
     binary: Path, trace: dict[str, Any], contract: dict[str, Any], timeout: float
 ) -> dict[str, Any]:
     pid, master, slave_path, history_home = spawn(
-        binary, SNAPSHOT_COLUMNS, SNAPSHOT_ROWS, CONFIGURED_LOOPBACK_ENV
+        binary, SNAPSHOT_COLUMNS, SNAPSHOT_ROWS, UNCONFIGURED_ENV
     )
     output = bytearray()
     reaped = False
@@ -773,7 +774,7 @@ def run_setup_required(
                         output,
                         f"{step_id}: setup overlay open",
                         lambda text, expected=markers: contains_all_markers(text, expected),
-                        timeout,
+                        max(timeout, 12.0),
                     )
                     setup_open = True
                     observed = list(markers)

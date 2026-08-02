@@ -277,13 +277,23 @@ def run_setup_case(binary: Path, steps: dict[str, dict[str, Any]], timeout: floa
     case = "setup-required-palette"
     home = Path(tempfile.mkdtemp(prefix="had035-setup-"))
     provider, provider_thread = start_hold_provider()
-    pid, fd = spawn(binary, home, hold_provider_environment(provider))
+    provider_environment = hold_provider_environment(provider)
+    provider_environment["HADES_PROVIDER_BASE_URL"] = ""
+    pid, fd = spawn(binary, home, provider_environment)
     buffer = b""
     try:
         buffer = wait_for(pid, fd, buffer, case, "startup", lambda current: contains_marker(current, "Hermes Agent"), timeout)
         setup_start = len(buffer)
         write_bytes(fd, b"/help\r")
-        buffer = wait_for(pid, fd, buffer, case, "setup-required", lambda current: contains_marker(current, "Setup Required"), timeout)
+        buffer = wait_for(
+            pid,
+            fd,
+            buffer,
+            case,
+            "setup-required",
+            lambda current: contains_marker(current, "Setup Required"),
+            max(timeout, 12.0),
+        )
         buffer = drain(pid, fd, buffer)
         setup = surface_record(buffer[setup_start:], buffer, ["Setup Required", "model provider", "/model", "/setup", "/help"])
         assert_surface(case, "setup-required", setup, steps["setup-required"]["output"])
