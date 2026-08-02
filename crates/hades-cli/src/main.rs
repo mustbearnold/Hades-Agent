@@ -32,8 +32,8 @@ use hades_core::{
     InputEvent, Key, PRODUCT_NAME, ProviderEvent, Role, SETUP_STANDALONE_BANNER,
     SETUP_STANDALONE_NO_PLATFORMS, SETUP_STANDALONE_PROMPT,
     SETUP_STANDALONE_TOOL_CONFIGURATION_LINES, SETUP_STANDALONE_TOOL_CONFIGURATION_TITLE,
-    SETUP_TERMINAL_BACKEND_ROWS, SETUP_WIZARD_CHOICES, StandaloneSetupAction, StandaloneSetupState,
-    StartupState, TurnState,
+    SETUP_STANDALONE_TOOL_PROVIDER_LINES, SETUP_TERMINAL_BACKEND_ROWS, SETUP_WIZARD_CHOICES,
+    StandaloneSetupAction, StandaloneSetupState, StartupState, TurnState,
 };
 use hades_provider::{
     CancellationToken, ChatMessage, ChatRequest, LocalOpenAiTransport, StreamEvent, TransportError,
@@ -126,7 +126,19 @@ enum SetupOutcome {
 #[derive(Debug)]
 enum SetupTransition {
     NumberedFallback(StandaloneSetupState),
-    ToolConfiguration,
+    ToolConfiguration(StandaloneSetupState),
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum ToolConfigurationEntry {
+    Checklist,
+    SignalInterrupt,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum ToolChecklistOutcome {
+    ProviderBoundary,
+    SignalInterrupt,
 }
 
 fn run_setup() -> Result<SetupOutcome, Box<dyn Error>> {
@@ -155,10 +167,21 @@ fn run_setup() -> Result<SetupOutcome, Box<dyn Error>> {
             wait_for_setup_signal(&cancelled);
             Ok(SetupOutcome::Cancelled)
         }
-        SetupTransition::ToolConfiguration => {
+        SetupTransition::ToolConfiguration(mut wizard) => {
             print_tool_configuration()?;
-            wait_for_setup_signal(&cancelled);
-            Ok(SetupOutcome::SignalInterrupt)
+            match wait_for_tool_configuration_entry(&mut wizard, &cancelled)? {
+                ToolConfigurationEntry::SignalInterrupt => Ok(SetupOutcome::SignalInterrupt),
+                ToolConfigurationEntry::Checklist => {
+                    match run_tool_checklist(&mut wizard, &cancelled)? {
+                        ToolChecklistOutcome::SignalInterrupt => Ok(SetupOutcome::SignalInterrupt),
+                        ToolChecklistOutcome::ProviderBoundary => {
+                            print_tool_provider_boundary()?;
+                            wait_for_setup_signal(&cancelled);
+                            Ok(SetupOutcome::SignalInterrupt)
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -196,12 +219,119 @@ fn setup_choice_loop(
                 return Ok(SetupTransition::NumberedFallback(wizard));
             }
             StandaloneSetupAction::EnteredToolConfiguration => {
-                return Ok(SetupTransition::ToolConfiguration);
+                return Ok(SetupTransition::ToolConfiguration(wizard));
             }
             StandaloneSetupAction::Continue
             | StandaloneSetupAction::Moved
             | StandaloneSetupAction::SkippedProvider
             | StandaloneSetupAction::EnteredPlatformPicker
+            | StandaloneSetupAction::EnteredToolChecklist
+            | StandaloneSetupAction::EnteredToolProviderBoundary
+            | StandaloneSetupAction::Quit => {}
+        }
+    }
+}
+
+fn wait_for_tool_configuration_entry(
+    wizard: &mut StandaloneSetupState,
+    cancelled: &AtomicBool,
+) -> Result<ToolConfigurationEntry, Box<dyn Error>> {
+    // Keep the plain handoff observable with canonical input and echo before
+    // arming the next raw surface. Bytes typed during this short handoff are
+    // retained by the terminal line discipline and become events once raw
+    // mode is enabled.
+    thread::sleep(Duration::from_millis(25));
+    if cancelled.load(Ordering::Relaxed) {
+        return Ok(ToolConfigurationEntry::SignalInterrupt);
+    }
+    enable_raw_mode()?;
+
+    loop {
+        if cancelled.load(Ordering::Relaxed) {
+            disable_raw_mode()?;
+            return Ok(ToolConfigurationEntry::SignalInterrupt);
+        }
+        if !event::poll(Duration::from_millis(250))? {
+            continue;
+        }
+        let Event::Key(key) = event::read()? else {
+            continue;
+        };
+        if key.kind != KeyEventKind::Press {
+            continue;
+        }
+        let Some(mapped) = map_key(key) else {
+            continue;
+        };
+        if mapped == Key::Ctrl('c') {
+            disable_raw_mode()?;
+            return Ok(ToolConfigurationEntry::SignalInterrupt);
+        }
+        match wizard.handle_key(mapped) {
+            StandaloneSetupAction::EnteredToolChecklist => {
+                return Ok(ToolConfigurationEntry::Checklist);
+            }
+            StandaloneSetupAction::Continue
+            | StandaloneSetupAction::Moved
+            | StandaloneSetupAction::EnteredFullSetupContinuation
+            | StandaloneSetupAction::SkippedProvider
+            | StandaloneSetupAction::EnteredPlatformPicker
+            | StandaloneSetupAction::EnteredToolConfiguration
+            | StandaloneSetupAction::EnteredToolProviderBoundary
+            | StandaloneSetupAction::EnteredFallback
+            | StandaloneSetupAction::Quit => {}
+        }
+    }
+}
+
+fn run_tool_checklist(
+    wizard: &mut StandaloneSetupState,
+    cancelled: &AtomicBool,
+) -> Result<ToolChecklistOutcome, Box<dyn Error>> {
+    let mut stdout = io::stdout();
+    execute!(stdout, EnterAlternateScreen)?;
+    let backend = CrosstermBackend::new(stdout);
+    let mut terminal = Terminal::new(backend)?;
+    let result = tool_checklist_loop(&mut terminal, wizard, cancelled);
+    let cleanup = restore_terminal(&mut terminal);
+    cleanup?;
+    result
+}
+
+fn tool_checklist_loop(
+    terminal: &mut Terminal<CrosstermBackend<io::Stdout>>,
+    wizard: &mut StandaloneSetupState,
+    cancelled: &AtomicBool,
+) -> Result<ToolChecklistOutcome, Box<dyn Error>> {
+    loop {
+        terminal.draw(|frame| draw_standalone_setup(frame, wizard))?;
+        if cancelled.load(Ordering::Relaxed) {
+            return Ok(ToolChecklistOutcome::SignalInterrupt);
+        }
+        if !event::poll(Duration::from_millis(250))? {
+            continue;
+        }
+        let Event::Key(key) = event::read()? else {
+            continue;
+        };
+        if key.kind != KeyEventKind::Press {
+            continue;
+        }
+        let Some(mapped) = map_key(key) else {
+            continue;
+        };
+        match wizard.handle_key(mapped) {
+            StandaloneSetupAction::EnteredToolProviderBoundary => {
+                return Ok(ToolChecklistOutcome::ProviderBoundary);
+            }
+            StandaloneSetupAction::Continue
+            | StandaloneSetupAction::Moved
+            | StandaloneSetupAction::EnteredFullSetupContinuation
+            | StandaloneSetupAction::SkippedProvider
+            | StandaloneSetupAction::EnteredPlatformPicker
+            | StandaloneSetupAction::EnteredToolConfiguration
+            | StandaloneSetupAction::EnteredToolChecklist
+            | StandaloneSetupAction::EnteredFallback
             | StandaloneSetupAction::Quit => {}
         }
     }
@@ -236,6 +366,14 @@ fn print_tool_configuration() -> io::Result<()> {
     writeln!(stdout, "{SETUP_STANDALONE_NO_PLATFORMS}")?;
     writeln!(stdout, "{SETUP_STANDALONE_TOOL_CONFIGURATION_TITLE}")?;
     for line in SETUP_STANDALONE_TOOL_CONFIGURATION_LINES {
+        writeln!(stdout, "{line}")?;
+    }
+    stdout.flush()
+}
+
+fn print_tool_provider_boundary() -> io::Result<()> {
+    let mut stdout = io::stdout();
+    for line in SETUP_STANDALONE_TOOL_PROVIDER_LINES {
         writeln!(stdout, "{line}")?;
     }
     stdout.flush()

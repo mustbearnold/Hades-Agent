@@ -9,7 +9,9 @@ use hades_core::{
     SETUP_STANDALONE_CONTROLS, SETUP_STANDALONE_NO_PLATFORMS, SETUP_STANDALONE_PROMPT,
     SETUP_STANDALONE_PROVIDER_PROMPT, SETUP_STANDALONE_PROVIDER_TITLE,
     SETUP_STANDALONE_TERMINAL_LINES, SETUP_STANDALONE_TERMINAL_TITLE,
-    SETUP_STANDALONE_TOOL_CONFIGURATION_LINES, SETUP_STANDALONE_TOOL_CONFIGURATION_TITLE,
+    SETUP_STANDALONE_TOOL_CHECKLIST_CONTROLS, SETUP_STANDALONE_TOOL_CHECKLIST_ROWS,
+    SETUP_STANDALONE_TOOL_CHECKLIST_TITLE, SETUP_STANDALONE_TOOL_CONFIGURATION_LINES,
+    SETUP_STANDALONE_TOOL_CONFIGURATION_TITLE, SETUP_STANDALONE_TOOL_PROVIDER_LINES,
     SETUP_TERMINAL_BACKEND_CONTROLS, SETUP_TERMINAL_BACKEND_ROWS, SETUP_TERMINAL_BACKEND_TITLE,
     SETUP_WIZARD_CHOICES, SetupWizardSurface, StandaloneSetupState, StartupState, TurnState,
 };
@@ -92,6 +94,14 @@ pub fn draw_standalone_setup(frame: &mut Frame<'_>, wizard: &StandaloneSetupStat
     }
     if wizard.is_tool_configuration() {
         draw_standalone_tool_configuration(frame);
+        return;
+    }
+    if wizard.is_tool_checklist() {
+        draw_standalone_tool_checklist(frame, wizard);
+        return;
+    }
+    if wizard.is_tool_provider_boundary() {
+        draw_standalone_tool_provider_boundary(frame);
         return;
     }
     if wizard.is_numbered_fallback() && wizard.terminal_backend_fallback() {
@@ -187,6 +197,32 @@ fn draw_standalone_tool_configuration(frame: &mut Frame<'_>) {
             .iter()
             .map(|line| Line::styled(*line, HERMES_PALETTE.secondary())),
     );
+    frame.render_widget(Paragraph::new(Text::from(lines)), frame.area());
+}
+
+fn draw_standalone_tool_checklist(frame: &mut Frame<'_>, wizard: &StandaloneSetupState) {
+    let mut lines = vec![
+        Line::styled(SETUP_STANDALONE_TOOL_CHECKLIST_TITLE, HERMES_PALETTE.brand()),
+        Line::styled(SETUP_STANDALONE_TOOL_CHECKLIST_CONTROLS, HERMES_PALETTE.secondary()),
+    ];
+    lines.extend(SETUP_STANDALONE_TOOL_CHECKLIST_ROWS.iter().enumerate().map(|(index, row)| {
+        let cursor = if index == wizard.tool_cursor() { "→" } else { " " };
+        let enabled = if wizard.tool_enabled(index) { "✓" } else { " " };
+        let style = if index == wizard.tool_cursor() {
+            HERMES_PALETTE.ready().add_modifier(Modifier::BOLD)
+        } else {
+            HERMES_PALETTE.secondary()
+        };
+        Line::styled(format!(" {cursor} [{enabled}] {row}"), style)
+    }));
+    frame.render_widget(Paragraph::new(Text::from(lines)), frame.area());
+}
+
+fn draw_standalone_tool_provider_boundary(frame: &mut Frame<'_>) {
+    let lines = SETUP_STANDALONE_TOOL_PROVIDER_LINES
+        .iter()
+        .map(|line| Line::styled(*line, HERMES_PALETTE.secondary()))
+        .collect::<Vec<_>>();
     frame.render_widget(Paragraph::new(Text::from(lines)), frame.area());
 }
 
@@ -994,6 +1030,69 @@ mod tests {
         assert!(rendered.contains("Hermes Tool Configuration"));
         assert!(rendered.contains("Enable or disable tools per platform."));
         assert!(rendered.contains("Tools that need API keys will be configured when enabled."));
+    }
+
+    #[test]
+    fn standalone_tool_checklist_renders_observed_title_controls_and_rows() {
+        let backend = TestBackend::new(HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let mut terminal = Terminal::new(backend).expect("TestBackend construction is infallible");
+        let mut wizard = StandaloneSetupState::default();
+        wizard.handle_key(hades_core::Key::Down);
+        wizard.handle_key(hades_core::Key::Enter);
+        wizard.handle_key(hades_core::Key::Ctrl('c'));
+        wizard.handle_key(hades_core::Key::Enter);
+        wizard.handle_key(hades_core::Key::Ctrl('c'));
+        wizard.handle_key(hades_core::Key::Escape);
+        terminal
+            .draw(|frame| draw_standalone_setup(frame, &wizard))
+            .expect("rendering is infallible");
+
+        let rendered = terminal
+            .backend()
+            .buffer()
+            .content()
+            .iter()
+            .map(|cell| cell.symbol())
+            .collect::<String>();
+        assert!(rendered.contains("Tools for 🖥"));
+        assert!(rendered.contains("CLI"));
+        assert!(rendered.contains("SPACE toggle"));
+        assert!(rendered.contains("ENTER confirm"));
+        assert!(rendered.contains("ESC cancel"));
+        assert!(rendered.contains("Web Search & Scraping"));
+        assert!(rendered.contains("Browser Automation"));
+        assert!(rendered.contains("Terminal & Processes"));
+        assert!(rendered.contains("File Operations"));
+        assert!(rendered.contains("→ [✓]"));
+    }
+
+    #[test]
+    fn standalone_tool_provider_boundary_renders_the_observed_landmarks() {
+        let backend = TestBackend::new(HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let mut terminal = Terminal::new(backend).expect("TestBackend construction is infallible");
+        let mut wizard = StandaloneSetupState::default();
+        wizard.handle_key(hades_core::Key::Down);
+        wizard.handle_key(hades_core::Key::Enter);
+        wizard.handle_key(hades_core::Key::Ctrl('c'));
+        wizard.handle_key(hades_core::Key::Enter);
+        wizard.handle_key(hades_core::Key::Ctrl('c'));
+        wizard.handle_key(hades_core::Key::Escape);
+        wizard.handle_key(hades_core::Key::Ctrl('c'));
+        terminal
+            .draw(|frame| draw_standalone_setup(frame, &wizard))
+            .expect("rendering is infallible");
+
+        let rendered = terminal
+            .backend()
+            .buffer()
+            .content()
+            .iter()
+            .map(|cell| cell.symbol())
+            .collect::<String>();
+        assert!(rendered.contains("Configuring 6 tool(s):"));
+        assert!(rendered.contains("Browser Automation"));
+        assert!(rendered.contains("Computer Use (macOS/Windows/Linux)"));
+        assert!(rendered.contains("Browser Automation - Choose a provider"));
     }
 
     #[test]

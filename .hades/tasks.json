@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-02T00:57:51Z",
+  "updated_at": "2026-08-02T01:24:29Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -4376,6 +4376,68 @@
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/hermes-tool-provider-boundary-probe.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-083",
+      "title": "Implement bounded Tool Configuration checklist and provider handoff",
+      "status": "complete",
+      "priority": 10,
+      "lane": "interaction",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-082"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "typed_core_state",
+        "focused_tests",
+        "direct_pty_replay",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Extend standalone `hades setup` from the observed Hermes Tool Configuration handoff so Escape enters a raw CLI checklist with the exact bounded title `Tools for \ud83d\udda5\ufe0f  CLI`, controls `SPACE toggle`, `ENTER confirm`, `ESC cancel`, and the observed Web Search & Scraping, Browser Automation, Terminal & Processes, and File Operations rows.",
+        "Add typed checklist and first-install provider-boundary state transitions. A bounded non-mutating navigation key must not toggle or confirm a tool; the first Ctrl+C from the checklist must restore canonical input and echo, keep setup alive, and render Configuring 6 tool(s) plus the observed Browser Automation provider boundary landmarks.",
+        "Keep provider inventories, provider selection, API keys, OAuth, network behavior, tool persistence, later cancellation, and unobserved cursor redraw semantics outside the implementation claim. This evidence scope must not disable, slow, or otherwise nerf existing Hades capabilities outside the new bounded setup seam.",
+        "Add focused core/TUI/CLI tests, a sanitized Hades OBS-0078 fixture, a direct-PTY replay asserting the exact safe sequence, raw-mode lifecycle, config/artifact invariants, process liveness, and no submission, then update parity/context/readme/gates.",
+        "Run the targeted replay and complete no-skip just verify gate before completion; preserve existing standalone Escape, Full setup, platform cancellation, configured TUI, provider streaming, and launcher behavior."
+      ],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-cli/src/main.rs",
+        "crates/hades-tui/src/lib.rs",
+        "scripts/replay_standalone_tool_provider_boundary.py",
+        "tests/fixtures/parity/OBS-0078-hades-tool-provider-boundary.json",
+        "docs/parity/observations/OBS-0078-hades-tool-provider-boundary-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hades-tool-provider-boundary-replay.json"
+      ],
+      "ready_at": "2026-08-02T00:59:10Z",
+      "claimed_by": "tool-provider-boundary-implementer",
+      "claimed_at": "2026-08-02T01:01:08Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Implemented and verified the bounded standalone Tool Configuration checklist and Browser Automation provider handoff. Typed Hades state, focused tests, direct PTY OBS-0078 replay, sanitized fixture, docs, and the complete no-skip just verify gate all pass; existing capabilities remain uncapped and unchanged outside this seam.",
+        "completed_at": "2026-08-02T01:24:29Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-cli/src/main.rs",
+          "crates/hades-tui/src/lib.rs",
+          "scripts/replay_standalone_tool_provider_boundary.py",
+          "tests/fixtures/parity/OBS-0078-hades-tool-provider-boundary.json",
+          "docs/parity/observations/OBS-0078-hades-tool-provider-boundary-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hades-tool-provider-boundary-replay.json"
         ]
       }
     }

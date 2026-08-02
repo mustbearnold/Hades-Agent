@@ -193,6 +193,28 @@ pub const SETUP_STANDALONE_TOOL_CONFIGURATION_LINES: [&str; 2] = [
     "Enable or disable tools per platform.",
     "Tools that need API keys will be configured when enabled.",
 ];
+pub const SETUP_STANDALONE_TOOL_CHECKLIST_TITLE: &str = "Tools for 🖥️  CLI";
+pub const SETUP_STANDALONE_TOOL_CHECKLIST_CONTROLS: &str =
+    "↑↓ navigate  SPACE toggle  ENTER confirm  ESC cancel";
+pub const SETUP_STANDALONE_TOOL_CHECKLIST_ROWS: [&str; 4] = [
+    "🔍  Web Search & Scraping  (web_search, web_extract)",
+    "🌐  Browser Automation  (navigate, click, type, scroll)",
+    "💻  Terminal & Processes  (terminal, process)",
+    "📁  File Operations  (read, write, patch, search)",
+];
+pub const SETUP_STANDALONE_TOOL_PROVIDER_LINES: [&str; 11] = [
+    "Configuring 6 tool(s):",
+    "  • 🌐 Browser Automation",
+    "  • 🖱️  Computer Use (macOS/Windows/Linux)",
+    "  • 🎨 Image Generation",
+    "  • 🔊 Text-to-Speech",
+    "  • 👁️  Vision / Image Analysis",
+    "  • 🔍 Web Search & Scraping",
+    "  You can skip any tool you don't need right now.",
+    "",
+    "",
+    "  --- 🌐 Browser Automation - Choose a provider ---",
+];
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub enum StandaloneSetupSurface {
@@ -202,6 +224,8 @@ pub enum StandaloneSetupSurface {
     TerminalBackend,
     PlatformPicker,
     ToolConfiguration,
+    ToolChecklist,
+    ToolProviderBoundary,
     NumberedFallback,
 }
 
@@ -220,6 +244,8 @@ pub enum StandaloneSetupAction {
     SkippedProvider,
     EnteredPlatformPicker,
     EnteredToolConfiguration,
+    EnteredToolChecklist,
+    EnteredToolProviderBoundary,
     EnteredFallback,
     Quit,
 }
@@ -231,6 +257,8 @@ pub struct StandaloneSetupState {
     cursor: usize,
     selected: usize,
     terminal_backend_cursor: usize,
+    tool_cursor: usize,
+    tool_enabled: [bool; SETUP_STANDALONE_TOOL_CHECKLIST_ROWS.len()],
 }
 
 impl Default for StandaloneSetupState {
@@ -241,6 +269,8 @@ impl Default for StandaloneSetupState {
             cursor: 0,
             selected: 0,
             terminal_backend_cursor: SETUP_TERMINAL_BACKEND_ROWS.len() - 1,
+            tool_cursor: 0,
+            tool_enabled: [true; SETUP_STANDALONE_TOOL_CHECKLIST_ROWS.len()],
         }
     }
 }
@@ -262,6 +292,14 @@ impl StandaloneSetupState {
         self.terminal_backend_cursor
     }
 
+    pub fn tool_cursor(&self) -> usize {
+        self.tool_cursor
+    }
+
+    pub fn tool_enabled(&self, index: usize) -> bool {
+        self.tool_enabled.get(index).copied().unwrap_or(false)
+    }
+
     pub fn terminal_backend_fallback(&self) -> bool {
         self.fallback == StandaloneSetupFallback::TerminalBackend
     }
@@ -280,6 +318,14 @@ impl StandaloneSetupState {
 
     pub fn is_tool_configuration(&self) -> bool {
         self.surface == StandaloneSetupSurface::ToolConfiguration
+    }
+
+    pub fn is_tool_checklist(&self) -> bool {
+        self.surface == StandaloneSetupSurface::ToolChecklist
+    }
+
+    pub fn is_tool_provider_boundary(&self) -> bool {
+        self.surface == StandaloneSetupSurface::ToolProviderBoundary
     }
 
     pub fn is_numbered_fallback(&self) -> bool {
@@ -346,7 +392,34 @@ impl StandaloneSetupState {
                 }
                 _ => StandaloneSetupAction::Continue,
             },
-            StandaloneSetupSurface::ToolConfiguration => StandaloneSetupAction::Continue,
+            StandaloneSetupSurface::ToolConfiguration => match key {
+                Key::Escape => {
+                    self.surface = StandaloneSetupSurface::ToolChecklist;
+                    StandaloneSetupAction::EnteredToolChecklist
+                }
+                _ => StandaloneSetupAction::Continue,
+            },
+            StandaloneSetupSurface::ToolChecklist => match key {
+                Key::Down | Key::Char('j') => {
+                    self.tool_cursor =
+                        (self.tool_cursor + 1).min(SETUP_STANDALONE_TOOL_CHECKLIST_ROWS.len() - 1);
+                    StandaloneSetupAction::Moved
+                }
+                Key::Up | Key::Char('k') => {
+                    self.tool_cursor = self.tool_cursor.saturating_sub(1);
+                    StandaloneSetupAction::Moved
+                }
+                Key::Char(' ') => {
+                    self.tool_enabled[self.tool_cursor] = !self.tool_enabled[self.tool_cursor];
+                    StandaloneSetupAction::Continue
+                }
+                Key::Ctrl('c') => {
+                    self.surface = StandaloneSetupSurface::ToolProviderBoundary;
+                    StandaloneSetupAction::EnteredToolProviderBoundary
+                }
+                _ => StandaloneSetupAction::Continue,
+            },
+            StandaloneSetupSurface::ToolProviderBoundary => StandaloneSetupAction::Continue,
             StandaloneSetupSurface::NumberedFallback => match key {
                 Key::Ctrl('c') => StandaloneSetupAction::Quit,
                 _ => StandaloneSetupAction::Continue,
@@ -1208,6 +1281,51 @@ mod tests {
             StandaloneSetupAction::EnteredToolConfiguration
         );
         assert!(setup.is_tool_configuration());
+    }
+
+    #[test]
+    fn standalone_tool_configuration_escape_enters_a_non_submitting_checklist() {
+        let mut setup = StandaloneSetupState::default();
+
+        setup.handle_key(Key::Down);
+        setup.handle_key(Key::Enter);
+        setup.handle_key(Key::Ctrl('c'));
+        setup.handle_key(Key::Enter);
+        assert_eq!(
+            setup.handle_key(Key::Ctrl('c')),
+            StandaloneSetupAction::EnteredToolConfiguration
+        );
+        assert_eq!(setup.handle_key(Key::Escape), StandaloneSetupAction::EnteredToolChecklist);
+        assert!(setup.is_tool_checklist());
+        assert_eq!(setup.tool_cursor(), 0);
+        assert!(setup.tool_enabled(0));
+        assert_eq!(setup.handle_key(Key::Char('j')), StandaloneSetupAction::Moved);
+        assert_eq!(setup.tool_cursor(), 1);
+        assert!(setup.tool_enabled(0));
+        assert!(setup.tool_enabled(1));
+        assert_eq!(
+            setup.handle_key(Key::Ctrl('c')),
+            StandaloneSetupAction::EnteredToolProviderBoundary
+        );
+        assert!(setup.is_tool_provider_boundary());
+    }
+
+    #[test]
+    fn standalone_tool_checklist_space_is_local_and_does_not_confirm() {
+        let mut setup = StandaloneSetupState::default();
+
+        setup.handle_key(Key::Down);
+        setup.handle_key(Key::Enter);
+        setup.handle_key(Key::Ctrl('c'));
+        setup.handle_key(Key::Enter);
+        setup.handle_key(Key::Ctrl('c'));
+        setup.handle_key(Key::Escape);
+
+        assert_eq!(setup.handle_key(Key::Char(' ')), StandaloneSetupAction::Continue);
+        assert!(!setup.tool_enabled(0));
+        assert!(setup.is_tool_checklist());
+        assert_eq!(setup.handle_key(Key::Enter), StandaloneSetupAction::Continue);
+        assert!(setup.is_tool_checklist());
     }
 
     #[test]

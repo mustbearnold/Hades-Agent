@@ -408,6 +408,16 @@ progress from August 1, 2026 through 2027.
   entered; the provider list, discovery subprocess behavior, network/OAuth
   activity, and later cancellation remain unknown. The probe teardown is
   harness-only and does not claim a Hermes product exit.
+- HAD-083 carries that bounded route into Hades. Escape opens the raw
+  `Tools for 🖥️  CLI` checklist with the observed controls and four stable rows;
+  one `j` remains navigation-only, and the first checklist Ctrl+C restores
+  canonical input and echo while keeping setup alive at the
+  `Configuring 6 tool(s)` / Browser Automation provider boundary. The local
+  checklist enable state is typed and ephemeral until persistence is observed;
+  provider inventories, credentials, OAuth, networking, successful save
+  behavior, later cancellation, and cursor-redraw timing remain outside the
+  claim. This evidence boundary does not cap Hades performance or existing
+  capabilities.
 
 ## Unknown until observed
 
