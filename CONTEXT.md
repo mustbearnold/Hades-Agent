@@ -386,6 +386,13 @@ progress from August 1, 2026 through 2027.
   setup alive; the second Ctrl+C exits with status 130. Platform selection,
   platform-specific setup, tool enablement, credentials, OAuth, networking, and
   successful save behavior remain unimplemented.
+- HAD-080 extends the Hermes evidence one safe action beyond that handoff. The
+  plain Tool Configuration surface is followed by Escape into a raw `Tools for
+  CLI` checklist with Space/Enter/Escape controls and stable Web Search,
+  Browser, Terminal, and File rows. No row or provider is submitted; bounded
+  repeated Ctrl+C cleanup exits with status 130 and leaves the normalized
+  config unchanged. Hades must not claim later tool/provider configuration
+  until it is separately observed.
 
 ## Unknown until observed
 

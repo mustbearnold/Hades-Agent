@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-01T23:39:04Z",
+  "updated_at": "2026-08-02T00:13:31Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -4211,6 +4211,61 @@
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/hades-standalone-terminal-platform-replay.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-080",
+      "title": "Capture Hermes standalone Tool Configuration action boundary",
+      "status": "complete",
+      "priority": 10,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-079"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "hermes_direct_pty",
+        "sanitized_fixture",
+        "replayable_tool_configuration_boundary",
+        "full_verify"
+      ],
+      "acceptance": [
+        "In the pinned Hermes reference, invoke standalone hermes setup from a fresh synthetic home, choose only Full setup, skip the unconfigured provider with Ctrl+C, accept only the displayed Keep current (local) backend, and cancel the unconfigured platform picker without selecting a platform.",
+        "Record the first stable plain Hermes Tool Configuration surface, exact safe action sequence, terminal flags, alternate-screen transition, process liveness, config/artifact shape, and final bounded cleanup status without entering credentials, selecting a platform, starting OAuth, or requesting external network behavior.",
+        "Exercise only a bounded non-secret action from Tool Configuration plus Ctrl+C cleanup; if the action opens an unobserved selection or configuration surface, record it as an explicit boundary and stop before any platform, tool, secret, or provider value is submitted.",
+        "Add provenance, a sanitized OBS-0075 fixture, a repeatable direct-PTY probe, and an observation document; update the parity matrix/context/readme and wire fixture validation and the probe into just verify.",
+        "Run the targeted probe and complete no-skip just verify gate, recording only the bounded Hermes Tool Configuration evidence before completion."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_standalone_tool_configuration.py",
+        "tests/fixtures/parity/OBS-0075-hermes-standalone-tool-configuration.json",
+        "docs/parity/observations/OBS-0075-hermes-standalone-tool-configuration-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hermes-standalone-tool-configuration-probe.json"
+      ],
+      "ready_at": "2026-08-02T00:00:00Z",
+      "attempts": 1,
+      "claimed_by": "standalone-tool-configuration",
+      "claimed_at": "2026-08-01T23:40:46Z",
+      "result": {
+        "summary": "Captured Hermes standalone Tool Configuration handoff and bounded Escape action boundary without submitting tools, platforms, credentials, or providers.",
+        "completed_at": "2026-08-02T00:13:31Z",
+        "evidence": [
+          "scripts/probe_hermes_standalone_tool_configuration.py",
+          "tests/fixtures/parity/OBS-0075-hermes-standalone-tool-configuration.json",
+          "docs/parity/observations/OBS-0075-hermes-standalone-tool-configuration-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hermes-standalone-tool-configuration-probe.json"
         ]
       }
     }
