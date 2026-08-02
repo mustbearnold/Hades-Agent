@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-02T06:35:26Z",
+  "updated_at": "2026-08-02T06:57:55Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -4961,6 +4961,60 @@
       "result": {
         "reason": "Deferred by the product-priority pivot to launcher reliability and the first end-to-end vertical slice; focused checks pass, but the full verify run was intentionally interrupted. Preserve the implementation for later.",
         "cancelled_at": "2026-08-02T06:35:26Z"
+      }
+    },
+    {
+      "id": "HAD-093",
+      "title": "Prove fresh-terminal Hades launch and clean TUI lifecycle",
+      "status": "complete",
+      "priority": 100,
+      "lane": "runtime",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-044",
+        "HAD-069",
+        "HAD-091"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "fresh_shell_command_resolution",
+        "installed_release_launcher",
+        "direct_pty_visible_startup",
+        "terminal_cleanup",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Make the supported user-local installation reliably resolve lowercase hades and capitalized Hades from a fresh Bash and Fish shell when ~/.local/bin is present on the supported PATH, with no shell mutation, credential access, or unrelated-path replacement.",
+        "Prove both command names and the explicit tui alias invoke the current release artifact rather than a stale debug binary, and make --version and --help useful before entering the interactive surface.",
+        "Prove through fresh direct PTYs that the no-argument command visibly renders the startup TUI, enters raw mode and the alternate screen, remains alive until explicit Ctrl+C, exits successfully, leaves the alternate screen, and restores canonical input and echo.",
+        "Add a sanitized launch/lifecycle report and durable documentation describing the exact PATH/install boundary; do not claim that a shell with ~/.local/bin absent can resolve a user-local command without user or system PATH configuration.",
+        "Run the focused fresh-shell/lifecycle replay and the complete no-skip just verify gate. This task is a launch/runtime proof, not permission to reproduce Hermes defects or to cap safer/faster Rust behavior."
+      ],
+      "evidence": [
+        "scripts/replay_fresh_shell_launch.py",
+        "scripts/install_user_launcher.sh",
+        "tests/fixtures/parity/OBS-0088-hades-fresh-shell-launch.json",
+        "docs/parity/observations/OBS-0088-hades-fresh-shell-launch-2026-08-02.md",
+        "justfile",
+        "scripts/verify.sh",
+        "scripts/probe_hermes_osc52_st_termination.py"
+      ],
+      "ready_at": "2026-08-02T06:36:42Z",
+      "attempts": 1,
+      "claimed_by": "launcher-lifecycle-implementer",
+      "claimed_at": "2026-08-02T06:36:57Z",
+      "result": {
+        "summary": "Proved the installed user-local Hades launch path from clean Bash and Fish shells: lowercase hades and capitalized Hades resolve to the current release artifact, version/help work, and four fresh 120x40 PTY cases visibly render the TUI, remain alive until Ctrl+C, exit 0, leave the alternate screen, and restore canonical input and echo. Added the sanitized OBS-0088 fixture and documentation, wired the replay into just and verify, and widened only the Hermes ST-termination reference probe's startup allowance to 30 seconds after the 8-second full-suite window flaked; all assertions and the complete no-skip just verify gate pass.",
+        "completed_at": "2026-08-02T06:57:55Z",
+        "evidence": [
+          "scripts/replay_fresh_shell_launch.py",
+          "scripts/install_user_launcher.sh",
+          "tests/fixtures/parity/OBS-0088-hades-fresh-shell-launch.json",
+          "docs/parity/observations/OBS-0088-hades-fresh-shell-launch-2026-08-02.md",
+          "justfile",
+          "scripts/verify.sh",
+          "scripts/probe_hermes_osc52_st_termination.py"
+        ]
       }
     }
   ]

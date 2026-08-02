@@ -181,6 +181,13 @@ progress from August 1, 2026 through 2027.
   terminal restoration. The user-local release artifact still requires an
   explicit `just install-user` refresh, and an existing shell must have
   `~/.local/bin` on `PATH`.
+- HAD-093 closes the user-facing launcher proof gap: clean Bash and Fish shells
+  resolve both `hades` and `Hades` to the current release artifact when
+  `~/.local/bin` is on `PATH`, and fresh PTYs show the visible startup TUI,
+  raw/alternate-screen ownership, explicit Ctrl+C exit, and terminal
+  restoration. The replay uses synthetic HOME state and does not mutate shell
+  configuration; a PATH that omits `~/.local/bin` remains a configuration
+  boundary rather than a bug the launcher can solve itself.
 - HAD-045 captures the bounded Hermes Full setup provider menu before any
   provider selection: current model/active provider, visible loopback and
   custom rows, reversible Down navigation, clean Ctrl+C, unchanged config

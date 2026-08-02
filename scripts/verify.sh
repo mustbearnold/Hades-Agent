@@ -51,6 +51,7 @@ python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0084-had
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0085-hermes-tool-provider-inventory-selection.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0086-hades-tool-provider-inventory-selection.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0087-hades-empty-platform-confirmation.json
+python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0088-hades-fresh-shell-launch.json
 cargo fmt --all -- --check
 cargo check --workspace --all-targets --locked
 cargo clippy --workspace --all-targets --locked -- -D warnings
@@ -71,6 +72,7 @@ python3 scripts/replay_standalone_tool_provider_inventory_navigation.py --binary
 python3 scripts/replay_standalone_tool_provider_inventory_selection.py --binary target/debug/hades --report .hades/runtime/hades-tool-provider-inventory-selection-replay.json --timeout 5
 cargo build --locked --release --package hades-cli
 bash scripts/install_user_launcher.sh
+python3 scripts/replay_fresh_shell_launch.py --report .hades/runtime/fresh-shell-launch-replay.json
 python3 scripts/replay_unconfigured_help.py --binary "$HOME/.local/bin/hades" --report .hades/runtime/installed-help-setup-required-hades.json --timeout 12
 python3 scripts/replay_unconfigured_help.py --binary "$HOME/.local/bin/Hades" --report .hades/runtime/installed-help-setup-required-Hades.json --timeout 12
 python3 scripts/replay_standalone_setup.py --binary "$HOME/.local/bin/hades" --report .hades/runtime/installed-standalone-setup-hades.json --timeout 5

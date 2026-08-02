@@ -23,6 +23,11 @@ replay-cli-launch:
     cargo build --locked --package hades-cli
     python3 scripts/replay_cli_launch.py --binary target/debug/hades --report .hades/runtime/cli-launch-replay.json
 
+replay-fresh-shell-launch:
+    cargo build --locked --release --package hades-cli
+    bash scripts/install_user_launcher.sh
+    python3 scripts/replay_fresh_shell_launch.py --report .hades/runtime/fresh-shell-launch-replay.json
+
 replay-differential:
     cargo build --locked --package hades-cli
     python3 scripts/differential_replay.py --binary target/debug/hades --report .hades/runtime/differential-replay.json

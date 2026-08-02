@@ -80,6 +80,9 @@ an unrelated existing path. The existing shell must already include
 `~/.local/bin` on `PATH`.
 After source changes, rerun `just install-user`; the launcher points at the
 release artifact and is not refreshed by a debug build or `cargo run`.
+`just replay-fresh-shell-launch` verifies both command names from clean Bash and
+Fish shells, checks that they resolve to the current release artifact, and
+proves the installed TUI renders and restores the terminal after Ctrl+C.
 
 The development contract is in [`AGENTS.md`](AGENTS.md). The task ledger and
 bounded execution policy are in [`.hades/`](.hades/), and the role/workflow
@@ -93,6 +96,7 @@ just check                    # complete local gate
 just run                      # interactive TUI
 just run setup                # standalone first-run setup entry
 just replay-cli-launch        # no-argument and explicit-tui PTY launch replay
+just replay-fresh-shell-launch # fresh Bash/Fish command resolution and installed TUI lifecycle
 just replay-unconfigured-help # delayed /help setup-required PTY replay
 just replay-standalone-setup  # standalone hades setup PTY replay
 just replay-standalone-full-setup # standalone Full setup continuation replay

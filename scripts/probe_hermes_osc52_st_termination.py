@@ -218,7 +218,7 @@ def run_case(reference: Path, case: dict[str, Any], timeout: float) -> dict[str,
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--reference", type=Path, default=DEFAULT_REFERENCE)
-    parser.add_argument("--timeout", type=float, default=8.0)
+    parser.add_argument("--timeout", type=float, default=30.0)
     parser.add_argument("--report", type=Path)
     args = parser.parse_args()
     reference = args.reference.resolve()

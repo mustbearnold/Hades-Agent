@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0088",
+  "reference_observation": "OBS-0043",
+  "surface": "hades-fresh-shell-launch-and-tui-lifecycle",
+  "reference": {
+    "product": "Hades Agent",
+    "version": "workspace",
+    "source_commit": "962e5d73c475b5dea0d7519f64c04e212c934ec9",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "clean Bash/Fish shells plus fresh direct PTYs"
+    },
+    "capture": "fresh-shell command resolution and installed release launcher replay"
+  },
+  "normalization": [
+    "The home directory, launcher directory, release binary path, PTY path, process identifiers, timestamps, and raw ANSI redraw bytes are omitted or represented by stable markers.",
+    "Each shell receives only a synthetic HOME/HERMES_HOME and a PATH containing the user-local launcher directory followed by /usr/bin and /bin; no shell profile or configuration file is read.",
+    "The replay checks lowercase hades and capitalized Hades resolution, version/help output, release symlink targets, startup landmarks, raw-mode flags, alternate-screen lifecycle, explicit Ctrl+C exit, and terminal restoration.",
+    "The user-local launcher is intentionally not treated as a system command: a shell whose PATH omits ~/.local/bin remains outside this proof."
+  ],
+  "steps": [
+    {
+      "id": "fresh-shell-resolution",
+      "precondition": "Current executable release installed as hades and Hades in ~/.local/bin; clean Bash and Fish shells receive ~/.local/bin on PATH.",
+      "input_sequence": [
+        {"kind": "command", "value": "bash --noprofile --norc -c 'hades --version; Hades --help'", "bytes_hex": "62 61 73 68 20 2d 2d 6e 6f 70 72 6f 66 69 6c 65 20 2d 2d 6e 6f 72 63 20 2d 63"},
+        {"kind": "command", "value": "fish --no-config -c 'hades --version; Hades --help'", "bytes_hex": "66 69 73 68 20 2d 2d 6e 6f 2d 63 6f 6e 66 69 67 20 2d 63"}
+      ],
+      "output": {
+        "status": "passed",
+        "resolved_commands": ["~/.local/bin/hades", "~/.local/bin/Hades"],
+        "version_marker": "Hades Agent 0.1.0",
+        "help_marker": "Usage: hades [tui|setup|--snapshot|--help|--version]"
+      }
+    },
+    {
+      "id": "fresh-shell-tui-lifecycle",
+      "precondition": "Clean Bash/Fish PTYs at 120x40 with isolated synthetic HERMES_HOME and the installed launchers on PATH.",
+      "input_sequence": [
+        {"kind": "command", "value": "hades", "bytes_hex": "68 61 64 65 73"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "exit after visible startup"},
+        {"kind": "command", "value": "Hades tui", "bytes_hex": "48 61 64 65 73 20 74 75 69"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "exit after visible startup"}
+      ],
+      "output": {
+        "status": "passed",
+        "startup_markers": ["Hermes Agent", "Nous Research", "Available Tools", "Available Skills"],
+        "raw_mode": {"canonical": false, "echo": false},
+        "process_alive_until": "explicit Ctrl+C",
+        "exit": {"kind": "exit", "code": 0},
+        "alternate_screen_entered": true,
+        "alternate_screen_left": true,
+        "terminal_restored": {"canonical": true, "echo": true}
+      }
+    }
+  ],
+  "unknowns": [
+    "A shell without ~/.local/bin on PATH cannot resolve a user-local command; system-wide installation, shell-profile mutation, and other operating systems are outside this task.",
+    "Provider credentials, OAuth, network access, model selection, persistence, and streamed responses remain outside the launcher/lifecycle proof."
+  ],
+  "passed": true
+}
