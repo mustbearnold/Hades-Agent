@@ -5,7 +5,8 @@
 - Reference checkout: `/tmp/hades-hermes-ref-X3bLd0`
 - Source commit: `e444d165807f489b5c1ab8e4a612c8d09c2e67a2`
 - Capture: direct PTY at 120x40, synthetic `SSH_TTY`, one synthetic `TMUX` or
-  `STY` marker per fresh process, synthetic `xclip`, and raw OSC52/DA1 bytes
+  `STY` marker per fresh process, a loopback-only synthetic provider config,
+  synthetic `xclip`, and raw OSC52/DA1 bytes
 - Probe: `scripts/probe_hermes_osc52_multiplexer.py`
 
 Hermes wrapped the bare OSC52 query according to the environment marker. With
@@ -43,6 +44,10 @@ live multiplexer parity.
 
 Image/path payloads, gateway behavior, delayed or oversized responses, and
 concurrent input remain unobserved.
+
+The probe filters host secret-like environment variables, writes only a
+non-secret synthetic provider key into each temporary Hermes home, and bounds
+PTY process-group cleanup so a failed reference child cannot hang the gate.
 
 ## Evidence
 

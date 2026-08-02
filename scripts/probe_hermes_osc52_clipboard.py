@@ -162,13 +162,34 @@ def stop(pid: int, fd: int) -> None:
     exited, _ = child_status(pid)
     if not exited:
         try:
-            os.kill(pid, signal.SIGTERM)
+            process_group = os.getpgid(pid)
+            current_group = os.getpgrp()
+            if process_group != current_group:
+                os.killpg(process_group, signal.SIGTERM)
+            else:
+                os.kill(pid, signal.SIGTERM)
         except ProcessLookupError:
             pass
-        try:
-            os.waitpid(pid, 0)
-        except ChildProcessError:
-            pass
+        deadline = time.monotonic() + 1.0
+        while time.monotonic() < deadline:
+            exited, _ = child_status(pid)
+            if exited:
+                break
+            time.sleep(0.01)
+        if not exited:
+            try:
+                process_group = os.getpgid(pid)
+                current_group = os.getpgrp()
+                if process_group != current_group:
+                    os.killpg(process_group, signal.SIGKILL)
+                else:
+                    os.kill(pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            try:
+                os.waitpid(pid, 0)
+            except ChildProcessError:
+                pass
     try:
         os.close(fd)
     except OSError:

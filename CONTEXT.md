@@ -196,6 +196,13 @@ progress from August 1, 2026 through 2027.
   completion, and returns to ready. Environment values override the sidecar,
   API keys remain environment-only, and the display-only Hermes setup overlays
   remain bounded parity surfaces rather than invented persistence claims.
+- HAD-095 proves that the configured journey is usable beyond the first answer:
+  `/he` completion, `/model`, Ctrl+X sessions, two streamed prompts, persisted
+  history across a fresh process, and synthetic native clipboard insertion all
+  work without provider requests during navigation. The replay validates the
+  recalled history by submitting an appended sentinel and validates clipboard
+  insertion by inspecting the resulting request body, while sparse redraw
+  fragments remain terminal-capture noise rather than invented product claims.
 - HAD-045 captures the bounded Hermes Full setup provider menu before any
   provider selection: current model/active provider, visible loopback and
   custom rows, reversible Down navigation, clean Ctrl+C, unchanged config

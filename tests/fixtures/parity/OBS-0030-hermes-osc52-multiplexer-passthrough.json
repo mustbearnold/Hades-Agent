@@ -22,7 +22,8 @@
     }
   },
   "normalization": [
-    "Temporary checkout, synthetic HERMES_HOME, HOME, xclip, and PTY paths are represented by placeholders.",
+    "Temporary checkout, synthetic HERMES_HOME, HOME, loopback-only provider config, xclip, and PTY paths are represented by placeholders.",
+    "Each fresh case uses a non-secret synthetic custom-provider key and loopback URL only to enter the ready TUI; no provider request is submitted.",
     "SSH_TTY is set to a synthetic remote marker; each fresh case sets exactly one synthetic TMUX or STY marker and removes the other.",
     "ANSI control sequences, cursor placement, colors, timestamps, session IDs, prompt faces, offsets, dynamic working-directory text, and wall-clock durations are not part of this contract.",
     "The PTY window is explicitly set to 120 columns by 40 rows before process launch.",

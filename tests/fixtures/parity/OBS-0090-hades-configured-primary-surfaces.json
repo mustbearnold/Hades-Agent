@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0090",
+  "reference_observation": "OBS-0010",
+  "surface": "hades-configured-primary-surfaces",
+  "reference": {
+    "product": "Hades Agent",
+    "version": "workspace",
+    "source_commit": "6c27fd982a57c5a609952af0f4223cfb486f482f",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "fresh direct PTY with deterministic loopback HTTP/SSE and synthetic xclip"
+    },
+    "capture": "Hades setup sidecar followed by configured surface, history restart, and clipboard re-entry replays"
+  },
+  "normalization": [
+    "Binary paths, synthetic HOME/HERMES_HOME paths, PTY paths, timestamps, session identifiers, raw redraw bytes, and ephemeral server ports are omitted or represented by stable markers.",
+    "The local server accepts only loopback OpenAI-compatible requests and records normalized request paths, models, stream flags, and deterministic prompt markers; no credentials or external network are used.",
+    "Slash completion, model picker, sessions overlay, history, and clipboard are observed only at their bounded configured seams; no claim is made about unobserved provider catalogs, session switching, or remote clipboard behavior.",
+    "Synthetic xclip is placed first on an isolated child PATH and the host clipboard, Hermes config.yaml, API keys, OAuth, and provider installers remain outside the replay."
+  ],
+  "steps": [
+    {
+      "id": "configured-slash-and-overlays",
+      "precondition": "hades setup --local has written only the Hades local-provider sidecar; a fresh 120x40 process reaches the ready composer.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "/he",
+          "bytes_hex": "2f 68 65"
+        },
+        {
+          "kind": "key",
+          "value": "Tab then Escape",
+          "bytes_hex": "09 1b"
+        },
+        {
+          "kind": "text",
+          "value": "/model",
+          "bytes_hex": "2f 6d 6f 64 65 6c"
+        },
+        {
+          "kind": "key",
+          "value": "Enter twice, Escape, Ctrl+X, Escape",
+          "bytes_hex": "0d 0d 1b 18 1b"
+        }
+      ],
+      "output": {
+        "status": "passed",
+        "startup_ready": true,
+        "slash_completion": {
+          "prefix": "/he",
+          "markers": ["completions", "/help"],
+          "applied_without_submit": true
+        },
+        "overlays": {
+          "model_picker": ["Model picker", "Select provider (step 1/2)"],
+          "sessions": ["Sessions", "current session"],
+          "provider_requests_during_surface_navigation": 0
+        }
+      }
+    },
+    {
+      "id": "configured-history-and-stream",
+      "precondition": "The same configured process has closed its overlays and the deterministic local stream is ready for another prompt.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "surface prompt one",
+          "bytes_hex": "73 75 72 66 61 63 65 20 70 72 6f 6d 70 74 20 6f 6e 65"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "text",
+          "value": "surface prompt two",
+          "bytes_hex": "73 75 72 66 61 63 65 20 70 72 6f 6d 70 74 20 74 77 6f"
+        },
+        {
+          "kind": "key",
+          "value": "Enter, Up, Up, Down, Ctrl+C",
+          "bytes_hex": "0d 1b 5b 41 1b 5b 41 1b 5b 42 03"
+        }
+      ],
+      "output": {
+        "status": "passed",
+        "request_count": 2,
+        "request_prompt_markers": ["surface prompt one", "surface prompt two"],
+        "stream_complete_before_next_interaction": true,
+        "history_file_persisted": true,
+        "same_process_up_down_without_submission": true,
+        "cleanup": {
+          "exit_code": 0,
+          "alternate_screen_left": true,
+          "canonical": true,
+          "echo": true
+        }
+      }
+    },
+    {
+      "id": "restart-history-and-clipboard",
+      "precondition": "A fresh configured process loads the same sidecar and .hermes_history; an isolated synthetic xclip is available to that process.",
+      "input_sequence": [
+        {
+          "kind": "key",
+          "value": "Up, append !, Enter",
+          "bytes_hex": "1b 5b 41 21 0d"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+V",
+          "bytes_hex": "16"
+        },
+        {
+          "kind": "key",
+          "value": "Enter, Ctrl+C",
+          "bytes_hex": "0d 03"
+        }
+      ],
+      "output": {
+        "status": "passed",
+        "history_recall_request_marker": "surface prompt two!",
+        "clipboard": {
+          "provider": "synthetic xclip",
+          "inserted_before_submit": true,
+          "request_prompt_marker": "configured clipboard payload"
+        },
+        "total_request_count": 4,
+        "hermes_config_unchanged": true,
+        "cleanup": {
+          "exit_code": 0,
+          "alternate_screen_left": true,
+          "canonical": true,
+          "echo": true
+        }
+      }
+    }
+  ],
+  "unknowns": [
+    "Exact Hermes provider selection persistence, session switching/resumption, provider errors, remote OSC52 clipboard behavior, and non-loopback networking remain outside this configured local journey.",
+    "The replay proves behavior at stable state and request boundaries; sparse terminal redraw fragments are not treated as independent product semantics."
+  ],
+  "passed": true
+}

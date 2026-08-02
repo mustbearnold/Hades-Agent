@@ -190,3 +190,10 @@ OAuth, platform selection, backend alternatives, and later setup remain outside
 the clone contract. The local setup command is an explicit Hades vertical-slice
 extension; it does not claim Hermes provider-persistence parity or reproduce
 Hermes failure cases.
+
+The next configured journey is covered by `just replay-configured-surfaces`.
+It starts from that saved sidecar and proves the useful interaction loop around
+the first answer: `/he` completion, `/model`, Ctrl+X sessions, persisted input
+history across a fresh process, and a synthetic native clipboard paste before a
+final streamed request. The replay uses only a local fixture server and never
+touches the host clipboard or Hermes config.

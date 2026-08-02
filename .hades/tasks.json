@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-02T07:23:20Z",
+  "updated_at": "2026-08-02T09:38:36Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -5068,6 +5068,68 @@
           "docs/parity/observations/OBS-0089-hades-local-provider-vertical-slice-2026-08-02.md",
           "justfile",
           "scripts/verify.sh"
+        ]
+      }
+    },
+    {
+      "id": "HAD-095",
+      "title": "Prove the configured primary interaction surfaces",
+      "status": "complete",
+      "priority": 95,
+      "lane": "vertical-slice",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-094"
+      ],
+      "risk": "high",
+      "oracle": [
+        "configured_surface_pty_replay",
+        "slash_completion",
+        "model_overlay",
+        "sessions_overlay",
+        "history_persistence",
+        "clipboard_insertion",
+        "full_verify"
+      ],
+      "acceptance": [
+        "From an explicit hades setup --local sidecar and a fresh process, prove the ready composer accepts ordinary editing and the observed /he slash completion surface, applies a completion without submitting a provider request, and leaves the composer usable.",
+        "Prove the configured /model picker and Ctrl+X sessions overlay render their stable landmarks, close through their supported Escape boundary, and do not lose unrelated draft state or start a provider request while an overlay is active.",
+        "Submit two deterministic local prompts through the loopback stream, prove the first response completes before the next interaction, and verify Up/Down navigation returns the newest and previous prompts without duplicate or stale entries.",
+        "Restart Hades against the same sanitized sidecar and history path, prove the newest prompt is available through history, then inject clipboard text through a synthetic xclip provider; verify Ctrl+V inserts into the composer without submitting until Enter and the resulting request contains the inserted text.",
+        "Keep this as an isolated direct-PTY replay with a local deterministic server, synthetic clipboard, no credentials, no host clipboard, no Hermes config mutation, and clean alternate-screen/canonical-input restoration for every process. Add sanitized OBS-0090 evidence, documentation, matrix/context/readme updates, and wire the replay into the targeted and complete gates. Hermes defects or unsafe side effects remain deviations to fix, and Rust performance or safer behavior must not be capped.",
+        "Run the targeted replay and complete the no-skip just verify gate before completion."
+      ],
+      "evidence": [
+        "scripts/replay_configured_surfaces.py",
+        "tests/fixtures/parity/OBS-0090-hades-configured-primary-surfaces.json",
+        "docs/parity/observations/OBS-0090-hades-configured-primary-surfaces-2026-08-02.md",
+        "scripts/probe_hermes_osc52_multiplexer.py",
+        "tests/fixtures/parity/OBS-0030-hermes-osc52-multiplexer-passthrough.json",
+        "docs/parity/observations/OBS-0030-hermes-osc52-multiplexer-passthrough-2026-08-01.md",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md"
+      ],
+      "claimed_by": "configured-surfaces-implementer",
+      "claimed_at": "2026-08-02T07:25:58Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Proved the configured primary Hades journey across slash completion, model and sessions overlays, streamed prompts, persisted history, restart recall, and synthetic clipboard, with full verification.",
+        "completed_at": "2026-08-02T09:38:36Z",
+        "evidence": [
+          "scripts/replay_configured_surfaces.py",
+          "tests/fixtures/parity/OBS-0090-hades-configured-primary-surfaces.json",
+          "docs/parity/observations/OBS-0090-hades-configured-primary-surfaces-2026-08-02.md",
+          "scripts/probe_hermes_osc52_multiplexer.py",
+          "tests/fixtures/parity/OBS-0030-hermes-osc52-multiplexer-passthrough.json",
+          "docs/parity/observations/OBS-0030-hermes-osc52-multiplexer-passthrough-2026-08-01.md",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md"
         ]
       }
     }

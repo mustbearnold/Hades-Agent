@@ -39,6 +39,9 @@ ROWS = 40
 OSC52_QUERY = b"\x1b]52;c;?\x07"
 OSC52_RESPONSE = b"\x1b]52;c;" + base64.b64encode(b"mux-remote  \nline-two\n\n") + b"\x07"
 NATIVE_ARGUMENTS = "-selection clipboard -out"
+BASE_URL = "http://127.0.0.1:8765/v1"
+SYNTHETIC_KEY = "synthetic-probe-key"
+SENSITIVE_ENV_PARTS = ("API_KEY", "TOKEN", "SECRET", "PASSWORD", "PRIVATE_KEY", "ACCESS_KEY")
 WRAPPED_QUERIES = {
     "TMUX": b"\x1bPtmux;\x1b\x1b]52;c;?\x07\x1b\\",
     "STY": b"\x1bP\x1b]52;c;?\x07\x1b\\",
@@ -89,9 +92,27 @@ def spawn_with_marker(
     native_log: Path,
     marker: str,
 ) -> tuple[int, int]:
+    home.mkdir(parents=True, exist_ok=True)
+    (home / "config.yaml").write_text(
+        "model:\n"
+        "  provider: custom\n"
+        "  default: multiplexer-model\n"
+        f"  base_url: {BASE_URL}\n"
+        f"  api_key: {SYNTHETIC_KEY}\n"
+        "custom_providers:\n"
+        "  - name: multiplexer-loopback\n"
+        f"    base_url: {BASE_URL}\n"
+        f"    api_key: {SYNTHETIC_KEY}\n"
+        "    model: multiplexer-model\n",
+        encoding="utf-8",
+    )
     pid, fd = pty.fork()
     if pid == 0:
-        environment = os.environ.copy()
+        environment = {
+            key: value
+            for key, value in os.environ.items()
+            if not any(part in key.upper() for part in SENSITIVE_ENV_PARTS)
+        }
         environment.update(
             {
                 "TERM": "xterm-256color",
