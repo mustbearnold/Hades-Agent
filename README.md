@@ -197,3 +197,9 @@ the first answer: `/he` completion, `/model`, Ctrl+X sessions, persisted input
 history across a fresh process, and a synthetic native clipboard paste before a
 final streamed request. The replay uses only a local fixture server and never
 touches the host clipboard or Hermes config.
+
+Provider failures are covered by `just replay-provider-recovery`. Its local
+HTTP 500, malformed-SSE, and incomplete-stream cases return to a visible Ready
+state without automatic retries; a new user prompt clears the notice and sends
+one explicit follow-up that can recover. This is an intentional safer Hades
+boundary, not a reproduction of Hermes' ambiguous failure behavior.

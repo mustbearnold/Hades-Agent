@@ -36,6 +36,10 @@ replay-configured-surfaces:
     cargo build --locked --package hades-cli
     python3 scripts/replay_configured_surfaces.py --binary target/debug/hades --report .hades/runtime/configured-surfaces-replay.json
 
+replay-provider-recovery:
+    cargo build --locked --package hades-cli
+    python3 scripts/replay_provider_recovery.py --binary target/debug/hades --report .hades/runtime/provider-recovery-replay.json
+
 replay-differential:
     cargo build --locked --package hades-cli
     python3 scripts/differential_replay.py --binary target/debug/hades --report .hades/runtime/differential-replay.json

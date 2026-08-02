@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0091",
+  "reference_observation": "OBS-0054",
+  "surface": "hades-local-provider-safe-failure-recovery-and-follow-up",
+  "reference": {
+    "product": "Hades Agent",
+    "version": "workspace",
+    "source_commit": "57c1a88ec8c2e8eb39f40361c21bccdd368cfb73",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "direct PTY with deterministic loopback HTTP/SSE failure fixtures"
+    },
+    "capture": "fresh Hades processes after explicit local sidecar setup"
+  },
+  "normalization": [
+    "Binary paths, synthetic home paths, PTY paths, timestamps, process identifiers, and redraw bytes are omitted or represented by stable markers.",
+    "The loopback server is owned by the replay and never contacts an external service; no real credential, host clipboard, or Hermes config is used.",
+    "Requests are reduced to method/path, content type, authorization presence, model, stream flag, message roles, and prompt markers.",
+    "The recovery contract intentionally differs from the Hermes reference boundary: failures return to Ready, do not create automatic follow-up requests, and preserve partial assistant text only as diagnostic context."
+  ],
+  "steps": [
+    {
+      "id": "http-error",
+      "precondition": "Configured Hades local sidecar with a loopback provider returning HTTP 500.",
+      "input_sequence": [
+        {"kind": "text", "value": "failure probe prompt", "bytes_hex": "66 61 69 6c 75 72 65 20 70 72 6f 62 65 20 70 72 6f 6d 70 74"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "text", "value": "recovery follow-up", "bytes_hex": "72 65 63 6f 76 65 72 79 20 66 6f 6c 6c 6f 77 2d 75 70"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"}
+      ],
+      "output": {
+        "failure_boundary": {
+        "provider_error_visible": true,
+        "ready_after_failure": true,
+        "automatic_follow_up_requests": 0,
+        "partial_response_preserved": false
+      },
+      "follow_up": {
+        "notice_cleared_on_edit": true,
+        "request_count": 2,
+        "recovered_answer_visible": true,
+        "prompts": ["failure probe prompt", "recovery follow-up"]
+      },
+        "cleanup": "exit 0; alternate screen left; canonical input and echo restored"
+      }
+    },
+    {
+      "id": "malformed-sse",
+      "precondition": "Configured Hades local sidecar with a loopback provider returning malformed SSE JSON.",
+      "input_sequence": [
+        {"kind": "text", "value": "failure probe prompt", "bytes_hex": "66 61 69 6c 75 72 65 20 70 72 6f 62 65 20 70 72 6f 6d 70 74"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "text", "value": "recovery follow-up", "bytes_hex": "72 65 63 6f 76 65 72 79 20 66 6f 6c 6c 6f 77 2d 75 70"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"}
+      ],
+      "output": {
+        "failure_boundary": {
+        "provider_error_visible": true,
+        "ready_after_failure": true,
+        "automatic_follow_up_requests": 0,
+        "partial_response_preserved": false
+      },
+      "follow_up": {
+        "notice_cleared_on_edit": true,
+        "request_count": 2,
+        "recovered_answer_visible": true,
+        "prompts": ["failure probe prompt", "recovery follow-up"]
+      },
+        "cleanup": "exit 0; alternate screen left; canonical input and echo restored"
+      }
+    },
+    {
+      "id": "incomplete-stream",
+      "precondition": "Configured Hades local sidecar with a loopback provider that emits partial text and closes without [DONE].",
+      "input_sequence": [
+        {"kind": "text", "value": "failure probe prompt", "bytes_hex": "66 61 69 6c 75 72 65 20 70 72 6f 62 65 20 70 72 6f 6d 70 74"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "text", "value": "recovery follow-up", "bytes_hex": "72 65 63 6f 76 65 72 79 20 66 6f 6c 6c 6f 77 2d 75 70"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"}
+      ],
+      "output": {
+        "failure_boundary": {
+        "provider_error_visible": true,
+        "ready_after_failure": true,
+        "automatic_follow_up_requests": 0,
+        "partial_response_preserved": true,
+        "partial_response_is_success": false
+      },
+      "follow_up": {
+        "notice_cleared_on_edit": true,
+        "request_count": 2,
+        "recovered_answer_visible": true,
+        "prompts": ["failure probe prompt", "recovery follow-up"]
+      },
+        "cleanup": "exit 0; alternate screen left; canonical input and echo restored"
+      }
+    }
+  ],
+  "boundaries": {
+    "provider": "loopback only",
+    "automatic_retries": false,
+    "follow_up_requires_user_submit": true,
+    "credential_persistence": false,
+    "hermes_config_mutation": false
+  },
+  "unknowns": [
+    "Non-loopback providers, authentication failures, tool-call failures, timeouts, backoff, and cancellation races remain outside this replay.",
+    "The exact reference failure copy and Hermes repeated-request purpose remain reference unknowns; Hades intentionally uses the safer explicit-follow-up policy.",
+    "Long-lived session recovery, persistence across process restart after a failure, and concurrent input remain separate tasks."
+  ]
+}

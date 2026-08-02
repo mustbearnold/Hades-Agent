@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-02T09:38:36Z",
+  "updated_at": "2026-08-02T10:05:06Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -5125,6 +5125,66 @@
           "scripts/probe_hermes_osc52_multiplexer.py",
           "tests/fixtures/parity/OBS-0030-hermes-osc52-multiplexer-passthrough.json",
           "docs/parity/observations/OBS-0030-hermes-osc52-multiplexer-passthrough-2026-08-01.md",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-096",
+      "title": "Implement safe provider failure recovery and follow-up",
+      "status": "complete",
+      "priority": 94,
+      "lane": "vertical-slice",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-095",
+        "HAD-058"
+      ],
+      "risk": "high",
+      "oracle": [
+        "typed_provider_failure_state",
+        "http_error_recovery",
+        "malformed_sse_recovery",
+        "incomplete_stream_recovery",
+        "follow_up_request",
+        "direct_pty_replay",
+        "full_verify"
+      ],
+      "acceptance": [
+        "For a configured Hades local sidecar, prove deterministic HTTP 500, malformed SSE, and incomplete-stream failures produce a visible bounded provider error, leave the app Ready, and never issue an automatic follow-up request while the user has not submitted another prompt.",
+        "Preserve any already-rendered partial assistant text as diagnostic context without treating an incomplete stream as a successful answer, and make the error notice clear when the user begins a new prompt.",
+        "Submit one explicit follow-up prompt after each failure and prove exactly one new local streaming request is made, the recovered answer completes, and the request body contains only the new prompt with the configured model and no credential leakage.",
+        "Use a fresh direct PTY and deterministic loopback server with no external network, host clipboard, Hermes config mutation, or real credentials; verify every case exits cleanly with alternate screen, canonical input, and echo restored. Do not reproduce Hermes' observed repeated requests or stuck busy surface; define the safer Hades behavior explicitly.",
+        "Add focused regression assertions, sanitized OBS-0091 fixture and observation, README/context/matrix documentation, just/verify wiring, and run the targeted replay plus complete no-skip just verify gate before completion."
+      ],
+      "evidence": [
+        "crates/hades-app/src/lib.rs",
+        "scripts/replay_provider_recovery.py",
+        "tests/fixtures/parity/OBS-0091-hades-provider-failure-recovery.json",
+        "docs/parity/observations/OBS-0091-hades-provider-failure-recovery-2026-08-02.md",
+        "docs/parity/observations/OBS-0054-hermes-provider-errors-2026-08-02.md",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md"
+      ],
+      "claimed_by": "provider-failure-recovery-implementer",
+      "claimed_at": "2026-08-02T09:41:21Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Implemented and proved safe local-provider failure recovery: HTTP 500, malformed SSE, and incomplete streams return to Ready with visible errors, preserve partial diagnostics, avoid automatic retries, and accept exactly one explicit recovered follow-up.",
+        "completed_at": "2026-08-02T10:05:06Z",
+        "evidence": [
+          "crates/hades-app/src/lib.rs",
+          "scripts/replay_provider_recovery.py",
+          "tests/fixtures/parity/OBS-0091-hades-provider-failure-recovery.json",
+          "docs/parity/observations/OBS-0091-hades-provider-failure-recovery-2026-08-02.md",
+          "docs/parity/observations/OBS-0054-hermes-provider-errors-2026-08-02.md",
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md",

@@ -820,6 +820,36 @@ mod tests {
     }
 
     #[test]
+    fn provider_failure_is_recoverable_only_through_an_explicit_follow_up() {
+        let mut app = App::new();
+        for character in "first attempt".chars() {
+            app.handle(InputEvent::Key(Key::Char(character)));
+        }
+        assert!(matches!(
+            app.handle(InputEvent::Key(Key::Enter)),
+            DispatchOutcome::Submitted(content) if content == "first attempt"
+        ));
+        app.handle(InputEvent::Provider(ProviderEvent::Failed("offline".to_owned())));
+
+        assert_eq!(app.state().turn, TurnState::Ready);
+        assert_eq!(
+            app.state().notice,
+            Some(Notice::ProviderError { message: "offline".to_owned() })
+        );
+
+        for character in "follow up".chars() {
+            app.handle(InputEvent::Key(Key::Char(character)));
+        }
+        assert_eq!(app.state().notice, None);
+        assert_eq!(app.state().turn, TurnState::Ready);
+        assert!(matches!(
+            app.handle(InputEvent::Key(Key::Enter)),
+            DispatchOutcome::Submitted(content) if content == "follow up"
+        ));
+        assert_eq!(app.state().turn, TurnState::Busy);
+    }
+
+    #[test]
     fn ctrl_c_interrupts_busy_turn_before_quitting() {
         let mut app = App::new();
         for character in "hello".chars() {

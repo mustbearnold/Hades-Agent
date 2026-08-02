@@ -203,6 +203,15 @@ progress from August 1, 2026 through 2027.
   recalled history by submitting an appended sentinel and validates clipboard
   insertion by inspecting the resulting request body, while sparse redraw
   fragments remain terminal-capture noise rather than invented product claims.
+- HAD-096 hardens the configured provider journey across HTTP 500, malformed
+  SSE, and incomplete-stream failures. Hades shows a bounded provider error,
+  returns to Ready without an automatic follow-up, preserves already-rendered
+  partial text as diagnostic context, clears the notice when the user edits a
+  new prompt, and sends exactly one explicit follow-up that can recover. The
+  direct-PTY OBS-0091 replay proves two local requests per case, no
+  authorization header, clean terminal restoration, and no Hermes config
+  mutation. Hermes' observed repeated requests and stuck busy surface remain
+  defects/unknowns rather than behavior Hades reproduces.
 - HAD-045 captures the bounded Hermes Full setup provider menu before any
   provider selection: current model/active provider, visible loopback and
   custom rows, reversible Down navigation, clean Ctrl+C, unchanged config
