@@ -14,6 +14,7 @@ from pathlib import Path
 from probe_tui_lifecycle import (
     ProbeError,
     describe_status,
+    retain_slave_descriptor,
     set_window_size,
     terminal_flags,
     wait_for,
@@ -37,7 +38,9 @@ def spawn(binary: Path, arguments: list[str]) -> tuple[int, int, str, Path]:
             os._exit(127)
 
     set_window_size(master, 120, 40)
-    return pid, master, os.readlink(f"/proc/{pid}/fd/0"), history_home
+    slave_path = os.readlink(f"/proc/{pid}/fd/0")
+    retain_slave_descriptor(slave_path)
+    return pid, master, slave_path, history_home
 
 
 def run_case(binary: Path, name: str, arguments: list[str], timeout: float) -> dict[str, object]:

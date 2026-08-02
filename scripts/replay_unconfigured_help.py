@@ -20,6 +20,7 @@ from probe_tui_lifecycle import (
     describe_status,
     marker_present,
     read_available,
+    retain_slave_descriptor,
     set_window_size,
     terminal_flags,
     wait_for,
@@ -85,7 +86,9 @@ def spawn(binary: Path, arguments: list[str]) -> tuple[int, int, str, Path]:
             os._exit(127)
 
     set_window_size(master, COLUMNS, ROWS)
-    return pid, master, os.readlink(f"/proc/{pid}/fd/0"), home
+    slave_path = os.readlink(f"/proc/{pid}/fd/0")
+    retain_slave_descriptor(slave_path)
+    return pid, master, slave_path, home
 
 
 def recent_output(output: bytearray, lines: int = 48) -> str:

@@ -15,7 +15,7 @@ network-bearing input.
 
 ## Verified provider surface
 
-The restored canonical/echo boundary renders `Choose a provider:`, the
+The raw interactive boundary renders `Choose a provider:`, the
 `↑↓ navigate`, `ENTER/SPACE select`, and `ESC cancel` controls, and the seven
 observed options:
 
@@ -27,10 +27,11 @@ observed options:
 - `Firecrawl [paid]` — Cloud browser with remote execution
 - `Skip — keep defaults / configure later`
 
-Local Browser is rendered as the selected recommended row. Hades keeps the
-provider surface bounded to the observed display contract; provider selection,
-Enter/Space/Escape behavior, discovery timing, and later cancellation remain
-unknown until directly observed.
+Local Browser is rendered as the selected recommended row. Hades now keeps the
+provider surface in raw mode so safe arrow navigation can be handled without
+line buffering; the display-only replay still sends no provider input. Provider
+selection, Enter/Space/Escape behavior, discovery timing, and later cancellation
+remain unknown until directly observed.
 
 ## Runtime and persistence evidence
 

@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0082",
+  "surface": "hades-standalone-tool-provider-inventory-navigation",
+  "reference_observation": "OBS-0081",
+  "reference": {
+    "product": "Hades Agent",
+    "version": "workspace",
+    "source_commit": "001fb58a5169eeef21db7d46748d492349220d51",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "direct PTY with normalized stable markers"
+    },
+    "capture": "fresh Hades debug process launched with standalone setup and a synthetic HERMES_HOME"
+  },
+  "normalization": [
+    "Binary paths, synthetic HOME/HERMES_HOME paths, PTY paths, timestamps, raw redraw bytes, and full rendered buffers are omitted or replaced by stable markers.",
+    "The route sends only the bounded setup inputs followed by one Down sequence (ESC [ B); no provider choice, credential, OAuth, network-bearing, or persistence action is sent.",
+    "Forced child teardown after the bounded read is harness cleanup only and is not a Hades product exit, cancellation, or failure-case claim."
+  ],
+  "unknowns": [
+    "Provider submission, Enter/Space semantics, Escape cancellation, Ctrl+C behavior, credentials, OAuth, network behavior, persistence, discovery completeness, and later provider setup remain outside this replay.",
+    "The ambiguous Hermes Ctrl+C cross-tool redraw is not copied into Hades and is not part of this contract."
+  ],
+  "steps": [
+    {
+      "id": "standalone-provider-inventory-down-navigation",
+      "input_sequence": [
+        {"kind": "key", "value": "j", "bytes_hex": "6a", "meaning": "move to Full setup"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d", "meaning": "submit Full setup"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "skip the unconfigured provider"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d", "meaning": "accept Keep current (local)"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "cancel the platform picker"},
+        {"kind": "key", "value": "Escape", "bytes_hex": "1b", "meaning": "open the raw CLI checklist"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "reach the provider inventory"},
+        {"kind": "key", "value": "Down", "bytes_hex": "1b 5b 42", "meaning": "move the provider cursor without submitting"}
+      ],
+      "output": {
+        "status": "passed",
+        "terminal_flags": {
+          "provider_inventory_before_navigation": {"canonical": false, "echo": false},
+          "provider_inventory_after_navigation": {"canonical": false, "echo": false}
+        },
+        "alternate_screen": {
+          "entered": true,
+          "left_before_provider_interaction": true
+        },
+        "process_alive_after_navigation": true,
+        "provider_inventory": {
+          "controls": [
+            "Choose a provider:",
+            "↑↓ navigate",
+            "ENTER/SPACE select",
+            "ESC cancel"
+          ],
+          "options_observed": [
+            "Local Browser [★ recommended · free] — Headless Chromium, no API key needed",
+            "Nous Subscription (Browser Use cloud) [subscription] — Managed Browser Use billed to your subscription",
+            "Camofox [free · local] — Anti-detection browser (Firefox/Camoufox)",
+            "Browser Use [paid] — Cloud browser with remote execution",
+            "Browserbase [paid] — Cloud browser with stealth and proxies",
+            "Firecrawl [paid] — Cloud browser with remote execution",
+            "Skip — keep defaults / configure later"
+          ],
+          "cursor_before": "Local Browser",
+          "selected_before": "Local Browser",
+          "cursor_after": "Nous Subscription (Browser Use cloud)",
+          "selected_after": "Local Browser",
+          "rendered_markers_after_navigation": [
+            "→ (○) Nous Subscription (Browser Use cloud)",
+            "(●) Local Browser"
+          ],
+          "provider_selection_submitted": false
+        },
+        "persistence": {
+          "config_unchanged_after_navigation": true,
+          "new_artifacts_after_navigation": [],
+          "secrets_file_created": false
+        },
+        "scope": {
+          "credentials_entered": false,
+          "oauth_action_sent": false,
+          "network_bearing_input_sent": false,
+          "replay_teardown": "forced child teardown after the bounded read; not a product outcome"
+        }
+      }
+    }
+  ],
+  "passed": true
+}

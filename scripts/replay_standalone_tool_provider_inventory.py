@@ -136,7 +136,8 @@ def run_case(binary: Path, timeout: float) -> dict[str, object]:
             raise ProbeError(f"checklist did not enter raw mode: {checklist_flags}")
 
         # Ctrl+C is the only input at the checklist boundary. The provider
-        # inventory is then read in the restored canonical/echo surface.
+        # inventory is then rendered in a raw interactive surface so bounded
+        # arrow-key navigation is available without submitting a provider.
         send(master, b"\x03")
         wait_for(
             pid,
@@ -153,8 +154,8 @@ def run_case(binary: Path, timeout: float) -> dict[str, object]:
         provider_config = config_shape(home / "config.yaml")
         files_at_provider = file_inventory(home)
         provider_alive = process_alive(pid)
-        if not provider_flags["canonical"] or not provider_flags["echo"]:
-            raise ProbeError(f"provider inventory did not restore terminal flags: {provider_flags}")
+        if provider_flags["canonical"] or provider_flags["echo"]:
+            raise ProbeError(f"provider inventory did not enter raw mode: {provider_flags}")
         if not provider_alive:
             raise ProbeError("provider inventory process exited before the bounded read completed")
         if provider_config != config_at_tool_configuration:
@@ -247,7 +248,7 @@ def main() -> int:
         "dimensions": {"columns": COLUMNS, "rows": ROWS},
         "normalization": [
             "Synthetic HOME/HERMES_HOME paths, PTY paths, timestamps, and raw redraw bytes are omitted or replaced by stable markers.",
-            "The route enters only Full setup, skips the provider, accepts the local backend, cancels the platform picker, opens the raw CLI checklist, sends Escape then Ctrl+C, and reads the provider inventory without further input.",
+            "The route enters only Full setup, skips the provider, accepts the local backend, cancels the platform picker, opens the raw CLI checklist, sends Escape then Ctrl+C, and reads the raw provider inventory without further input.",
             "Provider selection, credentials, OAuth, network activity, persistence, and later cancellation are not submitted or claimed.",
         ],
         "unknowns": [

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-02T02:30:25Z",
+  "updated_at": "2026-08-02T03:07:12Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -4617,6 +4617,89 @@
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/hermes-tool-provider-inventory-interaction-probe.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-087",
+      "title": "Implement bounded provider inventory navigation",
+      "status": "complete",
+      "priority": 10,
+      "lane": "interaction",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-086"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "typed_state_tests",
+        "direct_pty_replay",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Extend the standalone Hades Browser Automation provider inventory so the observed Down input (ESC [ B) moves the cursor from Local Browser to Nous Subscription while the selected Local Browser row remains unchanged and the process stays alive.",
+        "Keep this slice non-submitting: provider choice, Enter/Space, Escape cancellation, Ctrl+C behavior, credentials, OAuth, networking, persistence, and later provider setup remain outside the claim. Do not copy the ambiguous Hermes cross-tool Ctrl+C redraw or any Hermes bug/failure case.",
+        "Add typed core state/reducer coverage, TUI rendering coverage, and a repeatable direct-PTY replay with exact input bytes, cursor/selection markers, terminal lifecycle, process liveness, and normalized config/artifact invariants.",
+        "Add a sanitized OBS-0082 fixture and observation document; update the parity matrix, context, readme, justfile, and verification gates. The implementation must not cap Hades performance or safer capabilities.",
+        "Harden the Hades PTY replay spawn helpers that inspect termios by retaining their slave descriptors immediately after fork; this is deterministic oracle infrastructure and must not change product semantics.",
+        "Run the targeted replay and complete the no-skip just verify gate before completion."
+      ],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-cli/src/main.rs",
+        "crates/hades-tui/src/lib.rs",
+        "scripts/replay_cli_launch.py",
+        "scripts/replay_unconfigured_help.py",
+        "scripts/replay_unconfigured_input.py",
+        "scripts/replay_unconfigured_startup.py",
+        "scripts/replay_standalone_full_setup.py",
+        "scripts/replay_standalone_setup.py",
+        "scripts/replay_standalone_terminal_platform.py",
+        "scripts/replay_standalone_tool_provider_boundary.py",
+        "scripts/replay_standalone_tool_provider_inventory.py",
+        "scripts/replay_standalone_tool_provider_inventory_navigation.py",
+        "tests/fixtures/parity/OBS-0080-hades-tool-provider-inventory.json",
+        "tests/fixtures/parity/OBS-0082-hades-tool-provider-inventory-navigation.json",
+        "docs/parity/observations/OBS-0080-hades-tool-provider-inventory-2026-08-02.md",
+        "docs/parity/observations/OBS-0082-hades-tool-provider-inventory-navigation-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hades-tool-provider-inventory-navigation-replay.json"
+      ],
+      "claimed_by": "provider-inventory-navigation-implementer",
+      "claimed_at": "2026-08-02T02:32:39Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Implemented typed, bounded provider-inventory Down navigation: the raw Hades surface moves the cursor from Local Browser to Nous Subscription on ESC [ B while keeping Local Browser selected, the process alive, and config/artifacts unchanged. Preserved the canonical provider-boundary handoff, did not copy Hermes' ambiguous Ctrl+C cross-tool redraw or any bug/failure case, and hardened Hades PTY replay spawns by retaining slave descriptors. Targeted replay, boundary replay, and complete just verify all pass.",
+        "completed_at": "2026-08-02T03:07:12Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-cli/src/main.rs",
+          "crates/hades-tui/src/lib.rs",
+          "scripts/replay_cli_launch.py",
+          "scripts/replay_unconfigured_help.py",
+          "scripts/replay_unconfigured_input.py",
+          "scripts/replay_unconfigured_startup.py",
+          "scripts/replay_standalone_full_setup.py",
+          "scripts/replay_standalone_setup.py",
+          "scripts/replay_standalone_terminal_platform.py",
+          "scripts/replay_standalone_tool_provider_boundary.py",
+          "scripts/replay_standalone_tool_provider_inventory.py",
+          "scripts/replay_standalone_tool_provider_inventory_navigation.py",
+          "tests/fixtures/parity/OBS-0080-hades-tool-provider-inventory.json",
+          "tests/fixtures/parity/OBS-0082-hades-tool-provider-inventory-navigation.json",
+          "docs/parity/observations/OBS-0080-hades-tool-provider-inventory-2026-08-02.md",
+          "docs/parity/observations/OBS-0082-hades-tool-provider-inventory-navigation-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hades-tool-provider-inventory-navigation-replay.json"
         ]
       }
     }

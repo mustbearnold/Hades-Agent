@@ -445,6 +445,12 @@ progress from August 1, 2026 through 2027.
   persistence, delayed cancellation, and later behavior remain unknown. Hades
   must define safe typed semantics and fix defects rather than reproducing
   Hermes failures, and this observation does not cap Rust performance.
+- HAD-087 carries the observed safe Down navigation into the Hades provider
+  inventory. The provider surface now runs in raw mode, moves its cursor from
+  Local Browser to Nous Subscription on the exact `ESC [ B` sequence, keeps
+  Local Browser selected, and remains alive without changing config or creating
+  artifacts. Enter/Space/Escape/Ctrl+C provider semantics and later setup remain
+  unknown; the ambiguous Hermes Ctrl+C cross-tool redraw is not reproduced.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes

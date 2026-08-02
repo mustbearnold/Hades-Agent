@@ -32,8 +32,7 @@ use hades_core::{
     InputEvent, Key, PRODUCT_NAME, ProviderEvent, Role, SETUP_STANDALONE_BANNER,
     SETUP_STANDALONE_NO_PLATFORMS, SETUP_STANDALONE_PROMPT,
     SETUP_STANDALONE_TOOL_CONFIGURATION_LINES, SETUP_STANDALONE_TOOL_CONFIGURATION_TITLE,
-    SETUP_STANDALONE_TOOL_PROVIDER_CONTROLS, SETUP_STANDALONE_TOOL_PROVIDER_DEFAULT_INDEX,
-    SETUP_STANDALONE_TOOL_PROVIDER_LINES, SETUP_STANDALONE_TOOL_PROVIDER_OPTIONS,
+    SETUP_STANDALONE_TOOL_PROVIDER_CONTROLS, SETUP_STANDALONE_TOOL_PROVIDER_LINES,
     SETUP_STANDALONE_TOOL_PROVIDER_TITLE, SETUP_TERMINAL_BACKEND_ROWS, SETUP_WIZARD_CHOICES,
     StandaloneSetupAction, StandaloneSetupState, StartupState, TurnState,
 };
@@ -143,6 +142,11 @@ enum ToolChecklistOutcome {
     SignalInterrupt,
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum ToolProviderInventoryOutcome {
+    SignalInterrupt,
+}
+
 fn run_setup() -> Result<SetupOutcome, Box<dyn Error>> {
     force_color_output(true);
     let mut stdout = io::stdout();
@@ -177,9 +181,11 @@ fn run_setup() -> Result<SetupOutcome, Box<dyn Error>> {
                     match run_tool_checklist(&mut wizard, &cancelled)? {
                         ToolChecklistOutcome::SignalInterrupt => Ok(SetupOutcome::SignalInterrupt),
                         ToolChecklistOutcome::ProviderBoundary => {
-                            print_tool_provider_boundary()?;
-                            wait_for_setup_signal(&cancelled);
-                            Ok(SetupOutcome::SignalInterrupt)
+                            match run_tool_provider_inventory(&mut wizard, &cancelled)? {
+                                ToolProviderInventoryOutcome::SignalInterrupt => {
+                                    Ok(SetupOutcome::SignalInterrupt)
+                                }
+                            }
                         }
                     }
                 }
@@ -339,6 +345,61 @@ fn tool_checklist_loop(
     }
 }
 
+fn run_tool_provider_inventory(
+    wizard: &mut StandaloneSetupState,
+    cancelled: &AtomicBool,
+) -> Result<ToolProviderInventoryOutcome, Box<dyn Error>> {
+    print_tool_provider_boundary()?;
+    thread::sleep(Duration::from_millis(25));
+    enable_raw_mode()?;
+    let stdout = io::stdout();
+    let backend = CrosstermBackend::new(stdout);
+    let mut terminal = Terminal::new(backend)?;
+    let result = tool_provider_inventory_loop(&mut terminal, wizard, cancelled);
+    let cleanup = restore_raw_terminal(&mut terminal);
+    cleanup?;
+    result
+}
+
+fn print_tool_provider_boundary() -> io::Result<()> {
+    let mut stdout = io::stdout();
+    for line in SETUP_STANDALONE_TOOL_PROVIDER_LINES {
+        writeln!(stdout, "{line}")?;
+    }
+    writeln!(stdout, "{SETUP_STANDALONE_TOOL_PROVIDER_TITLE}")?;
+    writeln!(stdout, "{SETUP_STANDALONE_TOOL_PROVIDER_CONTROLS}")?;
+    stdout.flush()
+}
+
+fn tool_provider_inventory_loop(
+    terminal: &mut Terminal<CrosstermBackend<io::Stdout>>,
+    wizard: &mut StandaloneSetupState,
+    cancelled: &AtomicBool,
+) -> Result<ToolProviderInventoryOutcome, Box<dyn Error>> {
+    loop {
+        terminal.draw(|frame| draw_standalone_setup(frame, wizard))?;
+        if cancelled.load(Ordering::Relaxed) {
+            return Ok(ToolProviderInventoryOutcome::SignalInterrupt);
+        }
+        if !event::poll(Duration::from_millis(250))? {
+            continue;
+        }
+        let Event::Key(key) = event::read()? else {
+            continue;
+        };
+        if key.kind != KeyEventKind::Press {
+            continue;
+        }
+        let Some(mapped) = map_key(key) else {
+            continue;
+        };
+        if mapped == Key::Ctrl('c') {
+            return Ok(ToolProviderInventoryOutcome::SignalInterrupt);
+        }
+        wizard.handle_key(mapped);
+    }
+}
+
 fn print_setup_fallback(wizard: &StandaloneSetupState) -> io::Result<()> {
     let mut stdout = io::stdout();
     if wizard.terminal_backend_fallback() {
@@ -369,23 +430,6 @@ fn print_tool_configuration() -> io::Result<()> {
     writeln!(stdout, "{SETUP_STANDALONE_TOOL_CONFIGURATION_TITLE}")?;
     for line in SETUP_STANDALONE_TOOL_CONFIGURATION_LINES {
         writeln!(stdout, "{line}")?;
-    }
-    stdout.flush()
-}
-
-fn print_tool_provider_boundary() -> io::Result<()> {
-    let mut stdout = io::stdout();
-    for line in SETUP_STANDALONE_TOOL_PROVIDER_LINES {
-        writeln!(stdout, "{line}")?;
-    }
-    writeln!(stdout, "{SETUP_STANDALONE_TOOL_PROVIDER_TITLE}")?;
-    writeln!(stdout, "{SETUP_STANDALONE_TOOL_PROVIDER_CONTROLS}")?;
-    for (index, option) in SETUP_STANDALONE_TOOL_PROVIDER_OPTIONS.iter().enumerate() {
-        let selected =
-            if index == SETUP_STANDALONE_TOOL_PROVIDER_DEFAULT_INDEX { "●" } else { "○" };
-        let cursor =
-            if index == SETUP_STANDALONE_TOOL_PROVIDER_DEFAULT_INDEX { "→" } else { " " };
-        writeln!(stdout, " {cursor} ({selected}) {option}")?;
     }
     stdout.flush()
 }
@@ -423,6 +467,14 @@ fn restore_terminal(
 ) -> Result<(), Box<dyn Error>> {
     disable_raw_mode()?;
     execute!(terminal.backend_mut(), LeaveAlternateScreen)?;
+    terminal.show_cursor()?;
+    Ok(())
+}
+
+fn restore_raw_terminal(
+    terminal: &mut Terminal<CrosstermBackend<io::Stdout>>,
+) -> Result<(), Box<dyn Error>> {
+    disable_raw_mode()?;
     terminal.show_cursor()?;
     Ok(())
 }

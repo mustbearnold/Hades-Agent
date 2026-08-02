@@ -6,7 +6,7 @@
   "reference": {
     "product": "Hades Agent",
     "version": "workspace",
-    "source_commit": "630a44d38d59850eeebcd0fac0e59384f9e46fb7",
+    "source_commit": "001fb58a5169eeef21db7d46748d492349220d51",
     "terminal": {
       "columns": 120,
       "rows": 40,
@@ -105,7 +105,7 @@
           "platform_picker": {"canonical": false, "echo": false},
           "tool_configuration": {"canonical": true, "echo": true},
           "checklist": {"canonical": false, "echo": false},
-          "provider_inventory": {"canonical": true, "echo": true}
+          "provider_inventory": {"canonical": false, "echo": false}
         },
         "persistence": {
           "config_before_exists": false,

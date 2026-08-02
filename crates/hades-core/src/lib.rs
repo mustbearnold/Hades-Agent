@@ -272,6 +272,7 @@ pub struct StandaloneSetupState {
     terminal_backend_cursor: usize,
     tool_cursor: usize,
     tool_enabled: [bool; SETUP_STANDALONE_TOOL_CHECKLIST_ROWS.len()],
+    provider_cursor: usize,
 }
 
 impl Default for StandaloneSetupState {
@@ -284,6 +285,7 @@ impl Default for StandaloneSetupState {
             terminal_backend_cursor: SETUP_TERMINAL_BACKEND_ROWS.len() - 1,
             tool_cursor: 0,
             tool_enabled: [true; SETUP_STANDALONE_TOOL_CHECKLIST_ROWS.len()],
+            provider_cursor: SETUP_STANDALONE_TOOL_PROVIDER_DEFAULT_INDEX,
         }
     }
 }
@@ -339,6 +341,10 @@ impl StandaloneSetupState {
 
     pub fn is_tool_provider_boundary(&self) -> bool {
         self.surface == StandaloneSetupSurface::ToolProviderBoundary
+    }
+
+    pub fn provider_cursor(&self) -> usize {
+        self.provider_cursor
     }
 
     pub fn is_numbered_fallback(&self) -> bool {
@@ -432,7 +438,18 @@ impl StandaloneSetupState {
                 }
                 _ => StandaloneSetupAction::Continue,
             },
-            StandaloneSetupSurface::ToolProviderBoundary => StandaloneSetupAction::Continue,
+            StandaloneSetupSurface::ToolProviderBoundary => match key {
+                Key::Down => {
+                    self.provider_cursor = (self.provider_cursor + 1)
+                        .min(SETUP_STANDALONE_TOOL_PROVIDER_OPTIONS.len() - 1);
+                    StandaloneSetupAction::Moved
+                }
+                Key::Up => {
+                    self.provider_cursor = self.provider_cursor.saturating_sub(1);
+                    StandaloneSetupAction::Moved
+                }
+                _ => StandaloneSetupAction::Continue,
+            },
             StandaloneSetupSurface::NumberedFallback => match key {
                 Key::Ctrl('c') => StandaloneSetupAction::Quit,
                 _ => StandaloneSetupAction::Continue,
@@ -1348,6 +1365,28 @@ mod tests {
         assert!(SETUP_STANDALONE_TOOL_PROVIDER_OPTIONS[0].contains("Local Browser"));
         assert!(SETUP_STANDALONE_TOOL_PROVIDER_OPTIONS[6].contains("Skip"));
         assert!(SETUP_STANDALONE_TOOL_PROVIDER_CONTROLS.contains("ENTER/SPACE select"));
+    }
+
+    #[test]
+    fn standalone_tool_provider_down_moves_cursor_without_changing_selection() {
+        let mut setup = StandaloneSetupState::default();
+        setup.handle_key(Key::Down);
+        setup.handle_key(Key::Enter);
+        setup.handle_key(Key::Ctrl('c'));
+        setup.handle_key(Key::Enter);
+        setup.handle_key(Key::Ctrl('c'));
+        setup.handle_key(Key::Escape);
+        assert_eq!(
+            setup.handle_key(Key::Ctrl('c')),
+            StandaloneSetupAction::EnteredToolProviderBoundary
+        );
+        assert_eq!(setup.provider_cursor(), SETUP_STANDALONE_TOOL_PROVIDER_DEFAULT_INDEX);
+        assert_eq!(setup.handle_key(Key::Down), StandaloneSetupAction::Moved);
+        assert_eq!(setup.provider_cursor(), 1);
+        assert_eq!(SETUP_STANDALONE_TOOL_PROVIDER_DEFAULT_INDEX, 0);
+        assert!(setup.is_tool_provider_boundary());
+        assert_eq!(setup.handle_key(Key::Enter), StandaloneSetupAction::Continue);
+        assert_eq!(setup.provider_cursor(), 1);
     }
 
     #[test]

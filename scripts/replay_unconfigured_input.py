@@ -21,6 +21,7 @@ from probe_tui_lifecycle import (
     set_window_size,
     terminal_flags,
     marker_present,
+    retain_slave_descriptor,
     wait_for,
     wait_for_exit,
 )
@@ -83,7 +84,9 @@ def spawn(binary: Path, arguments: list[str]) -> tuple[int, int, str, Path]:
             os._exit(127)
 
     set_window_size(master, COLUMNS, ROWS)
-    return pid, master, os.readlink(f"/proc/{pid}/fd/0"), home
+    slave_path = os.readlink(f"/proc/{pid}/fd/0")
+    retain_slave_descriptor(slave_path)
+    return pid, master, slave_path, home
 
 
 def cleanup_process(pid: int, master: int, home: Path, reaped: bool) -> None:

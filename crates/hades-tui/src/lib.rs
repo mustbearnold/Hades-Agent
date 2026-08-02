@@ -103,7 +103,7 @@ pub fn draw_standalone_setup(frame: &mut Frame<'_>, wizard: &StandaloneSetupStat
         return;
     }
     if wizard.is_tool_provider_boundary() {
-        draw_standalone_tool_provider_boundary(frame);
+        draw_standalone_tool_provider_boundary(frame, wizard);
         return;
     }
     if wizard.is_numbered_fallback() && wizard.terminal_backend_fallback() {
@@ -220,7 +220,7 @@ fn draw_standalone_tool_checklist(frame: &mut Frame<'_>, wizard: &StandaloneSetu
     frame.render_widget(Paragraph::new(Text::from(lines)), frame.area());
 }
 
-fn draw_standalone_tool_provider_boundary(frame: &mut Frame<'_>) {
+fn draw_standalone_tool_provider_boundary(frame: &mut Frame<'_>, wizard: &StandaloneSetupState) {
     let mut lines = SETUP_STANDALONE_TOOL_PROVIDER_LINES
         .iter()
         .map(|line| Line::styled(*line, HERMES_PALETTE.secondary()))
@@ -233,9 +233,8 @@ fn draw_standalone_tool_provider_boundary(frame: &mut Frame<'_>) {
         |(index, option)| {
             let selected =
                 if index == SETUP_STANDALONE_TOOL_PROVIDER_DEFAULT_INDEX { "●" } else { "○" };
-            let cursor =
-                if index == SETUP_STANDALONE_TOOL_PROVIDER_DEFAULT_INDEX { "→" } else { " " };
-            let style = if index == SETUP_STANDALONE_TOOL_PROVIDER_DEFAULT_INDEX {
+            let cursor = if index == wizard.provider_cursor() { "→" } else { " " };
+            let style = if index == wizard.provider_cursor() {
                 HERMES_PALETTE.ready()
             } else {
                 HERMES_PALETTE.secondary()
@@ -1123,6 +1122,20 @@ mod tests {
         assert!(rendered.contains("Firecrawl"));
         assert!(rendered.contains("Skip — keep defaults / configure later"));
         assert!(rendered.contains("→ (●) Local Browser"));
+
+        wizard.handle_key(hades_core::Key::Down);
+        terminal
+            .draw(|frame| draw_standalone_setup(frame, &wizard))
+            .expect("rendering is infallible");
+        let moved = terminal
+            .backend()
+            .buffer()
+            .content()
+            .iter()
+            .map(|cell| cell.symbol())
+            .collect::<String>();
+        assert!(moved.contains("→ (○) Nous Subscription"));
+        assert!(moved.contains("(●) Local Browser"));
     }
 
     #[test]
