@@ -11,7 +11,9 @@ use hades_core::{
     SETUP_STANDALONE_TERMINAL_LINES, SETUP_STANDALONE_TERMINAL_TITLE,
     SETUP_STANDALONE_TOOL_CHECKLIST_CONTROLS, SETUP_STANDALONE_TOOL_CHECKLIST_ROWS,
     SETUP_STANDALONE_TOOL_CHECKLIST_TITLE, SETUP_STANDALONE_TOOL_CONFIGURATION_LINES,
-    SETUP_STANDALONE_TOOL_CONFIGURATION_TITLE, SETUP_STANDALONE_TOOL_PROVIDER_LINES,
+    SETUP_STANDALONE_TOOL_CONFIGURATION_TITLE, SETUP_STANDALONE_TOOL_PROVIDER_CONTROLS,
+    SETUP_STANDALONE_TOOL_PROVIDER_DEFAULT_INDEX, SETUP_STANDALONE_TOOL_PROVIDER_LINES,
+    SETUP_STANDALONE_TOOL_PROVIDER_OPTIONS, SETUP_STANDALONE_TOOL_PROVIDER_TITLE,
     SETUP_TERMINAL_BACKEND_CONTROLS, SETUP_TERMINAL_BACKEND_ROWS, SETUP_TERMINAL_BACKEND_TITLE,
     SETUP_WIZARD_CHOICES, SetupWizardSurface, StandaloneSetupState, StartupState, TurnState,
 };
@@ -219,10 +221,28 @@ fn draw_standalone_tool_checklist(frame: &mut Frame<'_>, wizard: &StandaloneSetu
 }
 
 fn draw_standalone_tool_provider_boundary(frame: &mut Frame<'_>) {
-    let lines = SETUP_STANDALONE_TOOL_PROVIDER_LINES
+    let mut lines = SETUP_STANDALONE_TOOL_PROVIDER_LINES
         .iter()
         .map(|line| Line::styled(*line, HERMES_PALETTE.secondary()))
         .collect::<Vec<_>>();
+    lines.extend([
+        Line::styled(SETUP_STANDALONE_TOOL_PROVIDER_TITLE, HERMES_PALETTE.brand()),
+        Line::styled(SETUP_STANDALONE_TOOL_PROVIDER_CONTROLS, HERMES_PALETTE.secondary()),
+    ]);
+    lines.extend(SETUP_STANDALONE_TOOL_PROVIDER_OPTIONS.iter().enumerate().map(
+        |(index, option)| {
+            let selected =
+                if index == SETUP_STANDALONE_TOOL_PROVIDER_DEFAULT_INDEX { "●" } else { "○" };
+            let cursor =
+                if index == SETUP_STANDALONE_TOOL_PROVIDER_DEFAULT_INDEX { "→" } else { " " };
+            let style = if index == SETUP_STANDALONE_TOOL_PROVIDER_DEFAULT_INDEX {
+                HERMES_PALETTE.ready()
+            } else {
+                HERMES_PALETTE.secondary()
+            };
+            Line::styled(format!(" {cursor} ({selected}) {option}"), style)
+        },
+    ));
     frame.render_widget(Paragraph::new(Text::from(lines)), frame.area());
 }
 
@@ -1093,6 +1113,16 @@ mod tests {
         assert!(rendered.contains("Browser Automation"));
         assert!(rendered.contains("Computer Use (macOS/Windows/Linux)"));
         assert!(rendered.contains("Browser Automation - Choose a provider"));
+        assert!(rendered.contains("Choose a provider:"));
+        assert!(rendered.contains("ENTER/SPACE select"));
+        assert!(rendered.contains("Local Browser"));
+        assert!(rendered.contains("Nous Subscription"));
+        assert!(rendered.contains("Camofox"));
+        assert!(rendered.contains("Browser Use"));
+        assert!(rendered.contains("Browserbase"));
+        assert!(rendered.contains("Firecrawl"));
+        assert!(rendered.contains("Skip — keep defaults / configure later"));
+        assert!(rendered.contains("→ (●) Local Browser"));
     }
 
     #[test]

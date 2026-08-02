@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-02T01:48:02Z",
+  "updated_at": "2026-08-02T02:07:35Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -4497,6 +4497,68 @@
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/hermes-tool-provider-inventory-probe.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-085",
+      "title": "Implement bounded Browser Automation provider inventory surface",
+      "status": "complete",
+      "priority": 10,
+      "lane": "interaction",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-084"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "typed_state",
+        "focused_tests",
+        "direct_pty_replay",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Extend the bounded standalone Hades setup handoff so the first-install Browser Automation provider surface renders the observed selection controls and seven observed options, with Local Browser visibly selected as the recommended free option.",
+        "Keep the provider inventory display in the restored canonical/echo terminal boundary and keep setup alive without submitting a provider, credential, OAuth action, network request, or persistence change. Do not claim Enter, Space, Escape, provider discovery, or later cancellation semantics that remain unobserved.",
+        "Add typed constants/state and focused core/TUI/CLI coverage plus a sanitized OBS-0080 Hades fixture and direct-PTY replay asserting the inventory labels, controls, process liveness, terminal flags, config/artifact invariants, and no secret-bearing input.",
+        "Update the parity observation, context, matrix, readme, and gates. The evidence boundary must not slow, disable, or otherwise nerf Hades capabilities, and Hermes defects or failure cases must not be intentionally reproduced.",
+        "Run the targeted replay and complete the no-skip just verify gate before completion."
+      ],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-cli/src/main.rs",
+        "crates/hades-tui/src/lib.rs",
+        "scripts/replay_standalone_tool_provider_inventory.py",
+        "tests/fixtures/parity/OBS-0080-hades-tool-provider-inventory.json",
+        "docs/parity/observations/OBS-0080-hades-tool-provider-inventory-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hades-tool-provider-inventory-replay.json"
+      ],
+      "ready_at": "2026-08-02T01:50:00Z",
+      "claimed_by": "provider-inventory-implementer",
+      "claimed_at": "2026-08-02T01:49:28Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Implemented the bounded Browser Automation provider inventory display with seven observed options, focused typed/core/TUI coverage, sanitized OBS-0080 evidence, direct PTY replay, and complete just verify PASS. No provider selection, credentials, OAuth, network, or persistence behavior was invented; Hermes defects are not reproduced and the evidence boundary does not nerf Hades.",
+        "completed_at": "2026-08-02T02:07:35Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-cli/src/main.rs",
+          "crates/hades-tui/src/lib.rs",
+          "scripts/replay_standalone_tool_provider_inventory.py",
+          "tests/fixtures/parity/OBS-0080-hades-tool-provider-inventory.json",
+          "docs/parity/observations/OBS-0080-hades-tool-provider-inventory-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hades-tool-provider-inventory-replay.json"
         ]
       }
     }

@@ -427,6 +427,15 @@ progress from August 1, 2026 through 2027.
   provider completeness, selection semantics, network behavior, persistence,
   and later cancellation remain unknown. The evidence boundary does not cap
   Hades performance or capabilities.
+- HAD-085 carries that inventory into Hades as a bounded display-only surface.
+  The restored canonical/echo boundary renders the seven observed options and
+  controls with Local Browser selected as the recommended default. The direct
+  PTY replay confirms the process remains alive, config is unchanged after the
+  Tool Configuration boundary, and no new artifact or `.env` file appears.
+  Provider selection, credentials, OAuth, networking, discovery timing, and
+  later cancellation remain unknown. Hermes defects and failure cases are not
+  compatibility requirements; Hades fixes them rather than intentionally
+  reproducing them, and the evidence boundary does not cap Rust performance.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes

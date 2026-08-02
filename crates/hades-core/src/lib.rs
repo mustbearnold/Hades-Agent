@@ -215,6 +215,19 @@ pub const SETUP_STANDALONE_TOOL_PROVIDER_LINES: [&str; 11] = [
     "",
     "  --- 🌐 Browser Automation - Choose a provider ---",
 ];
+pub const SETUP_STANDALONE_TOOL_PROVIDER_TITLE: &str = "Choose a provider:";
+pub const SETUP_STANDALONE_TOOL_PROVIDER_CONTROLS: &str =
+    "↑↓ navigate  ENTER/SPACE select  ESC cancel";
+pub const SETUP_STANDALONE_TOOL_PROVIDER_DEFAULT_INDEX: usize = 0;
+pub const SETUP_STANDALONE_TOOL_PROVIDER_OPTIONS: [&str; 7] = [
+    "Local Browser [★ recommended · free] — Headless Chromium, no API key needed",
+    "Nous Subscription (Browser Use cloud) [subscription] — Managed Browser Use billed to your subscription",
+    "Camofox [free · local] — Anti-detection browser (Firefox/Camoufox)",
+    "Browser Use [paid] — Cloud browser with remote execution",
+    "Browserbase [paid] — Cloud browser with stealth and proxies",
+    "Firecrawl [paid] — Cloud browser with remote execution",
+    "Skip — keep defaults / configure later",
+];
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub enum StandaloneSetupSurface {
@@ -1326,6 +1339,15 @@ mod tests {
         assert!(setup.is_tool_checklist());
         assert_eq!(setup.handle_key(Key::Enter), StandaloneSetupAction::Continue);
         assert!(setup.is_tool_checklist());
+    }
+
+    #[test]
+    fn standalone_tool_provider_inventory_is_a_display_only_observation() {
+        assert_eq!(SETUP_STANDALONE_TOOL_PROVIDER_DEFAULT_INDEX, 0);
+        assert_eq!(SETUP_STANDALONE_TOOL_PROVIDER_OPTIONS.len(), 7);
+        assert!(SETUP_STANDALONE_TOOL_PROVIDER_OPTIONS[0].contains("Local Browser"));
+        assert!(SETUP_STANDALONE_TOOL_PROVIDER_OPTIONS[6].contains("Skip"));
+        assert!(SETUP_STANDALONE_TOOL_PROVIDER_CONTROLS.contains("ENTER/SPACE select"));
     }
 
     #[test]

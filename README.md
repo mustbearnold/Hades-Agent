@@ -98,6 +98,7 @@ just replay-standalone-setup  # standalone hades setup PTY replay
 just replay-standalone-full-setup # standalone Full setup continuation replay
 just replay-standalone-terminal-platform # standalone platform cancellation replay
 just replay-standalone-tool-provider # standalone tool checklist/provider boundary replay
+just replay-standalone-tool-provider-inventory # standalone Browser Automation provider inventory replay
 just install-user             # build and install hades/Hades on user PATH
 just snapshot                 # deterministic terminal snapshot
 just probe-lifecycle          # PTY lifecycle and cleanup oracle

@@ -32,7 +32,9 @@ use hades_core::{
     InputEvent, Key, PRODUCT_NAME, ProviderEvent, Role, SETUP_STANDALONE_BANNER,
     SETUP_STANDALONE_NO_PLATFORMS, SETUP_STANDALONE_PROMPT,
     SETUP_STANDALONE_TOOL_CONFIGURATION_LINES, SETUP_STANDALONE_TOOL_CONFIGURATION_TITLE,
-    SETUP_STANDALONE_TOOL_PROVIDER_LINES, SETUP_TERMINAL_BACKEND_ROWS, SETUP_WIZARD_CHOICES,
+    SETUP_STANDALONE_TOOL_PROVIDER_CONTROLS, SETUP_STANDALONE_TOOL_PROVIDER_DEFAULT_INDEX,
+    SETUP_STANDALONE_TOOL_PROVIDER_LINES, SETUP_STANDALONE_TOOL_PROVIDER_OPTIONS,
+    SETUP_STANDALONE_TOOL_PROVIDER_TITLE, SETUP_TERMINAL_BACKEND_ROWS, SETUP_WIZARD_CHOICES,
     StandaloneSetupAction, StandaloneSetupState, StartupState, TurnState,
 };
 use hades_provider::{
@@ -375,6 +377,15 @@ fn print_tool_provider_boundary() -> io::Result<()> {
     let mut stdout = io::stdout();
     for line in SETUP_STANDALONE_TOOL_PROVIDER_LINES {
         writeln!(stdout, "{line}")?;
+    }
+    writeln!(stdout, "{SETUP_STANDALONE_TOOL_PROVIDER_TITLE}")?;
+    writeln!(stdout, "{SETUP_STANDALONE_TOOL_PROVIDER_CONTROLS}")?;
+    for (index, option) in SETUP_STANDALONE_TOOL_PROVIDER_OPTIONS.iter().enumerate() {
+        let selected =
+            if index == SETUP_STANDALONE_TOOL_PROVIDER_DEFAULT_INDEX { "●" } else { "○" };
+        let cursor =
+            if index == SETUP_STANDALONE_TOOL_PROVIDER_DEFAULT_INDEX { "→" } else { " " };
+        writeln!(stdout, " {cursor} ({selected}) {option}")?;
     }
     stdout.flush()
 }
