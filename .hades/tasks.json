@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-02T11:32:31Z",
+  "updated_at": "2026-08-02T11:51:13Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -5375,6 +5375,69 @@
           "docs/parity/MATRIX.md",
           "CONTEXT.md",
           "README.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-100",
+      "title": "Prove installed hades and Hades launchers through the vertical slice",
+      "status": "complete",
+      "priority": 90,
+      "lane": "release",
+      "owner_role": "verifier",
+      "depends_on": [
+        "HAD-099",
+        "HAD-093",
+        "HAD-094"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "release_launcher_resolution",
+        "installed_alias_vertical_slice",
+        "streamed_request_model_boundary",
+        "fresh_process_nonpersistence",
+        "full_verify"
+      ],
+      "acceptance": [
+        "After the existing user-local release install, clean Bash and Fish command lookup resolves both hades and Hades to the intended release artifact without reading shell profiles or mutating shell configuration.",
+        "Run the complete OBS-0094 setup, model-selection, prompt, streamed-answer, fresh-process, sidecar, and terminal-cleanup oracle through each installed alias, proving the shipped command\u2014not only target/debug/hades\u2014works.",
+        "Keep each alias run isolated with synthetic HERMES_HOME and a loopback-only HTTP/SSE fixture; record no credentials, no external network, no Hermes config mutation, exactly one selected-model request and one fresh-process configured-model request per run.",
+        "Add a sanitized OBS-0095 fixture, deterministic installed-alias replay/report, observation and README/matrix/just/verify wiring; preserve the existing installer refusal and PATH boundaries.",
+        "Run the targeted installed-alias replay and complete the no-skip just verify gate before completion."
+      ],
+      "evidence": [
+        "scripts/replay_installed_model_selection.py",
+        "scripts/replay_model_selection.py",
+        "scripts/replay_fresh_shell_launch.py",
+        "scripts/install_user_launcher.sh",
+        "tests/fixtures/parity/OBS-0095-hades-installed-model-selection.json",
+        "docs/parity/observations/OBS-0095-hades-installed-model-selection-2026-08-02.md",
+        ".hades/runtime/installed-model-selection-replay.json",
+        "justfile",
+        "scripts/verify.sh",
+        "README.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md"
+      ],
+      "claimed_by": "installed-vertical-slice-verifier",
+      "claimed_at": "2026-08-02T11:34:42Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Proved the installed release path end to end. Clean Bash and Fish shells resolve hades and Hades to target/release/hades, and both aliases pass the OBS-0094 setup, session model selection, streamed answer, fresh-process reset, sidecar, and terminal-cleanup oracle. OBS-0095 and the complete no-skip just verify gate pass without credentials, external network, or Hermes config mutation.",
+        "completed_at": "2026-08-02T11:51:13Z",
+        "evidence": [
+          "scripts/replay_installed_model_selection.py",
+          "scripts/replay_model_selection.py",
+          "scripts/replay_fresh_shell_launch.py",
+          "scripts/install_user_launcher.sh",
+          "tests/fixtures/parity/OBS-0095-hades-installed-model-selection.json",
+          "docs/parity/observations/OBS-0095-hades-installed-model-selection-2026-08-02.md",
+          ".hades/runtime/installed-model-selection-replay.json",
+          "justfile",
+          "scripts/verify.sh",
+          "README.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md"
         ]
       }
     }

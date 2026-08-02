@@ -84,6 +84,8 @@ python3 scripts/replay_model_selection.py --binary target/debug/hades --report .
 cargo build --locked --release --package hades-cli
 bash scripts/install_user_launcher.sh
 python3 scripts/replay_fresh_shell_launch.py --report .hades/runtime/fresh-shell-launch-replay.json
+python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0095-hades-installed-model-selection.json
+python3 scripts/replay_installed_model_selection.py --report .hades/runtime/installed-model-selection-replay.json --timeout 10
 python3 scripts/replay_unconfigured_help.py --binary "$HOME/.local/bin/hades" --report .hades/runtime/installed-help-setup-required-hades.json --timeout 12
 python3 scripts/replay_unconfigured_help.py --binary "$HOME/.local/bin/Hades" --report .hades/runtime/installed-help-setup-required-Hades.json --timeout 12
 python3 scripts/replay_standalone_setup.py --binary "$HOME/.local/bin/hades" --report .hades/runtime/installed-standalone-setup-hades.json --timeout 5

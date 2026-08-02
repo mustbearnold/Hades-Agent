@@ -99,6 +99,7 @@ just replay-cli-launch        # no-argument and explicit-tui PTY launch replay
 just replay-fresh-shell-launch # fresh Bash/Fish command resolution and installed TUI lifecycle
 just replay-vertical-slice    # setup -> local provider/model -> prompt -> streamed answer
 just replay-model-selection   # session model selection -> effective request -> fresh-process reset
+just replay-installed-model-selection # release hades/Hades aliases -> same vertical slice
 just replay-unconfigured-help # delayed /help setup-required PTY replay
 just replay-standalone-setup  # standalone hades setup PTY replay
 just replay-standalone-full-setup # standalone Full setup continuation replay
@@ -206,6 +207,11 @@ uses it, then launches a fresh process against the unchanged sidecar and
 proves vertical-model is used again. The selection is deliberately
 session-scoped; Hermes retries, failures, and repeated metadata requests are
 not copied into Hades.
+
+The installed command path is covered by just replay-installed-model-selection.
+It resolves both hades and Hades in clean Bash and Fish shells, then runs the
+same model-selection vertical slice through the release artifact behind each
+alias.
 
 Provider failures are covered by `just replay-provider-recovery`. Its local
 HTTP 500, malformed-SSE, and incomplete-stream cases return to a visible Ready

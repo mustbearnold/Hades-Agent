@@ -48,6 +48,11 @@ replay-model-selection:
     cargo build --locked --package hades-cli
     python3 scripts/replay_model_selection.py --binary target/debug/hades --report .hades/runtime/model-selection-replay.json
 
+replay-installed-model-selection:
+    cargo build --locked --release --package hades-cli
+    bash scripts/install_user_launcher.sh
+    python3 scripts/replay_installed_model_selection.py --report .hades/runtime/installed-model-selection-replay.json
+
 replay-differential:
     cargo build --locked --package hades-cli
     python3 scripts/differential_replay.py --binary target/debug/hades --report .hades/runtime/differential-replay.json

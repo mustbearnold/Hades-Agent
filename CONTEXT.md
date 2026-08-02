@@ -172,6 +172,11 @@ progress from August 1, 2026 through 2027.
   sidecar uses vertical-model again. OBS-0094 proves the request boundary,
   byte-identical sidecar, clean streaming lifecycle, and terminal restoration;
   saved provider selection remains intentionally unimplemented.
+- HAD-100 proves the shipped user-local command path for that vertical slice:
+  clean Bash and Fish shells resolve both hades and Hades to target/release/hades,
+  and each installed alias completes the OBS-0094 selection, streamed request,
+  fresh-process reset, and terminal-cleanup oracle. PATH absence, system-wide
+  installation, and shell-profile mutation remain explicit boundaries.
 - HAD-041 captures the initial Hermes setup wizard in fresh direct PTYs: the
   title, explanation, Quick Setup/Full setup/Blank Slate radio list, initial
   Quick Setup selection, Down navigation to Full setup, and the observed

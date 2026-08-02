@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0095",
+  "reference_observation": "OBS-0094",
+  "surface": "hades-installed-launcher-model-selection-vertical-slice",
+  "reference": {
+    "product": "Hades Agent",
+    "version": "workspace release artifact",
+    "source_commit": "aebdf8381e24c9a8695f8c8b6aecd427a036d8f7",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "clean Bash/Fish shells and fresh direct PTYs with deterministic loopback HTTP/SSE"
+    },
+    "capture": "user-local release install, lowercase/capitalized command lookup, and OBS-0094 replay through both aliases"
+  },
+  "normalization": [
+    "User home, launcher directory, release binary path, PTY paths, timestamps, process identifiers, ephemeral ports, and raw redraw bytes are omitted or represented by stable markers.",
+    "Fresh Bash and Fish shells receive only a synthetic HOME/HERMES_HOME and a PATH containing the user-local launcher directory followed by /usr/bin and /bin; shell profiles and configuration files are not read.",
+    "Each alias replay uses an isolated HERMES_HOME, a loopback-only HTTP/SSE fixture, and normalized model/request markers; no credential value or external request is recorded.",
+    "The lowercase and capitalized aliases are checked separately so a passing debug executable cannot mask an installed-release or command-resolution failure."
+  ],
+  "steps": [
+    {
+      "id": "fresh-shell-alias-resolution",
+      "precondition": "The user-local release binary is installed as hades and Hades in ~/.local/bin.",
+      "input_sequence": [
+        {
+          "kind": "command",
+          "value": "bash --noprofile --norc: command -v hades; Hades --version; hades --help",
+          "bytes_hex": "63 6f 6d 6d 61 6e 64 20 2d 76 20 68 61 64 65 73"
+        },
+        {
+          "kind": "command",
+          "value": "fish --no-config: command -v Hades; hades --version; Hades --help",
+          "bytes_hex": "63 6f 6d 6d 61 6e 64 20 2d 76 20 48 61 64 65 73"
+        }
+      ],
+      "output": {
+        "status": "passed",
+        "shells": ["bash", "fish"],
+        "resolved_aliases": ["~/.local/bin/hades", "~/.local/bin/Hades"],
+        "resolved_artifact": "target/release/hades",
+        "version_marker": "Hades Agent 0.1.0",
+        "help_marker": "Usage: hades",
+        "profiles_read": false
+      }
+    },
+    {
+      "id": "installed-lowercase-vertical-slice",
+      "precondition": "Fresh Hades launcher process started through the installed hades alias.",
+      "input_sequence": [
+        {
+          "kind": "command",
+          "value": "hades setup --local <loopback-url> vertical-model; hades",
+          "bytes_hex": "68 61 64 65 73 20 73 65 74 75 70 20 2d 2d 6c 6f 63 61 6c"
+        },
+        {
+          "kind": "key",
+          "value": "Select palette-model, submit prompt, fresh-process prompt, Ctrl+C cleanup",
+          "bytes_hex": "2f 6d 6f 64 65 6c 0d 0d 70 61 6c 65 74 74 65 0d 0d 0d 03"
+        }
+      ],
+      "output": {
+        "status": "passed",
+        "alias": "hades",
+        "selected_model_request": "palette-model",
+        "fresh_process_request": "vertical-model",
+        "provider_request_count": 2,
+        "sidecar_unchanged": true,
+        "hermes_config_created": false,
+        "terminal_restored": true
+      }
+    },
+    {
+      "id": "installed-capitalized-vertical-slice",
+      "precondition": "Fresh Hades launcher process started through the installed Hades alias.",
+      "input_sequence": [
+        {
+          "kind": "command",
+          "value": "Hades setup --local <loopback-url> vertical-model; Hades",
+          "bytes_hex": "48 61 64 65 73 20 73 65 74 75 70 20 2d 2d 6c 6f 63 61 6c"
+        },
+        {
+          "kind": "key",
+          "value": "Select palette-model, submit prompt, fresh-process prompt, Ctrl+C cleanup",
+          "bytes_hex": "2f 6d 6f 64 65 6c 0d 0d 70 61 6c 65 74 74 65 0d 0d 0d 03"
+        }
+      ],
+      "output": {
+        "status": "passed",
+        "alias": "Hades",
+        "selected_model_request": "palette-model",
+        "fresh_process_request": "vertical-model",
+        "provider_request_count": 2,
+        "sidecar_unchanged": true,
+        "hermes_config_created": false,
+        "terminal_restored": true
+      }
+    }
+  ],
+  "boundaries": {
+    "installation": "user-local symlinks only",
+    "aliases": ["hades", "Hades"],
+    "provider": "loopback only",
+    "external_network": false,
+    "authorization_values_recorded": false,
+    "hermes_config_mutation": false,
+    "shell_profile_mutation": false
+  },
+  "unknowns": [
+    "A shell whose PATH omits ~/.local/bin cannot resolve these user-local aliases; system-wide installation and shell-profile mutation remain outside the contract.",
+    "External providers, credentials, OAuth, tools, model catalogs, and network behavior remain outside this release-launcher oracle.",
+    "The replay proves the installed artifact carries the bounded vertical slice, not every future Hermes surface or persistent model-selection behavior."
+  ]
+}
