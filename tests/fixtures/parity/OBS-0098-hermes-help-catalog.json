@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0098",
+  "surface": "hermes-tui-stable-help-panel",
+  "reference": {
+    "product": "Hermes TUI",
+    "version": "0.19.1 (2026.7.30)",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "direct PTY with normalized stable landmarks and ANSI screen model"
+    },
+    "capture": "fresh synthetic Hermes home with bounded /help submission and clean ready-state cleanup"
+  },
+  "normalization": [
+    "Reference checkout, synthetic HOME/HERMES_HOME paths, loopback URL, credentials, session IDs, timestamps, dynamic inventories, and animated redraw bytes are omitted or represented by stable markers.",
+    "The configured loopback endpoint is intentionally absent; the bounded /help route exercises no provider request, credential, OAuth action, or external network.",
+    "The help surface is represented by its stable bordered command row and composer row; dynamic tool/skill counts and the complete slash-command catalog are not promoted into the contract.",
+    "Ctrl+C is sent only after the stable help panel and must restore the terminal and exit cleanly."
+  ],
+  "steps": [
+    {
+      "id": "configured-help-panel",
+      "precondition": "Fresh Hermes process at 120x40 with an isolated synthetic home and an intentionally absent loopback provider endpoint.",
+      "input_sequence": [
+        {"kind": "text", "value": "/help", "bytes_hex": "2f 68 65 6c 70"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "bounded cleanup"}
+      ],
+      "output": {
+        "status": "passed",
+        "main_surface_markers": [
+          "Hermes Agent",
+          "Available Tools",
+          "Available Skills",
+          "/help for commands"
+        ],
+        "help_panel": {
+          "top_border": "╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗",
+          "command": "/help Show available commands",
+          "bottom_border": "╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝",
+          "composer": "❯ /help"
+        },
+        "stable_samples": 3,
+        "state": "ready",
+        "provider_request": "not observed; the configured loopback endpoint was intentionally absent",
+        "side_effects": "No other slash command, provider request, credential, OAuth flow, or external network was exercised",
+        "clean_exit": true
+      }
+    }
+  ],
+  "boundaries": {
+    "provider": "intentionally absent loopback endpoint",
+    "side_effecting_commands": "not executed",
+    "dynamic_inventory": "not claimed",
+    "complete_catalog": "unknown"
+  },
+  "unknowns": [
+    "The complete slash-command catalog, aliases, arguments, command-specific state, and help pagination remain unknown.",
+    "Provider/tool/skill counts, discovery timing, redraw ordering, and dynamic command inventory remain outside this stable help-panel contract.",
+    "No side-effecting slash command, reachable provider, tool call, or external network behavior is claimed by this observation."
+  ]
+}

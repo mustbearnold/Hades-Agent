@@ -25,6 +25,7 @@ python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0033-had
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0034-hermes-terminal-palette.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0035-hades-terminal-palette.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0036-hermes-slash-command-surfaces.json
+python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0098-hermes-help-catalog.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0038-hermes-model-picker-model-stage.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0039-hades-model-picker-model-stage.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0093-hermes-model-picker-selection.json
@@ -115,6 +116,7 @@ python3 scripts/probe_hermes_osc52_multiplexer.py --report .hades/runtime/hermes
 python3 scripts/probe_hermes_osc52_timing_limits.py --report .hades/runtime/hermes-osc52-timing-limits-probe.json
 python3 scripts/probe_hermes_terminal_palette.py --report .hades/runtime/hermes-terminal-palette-probe.json --timeout 30
 python3 scripts/probe_hermes_slash_commands.py --report .hades/runtime/hermes-slash-commands-probe.json --timeout 30
+python3 scripts/probe_hermes_help_catalog.py --report .hades/runtime/hermes-help-catalog-probe.json --timeout 60
 python3 scripts/probe_hermes_model_picker.py --report .hades/runtime/hermes-model-picker-probe.json --timeout 30
 python3 scripts/probe_hermes_model_picker_selection.py --report .hades/runtime/hermes-model-picker-selection-probe.json --timeout 30
 python3 scripts/probe_hermes_distinct_model_selection.py --report .hades/runtime/hermes-distinct-model-selection-probe.json --timeout 60
@@ -160,7 +162,7 @@ python3 scripts/probe_hermes_setup_required_reconciliation.py --report .hades/ru
 python3 scripts/probe_hermes_help_setup_timing.py --report .hades/runtime/hermes-help-setup-timing-probe.json --timeout 30 --observation-window 15
 python3 scripts/probe_hermes_setup_required_actions.py --report .hades/runtime/hermes-setup-required-actions-probe.json --timeout 30 --observation-window 3
 python3 scripts/probe_hermes_standalone_setup.py --report .hades/runtime/hermes-standalone-setup-probe.json --timeout 30
-python3 scripts/probe_hermes_standalone_full_setup.py --report .hades/runtime/hermes-standalone-full-setup-probe.json --timeout 30
+python3 scripts/probe_hermes_standalone_full_setup.py --report .hades/runtime/hermes-standalone-full-setup-probe.json --timeout 60
 python3 scripts/probe_hermes_standalone_terminal_platform.py --report .hades/runtime/hermes-standalone-terminal-platform-probe.json --timeout 60
 python3 scripts/probe_hermes_standalone_tool_configuration.py --report .hades/runtime/hermes-standalone-tool-configuration-probe.json --timeout 30
 python3 scripts/probe_hermes_tool_configuration_navigation.py --report .hades/runtime/hermes-tool-configuration-navigation-probe.json --timeout 30

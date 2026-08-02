@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-02T22:32:00Z",
+  "updated_at": "2026-08-02T23:06:15Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -5556,6 +5556,60 @@
           "docs/parity/observations/OBS-0097-hermes-empty-platform-reconciliation-2026-08-03.md",
           ".hades/runtime/hermes-empty-platform-confirmation-probe.json",
           ".hades/runtime/hermes-empty-platform-reconciliation-probe.json",
+          "justfile",
+          "scripts/verify.sh",
+          "README.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-103",
+      "title": "Capture Hermes help catalog and safe slash-command boundaries",
+      "status": "complete",
+      "priority": 87,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-102"
+      ],
+      "risk": "high",
+      "oracle": [
+        "pinned_hermes_reference",
+        "normalized_help_transcript",
+        "safe_command_boundary",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Against the pinned Hermes source in a fresh synthetic home, submit only the bounded /help route and capture the stable help surface without credentials, external network, provider requests, or private runtime data.",
+        "Extract stable command/help landmarks and explicitly separate dynamic counts, provider/tool/skill inventory, redraw timing, and unobserved arguments from the compatibility contract.",
+        "Do not execute side-effecting slash commands or infer the complete catalog from names; preserve unknown commands and argument semantics as unknown until separately observed.",
+        "Add a provenance-bearing OBS-0098 fixture, repeatable direct-PTY probe, observation document, matrix/context/readme/just/verify wiring, and complete the no-skip gate."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_help_catalog.py",
+        "tests/fixtures/parity/OBS-0098-hermes-help-catalog.json",
+        "docs/parity/observations/OBS-0098-hermes-help-catalog-2026-08-03.md",
+        ".hades/runtime/hermes-help-catalog-probe.json",
+        "justfile",
+        "scripts/verify.sh",
+        "README.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md"
+      ],
+      "claimed_by": "hermes-help-catalog-researcher",
+      "claimed_at": "2026-08-02T22:35:31Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Captured the stable configured Hermes /help panel with exact bordered command/composer landmarks, ready-state cleanup, and explicit dynamic-catalog unknowns; wired OBS-0098 into the complete gate without executing side-effecting commands.",
+        "completed_at": "2026-08-02T23:06:15Z",
+        "evidence": [
+          "scripts/probe_hermes_help_catalog.py",
+          "tests/fixtures/parity/OBS-0098-hermes-help-catalog.json",
+          "docs/parity/observations/OBS-0098-hermes-help-catalog-2026-08-03.md",
+          ".hades/runtime/hermes-help-catalog-probe.json",
           "justfile",
           "scripts/verify.sh",
           "README.md",

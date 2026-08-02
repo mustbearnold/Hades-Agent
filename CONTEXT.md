@@ -552,6 +552,11 @@ progress from August 1, 2026 through 2027.
   surface without changing config or artifacts. The probe records either
   bounded outcome, and Hades keeps the safer explicit no-op until the
   reference variation and later continuation are resolved.
+- HAD-103 captures the stable configured Hermes `/help` panel in a fresh direct
+  PTY: the bordered `/help Show available commands` row, returned `❯ /help`
+  composer, ready state, and clean Ctrl+C cleanup. Dynamic inventories, the
+  complete slash-command catalog, aliases, and arguments remain unknown; no
+  side-effecting command or provider behavior is inferred or executed.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes

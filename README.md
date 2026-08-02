@@ -117,6 +117,7 @@ just probe-lifecycle          # PTY lifecycle and cleanup oracle
 just replay-differential     # visual + behavioral parity replay
 just replay-composer         # composer editing/history/multiline PTY replay
 just replay-completion       # slash completion and Tab application PTY replay
+just probe-help-catalog      # Hermes stable /help panel reference probe
 just replay-paste            # bracketed paste PTY replay
 just replay-editor             # unchanged-draft editor handoff PTY replay
 just replay-modified-enter     # native modified-Enter direct-PTY replay
@@ -217,6 +218,12 @@ streamed request using the alternate model, then checks the provider-stage
 current marker and config readback in a fresh process. The observed extra
 metadata or chat requests are retained as diagnostics only; Hades does not
 inherit an inferred retry or persistence policy.
+
+The stable Hermes `/help` panel is captured by `just probe-help-catalog`. It
+proves the bordered `/help Show available commands` row, the returned `❯ /help`
+composer, the ready state, and clean Ctrl+C cleanup without executing another
+command or contacting a provider. Dynamic counts and the complete command
+catalog remain explicitly unknown.
 
 The installed command path is covered by just replay-installed-model-selection.
 It resolves both hades and Hades in clean Bash and Fish shells, then runs the

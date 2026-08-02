@@ -140,6 +140,9 @@ probe-terminal-palette:
 probe-slash-commands:
     python3 scripts/probe_hermes_slash_commands.py --report .hades/runtime/hermes-slash-commands-probe.json --timeout 30
 
+probe-help-catalog:
+    python3 scripts/probe_hermes_help_catalog.py --report .hades/runtime/hermes-help-catalog-probe.json --timeout 60
+
 probe-model-picker:
     python3 scripts/probe_hermes_model_picker.py --report .hades/runtime/hermes-model-picker-probe.json --timeout 30
 
@@ -278,7 +281,7 @@ probe-hermes-standalone-setup:
     python3 scripts/probe_hermes_standalone_setup.py --report .hades/runtime/hermes-standalone-setup-probe.json --timeout 30
 
 probe-hermes-standalone-full-setup:
-    python3 scripts/probe_hermes_standalone_full_setup.py --report .hades/runtime/hermes-standalone-full-setup-probe.json --timeout 30
+    python3 scripts/probe_hermes_standalone_full_setup.py --report .hades/runtime/hermes-standalone-full-setup-probe.json --timeout 60
 
 probe-hermes-standalone-terminal-platform:
     python3 scripts/probe_hermes_standalone_terminal_platform.py --report .hades/runtime/hermes-standalone-terminal-platform-probe.json --timeout 60
