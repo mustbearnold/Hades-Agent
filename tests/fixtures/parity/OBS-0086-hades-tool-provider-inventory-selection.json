@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0086",
+  "surface": "hades-standalone-tool-provider-inventory-safe-actions",
+  "reference_observation": "OBS-0085",
+  "reference": {
+    "product": "Hades Agent",
+    "version": "workspace",
+    "source_commit": "c7fdf18cce5e149cd3be500a098351e44208d78d",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "fresh direct PTY cases with retained slave descriptors"
+    },
+    "capture": "fresh Hades debug process per safe provider action with synthetic HERMES_HOME"
+  },
+  "normalization": [
+    "Binary paths, synthetic HOME/HERMES_HOME paths, PTY paths, timestamps, process identifiers, raw redraw bytes, and full buffers are omitted or represented by stable markers.",
+    "Each fresh route reaches the provider inventory and sends exactly one bounded safe action; the Skip case sends six Down arrow sequences before Enter. No credential, OAuth, network-bearing, or persistence action is sent.",
+    "The replay requires canonical input and echo restoration, process liveness until explicit Ctrl+C cleanup, unchanged config/artifacts, and no provider subprocess or installer markers."
+  ],
+  "unknowns": [
+    "Paid/provider-specific selection, credentials, OAuth, discovery, persistence, later setup, and real browser capability remain outside this safe action boundary.",
+    "Hermes' implicit background installer/network side effect is deliberately not reproduced; Hades fixes that safety defect without capping performance or safer capabilities."
+  ],
+  "steps": [
+    {
+      "id": "enter-local-browser",
+      "input_sequence": [
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d", "meaning": "select the safe Local Browser row"}
+      ],
+      "output": {
+        "status": "passed",
+        "provider_inventory": {
+          "cursor_before": "Local Browser",
+          "selected_before": "Local Browser",
+          "terminal_flags_before_action": {"canonical": false, "echo": false},
+          "alternate_screen_entered": true,
+          "alternate_screen_left_before_provider_action": true
+        },
+        "action": {
+          "status_marker": "✓ Local Browser selected; no implicit installation or network activity started.",
+          "terminal_flags_after_action": {"canonical": true, "echo": true},
+          "process_alive_after_action": true,
+          "clean_exit_after_ctrl_c": {"kind": "exit", "code": 130},
+          "cleanup_terminal_flags": {"canonical": true, "echo": true},
+          "config_unchanged": true,
+          "new_artifacts": [],
+          "provider_subprocess_started": false
+        }
+      }
+    },
+    {
+      "id": "space-local-browser",
+      "input_sequence": [
+        {"kind": "key", "value": "Space", "bytes_hex": "20", "meaning": "select the safe Local Browser row"}
+      ],
+      "output": {
+        "status": "passed",
+        "provider_inventory": {
+          "cursor_before": "Local Browser",
+          "selected_before": "Local Browser",
+          "terminal_flags_before_action": {"canonical": false, "echo": false},
+          "alternate_screen_entered": true,
+          "alternate_screen_left_before_provider_action": true
+        },
+        "action": {
+          "status_marker": "✓ Local Browser selected; no implicit installation or network activity started.",
+          "terminal_flags_after_action": {"canonical": true, "echo": true},
+          "process_alive_after_action": true,
+          "clean_exit_after_ctrl_c": {"kind": "exit", "code": 130},
+          "cleanup_terminal_flags": {"canonical": true, "echo": true},
+          "config_unchanged": true,
+          "new_artifacts": [],
+          "provider_subprocess_started": false
+        }
+      }
+    },
+    {
+      "id": "enter-skip",
+      "input_sequence": [
+        {"kind": "key", "value": "Down x6", "repeat": 6, "bytes_hex": "1b 5b 42 1b 5b 42 1b 5b 42 1b 5b 42 1b 5b 42 1b 5b 42", "meaning": "move the cursor to Skip"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d", "meaning": "select Skip"}
+      ],
+      "output": {
+        "status": "passed",
+        "provider_inventory": {
+          "cursor_trace": [
+            "Nous Subscription (Browser Use cloud)",
+            "Camofox",
+            "Browser Use",
+            "Browserbase",
+            "Firecrawl",
+            "Skip — keep defaults / configure later"
+          ],
+          "selected_during_navigation": "Local Browser",
+          "terminal_flags_before_action": {"canonical": false, "echo": false},
+          "alternate_screen_entered": true,
+          "alternate_screen_left_before_provider_action": true
+        },
+        "action": {
+          "status_marker": "✓ Browser Automation skipped; no implicit installation or network activity started.",
+          "terminal_flags_after_action": {"canonical": true, "echo": true},
+          "process_alive_after_action": true,
+          "clean_exit_after_ctrl_c": {"kind": "exit", "code": 130},
+          "cleanup_terminal_flags": {"canonical": true, "echo": true},
+          "config_unchanged": true,
+          "new_artifacts": [],
+          "provider_subprocess_started": false
+        }
+      }
+    },
+    {
+      "id": "escape-cancel",
+      "input_sequence": [
+        {"kind": "key", "value": "Escape", "bytes_hex": "1b", "meaning": "cancel provider selection safely"}
+      ],
+      "output": {
+        "status": "passed",
+        "provider_inventory": {
+          "cursor_before": "Local Browser",
+          "selected_before": "Local Browser",
+          "terminal_flags_before_action": {"canonical": false, "echo": false},
+          "alternate_screen_entered": true,
+          "alternate_screen_left_before_provider_action": true
+        },
+        "action": {
+          "status_marker": "✓ Provider selection cancelled; no configuration or network activity started.",
+          "terminal_flags_after_action": {"canonical": true, "echo": true},
+          "process_alive_after_action": true,
+          "clean_exit_after_ctrl_c": {"kind": "exit", "code": 130},
+          "cleanup_terminal_flags": {"canonical": true, "echo": true},
+          "config_unchanged": true,
+          "new_artifacts": [],
+          "provider_subprocess_started": false
+        }
+      }
+    }
+  ],
+  "passed": true
+}

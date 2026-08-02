@@ -137,10 +137,18 @@ def wait_for_setup(pid: int, fd: int, buffer: bytes, case: str, timeout: float) 
 def wait_for_stable_menu(
     pid: int, fd: int, buffer: bytes, case: str, timeout: float
 ) -> tuple[bytes, dict[str, Any]]:
-    """Wait for the setup child to hold the rendered radiolist before input."""
+    """Wait for the setup child to hold the rendered radiolist before input.
+
+    The reference emits the first complete radiolist while it is still
+    switching the PTY into its interactive cursor mode.  A few equal screen
+    samples are not enough to establish that the input reader is ready: a key
+    sent in that gap can be consumed by the surrounding command surface.  Keep
+    the frame stable for a bounded settling interval before sending a key.
+    """
     deadline = time.monotonic() + timeout
     previous: tuple[tuple[str, Any], ...] | None = None
-    stable_samples = 0
+    stable_since: float | None = None
+    settle_seconds = 0.5
     while time.monotonic() < deadline:
         try:
             state = menu_state(buffer)
@@ -149,12 +157,16 @@ def wait_for_stable_menu(
         if state is not None:
             signature = tuple(sorted(state.items()))
             if signature == previous:
-                stable_samples += 1
+                if stable_since is None:
+                    stable_since = time.monotonic()
             else:
                 previous = signature
-                stable_samples = 1
-            if stable_samples >= 3:
+                stable_since = time.monotonic()
+            if stable_since is not None and time.monotonic() - stable_since >= settle_seconds:
                 return buffer, state
+        else:
+            previous = None
+            stable_since = None
         exited, status = child_status(pid)
         if exited:
             buffer += read_available(fd)

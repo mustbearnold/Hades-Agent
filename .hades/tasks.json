@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-02T05:37:37Z",
+  "updated_at": "2026-08-02T06:11:09Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -4872,6 +4872,59 @@
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/hermes-tool-provider-inventory-selection-probe.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-091",
+      "title": "Implement safe provider action boundary",
+      "status": "complete",
+      "priority": 10,
+      "lane": "interaction",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-090"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "typed_state_tests",
+        "typed_tui_tests",
+        "direct_pty_replay",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Implement the safe OBS-0085 provider-action boundary in Hades: Enter and Space on Local Browser, Enter on Skip, and Escape must leave the raw provider surface with canonical input and echo restored while the setup process remains alive for bounded readback.",
+        "Keep provider actions typed and explicit. Local Browser and Skip may report bounded local/cancel status, but no provider adapter, credential prompt, OAuth flow, network request, subprocess installer, or persistence write may start; Enter on unobserved paid/provider rows remains outside this slice rather than being guessed.",
+        "Add focused core reducer/state tests, TUI/status rendering tests, and fresh direct-PTY cases for the four action paths with exact bytes, visible status markers, terminal flags, alternate-screen lifecycle, process liveness, clean Ctrl+C cleanup, and normalized config/artifact invariants.",
+        "Add a sanitized OBS-0086 Hades fixture and observation document; update the parity matrix, context, readme, justfile, and verification gates. The Hermes background installer/network side effect is an explicit safety deviation to fix, not behavior to reproduce, and Hades performance or safer capabilities must not be capped.",
+        "Run the targeted replay and complete the no-skip just verify gate before completion."
+      ],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-tui/src/lib.rs",
+        "crates/hades-cli/src/main.rs",
+        "scripts/replay_standalone_tool_provider_inventory_selection.py",
+        "tests/fixtures/parity/OBS-0086-hades-tool-provider-inventory-selection.json",
+        "docs/parity/observations/OBS-0086-hades-tool-provider-inventory-selection-2026-08-02.md",
+        "scripts/probe_hermes_setup_wizard.py",
+        "scripts/verify.sh"
+      ],
+      "claimed_by": "provider-action-safety-implementer",
+      "claimed_at": "2026-08-02T05:39:44Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Implemented the typed safe provider-action boundary with local/skip/cancel status, restored canonical input and echo without installer/network/provider side effects, added core and TUI oracles plus a four-case direct-PTY replay and OBS-0086 evidence, and hardened Hermes OBS-0040 redraw synchronization. Targeted replay and complete no-skip just verify both pass.",
+        "completed_at": "2026-08-02T06:11:09Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-tui/src/lib.rs",
+          "crates/hades-cli/src/main.rs",
+          "scripts/replay_standalone_tool_provider_inventory_selection.py",
+          "tests/fixtures/parity/OBS-0086-hades-tool-provider-inventory-selection.json",
+          "docs/parity/observations/OBS-0086-hades-tool-provider-inventory-selection-2026-08-02.md",
+          "scripts/probe_hermes_setup_wizard.py",
+          "scripts/verify.sh"
         ]
       }
     }

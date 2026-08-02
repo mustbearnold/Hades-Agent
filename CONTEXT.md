@@ -469,6 +469,13 @@ progress from August 1, 2026 through 2027.
   shape remains unchanged. Hades must not reproduce that implicit network or
   installation side effect; it is a Hermes defect/safety finding, not a parity
   requirement, and later installer/provider behavior remains unknown.
+- HAD-091 implements the safe Hades side of that boundary. Typed Local Browser,
+  Skip, and cancellation actions leave the raw provider surface, restore
+  canonical input and echo, keep the process alive for bounded readback, and
+  emit explicit status without starting a provider adapter, installer,
+  subprocess, network request, or persistence write. A clean Ctrl+C exits with
+  status 130. Paid/provider-specific actions remain unknown and are not guessed;
+  Hermes' implicit installer/network behavior is fixed rather than reproduced.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes

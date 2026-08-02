@@ -39,7 +39,7 @@ use hades_core::{
 use hades_provider::{
     CancellationToken, ChatMessage, ChatRequest, LocalOpenAiTransport, StreamEvent, TransportError,
 };
-use hades_tui::{draw, draw_standalone_setup, snapshot};
+use hades_tui::{draw, draw_standalone_setup, snapshot, standalone_tool_provider_action_status};
 use ratatui::{Terminal, backend::CrosstermBackend};
 use signal_hook::{consts::SIGINT, flag};
 
@@ -145,6 +145,7 @@ enum ToolChecklistOutcome {
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum ToolProviderInventoryOutcome {
     SignalInterrupt,
+    Completed,
 }
 
 fn run_setup() -> Result<SetupOutcome, Box<dyn Error>> {
@@ -183,6 +184,11 @@ fn run_setup() -> Result<SetupOutcome, Box<dyn Error>> {
                         ToolChecklistOutcome::ProviderBoundary => {
                             match run_tool_provider_inventory(&mut wizard, &cancelled)? {
                                 ToolProviderInventoryOutcome::SignalInterrupt => {
+                                    Ok(SetupOutcome::SignalInterrupt)
+                                }
+                                ToolProviderInventoryOutcome::Completed => {
+                                    print_tool_provider_action(&wizard)?;
+                                    wait_for_setup_signal(&cancelled);
                                     Ok(SetupOutcome::SignalInterrupt)
                                 }
                             }
@@ -235,6 +241,9 @@ fn setup_choice_loop(
             | StandaloneSetupAction::EnteredPlatformPicker
             | StandaloneSetupAction::EnteredToolChecklist
             | StandaloneSetupAction::EnteredToolProviderBoundary
+            | StandaloneSetupAction::SelectedLocalBrowser
+            | StandaloneSetupAction::SkippedToolProvider
+            | StandaloneSetupAction::CancelledToolProvider
             | StandaloneSetupAction::Quit => {}
         }
     }
@@ -286,6 +295,9 @@ fn wait_for_tool_configuration_entry(
             | StandaloneSetupAction::EnteredPlatformPicker
             | StandaloneSetupAction::EnteredToolConfiguration
             | StandaloneSetupAction::EnteredToolProviderBoundary
+            | StandaloneSetupAction::SelectedLocalBrowser
+            | StandaloneSetupAction::SkippedToolProvider
+            | StandaloneSetupAction::CancelledToolProvider
             | StandaloneSetupAction::EnteredFallback
             | StandaloneSetupAction::Quit => {}
         }
@@ -340,6 +352,9 @@ fn tool_checklist_loop(
             | StandaloneSetupAction::EnteredToolConfiguration
             | StandaloneSetupAction::EnteredToolChecklist
             | StandaloneSetupAction::EnteredFallback
+            | StandaloneSetupAction::SelectedLocalBrowser
+            | StandaloneSetupAction::SkippedToolProvider
+            | StandaloneSetupAction::CancelledToolProvider
             | StandaloneSetupAction::Quit => {}
         }
     }
@@ -371,6 +386,14 @@ fn print_tool_provider_boundary() -> io::Result<()> {
     stdout.flush()
 }
 
+fn print_tool_provider_action(wizard: &StandaloneSetupState) -> io::Result<()> {
+    let mut stdout = io::stdout();
+    if let Some(action) = wizard.provider_action() {
+        writeln!(stdout, "\n{}", standalone_tool_provider_action_status(action))?;
+    }
+    stdout.flush()
+}
+
 fn tool_provider_inventory_loop(
     terminal: &mut Terminal<CrosstermBackend<io::Stdout>>,
     wizard: &mut StandaloneSetupState,
@@ -396,7 +419,23 @@ fn tool_provider_inventory_loop(
         if mapped == Key::Ctrl('c') {
             return Ok(ToolProviderInventoryOutcome::SignalInterrupt);
         }
-        wizard.handle_key(mapped);
+        match wizard.handle_key(mapped) {
+            StandaloneSetupAction::SelectedLocalBrowser
+            | StandaloneSetupAction::SkippedToolProvider
+            | StandaloneSetupAction::CancelledToolProvider => {
+                return Ok(ToolProviderInventoryOutcome::Completed);
+            }
+            StandaloneSetupAction::Continue
+            | StandaloneSetupAction::Moved
+            | StandaloneSetupAction::EnteredFullSetupContinuation
+            | StandaloneSetupAction::SkippedProvider
+            | StandaloneSetupAction::EnteredPlatformPicker
+            | StandaloneSetupAction::EnteredToolConfiguration
+            | StandaloneSetupAction::EnteredToolChecklist
+            | StandaloneSetupAction::EnteredToolProviderBoundary
+            | StandaloneSetupAction::EnteredFallback
+            | StandaloneSetupAction::Quit => {}
+        }
     }
 }
 

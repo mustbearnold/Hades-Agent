@@ -259,8 +259,18 @@ pub enum StandaloneSetupAction {
     EnteredToolConfiguration,
     EnteredToolChecklist,
     EnteredToolProviderBoundary,
+    SelectedLocalBrowser,
+    SkippedToolProvider,
+    CancelledToolProvider,
     EnteredFallback,
     Quit,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub enum StandaloneToolProviderAction {
+    LocalBrowserSelected,
+    Skipped,
+    Cancelled,
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
@@ -273,6 +283,7 @@ pub struct StandaloneSetupState {
     tool_cursor: usize,
     tool_enabled: [bool; SETUP_STANDALONE_TOOL_CHECKLIST_ROWS.len()],
     provider_cursor: usize,
+    provider_action: Option<StandaloneToolProviderAction>,
 }
 
 impl Default for StandaloneSetupState {
@@ -286,6 +297,7 @@ impl Default for StandaloneSetupState {
             tool_cursor: 0,
             tool_enabled: [true; SETUP_STANDALONE_TOOL_CHECKLIST_ROWS.len()],
             provider_cursor: SETUP_STANDALONE_TOOL_PROVIDER_DEFAULT_INDEX,
+            provider_action: None,
         }
     }
 }
@@ -345,6 +357,10 @@ impl StandaloneSetupState {
 
     pub fn provider_cursor(&self) -> usize {
         self.provider_cursor
+    }
+
+    pub fn provider_action(&self) -> Option<StandaloneToolProviderAction> {
+        self.provider_action
     }
 
     pub fn is_numbered_fallback(&self) -> bool {
@@ -433,6 +449,7 @@ impl StandaloneSetupState {
                     StandaloneSetupAction::Continue
                 }
                 Key::Ctrl('c') => {
+                    self.provider_action = None;
                     self.surface = StandaloneSetupSurface::ToolProviderBoundary;
                     StandaloneSetupAction::EnteredToolProviderBoundary
                 }
@@ -451,6 +468,22 @@ impl StandaloneSetupState {
                         self.provider_cursor - 1
                     };
                     StandaloneSetupAction::Moved
+                }
+                Key::Enter | Key::Char(' ') => match self.provider_cursor {
+                    SETUP_STANDALONE_TOOL_PROVIDER_DEFAULT_INDEX => {
+                        self.provider_action =
+                            Some(StandaloneToolProviderAction::LocalBrowserSelected);
+                        StandaloneSetupAction::SelectedLocalBrowser
+                    }
+                    index if index + 1 == SETUP_STANDALONE_TOOL_PROVIDER_OPTIONS.len() => {
+                        self.provider_action = Some(StandaloneToolProviderAction::Skipped);
+                        StandaloneSetupAction::SkippedToolProvider
+                    }
+                    _ => StandaloneSetupAction::Continue,
+                },
+                Key::Escape => {
+                    self.provider_action = Some(StandaloneToolProviderAction::Cancelled);
+                    StandaloneSetupAction::CancelledToolProvider
                 }
                 _ => StandaloneSetupAction::Continue,
             },
@@ -1390,7 +1423,56 @@ mod tests {
         assert_eq!(SETUP_STANDALONE_TOOL_PROVIDER_DEFAULT_INDEX, 0);
         assert!(setup.is_tool_provider_boundary());
         assert_eq!(setup.handle_key(Key::Enter), StandaloneSetupAction::Continue);
+        assert_eq!(setup.provider_action(), None);
         assert_eq!(setup.provider_cursor(), 1);
+    }
+
+    #[test]
+    fn standalone_tool_provider_safe_actions_are_typed_without_provider_side_effects() {
+        let provider_boundary = || {
+            let mut setup = StandaloneSetupState::default();
+            setup.handle_key(Key::Down);
+            setup.handle_key(Key::Enter);
+            setup.handle_key(Key::Ctrl('c'));
+            setup.handle_key(Key::Enter);
+            setup.handle_key(Key::Ctrl('c'));
+            setup.handle_key(Key::Escape);
+            assert_eq!(
+                setup.handle_key(Key::Ctrl('c')),
+                StandaloneSetupAction::EnteredToolProviderBoundary
+            );
+            setup
+        };
+
+        let mut local_enter = provider_boundary();
+        assert_eq!(local_enter.handle_key(Key::Enter), StandaloneSetupAction::SelectedLocalBrowser);
+        assert_eq!(
+            local_enter.provider_action(),
+            Some(StandaloneToolProviderAction::LocalBrowserSelected)
+        );
+        assert_eq!(local_enter.selected(), SETUP_STANDALONE_TOOL_PROVIDER_DEFAULT_INDEX);
+
+        let mut local_space = provider_boundary();
+        assert_eq!(
+            local_space.handle_key(Key::Char(' ')),
+            StandaloneSetupAction::SelectedLocalBrowser
+        );
+        assert_eq!(
+            local_space.provider_action(),
+            Some(StandaloneToolProviderAction::LocalBrowserSelected)
+        );
+
+        let mut skip = provider_boundary();
+        for _ in 0..SETUP_STANDALONE_TOOL_PROVIDER_OPTIONS.len() - 1 {
+            assert_eq!(skip.handle_key(Key::Down), StandaloneSetupAction::Moved);
+        }
+        assert_eq!(skip.provider_cursor(), SETUP_STANDALONE_TOOL_PROVIDER_OPTIONS.len() - 1);
+        assert_eq!(skip.handle_key(Key::Enter), StandaloneSetupAction::SkippedToolProvider);
+        assert_eq!(skip.provider_action(), Some(StandaloneToolProviderAction::Skipped));
+
+        let mut cancelled = provider_boundary();
+        assert_eq!(cancelled.handle_key(Key::Escape), StandaloneSetupAction::CancelledToolProvider);
+        assert_eq!(cancelled.provider_action(), Some(StandaloneToolProviderAction::Cancelled));
     }
 
     #[test]

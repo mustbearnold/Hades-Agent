@@ -15,7 +15,8 @@ use hades_core::{
     SETUP_STANDALONE_TOOL_PROVIDER_DEFAULT_INDEX, SETUP_STANDALONE_TOOL_PROVIDER_LINES,
     SETUP_STANDALONE_TOOL_PROVIDER_OPTIONS, SETUP_STANDALONE_TOOL_PROVIDER_TITLE,
     SETUP_TERMINAL_BACKEND_CONTROLS, SETUP_TERMINAL_BACKEND_ROWS, SETUP_TERMINAL_BACKEND_TITLE,
-    SETUP_WIZARD_CHOICES, SetupWizardSurface, StandaloneSetupState, StartupState, TurnState,
+    SETUP_WIZARD_CHOICES, SetupWizardSurface, StandaloneSetupState, StandaloneToolProviderAction,
+    StartupState, TurnState,
 };
 use ratatui::{
     Frame, Terminal,
@@ -37,6 +38,22 @@ const HERMES_UNCONFIGURED_MODEL: &str = " │ glm-5.2 · Nous Research          
 const HERMES_UNCONFIGURED_FOOTER: &str = " ─ starting agent… │ glm5.2 │ 0s │ voice off │ 1 session                                      ─ <reference-cwd> (main)";
 const HERMES_CLIPBOARD_MISS: &str = "No image found in clipboard";
 const HERMES_COMPOSER_MAX_CHARS: usize = 117;
+
+pub fn standalone_tool_provider_action_status(
+    action: StandaloneToolProviderAction,
+) -> &'static str {
+    match action {
+        StandaloneToolProviderAction::LocalBrowserSelected => {
+            "✓ Local Browser selected; no implicit installation or network activity started."
+        }
+        StandaloneToolProviderAction::Skipped => {
+            "✓ Browser Automation skipped; no implicit installation or network activity started."
+        }
+        StandaloneToolProviderAction::Cancelled => {
+            "✓ Provider selection cancelled; no configuration or network activity started."
+        }
+    }
+}
 
 #[derive(Clone, Copy, Debug, Default)]
 struct HermesPalette;
@@ -1177,6 +1194,24 @@ mod tests {
             .map(|cell| cell.symbol())
             .collect::<String>();
         assert!(wrapped_down.contains("→ (●) Local Browser"));
+    }
+
+    #[test]
+    fn standalone_tool_provider_action_statuses_are_safe_and_explicit() {
+        assert_eq!(
+            standalone_tool_provider_action_status(
+                StandaloneToolProviderAction::LocalBrowserSelected
+            ),
+            "✓ Local Browser selected; no implicit installation or network activity started."
+        );
+        assert_eq!(
+            standalone_tool_provider_action_status(StandaloneToolProviderAction::Skipped),
+            "✓ Browser Automation skipped; no implicit installation or network activity started."
+        );
+        assert_eq!(
+            standalone_tool_provider_action_status(StandaloneToolProviderAction::Cancelled),
+            "✓ Provider selection cancelled; no configuration or network activity started."
+        );
     }
 
     #[test]

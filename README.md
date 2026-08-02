@@ -100,6 +100,7 @@ just replay-standalone-terminal-platform # standalone platform cancellation repl
 just replay-standalone-tool-provider # standalone tool checklist/provider boundary replay
 just replay-standalone-tool-provider-inventory # standalone Browser Automation provider inventory replay
 just replay-standalone-tool-provider-inventory-navigation # bounded cyclic provider navigation replay
+just replay-standalone-tool-provider-inventory-selection # bounded safe provider action replay
 just install-user             # build and install hades/Hades on user PATH
 just snapshot                 # deterministic terminal snapshot
 just probe-lifecycle          # PTY lifecycle and cleanup oracle
