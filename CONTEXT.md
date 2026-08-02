@@ -165,8 +165,13 @@ progress from August 1, 2026 through 2027.
   control and fresh-process readback show no distinct config or effective-model
   proof because that model was already current. The local observation records
   bounded metadata paths and repeated probes as diagnostic reference evidence;
-  Hades must not reproduce any retry or failure behavior, and model selection
-  remains unimplemented until an isolated effective-use contract is proven.
+  Hades must not reproduce any retry or failure behavior.
+- HAD-099 carries that safe boundary into Hades as typed session-scoped model
+  selection: selecting palette-model visibly closes the picker and changes the
+  next explicit loopback request, while a fresh process with the unchanged
+  sidecar uses vertical-model again. OBS-0094 proves the request boundary,
+  byte-identical sidecar, clean streaming lifecycle, and terminal restoration;
+  saved provider selection remains intentionally unimplemented.
 - HAD-041 captures the initial Hermes setup wizard in fresh direct PTYs: the
   title, explanation, Quick Setup/Full setup/Blank Slate radio list, initial
   Quick Setup selection, Down navigation to Full setup, and the observed

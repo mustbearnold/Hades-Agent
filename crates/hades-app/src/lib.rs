@@ -138,6 +138,7 @@ pub struct App {
     help_setup_deadline: Option<Instant>,
     completed_turns: Vec<CompletedTurn>,
     active_turn: Option<ActiveTurn>,
+    selected_model: Option<String>,
 }
 
 impl App {
@@ -159,6 +160,7 @@ impl App {
             help_setup_deadline: None,
             completed_turns: Vec::new(),
             active_turn: None,
+            selected_model: None,
         }
     }
 
@@ -176,6 +178,10 @@ impl App {
 
     pub fn state(&self) -> &SessionState {
         &self.state
+    }
+
+    pub fn selected_model(&self) -> Option<&str> {
+        self.selected_model.as_deref()
     }
 
     /// Return only provider-safe conversation context.
@@ -591,6 +597,12 @@ impl App {
             }
             ModelPickerAction::ReturnedToProvider => {
                 self.state.status = "Select provider (step 1/2).".to_owned();
+            }
+            ModelPickerAction::Selected(model) => {
+                self.selected_model = Some(model.clone());
+                self.state.overlay = None;
+                self.state.model_picker = None;
+                self.state.status = format!("model → {model}");
             }
             ModelPickerAction::Continue => {
                 self.state.status = match (stage, filter.is_empty()) {
@@ -1397,5 +1409,29 @@ mod tests {
         assert_eq!(second.state().composer.text(), "");
 
         remove_test_history(&path);
+    }
+
+    #[test]
+    fn model_picker_selection_closes_to_ready_and_is_session_scoped() {
+        let mut app = App::new();
+        for character in "/model".chars() {
+            app.handle(InputEvent::Key(Key::Char(character)));
+        }
+        app.handle(InputEvent::Key(Key::Enter));
+        app.handle(InputEvent::Key(Key::Enter));
+        for character in "palette".chars() {
+            app.handle(InputEvent::Key(Key::Char(character)));
+        }
+        app.handle(InputEvent::Key(Key::Enter));
+        assert_eq!(app.state().overlay, Some(Overlay::ModelPicker));
+        app.handle(InputEvent::Key(Key::Enter));
+
+        assert_eq!(app.state().overlay, None);
+        assert!(app.state().model_picker.is_none());
+        assert_eq!(app.selected_model(), Some("palette-model"));
+        assert_eq!(app.state().status, "model → palette-model");
+
+        let fresh = App::new();
+        assert_eq!(fresh.selected_model(), None);
     }
 }

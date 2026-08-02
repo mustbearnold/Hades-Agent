@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0094",
+  "reference_observation": "OBS-0093",
+  "surface": "hades-session-scoped-model-picker-selection",
+  "reference": {
+    "product": "Hades Agent",
+    "version": "workspace",
+    "source_commit": "2140a915e6971dd2db2b45590db89da9c91e4621",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "fresh direct PTY with deterministic loopback HTTP/SSE"
+    },
+    "capture": "Hades local setup followed by bounded model selection, one streamed request, and fresh-process readback"
+  },
+  "normalization": [
+    "Binary paths, synthetic HOME/HERMES_HOME paths, PTY paths, timestamps, process identifiers, raw redraw bytes, and ephemeral server ports are omitted or represented by stable markers.",
+    "The loopback server records only normalized request path, content type, model, stream flag, message roles, prompt markers, request count, and authorization presence; no credential value or external request is used.",
+    "The selection status is recorded as a stable visible marker, while sidecar bytes are compared privately for equality and no Hermes config.yaml is created.",
+    "The fresh-process step intentionally proves non-persistence; session selection is not promoted into saved provider configuration."
+  ],
+  "steps": [
+    {
+      "id": "configured-selection-and-stream",
+      "precondition": "hades setup --local has written only a Hades sidecar with vertical-model; a fresh 120x40 process reaches the ready composer.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "/model",
+          "bytes_hex": "2f 6d 6f 64 65 6c"
+        },
+        {
+          "kind": "key",
+          "value": "Enter twice to open the model picker",
+          "bytes_hex": "0d 0d"
+        },
+        {
+          "kind": "text",
+          "value": "palette",
+          "bytes_hex": "70 61 6c 65 74 74 65"
+        },
+        {
+          "kind": "key",
+          "value": "Enter to open model stage, Enter to select palette-model",
+          "bytes_hex": "0d 0d"
+        },
+        {
+          "kind": "text",
+          "value": "selected prompt",
+          "bytes_hex": "73 65 6c 65 63 74 65 64 20 70 72 6f 6d 70 74"
+        },
+        {
+          "kind": "key",
+          "value": "Enter then Ctrl+C clean exit",
+          "bytes_hex": "0d 03"
+        }
+      ],
+      "output": {
+        "status": "passed",
+        "selection_status_marker": "model → palette-model",
+        "selection_status_visible": true,
+        "provider_requests_during_selection": 0,
+        "request": {
+          "method": "POST",
+          "path": "/v1/chat/completions",
+          "content_type": "application/json",
+          "authorization_present": false,
+          "model": "palette-model",
+          "stream": true,
+          "message_roles": ["system", "user"],
+          "prompt_marker": "selected prompt"
+        },
+        "response": {
+          "first_delta_visible_before_completion": true,
+          "final_delta_marker": "Final streamed answer."
+        },
+        "cleanup": "exit 0; alternate screen left; canonical input and echo restored"
+      }
+    },
+    {
+      "id": "fresh-process-selection-readback",
+      "precondition": "The selected process has exited; a fresh process reuses the unchanged Hades sidecar without any selection input.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "fresh process prompt",
+          "bytes_hex": "66 72 65 73 68 20 70 72 6f 63 65 73 73 20 70 72 6f 6d 70 74"
+        },
+        {
+          "kind": "key",
+          "value": "Enter then Ctrl+C clean exit",
+          "bytes_hex": "0d 03"
+        }
+      ],
+      "output": {
+        "status": "passed",
+        "request_model": "vertical-model",
+        "same_sidecar_reused": true,
+        "sidecar_unchanged": true,
+        "hermes_config_created": false,
+        "authorization_present": false,
+        "cleanup": "exit 0; alternate screen left; canonical input and echo restored"
+      }
+    }
+  ],
+  "boundaries": {
+    "provider": "loopback only",
+    "selection_scope": "current Hades process",
+    "selection_persistence": "explicitly not persisted",
+    "credential_persistence": false,
+    "hermes_config_mutation": false,
+    "external_network": false,
+    "automatic_requests": false
+  },
+  "unknowns": [
+    "Hermes selection persistence and effective use for a distinct model remain bounded by OBS-0093; this Hades extension deliberately chooses a safer explicit session-scoped contract.",
+    "Provider catalogs beyond the deterministic palette row, multiple selected models, unavailable models, external providers, OAuth, tools, and concurrent selection/request races remain separate work.",
+    "Hermes repeated metadata requests and failure behavior are not copied into Hades without independent evidence."
+  ]
+}

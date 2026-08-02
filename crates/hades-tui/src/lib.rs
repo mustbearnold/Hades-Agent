@@ -310,6 +310,9 @@ fn draw_hermes_startup(frame: &mut Frame<'_>, app: &App) {
     if app.state().status == HERMES_CLIPBOARD_MISS {
         rows[37] = format!(" │ {HERMES_CLIPBOARD_MISS}");
     }
+    if let Some(model_status) = app.state().status.strip_prefix("model → ") {
+        rows[37] = format!(" │ model → {model_status}");
+    }
     if let Some(Notice::UnknownCommand { command }) = &app.state().notice {
         rows[36] = format!(" Unknown command: {command}");
         rows[37] = " Type /help for available commands".to_owned();
@@ -1498,6 +1501,25 @@ mod tests {
         let closed = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
         assert!(!closed.contains("Select provider (step 1/2)"));
         assert!(closed.contains("─ ready │ mock model"));
+    }
+
+    #[test]
+    fn hermes_startup_surface_renders_transient_model_selection_status() {
+        let mut app = App::new();
+        for character in "/model".chars() {
+            app.handle(hades_core::InputEvent::Key(hades_core::Key::Char(character)));
+        }
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
+        for character in "palette".chars() {
+            app.handle(hades_core::InputEvent::Key(hades_core::Key::Char(character)));
+        }
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
+
+        let selected = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        assert!(selected.contains("model → palette-model"));
+        assert!(app.state().overlay.is_none());
     }
 
     #[test]

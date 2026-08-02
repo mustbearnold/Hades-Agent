@@ -28,6 +28,7 @@ python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0036-her
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0038-hermes-model-picker-model-stage.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0039-hades-model-picker-model-stage.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0093-hermes-model-picker-selection.json
+python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0094-hades-model-picker-selection.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0040-hermes-setup-wizard-cancel.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0041-hades-setup-wizard-cancel.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0042-hermes-full-setup-continuation.json
@@ -79,6 +80,7 @@ python3 scripts/replay_vertical_slice.py --binary target/debug/hades --report .h
 python3 scripts/replay_configured_surfaces.py --binary target/debug/hades --report .hades/runtime/configured-surfaces-replay.json --timeout 8
 python3 scripts/replay_provider_recovery.py --binary target/debug/hades --report .hades/runtime/provider-recovery-replay.json --timeout 8
 python3 scripts/replay_conversation_context.py --binary target/debug/hades --report .hades/runtime/conversation-context-replay.json --timeout 8
+python3 scripts/replay_model_selection.py --binary target/debug/hades --report .hades/runtime/model-selection-replay.json --timeout 10
 cargo build --locked --release --package hades-cli
 bash scripts/install_user_launcher.sh
 python3 scripts/replay_fresh_shell_launch.py --report .hades/runtime/fresh-shell-launch-replay.json

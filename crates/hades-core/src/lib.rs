@@ -115,11 +115,12 @@ impl ModelPickerStage {
     }
 }
 
-#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum ModelPickerAction {
     Continue,
     ClearedFilter,
     ReturnedToProvider,
+    Selected(String),
     Closed,
 }
 
@@ -684,6 +685,9 @@ impl ModelPickerState {
                 self.filter.clear();
                 ModelPickerAction::Continue
             }
+            Key::Enter if self.stage == ModelPickerStage::Model && self.model_matches() => {
+                ModelPickerAction::Selected(MODEL_PICKER_MODEL.to_owned())
+            }
             Key::Escape if !self.filter.is_empty() => {
                 self.filter.clear();
                 ModelPickerAction::ClearedFilter
@@ -1247,6 +1251,24 @@ mod tests {
         assert_eq!(picker.handle_key(Key::Escape), ModelPickerAction::ReturnedToProvider);
         assert_eq!(picker.stage(), ModelPickerStage::Provider);
         assert_eq!(picker.handle_key(Key::Escape), ModelPickerAction::Closed);
+    }
+
+    #[test]
+    fn model_picker_selects_a_visible_model_row() {
+        let mut picker = ModelPickerState::default();
+        for character in "palette".chars() {
+            picker.handle_key(Key::Char(character));
+        }
+        assert_eq!(picker.handle_key(Key::Enter), ModelPickerAction::Continue);
+        assert!(picker.model_matches());
+
+        for character in "palette".chars() {
+            picker.handle_key(Key::Char(character));
+        }
+        assert_eq!(
+            picker.handle_key(Key::Enter),
+            ModelPickerAction::Selected(MODEL_PICKER_MODEL.to_owned())
+        );
     }
 
     #[test]

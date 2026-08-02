@@ -44,6 +44,10 @@ replay-conversation-context:
     cargo build --locked --package hades-cli
     python3 scripts/replay_conversation_context.py --binary target/debug/hades --report .hades/runtime/conversation-context-replay.json
 
+replay-model-selection:
+    cargo build --locked --package hades-cli
+    python3 scripts/replay_model_selection.py --binary target/debug/hades --report .hades/runtime/model-selection-replay.json
+
 replay-differential:
     cargo build --locked --package hades-cli
     python3 scripts/differential_replay.py --binary target/debug/hades --report .hades/runtime/differential-replay.json

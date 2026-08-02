@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-02T11:08:20Z",
+  "updated_at": "2026-08-02T11:32:31Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -5308,6 +5308,73 @@
           "README.md",
           "justfile",
           "scripts/verify.sh"
+        ]
+      }
+    },
+    {
+      "id": "HAD-099",
+      "title": "Implement session-scoped model-picker selection",
+      "status": "complete",
+      "priority": 91,
+      "lane": "vertical-slice",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-098",
+        "HAD-097",
+        "HAD-040"
+      ],
+      "risk": "high",
+      "oracle": [
+        "typed_model_selection",
+        "session_scoped_request_override",
+        "saved_config_unchanged",
+        "fresh_process_nonpersistence",
+        "direct_pty_replay",
+        "full_verify"
+      ],
+      "acceptance": [
+        "In Hades /model provider-to-model flow, Enter on the visible palette-model row closes the picker to the ready surface and displays the observed model \u2192 palette-model status without opening a provider request during selection.",
+        "Represent the selection as typed session state and use it for the next local provider request; do not rewrite the Hades local-provider sidecar or any Hermes config, and preserve existing filter, Escape, q, streaming, and cleanup behavior.",
+        "A deterministic direct-PTY replay configures vertical-model, selects palette-model, submits one prompt, and proves the loopback request uses palette-model with one request, a streamed answer, no credentials, no external network, no Hermes mutation, and restored terminal ownership.",
+        "A fresh process using the unchanged sidecar sends vertical-model again without the prior selection, proving selection is session-scoped and not falsely advertised as persistence.",
+        "Add focused core/app/CLI tests and sanitized OBS-0094 fixture, replay report, observation, parity matrix/context/readme updates, and just/verify wiring; do not reproduce Hermes retries, failures, unsafe behavior, or other defects.",
+        "Run the targeted replay and complete the no-skip just verify gate before completion."
+      ],
+      "evidence": [
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-app/src/lib.rs",
+        "crates/hades-cli/src/main.rs",
+        "crates/hades-tui/src/lib.rs",
+        "scripts/replay_model_selection.py",
+        "tests/fixtures/parity/OBS-0094-hades-model-picker-selection.json",
+        "docs/parity/observations/OBS-0094-hades-model-picker-selection-2026-08-02.md",
+        ".hades/runtime/model-selection-replay.json",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md"
+      ],
+      "claimed_by": "model-picker-implementer",
+      "claimed_at": "2026-08-02T11:10:59Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Implemented typed session-scoped model-picker selection. The direct-PTY OBS-0094 replay proves the visible model \u2192 palette-model transition, no request during selection, effective palette-model use for the next streamed request, byte-identical sidecar and no Hermes config mutation, clean terminal restoration, and fresh-process return to vertical-model. Focused Rust tests and the complete no-skip just verify gate pass.",
+        "completed_at": "2026-08-02T11:32:31Z",
+        "evidence": [
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-app/src/lib.rs",
+          "crates/hades-cli/src/main.rs",
+          "crates/hades-tui/src/lib.rs",
+          "scripts/replay_model_selection.py",
+          "tests/fixtures/parity/OBS-0094-hades-model-picker-selection.json",
+          "docs/parity/observations/OBS-0094-hades-model-picker-selection-2026-08-02.md",
+          ".hades/runtime/model-selection-replay.json",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md"
         ]
       }
     }

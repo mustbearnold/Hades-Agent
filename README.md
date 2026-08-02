@@ -98,6 +98,7 @@ just run setup                # standalone first-run setup entry
 just replay-cli-launch        # no-argument and explicit-tui PTY launch replay
 just replay-fresh-shell-launch # fresh Bash/Fish command resolution and installed TUI lifecycle
 just replay-vertical-slice    # setup -> local provider/model -> prompt -> streamed answer
+just replay-model-selection   # session model selection -> effective request -> fresh-process reset
 just replay-unconfigured-help # delayed /help setup-required PTY replay
 just replay-standalone-setup  # standalone hades setup PTY replay
 just replay-standalone-full-setup # standalone Full setup continuation replay
@@ -198,6 +199,13 @@ the first answer: `/he` completion, `/model`, Ctrl+X sessions, persisted input
 history across a fresh process, and a synthetic native clipboard paste before a
 final streamed request. The replay uses only a local fixture server and never
 touches the host clipboard or Hermes config.
+
+Model selection is covered by the focused model-selection replay. It selects
+palette-model in one configured process, proves that the next explicit request
+uses it, then launches a fresh process against the unchanged sidecar and
+proves vertical-model is used again. The selection is deliberately
+session-scoped; Hermes retries, failures, and repeated metadata requests are
+not copied into Hades.
 
 Provider failures are covered by `just replay-provider-recovery`. Its local
 HTTP 500, malformed-SSE, and incomplete-stream cases return to a visible Ready

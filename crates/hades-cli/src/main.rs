@@ -854,7 +854,8 @@ fn start_provider(app: &mut App, provider_runtime: &mut Option<ProviderRuntime>)
             return;
         }
     };
-    let request = ChatRequest::new(config.model, provider_request_messages(app), Vec::new());
+    let model = provider_request_model(app, &config.model);
+    let request = ChatRequest::new(model, provider_request_messages(app), Vec::new());
     let cancellation = CancellationToken::new();
     let worker_cancellation = cancellation.clone();
     let (sender, receiver) = mpsc::channel();
@@ -873,6 +874,10 @@ fn provider_request_messages(app: &App) -> Vec<ChatMessage> {
         ChatMessage::new(role, message.content)
     }));
     messages
+}
+
+fn provider_request_model(app: &App, configured_model: &str) -> String {
+    app.selected_model().unwrap_or(configured_model).to_owned()
 }
 
 fn cancel_provider(provider_runtime: &mut Option<ProviderRuntime>) {
@@ -1238,6 +1243,26 @@ mod tests {
                 ChatMessage::new("user", "second")
             ]
         );
+    }
+
+    #[test]
+    fn provider_request_model_prefers_session_selection_without_mutating_configuration() {
+        let mut app = App::new();
+        for character in "/model".chars() {
+            app.handle(InputEvent::Key(Key::Char(character)));
+        }
+        app.handle(InputEvent::Key(Key::Enter));
+        app.handle(InputEvent::Key(Key::Enter));
+        for character in "palette".chars() {
+            app.handle(InputEvent::Key(Key::Char(character)));
+        }
+        app.handle(InputEvent::Key(Key::Enter));
+        app.handle(InputEvent::Key(Key::Enter));
+
+        let configured_model = "vertical-model";
+        assert_eq!(provider_request_model(&app, configured_model), "palette-model");
+        assert_eq!(configured_model, "vertical-model");
+        assert_eq!(provider_request_model(&App::new(), configured_model), configured_model);
     }
 
     #[test]
