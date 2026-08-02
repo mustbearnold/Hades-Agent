@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-02T06:11:09Z",
+  "updated_at": "2026-08-02T06:35:26Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -4926,6 +4926,41 @@
           "scripts/probe_hermes_setup_wizard.py",
           "scripts/verify.sh"
         ]
+      }
+    },
+    {
+      "id": "HAD-092",
+      "title": "Implement safe empty-platform confirmation boundary",
+      "status": "cancelled",
+      "priority": 10,
+      "lane": "interaction",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-062",
+        "HAD-091"
+      ],
+      "risk": "low",
+      "oracle": [
+        "typed_state_tests",
+        "direct_pty_replay",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Implement the observed OBS-0058 empty-platform boundary in standalone Hades: Enter on the platform picker with every platform unselected is a typed, safe no-op that leaves the same picker visible and does not advance to Tool Configuration.",
+        "Keep the no-op bounded and explicit: the process remains alive, no provider adapter, credential prompt, OAuth flow, network request, persistence write, or artifact is started, and the existing Ctrl+C cancellation boundary remains available. Do not infer Space, platform toggling, selected-platform confirmation, or later setup behavior from this observation.",
+        "Add focused core state/reducer coverage and a fresh direct-PTY case with exact Enter bytes, unchanged platform markers, process liveness, raw terminal flags, alternate-screen lifecycle, clean cleanup, and normalized config/artifact invariants.",
+        "Add a sanitized OBS-0087 Hades fixture and observation document; update the parity matrix, context, readme, justfile, and verification gates. Any Hermes defect or failure case remains a defect to fix rather than a compatibility requirement, and the evidence boundary must not cap Hades performance or safer capabilities.",
+        "Run the targeted replay and complete the no-skip just verify gate before completion."
+      ],
+      "evidence": [],
+      "ready_at": "2026-08-02T06:13:12Z",
+      "claimed_by": "empty-platform-confirm-implementer",
+      "claimed_at": "2026-08-02T06:13:34Z",
+      "attempts": 1,
+      "result": {
+        "reason": "Deferred by the product-priority pivot to launcher reliability and the first end-to-end vertical slice; focused checks pass, but the full verify run was intentionally interrupted. Preserve the implementation for later.",
+        "cancelled_at": "2026-08-02T06:35:26Z"
       }
     }
   ]

@@ -148,7 +148,7 @@ def wait_for_stable_menu(
     deadline = time.monotonic() + timeout
     previous: tuple[tuple[str, Any], ...] | None = None
     stable_since: float | None = None
-    settle_seconds = 0.5
+    settle_seconds = 1.5
     while time.monotonic() < deadline:
         try:
             state = menu_state(buffer)

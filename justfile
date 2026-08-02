@@ -193,6 +193,10 @@ replay-standalone-terminal-platform:
     cargo build --locked --package hades-cli
     python3 scripts/replay_standalone_terminal_platform.py --binary target/debug/hades --report .hades/runtime/hades-standalone-terminal-platform-replay.json --timeout 5
 
+replay-standalone-empty-platform:
+    cargo build --locked --package hades-cli
+    python3 scripts/replay_standalone_empty_platform_confirmation.py --binary target/debug/hades --report .hades/runtime/hades-empty-platform-confirmation-replay.json --timeout 5
+
 replay-standalone-tool-provider:
     cargo build --locked --package hades-cli
     python3 scripts/replay_standalone_tool_provider_boundary.py --binary target/debug/hades --report .hades/runtime/hades-tool-provider-boundary-replay.json --timeout 5
@@ -331,6 +335,7 @@ validate-reference:
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0084-hades-tool-provider-inventory-navigation-edges.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0085-hermes-tool-provider-inventory-selection.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0086-hades-tool-provider-inventory-selection.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0087-hades-empty-platform-confirmation.json
 
 agent command *args:
     python3 scripts/agent/control_plane.py {{command}} {{args}}

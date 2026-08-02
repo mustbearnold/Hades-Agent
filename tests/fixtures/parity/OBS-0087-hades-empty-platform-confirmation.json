@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0087",
+  "reference_observation": "OBS-0058",
+  "surface": "hades-standalone-empty-platform-confirmation",
+  "reference": {
+    "product": "Hades Agent",
+    "version": "workspace",
+    "source_commit": "3da653b17afd9457577b4f9b469d4a43e7720835",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "fresh direct PTY with terminal restoration and liveness oracles"
+    },
+    "capture": "fresh Hades standalone setup process replayed against the bounded OBS-0058 empty-platform contract"
+  },
+  "normalization": [
+    "Binary paths, synthetic HOME/HERMES_HOME paths, PTY paths, timestamps, and raw redraw bytes are omitted or represented by stable markers.",
+    "The replay accepts only the displayed Full setup, Keep current (local) backend, and an empty platform confirmation; no platform, credential, OAuth, provider, or network action is entered.",
+    "The platform markers and raw terminal flags are sampled before and after Enter; the bounded no-op must keep the process alive, the same picker visible, the alternate screen active, and config/artifacts unchanged.",
+    "Ctrl+C cleanup is recorded separately: the first leaves the platform picker for the existing plain Tool Configuration boundary and the second exits with status 130."
+  ],
+  "steps": [
+    {
+      "id": "standalone-empty-platform-confirmation",
+      "precondition": "Fresh Hades 120x40 standalone setup process with an isolated synthetic home and no provider environment, navigated to the platform picker with every platform unselected.",
+      "input_sequence": [
+        {"kind": "command", "value": "hades setup", "bytes_hex": "68 61 64 65 73 20 73 65 74 75 70"},
+        {"kind": "key", "value": "j", "bytes_hex": "6a", "meaning": "move from Quick Setup to Full setup"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d", "meaning": "submit Full setup"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "skip the unconfigured provider"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d", "meaning": "accept highlighted Keep current (local) backend"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d", "meaning": "confirm with no platform selected"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "leave the unchanged platform picker"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "SIGINT cleanup"}
+      ],
+      "output": {
+        "status": "passed",
+        "post_confirmation_markers": [
+          "Mattermost",
+          "Signal",
+          "WhatsApp",
+          "(not configured)"
+        ],
+        "post_confirmation_surface_unchanged": true,
+        "ready_after_empty_confirmation": false,
+        "tool_configuration_after_empty_confirmation": false,
+        "process_alive_after_empty_confirmation": true,
+        "terminal_flags_before_confirmation": {"canonical": false, "echo": false},
+        "terminal_flags_after_confirmation": {"canonical": false, "echo": false},
+        "alternate_screen_left_after_confirmation": false,
+        "config_changed_on_empty_confirmation": false,
+        "artifact_classes_on_empty_confirmation": [],
+        "provider_started": false,
+        "clean_exit": true,
+        "exit": {"kind": "exit", "code": 130},
+        "terminal_restored": true
+      }
+    }
+  ],
+  "unknowns": [
+    "Space semantics, platform cursor movement, toggling, confirmation with one or more platforms, platform-specific setup, credentials, OAuth, network behavior, and later setup remain outside this replay.",
+    "The safe no-op is an explicit Hades action boundary; it does not infer that Hermes can eventually complete an empty setup beyond the observed window."
+  ],
+  "passed": true
+}

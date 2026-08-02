@@ -476,6 +476,13 @@ progress from August 1, 2026 through 2027.
   subprocess, network request, or persistence write. A clean Ctrl+C exits with
   status 130. Paid/provider-specific actions remain unknown and are not guessed;
   Hermes' implicit installer/network behavior is fixed rather than reproduced.
+- HAD-092 makes the OBS-0058 empty-platform boundary explicit in Hades. Enter
+  with every platform unselected is a typed safe no-op: the same picker remains
+  visible in raw mode, the process stays alive, the alternate screen remains
+  active, and config/artifacts/provider activity do not change. The existing
+  Ctrl+C handoff to Tool Configuration and status-130 cleanup remain verified;
+  Space, platform toggling, and confirmation with selected platforms remain
+  unknown rather than guessed.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes

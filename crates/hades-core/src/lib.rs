@@ -256,6 +256,7 @@ pub enum StandaloneSetupAction {
     EnteredFullSetupContinuation,
     SkippedProvider,
     EnteredPlatformPicker,
+    ConfirmedEmptyPlatformSelection,
     EnteredToolConfiguration,
     EnteredToolChecklist,
     EnteredToolProviderBoundary,
@@ -421,6 +422,7 @@ impl StandaloneSetupState {
                 _ => StandaloneSetupAction::Continue,
             },
             StandaloneSetupSurface::PlatformPicker => match key {
+                Key::Enter => StandaloneSetupAction::ConfirmedEmptyPlatformSelection,
                 Key::Ctrl('c') => {
                     self.surface = StandaloneSetupSurface::ToolConfiguration;
                     StandaloneSetupAction::EnteredToolConfiguration
@@ -1348,6 +1350,27 @@ mod tests {
             StandaloneSetupAction::EnteredToolConfiguration
         );
         assert!(setup.is_tool_configuration());
+    }
+
+    #[test]
+    fn standalone_empty_platform_confirmation_is_typed_noop() {
+        let mut setup = StandaloneSetupState::default();
+
+        setup.handle_key(Key::Down);
+        setup.handle_key(Key::Enter);
+        setup.handle_key(Key::Ctrl('c'));
+        assert_eq!(setup.handle_key(Key::Enter), StandaloneSetupAction::EnteredPlatformPicker);
+        assert!(setup.is_platform_picker());
+
+        assert_eq!(
+            setup.handle_key(Key::Enter),
+            StandaloneSetupAction::ConfirmedEmptyPlatformSelection
+        );
+        assert!(setup.is_platform_picker());
+        assert_eq!(
+            setup.handle_key(Key::Ctrl('c')),
+            StandaloneSetupAction::EnteredToolConfiguration
+        );
     }
 
     #[test]

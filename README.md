@@ -97,6 +97,7 @@ just replay-unconfigured-help # delayed /help setup-required PTY replay
 just replay-standalone-setup  # standalone hades setup PTY replay
 just replay-standalone-full-setup # standalone Full setup continuation replay
 just replay-standalone-terminal-platform # standalone platform cancellation replay
+just replay-standalone-empty-platform # bounded empty-platform confirmation replay
 just replay-standalone-tool-provider # standalone tool checklist/provider boundary replay
 just replay-standalone-tool-provider-inventory # standalone Browser Automation provider inventory replay
 just replay-standalone-tool-provider-inventory-navigation # bounded cyclic provider navigation replay

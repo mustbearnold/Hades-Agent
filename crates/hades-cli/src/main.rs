@@ -239,6 +239,7 @@ fn setup_choice_loop(
             | StandaloneSetupAction::Moved
             | StandaloneSetupAction::SkippedProvider
             | StandaloneSetupAction::EnteredPlatformPicker
+            | StandaloneSetupAction::ConfirmedEmptyPlatformSelection
             | StandaloneSetupAction::EnteredToolChecklist
             | StandaloneSetupAction::EnteredToolProviderBoundary
             | StandaloneSetupAction::SelectedLocalBrowser
@@ -295,6 +296,7 @@ fn wait_for_tool_configuration_entry(
             | StandaloneSetupAction::EnteredPlatformPicker
             | StandaloneSetupAction::EnteredToolConfiguration
             | StandaloneSetupAction::EnteredToolProviderBoundary
+            | StandaloneSetupAction::ConfirmedEmptyPlatformSelection
             | StandaloneSetupAction::SelectedLocalBrowser
             | StandaloneSetupAction::SkippedToolProvider
             | StandaloneSetupAction::CancelledToolProvider
@@ -351,6 +353,7 @@ fn tool_checklist_loop(
             | StandaloneSetupAction::EnteredPlatformPicker
             | StandaloneSetupAction::EnteredToolConfiguration
             | StandaloneSetupAction::EnteredToolChecklist
+            | StandaloneSetupAction::ConfirmedEmptyPlatformSelection
             | StandaloneSetupAction::EnteredFallback
             | StandaloneSetupAction::SelectedLocalBrowser
             | StandaloneSetupAction::SkippedToolProvider
@@ -433,6 +436,7 @@ fn tool_provider_inventory_loop(
             | StandaloneSetupAction::EnteredToolConfiguration
             | StandaloneSetupAction::EnteredToolChecklist
             | StandaloneSetupAction::EnteredToolProviderBoundary
+            | StandaloneSetupAction::ConfirmedEmptyPlatformSelection
             | StandaloneSetupAction::EnteredFallback
             | StandaloneSetupAction::Quit => {}
         }
