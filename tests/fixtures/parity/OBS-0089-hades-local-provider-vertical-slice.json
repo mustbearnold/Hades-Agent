@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0089",
+  "reference_observation": "OBS-0050",
+  "surface": "hades-local-provider-vertical-slice",
+  "reference": {
+    "product": "Hades Agent",
+    "version": "workspace",
+    "source_commit": "1f80390adf6f43b6d185bcacff65aef741118fce",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "fresh direct PTY with deterministic loopback HTTP/SSE fixture"
+    },
+    "capture": "Hades-only setup sidecar readback followed by a fresh configured chat process"
+  },
+  "normalization": [
+    "Binary paths, synthetic HOME/HERMES_HOME paths, PTY paths, timestamps, session identifiers, raw redraw bytes, and temporary sidecar paths are omitted or represented by stable markers.",
+    "The setup command accepts only a loopback HTTP endpoint and model, writes the Hades-owned hades-local-provider.conf sidecar atomically, leaves config.yaml absent and unchanged, and never persists an API key.",
+    "The second process receives no provider environment variables; it proves that the sidecar supplies the model, sends one sanitized OpenAI-compatible streaming request, and renders the first delta before the delayed [DONE] completion.",
+    "The server is a deterministic local fixture owned by the replay. No credentials, OAuth flow, external network, tool call, or Hermes provider-persistence claim is exercised."
+  ],
+  "steps": [
+    {
+      "id": "setup-local-loopback",
+      "precondition": "Fresh synthetic HERMES_HOME with no Hades provider environment and a local loopback HTTP fixture listening on an ephemeral port.",
+      "input_sequence": [
+        {
+          "kind": "command",
+          "value": "hades setup --local http://127.0.0.1:<port>/v1 vertical-model",
+          "bytes_hex": "68 61 64 65 73 20 73 65 74 75 70 20 2d 2d 6c 6f 63 61 6c"
+        }
+      ],
+      "output": {
+        "status": "passed",
+        "provider": "loopback",
+        "model": "vertical-model",
+        "sidecar": "hades-local-provider.conf",
+        "hermes_config_unchanged": true,
+        "credential_persisted": false
+      }
+    },
+    {
+      "id": "fresh-process-streamed-answer",
+      "precondition": "Fresh Hades TUI process with the saved sidecar and HADES_PROVIDER_BASE_URL, HADES_MODEL, and HADES_PROVIDER_API_KEY absent.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "vertical prompt",
+          "bytes_hex": "76 65 72 74 69 63 61 6c 20 70 72 6f 6d 70 74"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "wait",
+          "value": "first assistant delta becomes visible before delayed completion"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+C",
+          "bytes_hex": "03"
+        }
+      ],
+      "output": {
+        "status": "passed",
+        "startup_ready": true,
+        "request": {
+          "method": "POST",
+          "path": "/v1/chat/completions",
+          "content_type": "application/json",
+          "authorization_present": false,
+          "model": "vertical-model",
+          "message_roles": ["system", "user"],
+          "prompt_marker": "vertical prompt",
+          "stream": true
+        },
+        "stream": {
+          "first_delta_marker": "First streamed delta.",
+          "first_delta_visible_before_completion": true,
+          "final_delta_marker": "Final streamed answer.",
+          "ready_after_completion": true
+        },
+        "cleanup": {
+          "exit": {"kind": "exit", "code": 0},
+          "alternate_screen_left": true,
+          "terminal_restored": {"canonical": true, "echo": true}
+        }
+      }
+    }
+  ],
+  "unknowns": [
+    "Hermes provider setup persistence, external provider selection, credentials, OAuth, retries, tools, and non-loopback network behavior remain outside this explicit Hades loopback extension.",
+    "The setup sidecar is a Hades-owned configuration seam and is not presented as exact Hermes config-file parity."
+  ],
+  "passed": true
+}

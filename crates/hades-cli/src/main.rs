@@ -47,8 +47,10 @@ const DEFAULT_PROVIDER_MODEL: &str = "palette-model";
 const PROVIDER_BASE_URL_ENV: &str = "HADES_PROVIDER_BASE_URL";
 const PROVIDER_MODEL_ENV: &str = "HADES_MODEL";
 const PROVIDER_API_KEY_ENV: &str = "HADES_PROVIDER_API_KEY";
+const LOCAL_PROVIDER_CONFIG_FILE: &str = "hades-local-provider.conf";
 const PROVIDER_SYSTEM_PROMPT: &str = "You are Hades Agent. Respond concisely to the user.";
 
+#[derive(Debug, Eq, PartialEq)]
 struct ProviderConfig {
     base_url: String,
     model: String,
@@ -61,9 +63,12 @@ struct ProviderRuntime {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    match cli_command(env::args().nth(1).as_deref()) {
+    let arguments = env::args().skip(1).collect::<Vec<_>>();
+    match cli_command_from_args(&arguments) {
         Ok(CliCommand::Help) => {
-            println!("{PRODUCT_NAME}\n\nUsage: hades [tui|setup|--snapshot|--help|--version]");
+            println!(
+                "{PRODUCT_NAME}\n\nUsage: hades [tui|setup [--local <loopback-url> [model]]|--snapshot|--help|--version]"
+            );
             Ok(())
         }
         Ok(CliCommand::Version) => {
@@ -79,7 +84,17 @@ fn main() -> Result<(), Box<dyn Error>> {
             SetupOutcome::Cancelled => process::exit(1),
             SetupOutcome::SignalInterrupt => process::exit(130),
         },
-        Err(argument) => Err(format!("unknown argument: {argument}").into()),
+        Ok(CliCommand::SetupLocal { base_url, model }) => {
+            let (config, path) = write_local_provider_config(&base_url, model.as_deref())?;
+            println!(
+                "Hades local setup complete\nProvider: loopback\nEndpoint: {}\nModel: {}\nSaved: {}",
+                config.base_url,
+                config.model,
+                path.display()
+            );
+            Ok(())
+        }
+        Err(error) => Err(error.into()),
     }
 }
 
@@ -87,6 +102,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 enum CliCommand {
     Tui,
     Setup,
+    SetupLocal { base_url: String, model: Option<String> },
     Snapshot,
     Help,
     Version,
@@ -100,6 +116,23 @@ fn cli_command(argument: Option<&str>) -> Result<CliCommand, &str> {
         Some("--version") | Some("-V") => Ok(CliCommand::Version),
         Some("--snapshot") => Ok(CliCommand::Snapshot),
         Some(argument) => Err(argument),
+    }
+}
+
+fn cli_command_from_args(arguments: &[String]) -> Result<CliCommand, String> {
+    match arguments {
+        [] => Ok(CliCommand::Tui),
+        [argument] => cli_command(Some(argument)).map_err(|argument| argument.to_owned()),
+        [command, local, base_url] if command == "setup" && local == "--local" => {
+            Ok(CliCommand::SetupLocal { base_url: base_url.clone(), model: None })
+        }
+        [command, local, base_url, model] if command == "setup" && local == "--local" => {
+            Ok(CliCommand::SetupLocal { base_url: base_url.clone(), model: Some(model.clone()) })
+        }
+        [command, local, ..] if command == "setup" && local == "--local" => {
+            Err("usage: hades setup --local <loopback-url> [model]".to_owned())
+        }
+        [argument, ..] => Err(format!("unknown argument: {argument}")),
     }
 }
 
@@ -505,6 +538,122 @@ fn standalone_setup_config_path_from(
         .map(|path| path.join("config.yaml"))
 }
 
+fn local_provider_config_path() -> Option<PathBuf> {
+    local_provider_config_path_from(
+        env::var_os("HERMES_HOME").map(PathBuf::from),
+        env::var_os("HOME").map(PathBuf::from),
+    )
+}
+
+fn local_provider_config_path_from(
+    hermes_home: Option<PathBuf>,
+    home: Option<PathBuf>,
+) -> Option<PathBuf> {
+    standalone_setup_config_path_from(hermes_home, home)
+        .and_then(|path| path.parent().map(|parent| parent.join(LOCAL_PROVIDER_CONFIG_FILE)))
+}
+
+fn write_local_provider_config(
+    base_url: &str,
+    model: Option<&str>,
+) -> Result<(ProviderConfig, PathBuf), String> {
+    let path = local_provider_config_path()
+        .ok_or_else(|| "HOME or HERMES_HOME is required for local setup".to_owned())?;
+    let config = local_provider_config_from_input(base_url, model)?;
+    write_local_provider_config_at(&path, &config)?;
+    Ok((config, path))
+}
+
+fn local_provider_config_from_input(
+    base_url: &str,
+    model: Option<&str>,
+) -> Result<ProviderConfig, String> {
+    let config = provider_config_from(Some(base_url), model, None)?
+        .ok_or_else(|| "a loopback provider URL is required".to_owned())?;
+    validate_local_config_value("endpoint", &config.base_url)?;
+    validate_local_config_value("model", &config.model)?;
+    LocalOpenAiTransport::new(&config.base_url, None)
+        .map_err(|error| format!("local provider endpoint rejected: {error}"))?;
+    Ok(config)
+}
+
+fn validate_local_config_value(name: &str, value: &str) -> Result<(), String> {
+    if value.trim().is_empty() {
+        return Err(format!("{name} must not be empty"));
+    }
+    if value.chars().any(char::is_control) {
+        return Err(format!("{name} must not contain control characters"));
+    }
+    Ok(())
+}
+
+fn write_local_provider_config_at(
+    path: &std::path::Path,
+    config: &ProviderConfig,
+) -> Result<(), String> {
+    let Some(parent) = path.parent() else {
+        return Err("local provider config path has no parent".to_owned());
+    };
+    fs::create_dir_all(parent)
+        .map_err(|error| format!("could not create config directory: {error}"))?;
+    let contents = format!(
+        "# Hades Agent local loopback provider\nbase_url={}\nmodel={}\n",
+        config.base_url, config.model
+    );
+    let stamp = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map_err(|error| format!("could not create config write token: {error}"))?
+        .as_nanos();
+    let temporary =
+        parent.join(format!(".{LOCAL_PROVIDER_CONFIG_FILE}.{}.{stamp}.tmp", process::id()));
+    fs::write(&temporary, contents)
+        .map_err(|error| format!("could not write local setup: {error}"))?;
+    if let Err(error) = fs::rename(&temporary, path) {
+        let _ = fs::remove_file(&temporary);
+        return Err(format!("could not commit local setup: {error}"));
+    }
+    Ok(())
+}
+
+fn read_local_provider_config() -> Result<Option<ProviderConfig>, String> {
+    let Some(path) = local_provider_config_path() else {
+        return Ok(None);
+    };
+    read_local_provider_config_at(&path)
+}
+
+fn read_local_provider_config_at(path: &std::path::Path) -> Result<Option<ProviderConfig>, String> {
+    let contents = match fs::read_to_string(path) {
+        Ok(contents) => contents,
+        Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(None),
+        Err(error) => return Err(format!("could not read local provider setup: {error}")),
+    };
+    let mut base_url = None;
+    let mut model = None;
+    for (line_number, line) in contents.lines().enumerate() {
+        let line = line.trim();
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        let Some((key, value)) = line.split_once('=') else {
+            return Err(format!("local provider setup line {} is malformed", line_number + 1));
+        };
+        let value = value.trim();
+        match key.trim() {
+            "base_url" if base_url.is_none() => base_url = Some(value.to_owned()),
+            "model" if model.is_none() => model = Some(value.to_owned()),
+            "api_key" => return Err("local provider setup must not contain api_key".to_owned()),
+            "base_url" | "model" => {
+                return Err(format!("local provider setup line {} is duplicated", line_number + 1));
+            }
+            key => return Err(format!("local provider setup has unknown key: {key}")),
+        }
+    }
+    let base_url = base_url.ok_or_else(|| "local provider setup has no base_url".to_owned())?;
+    let config = local_provider_config_from_input(&base_url, model.as_deref())?;
+    Ok(Some(config))
+}
+
 fn restore_terminal(
     terminal: &mut Terminal<CrosstermBackend<io::Stdout>>,
 ) -> Result<(), Box<dyn Error>> {
@@ -571,19 +720,20 @@ fn event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> Result<(
 }
 
 fn configured_app() -> App {
-    let startup =
-        startup_state_from_provider_endpoint(env::var(PROVIDER_BASE_URL_ENV).ok().as_deref());
+    let startup = startup_state_from_provider_configuration(provider_config());
     history_path().map_or_else(
         || App::with_startup_state(startup),
         |path| App::with_history_path_and_startup(path, startup),
     )
 }
 
-fn startup_state_from_provider_endpoint(endpoint: Option<&str>) -> StartupState {
-    endpoint
-        .map(str::trim)
-        .filter(|value| !value.is_empty())
-        .map_or(StartupState::Unconfigured, |_| StartupState::Ready)
+fn startup_state_from_provider_configuration(
+    config: Result<Option<ProviderConfig>, String>,
+) -> StartupState {
+    match config {
+        Ok(Some(_)) | Err(_) => StartupState::Ready,
+        Ok(None) => StartupState::Unconfigured,
+    }
 }
 
 fn history_path() -> Option<PathBuf> {
@@ -638,7 +788,18 @@ fn provider_config() -> Result<Option<ProviderConfig>, String> {
     let base_url = env::var(PROVIDER_BASE_URL_ENV).ok();
     let model = env::var(PROVIDER_MODEL_ENV).ok();
     let api_key = env::var(PROVIDER_API_KEY_ENV).ok();
-    provider_config_from(base_url.as_deref(), model.as_deref(), api_key.as_deref())
+    if base_url.as_deref().is_some_and(|value| !value.trim().is_empty()) {
+        return provider_config_from(base_url.as_deref(), model.as_deref(), api_key.as_deref());
+    }
+
+    let Some(saved) = read_local_provider_config()? else {
+        return Ok(None);
+    };
+    provider_config_from(
+        Some(&saved.base_url),
+        model.as_deref().or(Some(saved.model.as_str())),
+        api_key.as_deref(),
+    )
 }
 
 fn provider_config_from(
@@ -928,6 +1089,21 @@ mod tests {
     }
 
     #[test]
+    fn cli_dispatch_accepts_explicit_local_setup_arguments() {
+        let arguments = ["setup", "--local", "http://127.0.0.1:8765/v1", "palette-model"]
+            .into_iter()
+            .map(str::to_owned)
+            .collect::<Vec<_>>();
+        assert_eq!(
+            cli_command_from_args(&arguments),
+            Ok(CliCommand::SetupLocal {
+                base_url: "http://127.0.0.1:8765/v1".to_owned(),
+                model: Some("palette-model".to_owned()),
+            })
+        );
+    }
+
+    #[test]
     fn standalone_setup_config_path_prefers_hermes_home_without_reading_existing_state() {
         assert_eq!(
             standalone_setup_config_path_from(
@@ -941,6 +1117,41 @@ mod tests {
             Some(PathBuf::from("/synthetic/home/.hermes/config.yaml"))
         );
         assert_eq!(standalone_setup_config_path_from(None, None), None);
+    }
+
+    #[test]
+    fn local_provider_config_path_stays_separate_from_hermes_config() {
+        assert_eq!(
+            local_provider_config_path_from(
+                Some(PathBuf::from("/synthetic/hermes")),
+                Some(PathBuf::from("/synthetic/home")),
+            ),
+            Some(PathBuf::from("/synthetic/hermes/hades-local-provider.conf"))
+        );
+    }
+
+    #[test]
+    fn local_setup_round_trips_only_loopback_provider_and_model() {
+        let stamp = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
+        let path = env::temp_dir().join(format!("hades-local-setup-test-{stamp}.conf"));
+        let config =
+            local_provider_config_from_input(" http://127.0.0.1:8765/v1 ", Some(" demo-model "))
+                .unwrap();
+        write_local_provider_config_at(&path, &config).unwrap();
+        let loaded = read_local_provider_config_at(&path).unwrap().unwrap();
+        assert_eq!(loaded.base_url, "http://127.0.0.1:8765/v1");
+        assert_eq!(loaded.model, "demo-model");
+        let contents = fs::read_to_string(&path).unwrap();
+        assert!(contents.contains("base_url=http://127.0.0.1:8765/v1"));
+        assert!(contents.contains("model=demo-model"));
+        assert!(!contents.contains("api_key"));
+        let _ = fs::remove_file(path);
+    }
+
+    #[test]
+    fn local_setup_rejects_non_loopback_provider() {
+        let error = local_provider_config_from_input("https://example.com/v1", None).unwrap_err();
+        assert!(error.contains("local provider endpoint rejected"));
     }
 
     #[test]
@@ -960,11 +1171,18 @@ mod tests {
     }
 
     #[test]
-    fn startup_state_is_unconfigured_without_a_provider_endpoint() {
-        assert_eq!(startup_state_from_provider_endpoint(None), StartupState::Unconfigured);
-        assert_eq!(startup_state_from_provider_endpoint(Some("  ")), StartupState::Unconfigured);
+    fn startup_state_treats_saved_or_invalid_provider_configuration_as_configured_boundary() {
+        assert_eq!(startup_state_from_provider_configuration(Ok(None)), StartupState::Unconfigured);
         assert_eq!(
-            startup_state_from_provider_endpoint(Some("http://127.0.0.1:8765/v1")),
+            startup_state_from_provider_configuration(Ok(Some(ProviderConfig {
+                base_url: "http://127.0.0.1:8765/v1".to_owned(),
+                model: "palette-model".to_owned(),
+                api_key: None,
+            }))),
+            StartupState::Ready
+        );
+        assert_eq!(
+            startup_state_from_provider_configuration(Err("invalid saved setup".to_owned())),
             StartupState::Ready
         );
     }

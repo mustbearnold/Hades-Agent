@@ -188,6 +188,14 @@ progress from August 1, 2026 through 2027.
   restoration. The replay uses synthetic HOME state and does not mutate shell
   configuration; a PATH that omits `~/.local/bin` remains a configuration
   boundary rather than a bug the launcher can solve itself.
+- HAD-094 wires the first usable Hades-only vertical slice. hades setup --local
+  <loopback-url> [model] validates a loopback endpoint and atomically writes
+  only hades-local-provider.conf; a fresh process reads that sidecar, reaches
+  a ready composer, sends the selected model and prompt to the local
+  OpenAI-compatible stream, renders the first assistant delta before delayed
+  completion, and returns to ready. Environment values override the sidecar,
+  API keys remain environment-only, and the display-only Hermes setup overlays
+  remain bounded parity surfaces rather than invented persistence claims.
 - HAD-045 captures the bounded Hermes Full setup provider menu before any
   provider selection: current model/active provider, visible loopback and
   custom rows, reversible Down navigation, clean Ctrl+C, unchanged config

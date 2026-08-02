@@ -28,6 +28,10 @@ replay-fresh-shell-launch:
     bash scripts/install_user_launcher.sh
     python3 scripts/replay_fresh_shell_launch.py --report .hades/runtime/fresh-shell-launch-replay.json
 
+replay-vertical-slice:
+    cargo build --locked --package hades-cli
+    python3 scripts/replay_vertical_slice.py --binary target/debug/hades --report .hades/runtime/vertical-slice-replay.json
+
 replay-differential:
     cargo build --locked --package hades-cli
     python3 scripts/differential_replay.py --binary target/debug/hades --report .hades/runtime/differential-replay.json

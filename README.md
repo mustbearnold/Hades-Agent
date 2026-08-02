@@ -97,6 +97,7 @@ just run                      # interactive TUI
 just run setup                # standalone first-run setup entry
 just replay-cli-launch        # no-argument and explicit-tui PTY launch replay
 just replay-fresh-shell-launch # fresh Bash/Fish command resolution and installed TUI lifecycle
+just replay-vertical-slice    # setup -> local provider/model -> prompt -> streamed answer
 just replay-unconfigured-help # delayed /help setup-required PTY replay
 just replay-standalone-setup  # standalone hades setup PTY replay
 just replay-standalone-full-setup # standalone Full setup continuation replay
@@ -152,31 +153,40 @@ The first provider protocol seam lives in the `hades-provider` crate. It is
 deliberately loopback-only (`http://127.0.0.1:<port>/...`). To connect a local
 OpenAI-compatible server, set the endpoint before launching:
 
-```bash
-export HADES_PROVIDER_BASE_URL=http://127.0.0.1:8765/v1
-export HADES_MODEL=palette-model              # optional
-# export HADES_PROVIDER_API_KEY=...            # optional; never logged by Hades
-hades tui
-```
+    export HADES_PROVIDER_BASE_URL=http://127.0.0.1:8765/v1
+    export HADES_MODEL=palette-model
+    hades tui
+
+For the first working setup-to-answer journey, configure the loopback provider
+once and then launch a fresh process:
+
+    hades setup --local http://127.0.0.1:8765/v1 palette-model
+    hades
+
+That command writes only Hades' hades-local-provider.conf sidecar under
+HERMES_HOME (or ~/.hermes) and leaves Hermes' config.yaml untouched. The
+stored loopback endpoint and model are used when the environment variables are
+absent; environment values remain the higher-priority override. API keys are
+accepted only through HADES_PROVIDER_API_KEY and are never persisted.
 
 The CLI worker translates the local SSE response into typed reducer events and
-renders the assistant response. Without `HADES_PROVIDER_BASE_URL`, a fresh
-launch stays on the reference-backed `starting agent…` boundary and does not
-start a provider worker or deliver prompts; the bounded clone still accepts a
-visible draft during startup. Hermes also remains on that boundary for a
-bounded 15-second window after `/setup` or `/model`, so those commands are not
-yet a configuration escape in Hades. `/help` is the observed exception: after
-submission it remains visible for the bounded 8000 ms route deadline, then
-opens Setup Required with `/model`, `/setup`, and Ctrl+C.
-`just replay-unconfigured-help` proves that transition against both launch
-forms, and `just verify` also refreshes and replays the installed `hades` and
-`Hades` launchers. Use `hades setup` for the separate first-run entry; its
-current bounded slice reaches the observed Full setup continuation, accepts the
-local terminal backend into the unconfigured platform picker, and carries
-platform cancellation through the plain Hermes Tool Configuration boundary.
-The bounded reference probe also records the first checklist navigation key
-and the first-install provider handoff without selecting a tool. Provider
-credentials, OAuth, platform selection, backend alternatives, and later setup
-remain outside the clone contract. Configure the loopback endpoint
-before expecting a model response. No external provider service is required
-for the deterministic bootstrap path.
+renders the assistant response. Without HADES_PROVIDER_BASE_URL or a saved
+local setup, a fresh launch stays on the reference-backed starting agent…
+boundary and does not start a provider worker or deliver prompts; the bounded
+clone still accepts a visible draft during startup. Hermes also remains on
+that boundary for a bounded 15-second window after /setup or /model, so those
+commands are not yet a configuration escape in Hades. /help is the observed
+exception: after submission it remains visible for the bounded 8000 ms route
+deadline, then opens Setup Required with /model, /setup, and Ctrl+C.
+just replay-unconfigured-help proves that transition against both launch forms,
+and just verify also refreshes and replays the installed hades and Hades
+launchers. Use hades setup for the separate first-run entry; its current
+bounded slice reaches the observed Full setup continuation, accepts the local
+terminal backend into the unconfigured platform picker, and carries platform
+cancellation through the plain Hermes Tool Configuration boundary. The bounded
+reference probe also records the first checklist navigation key and the
+first-install provider handoff without selecting a tool. Provider credentials,
+OAuth, platform selection, backend alternatives, and later setup remain outside
+the clone contract. The local setup command is an explicit Hades vertical-slice
+extension; it does not claim Hermes provider-persistence parity or reproduce
+Hermes failure cases.

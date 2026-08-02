@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-02T06:57:55Z",
+  "updated_at": "2026-08-02T07:23:20Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -5014,6 +5014,60 @@
           "justfile",
           "scripts/verify.sh",
           "scripts/probe_hermes_osc52_st_termination.py"
+        ]
+      }
+    },
+    {
+      "id": "HAD-094",
+      "title": "Wire the first local-provider vertical slice",
+      "status": "complete",
+      "priority": 100,
+      "lane": "vertical-slice",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-053",
+        "HAD-055",
+        "HAD-057",
+        "HAD-093"
+      ],
+      "risk": "high",
+      "oracle": [
+        "typed_cli_setup",
+        "sidecar_config_readback",
+        "local_provider_request_shape",
+        "incremental_stream_visibility",
+        "fresh_process_pty_replay",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Add an explicit Hades-only local setup path that lets a user choose the loopback provider and model without credentials or external network access, persists only a sanitized Hades sidecar, and never overwrites an existing Hermes config.yaml or stores an API key.",
+        "Make a fresh hades process load the persisted local provider/model configuration when environment overrides are absent; environment configuration remains an explicit higher-priority override and invalid loopback URLs fail visibly before a request starts.",
+        "Prove one complete journey: setup --local endpoint [model] -> fresh hades launch -> visible ready composer -> prompt submission -> deterministic OpenAI-compatible streaming request -> first assistant delta visible before completion -> final ready state and clean Ctrl+C terminal restoration.",
+        "Preserve the existing display-only Hermes parity setup/model overlays as bounded reference surfaces; this local setup command is an explicit Hades vertical-slice extension, not an invented claim about Hermes persistence or a permission to reproduce Hermes bugs/failure cases.",
+        "Add focused config/CLI tests, a deterministic loopback direct-PTY replay, a sanitized OBS-0089 implementation fixture and observation, README/context/matrix documentation, and wire the oracle into just verify. Run the targeted replay and complete the no-skip just verify gate."
+      ],
+      "evidence": [
+        "crates/hades-cli/src/main.rs",
+        "scripts/replay_vertical_slice.py",
+        "tests/fixtures/parity/OBS-0089-hades-local-provider-vertical-slice.json",
+        "docs/parity/observations/OBS-0089-hades-local-provider-vertical-slice-2026-08-02.md",
+        "justfile",
+        "scripts/verify.sh"
+      ],
+      "ready_at": "2026-08-02T07:00:07Z",
+      "attempts": 1,
+      "claimed_by": "vertical-slice-implementer",
+      "claimed_at": "2026-08-02T07:00:25Z",
+      "result": {
+        "summary": "Implemented the first Hades-only local-provider vertical slice: explicit loopback setup writes a sanitized sidecar, fresh launches load it with environment overrides, and a PTY replay proves setup through streamed first delta, completion, and clean exit.",
+        "completed_at": "2026-08-02T07:23:20Z",
+        "evidence": [
+          "crates/hades-cli/src/main.rs",
+          "scripts/replay_vertical_slice.py",
+          "tests/fixtures/parity/OBS-0089-hades-local-provider-vertical-slice.json",
+          "docs/parity/observations/OBS-0089-hades-local-provider-vertical-slice-2026-08-02.md",
+          "justfile",
+          "scripts/verify.sh"
         ]
       }
     }
