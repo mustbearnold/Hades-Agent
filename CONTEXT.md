@@ -401,6 +401,13 @@ progress from August 1, 2026 through 2027.
   `Configuring 6 tool(s)` / Browser Automation provider boundary. The probe
   stops before provider selection and uses harness-only forced teardown; later
   cancellation, tool toggling, and provider/key behavior remain unknown.
+- HAD-082 records that first-install continuation directly. Within a bounded
+  200 ms window after checklist Ctrl+C, Hermes prints `Configuring 6 tool(s)`
+  and reaches the `Browser Automation - Choose a provider` boundary while
+  keeping canonical input and echo restored. No provider choice or key is
+  entered; the provider list, discovery subprocess behavior, network/OAuth
+  activity, and later cancellation remain unknown. The probe teardown is
+  harness-only and does not claim a Hermes product exit.
 
 ## Unknown until observed
 

@@ -230,6 +230,9 @@ probe-hermes-standalone-tool-configuration:
 probe-hermes-tool-configuration-navigation:
     python3 scripts/probe_hermes_tool_configuration_navigation.py --report .hades/runtime/hermes-tool-configuration-navigation-probe.json --timeout 30
 
+probe-hermes-tool-provider-boundary:
+    python3 scripts/probe_hermes_tool_provider_boundary.py --report .hades/runtime/hermes-tool-provider-boundary-probe.json --timeout 30
+
 replay-local-provider:
     cargo build --locked --package hades-cli
     python3 scripts/replay_local_provider.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0051-hades-local-provider-stream.json --report .hades/runtime/local-provider-replay.json
@@ -290,6 +293,7 @@ validate-reference:
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0074-hades-standalone-terminal-platform.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0075-hermes-standalone-tool-configuration.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0076-hermes-tool-configuration-navigation.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0077-hermes-tool-provider-boundary.json
 
 agent command *args:
     python3 scripts/agent/control_plane.py {{command}} {{args}}

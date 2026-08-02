@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-02T00:38:58Z",
+  "updated_at": "2026-08-02T00:57:51Z",
   "tasks": [
     {
       "id": "HAD-001",
@@ -4321,6 +4321,61 @@
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/hermes-tool-configuration-navigation-probe.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-082",
+      "title": "Capture Hermes first-install Browser Automation provider boundary",
+      "status": "complete",
+      "priority": 10,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-081"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "hermes_direct_pty",
+        "sanitized_fixture",
+        "replayable_tool_provider_boundary",
+        "full_verify"
+      ],
+      "acceptance": [
+        "In the pinned Hermes reference, repeat the fresh standalone Full setup route through the raw Tools for CLI checklist, send only the observed bounded Ctrl+C cancellation, and capture the resulting first-install Configuring 6 tool(s) continuation and Browser Automation provider boundary.",
+        "Record stable provider title/choice landmarks if they render, terminal flags, process liveness, alternate-screen transition, exact safe input sequence, config/artifact shape, and any bounded discovery timing without selecting a provider, entering credentials, starting OAuth, or requesting external provider behavior.",
+        "Stop at the first provider/key/network or other unobserved surface; if Hermes begins a provider-discovery subprocess that does not resolve inside the bounded window, record the hang/unknown cancellation status and use harness-only teardown rather than inventing a product outcome.",
+        "Add provenance, a sanitized OBS-0077 fixture, a repeatable direct-PTY probe, and an observation document; update the parity matrix/context/readme and wire fixture validation and the probe into just verify.",
+        "Run the targeted probe and complete no-skip just verify gate, recording only the bounded first-install provider evidence before completion; do not submit any provider, tool, platform, secret, OAuth, or model value."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_tool_provider_boundary.py",
+        "tests/fixtures/parity/OBS-0077-hermes-tool-provider-boundary.json",
+        "docs/parity/observations/OBS-0077-hermes-tool-provider-boundary-2026-08-02.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hermes-tool-provider-boundary-probe.json"
+      ],
+      "ready_at": "2026-08-02T00:40:03Z",
+      "claimed_by": "tool-provider-boundary",
+      "claimed_at": "2026-08-02T00:40:32Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Captured the first-install Configuring 6 tool(s) and Browser Automation provider boundary without selecting a provider or entering credentials; preserved discovery and later cancellation as unknown.",
+        "completed_at": "2026-08-02T00:57:51Z",
+        "evidence": [
+          "scripts/probe_hermes_tool_provider_boundary.py",
+          "tests/fixtures/parity/OBS-0077-hermes-tool-provider-boundary.json",
+          "docs/parity/observations/OBS-0077-hermes-tool-provider-boundary-2026-08-02.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hermes-tool-provider-boundary-probe.json"
         ]
       }
     }

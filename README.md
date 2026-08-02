@@ -121,6 +121,7 @@ just probe-hermes-standalone-full-setup # standalone Full setup continuation pro
 just probe-hermes-standalone-terminal-platform # standalone backend/platform boundary probe
 just probe-hermes-standalone-tool-configuration # standalone Tool Configuration action probe
 just probe-hermes-tool-configuration-navigation # standalone Tool Configuration navigation probe
+just probe-hermes-tool-provider-boundary # first-install provider boundary probe
 just replay-terminal-palette   # Hades SGR palette and cell-style parity replay
 just replay-osc52-timing-limits # Hades OSC52 timing and bounded-size parity replay
 just replay-osc52-st-termination # Hades ST-terminated OSC52 parity replay
