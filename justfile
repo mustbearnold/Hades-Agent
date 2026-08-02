@@ -40,6 +40,10 @@ replay-provider-recovery:
     cargo build --locked --package hades-cli
     python3 scripts/replay_provider_recovery.py --binary target/debug/hades --report .hades/runtime/provider-recovery-replay.json
 
+replay-conversation-context:
+    cargo build --locked --package hades-cli
+    python3 scripts/replay_conversation_context.py --binary target/debug/hades --report .hades/runtime/conversation-context-replay.json
+
 replay-differential:
     cargo build --locked --package hades-cli
     python3 scripts/differential_replay.py --binary target/debug/hades --report .hades/runtime/differential-replay.json

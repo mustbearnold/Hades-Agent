@@ -771,7 +771,7 @@ fn dispatch_input(
 ) -> Result<(), Box<dyn Error>> {
     let event = resolve_clipboard_event(terminal, app, event);
     match app.handle(event) {
-        DispatchOutcome::Submitted(content) => start_provider(app, provider_runtime, content),
+        DispatchOutcome::Submitted(_) => start_provider(app, provider_runtime),
         DispatchOutcome::Interrupted => {
             cancel_provider(provider_runtime);
         }
@@ -820,22 +820,18 @@ fn start_provider_from_latest_user(app: &mut App, provider_runtime: &mut Option<
     if app.state().turn != TurnState::Busy {
         return;
     }
-    let Some(content) = app
-        .state()
-        .messages
-        .last()
-        .filter(|message| message.role == Role::User)
-        .map(|message| message.content.clone())
-    else {
+    let has_latest_user =
+        app.state().messages.last().is_some_and(|message| message.role == Role::User);
+    if !has_latest_user {
         app.handle(InputEvent::Provider(ProviderEvent::Failed(
             "provider request has no user message".to_owned(),
         )));
         return;
-    };
-    start_provider(app, provider_runtime, content);
+    }
+    start_provider(app, provider_runtime);
 }
 
-fn start_provider(app: &mut App, provider_runtime: &mut Option<ProviderRuntime>, content: String) {
+fn start_provider(app: &mut App, provider_runtime: &mut Option<ProviderRuntime>) {
     cancel_provider(provider_runtime);
     let config = match provider_config() {
         Ok(Some(config)) => config,
@@ -858,16 +854,25 @@ fn start_provider(app: &mut App, provider_runtime: &mut Option<ProviderRuntime>,
             return;
         }
     };
-    let request = ChatRequest::new(
-        config.model,
-        vec![ChatMessage::new("system", PROVIDER_SYSTEM_PROMPT), ChatMessage::new("user", content)],
-        Vec::new(),
-    );
+    let request = ChatRequest::new(config.model, provider_request_messages(app), Vec::new());
     let cancellation = CancellationToken::new();
     let worker_cancellation = cancellation.clone();
     let (sender, receiver) = mpsc::channel();
     thread::spawn(move || run_provider_worker(transport, request, sender, worker_cancellation));
     *provider_runtime = Some(ProviderRuntime { events: receiver, cancellation });
+}
+
+fn provider_request_messages(app: &App) -> Vec<ChatMessage> {
+    let mut messages = vec![ChatMessage::new("system", PROVIDER_SYSTEM_PROMPT)];
+    messages.extend(app.provider_conversation().into_iter().map(|message| {
+        let role = match message.role {
+            Role::System => "system",
+            Role::User => "user",
+            Role::Assistant => "assistant",
+        };
+        ChatMessage::new(role, message.content)
+    }));
+    messages
 }
 
 fn cancel_provider(provider_runtime: &mut Option<ProviderRuntime>) {
@@ -1213,6 +1218,26 @@ mod tests {
         assert!(runtime.is_none());
         assert_eq!(app.state().turn, TurnState::Ready);
         assert_eq!(app.state().messages.last().unwrap().content, "hello");
+    }
+
+    #[test]
+    fn provider_request_contains_one_system_prompt_and_completed_context() {
+        let mut app = App::new();
+        app.submit_editor_draft("first".to_owned());
+        app.handle(InputEvent::Provider(ProviderEvent::Started));
+        app.handle(InputEvent::Provider(ProviderEvent::TextDelta("answer".to_owned())));
+        app.handle(InputEvent::Provider(ProviderEvent::Completed));
+        app.submit_editor_draft("second".to_owned());
+
+        assert_eq!(
+            provider_request_messages(&app),
+            vec![
+                ChatMessage::new("system", PROVIDER_SYSTEM_PROMPT),
+                ChatMessage::new("user", "first"),
+                ChatMessage::new("assistant", "answer"),
+                ChatMessage::new("user", "second")
+            ]
+        );
     }
 
     #[test]

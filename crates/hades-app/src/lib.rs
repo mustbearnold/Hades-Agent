@@ -119,11 +119,25 @@ pub enum DispatchOutcome {
     Quit,
 }
 
+#[derive(Clone, Debug, Eq, PartialEq)]
+struct CompletedTurn {
+    user: String,
+    assistant: String,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+struct ActiveTurn {
+    user: String,
+    assistant: String,
+}
+
 #[derive(Clone, Debug)]
 pub struct App {
     state: SessionState,
     history_store: Option<HistoryStore>,
     help_setup_deadline: Option<Instant>,
+    completed_turns: Vec<CompletedTurn>,
+    active_turn: Option<ActiveTurn>,
 }
 
 impl App {
@@ -139,7 +153,13 @@ impl App {
         state.messages.push(Message::system(
             "Hades Agent bootstrap shell. Reference-backed behavior is not implemented yet.",
         ));
-        Self { state, history_store: None, help_setup_deadline: None }
+        Self {
+            state,
+            history_store: None,
+            help_setup_deadline: None,
+            completed_turns: Vec::new(),
+            active_turn: None,
+        }
     }
 
     pub fn with_history_path(path: impl Into<PathBuf>) -> Self {
@@ -156,6 +176,24 @@ impl App {
 
     pub fn state(&self) -> &SessionState {
         &self.state
+    }
+
+    /// Return only provider-safe conversation context.
+    ///
+    /// The display transcript intentionally contains bootstrap and diagnostic
+    /// messages. Only completed user/assistant turns belong in a later model
+    /// request; the active user message is included so its first request can
+    /// be built before the provider has emitted a response.
+    pub fn provider_conversation(&self) -> Vec<Message> {
+        let mut messages = Vec::with_capacity(self.completed_turns.len() * 2 + 1);
+        for turn in &self.completed_turns {
+            messages.push(Message::user(&turn.user));
+            messages.push(Message::assistant(&turn.assistant));
+        }
+        if let Some(turn) = &self.active_turn {
+            messages.push(Message::user(&turn.user));
+        }
+        messages
     }
 
     pub fn submit_editor_draft(&mut self, draft: String) -> DispatchOutcome {
@@ -213,6 +251,9 @@ impl App {
                     return DispatchOutcome::Continue;
                 }
 
+                if let Some(turn) = &mut self.active_turn {
+                    turn.assistant.push_str(&text);
+                }
                 if let Some(message) = self
                     .state
                     .messages
@@ -226,10 +267,15 @@ impl App {
                 self.state.status = "Receiving response.".to_owned();
             }
             ProviderEvent::Completed => {
+                if let Some(turn) = self.active_turn.take() {
+                    self.completed_turns
+                        .push(CompletedTurn { user: turn.user, assistant: turn.assistant });
+                }
                 self.state.turn = TurnState::Ready;
                 self.state.status = "Response complete.".to_owned();
             }
             ProviderEvent::Failed(message) => {
+                self.active_turn = None;
                 self.state.turn = TurnState::Ready;
                 self.state.status = if message.is_empty() {
                     "Provider error.".to_owned()
@@ -239,6 +285,7 @@ impl App {
                 self.state.notice = Some(Notice::ProviderError { message });
             }
             ProviderEvent::Cancelled => {
+                self.active_turn = None;
                 self.state.turn = TurnState::Ready;
                 self.state.status = "Provider cancelled.".to_owned();
                 self.state.notice = Some(Notice::ProviderCancelled);
@@ -489,6 +536,7 @@ impl App {
         self.clear_notice();
         self.state.messages.push(Message::user(&content));
         self.state.composer.clear();
+        self.active_turn = Some(ActiveTurn { user: content.clone(), assistant: String::new() });
         self.state.turn = TurnState::Busy;
         self.state.status = "Busy; response adapter not connected.".to_owned();
         DispatchOutcome::Submitted(content)
@@ -497,6 +545,7 @@ impl App {
     fn interrupt(&mut self) -> DispatchOutcome {
         self.clear_notice();
         self.clear_completion();
+        self.active_turn = None;
         self.state.turn = TurnState::Ready;
         self.state.status = "Interrupted.".to_owned();
         DispatchOutcome::Interrupted
@@ -788,6 +837,48 @@ mod tests {
         app.handle(InputEvent::Provider(ProviderEvent::Completed));
         assert_eq!(app.state().turn, TurnState::Ready);
         assert_eq!(app.state().status, "Response complete.");
+    }
+
+    #[test]
+    fn provider_conversation_promotes_only_completed_turns() {
+        let mut app = App::new();
+        assert_eq!(
+            app.submit_editor_draft("first".to_owned()),
+            DispatchOutcome::Submitted("first".to_owned())
+        );
+        app.handle(InputEvent::Provider(ProviderEvent::Started));
+        app.handle(InputEvent::Provider(ProviderEvent::TextDelta("answer".to_owned())));
+        app.handle(InputEvent::Provider(ProviderEvent::Completed));
+
+        assert_eq!(
+            app.submit_editor_draft("second".to_owned()),
+            DispatchOutcome::Submitted("second".to_owned())
+        );
+        assert_eq!(
+            app.provider_conversation(),
+            vec![Message::user("first"), Message::assistant("answer"), Message::user("second")]
+        );
+    }
+
+    #[test]
+    fn provider_conversation_excludes_failed_partial_turns_but_keeps_them_visible() {
+        let mut app = App::new();
+        app.submit_editor_draft("first".to_owned());
+        app.handle(InputEvent::Provider(ProviderEvent::Started));
+        app.handle(InputEvent::Provider(ProviderEvent::TextDelta("answer".to_owned())));
+        app.handle(InputEvent::Provider(ProviderEvent::Completed));
+
+        app.submit_editor_draft("failed".to_owned());
+        app.handle(InputEvent::Provider(ProviderEvent::Started));
+        app.handle(InputEvent::Provider(ProviderEvent::TextDelta("partial".to_owned())));
+        app.handle(InputEvent::Provider(ProviderEvent::Failed("offline".to_owned())));
+        assert!(app.state().messages.iter().any(|message| message.content == "partial"));
+
+        app.submit_editor_draft("follow-up".to_owned());
+        assert_eq!(
+            app.provider_conversation(),
+            vec![Message::user("first"), Message::assistant("answer"), Message::user("follow-up")]
+        );
     }
 
     #[test]

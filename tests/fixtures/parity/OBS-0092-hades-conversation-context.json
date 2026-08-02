@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0092",
+  "reference_observation": "OBS-0054",
+  "surface": "hades-local-provider-conversation-context",
+  "reference": {
+    "product": "Hades Agent",
+    "version": "workspace",
+    "source_commit": "602050fac4db7073a5c4ee447abb70400ed35456",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "fresh direct PTY with deterministic loopback HTTP/SSE"
+    },
+    "capture": "Hades local sidecar followed by successful multi-turn context and failed-turn isolation in one fresh process"
+  },
+  "normalization": [
+    "Binary paths, synthetic HOME/HERMES_HOME paths, PTY paths, timestamps, process identifiers, raw redraw bytes, and ephemeral server ports are omitted or represented by stable markers.",
+    "The loopback server accepts only local OpenAI-compatible requests and records normalized message roles/content markers, model, stream flag, request count, and authorization presence; no credentials or external network are used.",
+    "The display transcript may retain bootstrap and failed diagnostic messages, but provider payloads are evaluated against the typed completed-turn lifecycle rather than rendered text.",
+    "The failed-turn follow-up intentionally excludes the failed user prompt and partial assistant diagnostic text while preserving prior successful turns; automatic retries remain outside the user submission boundary."
+  ],
+  "steps": [
+    {
+      "id": "successful-context-then-failure-isolation",
+      "precondition": "hades setup --local has written only the Hades local-provider sidecar; a fresh 120x40 process reaches the ready composer.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "first context prompt",
+          "bytes_hex": "66 69 72 73 74 20 63 6f 6e 74 65 78 74 20 70 72 6f 6d 70 74"
+        },
+        {"kind": "key", "value": "Enter after first stream", "bytes_hex": "0d"},
+        {
+          "kind": "text",
+          "value": "second context prompt",
+          "bytes_hex": "73 65 63 6f 6e 64 20 63 6f 6e 74 65 78 74 20 70 72 6f 6d 70 74"
+        },
+        {"kind": "key", "value": "Enter after second stream", "bytes_hex": "0d"},
+        {
+          "kind": "text",
+          "value": "failed context prompt",
+          "bytes_hex": "66 61 69 6c 65 64 20 63 6f 6e 74 65 78 74 20 70 72 6f 6d 70 74"
+        },
+        {"kind": "key", "value": "Enter; server closes before DONE", "bytes_hex": "0d"},
+        {
+          "kind": "text",
+          "value": "recovered context prompt",
+          "bytes_hex": "72 65 63 6f 76 65 72 65 64 20 63 6f 6e 74 65 78 74 20 70 72 6f 6d 70 74"
+        },
+        {"kind": "key", "value": "Enter after explicit follow-up", "bytes_hex": "0d"},
+        {"kind": "key", "value": "Ctrl+C clean exit", "bytes_hex": "03"}
+      ],
+      "output": {
+        "status": "passed",
+        "successful_turns_preserved": true,
+        "request_message_sequences": [
+          ["system:You are Hades Agent. Respond concisely to the user.", "user:first context prompt"],
+          [
+            "system:You are Hades Agent. Respond concisely to the user.",
+            "user:first context prompt",
+            "assistant:First context answer.",
+            "user:second context prompt"
+          ],
+          [
+            "system:You are Hades Agent. Respond concisely to the user.",
+            "user:first context prompt",
+            "assistant:First context answer.",
+            "user:second context prompt",
+            "assistant:Second context answer.",
+            "user:failed context prompt"
+          ],
+          [
+            "system:You are Hades Agent. Respond concisely to the user.",
+            "user:first context prompt",
+            "assistant:First context answer.",
+            "user:second context prompt",
+            "assistant:Second context answer.",
+            "user:recovered context prompt"
+          ]
+        ],
+        "failed_partial_visible_as_diagnostic": true,
+        "failed_turn_excluded_from_follow_up": true,
+        "automatic_requests": 0,
+        "model": "vertical-model",
+        "authorization_present": false,
+        "cleanup": "exit 0; alternate screen left; canonical input and echo restored"
+      }
+    }
+  ],
+  "boundaries": {
+    "provider": "loopback only",
+    "successful_context": "completed turns only",
+    "failed_context": "diagnostic display only",
+    "automatic_retries": false,
+    "credential_persistence": false,
+    "hermes_config_mutation": false
+  },
+  "unknowns": [
+    "Conversation persistence across a process restart, session switching/resumption, tool-call messages, multimodal content, and context-window budgeting remain outside this replay.",
+    "The exact Hermes successful conversation payload and any external-provider token accounting remain unobserved; Hades uses the typed safe lifecycle proved here.",
+    "Concurrent submissions and cancellation races during a context-bearing request remain separate boundaries."
+  ]
+}

@@ -55,6 +55,7 @@ python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0088-had
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0089-hades-local-provider-vertical-slice.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0090-hades-configured-primary-surfaces.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0091-hades-provider-failure-recovery.json
+python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0092-hades-conversation-context.json
 cargo fmt --all -- --check
 cargo check --workspace --all-targets --locked
 cargo clippy --workspace --all-targets --locked -- -D warnings
@@ -76,6 +77,7 @@ python3 scripts/replay_standalone_tool_provider_inventory_selection.py --binary 
 python3 scripts/replay_vertical_slice.py --binary target/debug/hades --report .hades/runtime/vertical-slice-replay.json --timeout 8
 python3 scripts/replay_configured_surfaces.py --binary target/debug/hades --report .hades/runtime/configured-surfaces-replay.json --timeout 8
 python3 scripts/replay_provider_recovery.py --binary target/debug/hades --report .hades/runtime/provider-recovery-replay.json --timeout 8
+python3 scripts/replay_conversation_context.py --binary target/debug/hades --report .hades/runtime/conversation-context-replay.json --timeout 8
 cargo build --locked --release --package hades-cli
 bash scripts/install_user_launcher.sh
 python3 scripts/replay_fresh_shell_launch.py --report .hades/runtime/fresh-shell-launch-replay.json

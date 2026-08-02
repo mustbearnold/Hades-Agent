@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-02T10:05:06Z",
+  "updated_at": "2026-08-02T10:35:10Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -5185,6 +5185,67 @@
           "tests/fixtures/parity/OBS-0091-hades-provider-failure-recovery.json",
           "docs/parity/observations/OBS-0091-hades-provider-failure-recovery-2026-08-02.md",
           "docs/parity/observations/OBS-0054-hermes-provider-errors-2026-08-02.md",
+          "justfile",
+          "scripts/verify.sh",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-097",
+      "title": "Preserve successful conversation context across turns",
+      "status": "complete",
+      "priority": 93,
+      "lane": "vertical-slice",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-096",
+        "HAD-057"
+      ],
+      "risk": "high",
+      "oracle": [
+        "typed_conversation_lifecycle",
+        "multi_turn_request_shape",
+        "failed_turn_isolation",
+        "direct_pty_replay",
+        "full_verify"
+      ],
+      "acceptance": [
+        "In one fresh configured local-provider process, submit two ordinary prompts only after the first streamed response completes; prove the second request contains exactly one provider system message, the first user message, the first completed assistant answer, and the second user message in order, with no bootstrap text, duplicate messages, or hidden prompt state.",
+        "Keep the request boundary explicit: a second request is created only by a new user submission, uses the configured model, preserves incremental streaming and clean terminal ownership, and never sends an automatic context refresh or retry.",
+        "Keep failed, cancelled, or incomplete turns visible in the transcript as diagnostic context but exclude their user and partial assistant messages from later provider history; after a safe explicit follow-up, send prior successful turns plus the new prompt, or only the new prompt when no successful turn exists.",
+        "Implement the lifecycle rule at a typed app seam with focused tests rather than reconstructing history from display strings; preserve Hades' safer failure behavior and do not cap Rust performance or reproduce Hermes defects, unsafe behavior, or stuck retries.",
+        "Add a deterministic direct-PTY replay against a loopback streaming server with no credentials, external network, host clipboard, Hermes config mutation, or private runtime reads; prove request bodies, response visibility, follow-up isolation, request counts, and canonical-input/echo/alternate-screen restoration.",
+        "Add sanitized OBS-0092 fixture and observation, README/context/matrix documentation, just/verify wiring, and run the targeted replay plus complete no-skip just verify gate before completion."
+      ],
+      "evidence": [
+        "crates/hades-app/src/lib.rs",
+        "crates/hades-cli/src/main.rs",
+        "scripts/replay_conversation_context.py",
+        "tests/fixtures/parity/OBS-0092-hades-conversation-context.json",
+        "docs/parity/observations/OBS-0092-hades-conversation-context-2026-08-02.md",
+        ".hades/runtime/conversation-context-replay.json",
+        "justfile",
+        "scripts/verify.sh",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md"
+      ],
+      "claimed_by": "conversation-context-implementer",
+      "claimed_at": "2026-08-02T10:09:19Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Implemented typed successful conversation context: completed turns are carried into later local-provider requests, while failed, cancelled, and incomplete turns remain diagnostic-only and are excluded from explicit recovery follow-ups. OBS-0092 and the complete no-skip gate prove exact request order, no automatic context refresh, credential-free loopback boundaries, and clean terminal restoration.",
+        "completed_at": "2026-08-02T10:35:10Z",
+        "evidence": [
+          "crates/hades-app/src/lib.rs",
+          "crates/hades-cli/src/main.rs",
+          "scripts/replay_conversation_context.py",
+          "tests/fixtures/parity/OBS-0092-hades-conversation-context.json",
+          "docs/parity/observations/OBS-0092-hades-conversation-context-2026-08-02.md",
+          ".hades/runtime/conversation-context-replay.json",
           "justfile",
           "scripts/verify.sh",
           "docs/parity/MATRIX.md",

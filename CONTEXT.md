@@ -212,6 +212,13 @@ progress from August 1, 2026 through 2027.
   authorization header, clean terminal restoration, and no Hermes config
   mutation. Hermes' observed repeated requests and stuck busy surface remain
   defects/unknowns rather than behavior Hades reproduces.
+- HAD-097 carries only successful conversation turns into later local-provider
+  requests through a typed app lifecycle. The direct-PTY OBS-0092 replay proves
+  the second request contains the first completed user/assistant turn, while a
+  failed partial turn remains visible as diagnostic text but is excluded from
+  the explicit recovery follow-up. Bootstrap display text never enters the
+  request, no automatic context refresh occurs, and the replay proves clean
+  terminal restoration with no Hermes config mutation or credentials.
 - HAD-045 captures the bounded Hermes Full setup provider menu before any
   provider selection: current model/active provider, visible loopback and
   custom rows, reversible Down navigation, clean Ctrl+C, unchanged config

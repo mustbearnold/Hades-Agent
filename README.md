@@ -203,3 +203,10 @@ HTTP 500, malformed-SSE, and incomplete-stream cases return to a visible Ready
 state without automatic retries; a new user prompt clears the notice and sends
 one explicit follow-up that can recover. This is an intentional safer Hades
 boundary, not a reproduction of Hermes' ambiguous failure behavior.
+
+Successful multi-turn context is covered by `just replay-conversation-context`.
+Completed user/assistant turns become typed provider context, while failed or
+partial turns remain visible for diagnosis but are excluded from the next
+explicit follow-up. The direct-PTY replay proves the exact request sequence,
+clean terminal restoration, and the absence of bootstrap or credential data in
+the loopback payload.
