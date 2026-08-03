@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-03T06:59:40Z",
+  "updated_at": "2026-08-03T07:20:57Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -6346,6 +6346,63 @@
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/tool-call-deltas-replay.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-116",
+      "title": "Capture exact Hermes tool inventory with description text",
+      "status": "complete",
+      "priority": 74,
+      "lane": "research",
+      "owner_role": "observer",
+      "depends_on": [
+        "HAD-115"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "pinned_hermes_reference",
+        "direct_pty_probe",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Against the pinned Hermes source in a fresh synthetic HOME/HERMES_HOME with a deterministic loopback provider, submit one ordinary prompt and record the complete tools array from the streaming chat request.",
+        "Persist the full 31-tool inventory (names, descriptions, parameter property names/types, required fields, enum values, nested structure) in a sanitized OBS-0112 fixture; tool definitions are public API schemas from the pinned commit, not credentials or private state.",
+        "Prove the captured inventory is stable: record the raw-JSON inventory digest and confirm the normalized marker digest matches OBS-0109 (90bc20dad34193bb183edab4038f4ca4cf220c63de3ebcec63b90fd9d14470bf) to anchor the new fixture to the existing evidence.",
+        "No tool execution, credential, OAuth, network, or provider action beyond the bounded loopback request; the process is interrupted and cleaned up before any tool processing.",
+        "Add the provenance-bearing fixture, repeatable direct-PTY probe, observation document, parity matrix/context/readme updates, wire fixture validation and the probe through just verify, and complete the no-skip gate before completion."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_tool_inventory.py",
+        "tests/fixtures/parity/OBS-0112-hermes-tool-inventory.json",
+        "docs/parity/observations/OBS-0112-hermes-tool-inventory-2026-08-03.md",
+        "scripts/validate_reference_fixture.py",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hermes-tool-inventory-probe.json"
+      ],
+      "ready_at": "2026-08-03T07:01:12Z",
+      "claimed_by": "tool-inventory-observer",
+      "claimed_at": "2026-08-03T07:01:12Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Captured the exact pinned Hermes 31-tool inventory with full description text in a fresh 120x40 direct PTY: one ordinary prompt produced a streaming request whose tools array (names, descriptions, parameter names/types, required fields, enums, nested structure) is recorded verbatim as public API schema, anchored by the OBS-0109 normalized marker digest (90bc20...) and a raw-JSON digest b2cbd3f2... with no tool execution, credential, OAuth, network, or provider action beyond the bounded loopback. Refined the shared fixture validator's sk- scan to require a credential-shaped token boundary so hyphenated prose like task-specific no longer false-positives; sanitized OBS-0112 fixture, repeatable direct-PTY probe, observation document, matrix/context/readme updates, and just verify wiring added; complete no-skip just verify gate PASS (verification: PASS).",
+        "completed_at": "2026-08-03T07:20:57Z",
+        "evidence": [
+          "scripts/probe_hermes_tool_inventory.py",
+          "tests/fixtures/parity/OBS-0112-hermes-tool-inventory.json",
+          "docs/parity/observations/OBS-0112-hermes-tool-inventory-2026-08-03.md",
+          "scripts/validate_reference_fixture.py",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hermes-tool-inventory-probe.json"
         ]
       }
     }

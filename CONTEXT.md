@@ -646,6 +646,16 @@ progress from August 1, 2026 through 2027.
   registration, approval policy, execution, results, retries, and multiple
   calls per turn remain explicit unknowns.
 
+  OBS-0112 captures the exact Hermes tool inventory with description text: a
+  fresh synthetic process's streaming request carries the same stable 31-tool
+  array from OBS-0109 (normalized marker digest matches), now recorded in
+  full — names, descriptions, parameter names/types, required fields, enums,
+  and nested structure. Tool definitions are public API schemas from the
+  pinned commit, so the fixture keeps them verbatim with no execution or
+  side effect; the fixture validator's `sk-` scan was refined to require a
+  credential-shaped token boundary so hyphenated prose like "task-specific"
+  no longer false-positives.
+
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes
 defects, unsafe behavior, or failure cases; fix them and record any deliberate

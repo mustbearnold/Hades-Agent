@@ -15,6 +15,10 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_FIXTURE = ROOT / "tests/fixtures/parity/OBS-0010-input-editing-keymap.json"
 SHA1 = re.compile(r"^[0-9a-f]{40}$")
 FORBIDDEN_MARKERS = ("local-test-key", "authorization:", "bearer ", "sk-")
+# `sk-` keys appear at a token boundary ("sk-..."); hyphenated prose such as
+# "task-specific" embeds `sk-` between word characters and must not trip the
+# credential scan.
+SK_TOKEN = re.compile(r"(^|[^a-z0-9_])sk-[a-z0-9]")
 
 
 def fail(message: str) -> None:
@@ -99,8 +103,10 @@ def validate_fixture(path: Path) -> dict[str, Any]:
 
     serialized = json.dumps(data, ensure_ascii=False).lower()
     for marker in FORBIDDEN_MARKERS:
-        if marker in serialized:
+        if marker != "sk-" and marker in serialized:
             fail(f"fixture contains a forbidden credential-like marker: {marker}")
+    if SK_TOKEN.search(serialized):
+        fail("fixture contains a forbidden credential-like marker: sk-")
     return data
 
 

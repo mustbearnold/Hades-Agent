@@ -160,6 +160,7 @@ just replay-local-provider   # loopback provider worker PTY replay
 just replay-tool-call-deltas # safe Hades tool-call delta parse/accumulate replay
 just probe-multi-turn-provider # Hermes multi-turn payload and tool-schema probe
 just probe-tool-schema-semantics # Hermes tool schema semantics without execution
+just probe-tool-inventory # Hermes exact 31-tool inventory with descriptions
 just probe-tool-call-handoff # Hermes tool-call stream handoff without execution
 just probe-model-picker-selection # Hermes model selection side-effect boundary
 just agent validate           # validate task/control-plane invariants
@@ -296,6 +297,12 @@ The companion `just probe-tool-schema-semantics` probe records the stable
 structural schema markers across two ordinary streamed turns. Descriptions are
 represented only by safe digest markers, and the probe never returns or
 executes a tool call.
+
+The `just probe-tool-inventory` probe captures the same 31-tool inventory in
+full — names, description text, parameter schemas, required fields, enums, and
+nested structure — from one ordinary streamed turn. Tool definitions are
+public API schemas from the pinned open-source commit and are anchored by the
+OBS-0109 normalized marker digest.
 
 The bounded `just probe-tool-call-handoff` probe returns a valid fragmented
 `clarify` tool call and `finish_reason: "tool_calls"`, then withholds `[DONE]`

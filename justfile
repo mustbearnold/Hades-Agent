@@ -194,6 +194,9 @@ probe-multi-turn-provider:
 probe-tool-schema-semantics:
     python3 scripts/probe_hermes_tool_schema_semantics.py --report .hades/runtime/hermes-tool-schema-semantics-probe.json --timeout 30
 
+probe-tool-inventory:
+    python3 scripts/probe_hermes_tool_inventory.py --report .hades/runtime/hermes-tool-inventory-probe.json --timeout 60
+
 probe-tool-call-handoff:
     python3 scripts/probe_hermes_tool_call_handoff.py --report .hades/runtime/hermes-tool-call-handoff-probe.json --timeout 30 --observation-window 0.2
 
@@ -383,6 +386,7 @@ validate-reference:
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0108-hermes-multi-turn-provider.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0109-hermes-tool-schema-semantics.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0110-hermes-tool-call-handoff.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0112-hermes-tool-inventory.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0051-hades-local-provider-stream.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0111-hades-tool-call-deltas.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0052-hermes-stream-timing.json
