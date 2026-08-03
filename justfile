@@ -11,12 +11,15 @@ verify: check
 verify-fast:
     bash scripts/verify_fast.sh
 
-# Sub-minute unit loop for tight implementation feedback.
+# Sub-minute unit loop for tight implementation feedback. Timing is recorded
+# in .hades/runtime/dev-timing.log (ms).
 test:
-    python3 scripts/agent/control_plane.py validate
-    cargo fmt --all -- --check
-    cargo clippy --workspace --all-targets --locked -- -D warnings
-    cargo test --workspace --all-targets --locked
+    bash scripts/time_action.sh just-test -- bash -c 'python3 scripts/agent/control_plane.py validate && cargo fmt --all -- --check && cargo clippy --workspace --all-targets --locked -- -D warnings && cargo test --workspace --all-targets --locked'
+
+# Measure any development action in ms and append to the local timing ledger:
+#   just time <label> -- <command...>
+time label *args:
+    bash scripts/time_action.sh {{label}} -- {{args}}
 
 prepare-reference:
     bash scripts/prepare_hermes_reference.sh
@@ -405,7 +408,7 @@ validate-reference:
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0112-hermes-tool-inventory.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0051-hades-local-provider-stream.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0111-hades-tool-call-deltas.json
-python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0113-hades-tool-inventory-advertisement.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0113-hades-tool-inventory-advertisement.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0052-hermes-stream-timing.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0053-hades-stream-timing.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0054-hermes-provider-errors.json

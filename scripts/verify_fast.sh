@@ -4,6 +4,7 @@ set -euo pipefail
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 project_root="$(cd -- "$script_dir/.." && pwd)"
 cd "$project_root"
+_start_ms=$(date +%s%3N)
 
 python3 scripts/agent/control_plane.py validate
 python3 scripts/validate_reference_fixture.py
@@ -163,4 +164,6 @@ python3 scripts/replay_local_provider.py --binary target/debug/hades --contract 
 python3 scripts/replay_local_provider_timing.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0053-hades-stream-timing.json --report .hades/runtime/local-provider-timing-replay.json
 git diff --check
 
-echo "verification: PASS"
+_end_ms=$(date +%s%3N)
+printf '%s\t%s\t%s ms\texit=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "just-verify-fast" "$((_end_ms - _start_ms))" 0 >> "$project_root/.hades/runtime/dev-timing.log"
+echo "verification-fast: PASS ($((_end_ms - _start_ms)) ms)"
