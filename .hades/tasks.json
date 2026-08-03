@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-03T02:08:48Z",
+  "updated_at": "2026-08-03T02:40:53Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -5980,6 +5980,73 @@
           "docs/parity/observations/OBS-0105-hades-setup-required-actions-2026-08-03.md",
           ".hades/runtime/setup-required-actions-replay.json",
           "tests/fixtures/parity/OBS-0104-hermes-setup-required-actions-revalidation.json",
+          "justfile",
+          "scripts/verify.sh",
+          "README.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-110",
+      "title": "Revalidate Hermes bounded setup persistence contract",
+      "status": "complete",
+      "priority": 80,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-109"
+      ],
+      "risk": "high",
+      "oracle": [
+        "pinned_hermes_reference",
+        "synthetic_home_config_boundary",
+        "sanitized_config_shape",
+        "fresh_process_readback",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Against the pinned Hermes source in a fresh synthetic home with a sanitized loopback provider, observe only the bounded Full setup path through the displayed model default and Keep current (local) terminal backend, including cancellation and fresh-process readback.",
+        "Record config change boundaries, normalized config key shape, backup/artifact classes, stable terminal-backend/platform markers, and fresh-process readiness without recording config values, endpoint contents, API keys, credentials, OAuth, network activity, or later platform selection.",
+        "Keep secret handling out of scope and do not infer Hades persistence semantics from config keys alone; preserve any unknown exact deltas or artifact identity as explicit unknowns.",
+        "Add provenance-bearing OBS-0106 revalidation fixture and document, reuse or extend the repeatable direct-PTY probes, wire matrix/context/readme/just/verify, and complete the no-skip gate before completion."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_provider_setup_persistence.py",
+        "scripts/probe_hermes_setup_config_shape.py",
+        "tests/fixtures/parity/OBS-0055-hermes-provider-setup-persistence.json",
+        "tests/fixtures/parity/OBS-0056-hermes-setup-config-shape.json",
+        "tests/fixtures/parity/OBS-0106-hermes-setup-persistence-revalidation.json",
+        "docs/parity/observations/OBS-0055-hermes-provider-setup-persistence-2026-08-02.md",
+        "docs/parity/observations/OBS-0056-hermes-setup-config-shape-2026-08-02.md",
+        "docs/parity/observations/OBS-0106-hermes-setup-persistence-revalidation-2026-08-03.md",
+        ".hades/runtime/hermes-provider-setup-persistence-probe.json",
+        ".hades/runtime/hermes-setup-config-shape-probe.json",
+        "justfile",
+        "scripts/verify.sh",
+        "README.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md"
+      ],
+      "ready_at": "2026-08-03T02:12:00Z",
+      "claimed_by": "hermes-setup-persistence-researcher",
+      "claimed_at": "2026-08-03T02:10:58Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Revalidated Hermes bounded Full setup persistence and config shape: model defaults mutate config, backend cancellation does not, accepting Keep current mutates again, and a fresh process returns ready; values and secrets remain excluded. Full just verify passes.",
+        "completed_at": "2026-08-03T02:40:53Z",
+        "evidence": [
+          "scripts/probe_hermes_provider_setup_persistence.py",
+          "scripts/probe_hermes_setup_config_shape.py",
+          "tests/fixtures/parity/OBS-0055-hermes-provider-setup-persistence.json",
+          "tests/fixtures/parity/OBS-0056-hermes-setup-config-shape.json",
+          "tests/fixtures/parity/OBS-0106-hermes-setup-persistence-revalidation.json",
+          "docs/parity/observations/OBS-0055-hermes-provider-setup-persistence-2026-08-02.md",
+          "docs/parity/observations/OBS-0056-hermes-setup-config-shape-2026-08-02.md",
+          "docs/parity/observations/OBS-0106-hermes-setup-persistence-revalidation-2026-08-03.md",
+          ".hades/runtime/hermes-provider-setup-persistence-probe.json",
+          ".hades/runtime/hermes-setup-config-shape-probe.json",
           "justfile",
           "scripts/verify.sh",
           "README.md",

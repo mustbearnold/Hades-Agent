@@ -137,6 +137,8 @@ just probe-osc52-timing-limits # Hermes OSC52 timing and bounded-size reference 
 just probe-terminal-palette    # Hermes SGR palette and cell-style reference probe
 just probe-hermes-help-setup-timing # timed /help setup-required reference probe
 just probe-hermes-setup-required-actions # post-delay /model /setup action probe (OBS-0104 revalidation)
+just probe-provider-setup-persistence # Hermes bounded setup persistence revalidation (OBS-0106)
+just probe-setup-config-shape # Hermes normalized setup config-shape revalidation (OBS-0106)
 just probe-hermes-standalone-setup # standalone hermes setup first-run probe
 just probe-hermes-standalone-full-setup # standalone Full setup continuation probe
 just probe-hermes-standalone-terminal-platform # standalone backend/platform boundary probe

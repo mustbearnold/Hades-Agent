@@ -591,6 +591,13 @@ progress from August 1, 2026 through 2027.
   request. Focused state coverage and the latest-frame PTY oracle prove the first
   Ctrl+C clears the retained `/help` draft while the overlay stays alive; the
   second restores the terminal and exits. An actionable route remains unknown.
+- HAD-110 revalidates OBS-0106 for the next persistence seam. Hermes changes
+  config after the displayed Full setup provider/model defaults, does not add a
+  change when cancelling at Keep current (local), changes it again when that
+  backend is accepted, and returns ready in a fresh process. The normalized
+  shape includes `_config_version`, model/custom-provider paths, and bounded
+  agent/display/session-reset additions; values, secrets, OAuth, and later
+  platform behavior remain unknown. Hades persistence is still unimplemented.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes
