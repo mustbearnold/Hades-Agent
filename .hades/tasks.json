@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-03T06:29:23Z",
+  "updated_at": "2026-08-03T06:59:40Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -6283,6 +6283,69 @@
           "scripts/probe_hermes_osc52_clipboard.py",
           "scripts/probe_hermes_terminal_palette.py",
           "scripts/probe_hermes_text_clipboard.py"
+        ]
+      }
+    },
+    {
+      "id": "HAD-115",
+      "title": "Implement safe tool-call delta parsing in provider transport",
+      "status": "complete",
+      "priority": 75,
+      "lane": "behavior",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-114"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "typed_state_tests",
+        "direct_pty_replay",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Extend the Hades provider SSE seam with a typed ToolCallDelta event that captures tool-call index, identifier, function name, and argument fragment from OpenAI-compatible delta.tool_calls; a stream that finishes with finish_reason tool_calls and no text must complete without a MissingCompletionData error.",
+        "Carry tool-call deltas through the typed core ProviderEvent seam and accumulate per-call fragments into typed pending tool-call state in the app; record name and argument digest on the completed turn without executing, approving, or rendering an invented processing overlay.",
+        "Add focused provider/app unit tests: fragmented multi-chunk arguments, text+tool-call mixed deltas, no-text tool-call-only completion, and per-index accumulation; each proves no execution or side effect.",
+        "Add a sanitized OBS-0111 Hades fixture and a fresh 120x40 direct-PTY replay with a deterministic synthetic tool-call stream: the assistant text renders, the process returns to ready without a busy marker or tool overlay, no provider request follows completion, config/artifacts are unchanged, and Ctrl+C exits cleanly.",
+        "Update the parity matrix, context, readme, justfile, and verification gates; run the complete no-skip just verify gate and record evidence before completion."
+      ],
+      "evidence": [
+        "crates/hades-provider/src/lib.rs",
+        "crates/hades-core/src/lib.rs",
+        "crates/hades-app/src/lib.rs",
+        "crates/hades-cli/src/main.rs",
+        "scripts/replay_tool_call_deltas.py",
+        "tests/fixtures/parity/OBS-0111-hades-tool-call-deltas.json",
+        "docs/parity/observations/OBS-0111-hades-tool-call-deltas-2026-08-03.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/tool-call-deltas-replay.json"
+      ],
+      "ready_at": "2026-08-03T06:30:00Z",
+      "claimed_by": "tool-call-parser-implementer",
+      "claimed_at": "2026-08-03T06:30:00Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Implemented the safe Hades tool-call delta boundary from OBS-0110: the provider SSE seam parses delta.tool_calls into typed ToolCallDelta events and tool-call-only streams complete without a missing-data error; the core/app seam accumulates argument fragments per call index into a bounded completed-turn record (name, argument length, stable FNV-1a digest) with no execution, approval, or forwarding. Added 4 focused provider tests, 3 app accumulation/drop tests, and CLI translation coverage; a fresh 120x40 direct-PTY replay (OBS-0111) proves assistant text renders, ready returns with no busy marker or invented tool overlay, one chat request and zero follow-ups, and clean Ctrl+C exit. Bumped two OSC52 reference-probe gate timeouts to 60s for shared-sandbox startup robustness. Complete no-skip just verify gate PASS (verification: PASS).",
+        "completed_at": "2026-08-03T06:59:40Z",
+        "evidence": [
+          "crates/hades-provider/src/lib.rs",
+          "crates/hades-core/src/lib.rs",
+          "crates/hades-app/src/lib.rs",
+          "crates/hades-cli/src/main.rs",
+          "scripts/replay_tool_call_deltas.py",
+          "tests/fixtures/parity/OBS-0111-hades-tool-call-deltas.json",
+          "docs/parity/observations/OBS-0111-hades-tool-call-deltas-2026-08-03.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/tool-call-deltas-replay.json"
         ]
       }
     }

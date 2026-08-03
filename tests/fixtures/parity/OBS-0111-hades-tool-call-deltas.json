@@ -1,0 +1,142 @@
+{
+ "schema_version": 1,
+ "observation_id": "OBS-0111",
+ "reference_observation": "OBS-0110",
+ "surface": "hades-tui-tool-call-delta-boundary",
+ "reference": {
+  "product": "Hades Agent",
+  "version": "workspace",
+  "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+  "terminal": {
+   "columns": 120,
+   "rows": 40,
+   "emulator": "direct PTY with probe-owned loopback HTTP/SSE tool-call fixture"
+  },
+  "capture": "Hades debug binary with isolated HOME/HERMES_HOME and explicit loopback provider configuration"
+ },
+ "normalization": [
+  "The binary path, synthetic HOME/HERMES_HOME, PTY path, timestamps, session identifiers, prompt text, assistant text, tool arguments, and raw ANSI redraw stream are omitted or represented by stable markers, lengths, and SHA-256 digests.",
+  "The local HTTP server binds only to 127.0.0.1 and records method/path, authorization presence, body keys, model, stream flag, message roles, tool presence, and per-chunk digest boundaries; prompt and argument payloads are never persisted.",
+  "The response is reduced to the text/event-stream content type, the fragment count, per-fragment lengths/digests, the joined-argument length/digest, and the finish_reason marker.",
+  "No tool is executed, approved, or forwarded: the fixture records executed=false, approved=false, one chat request, zero follow-up chat requests, and zero tool-response requests.",
+  "Hades does not yet advertise the Hermes 31-tool inventory (tools_present=false); this fixture covers parsing of a tool-call response, not tool registration or execution."
+ ],
+ "steps": [
+  {
+   "id": "tool-call-deltas",
+   "precondition": "Fresh Hades 120x40 PTY with HADES_PROVIDER_BASE_URL set to the probe-owned loopback endpoint and no API key.",
+   "input_sequence": [
+    {
+     "kind": "text",
+     "value": "<synthetic prompt>",
+     "bytes_hex": "3c 73 79 6e 74 68 65 74 69 63 20 70 72 6f 6d 70 74 3e"
+    },
+    {
+     "kind": "key",
+     "value": "Enter",
+     "bytes_hex": "0d"
+    },
+    {
+     "kind": "key",
+     "value": "Ctrl+C",
+     "bytes_hex": "03"
+    }
+   ],
+   "output": {
+    "status": "passed",
+    "request": {
+     "method": "POST",
+     "path": "/v1/chat/completions",
+     "authorization_present": false,
+     "body_keys": [
+      "max_tokens",
+      "messages",
+      "model",
+      "stream",
+      "stream_options",
+      "tools"
+     ],
+     "model": "palette-model",
+     "stream": true,
+     "message_roles": [
+      "system",
+      "user"
+     ],
+     "tools_present": false,
+     "clarify_present": false
+    },
+    "tool_call": {
+     "name": "clarify",
+     "argument_fragment_count": 2,
+     "argument_fragments": [
+      {
+       "sequence": 1,
+       "length": 45,
+       "sha256": "89816afdb7521998a8a6627ee3b8484172ca7cddeed676424b522626a4e374ac"
+      },
+      {
+       "sequence": 2,
+       "length": 58,
+       "sha256": "23eeb8e9123a40e76902a5d02799f6a686dcad597f76c950793ccf1f372e0f80"
+      }
+     ],
+     "joined_arguments": {
+      "length": 103,
+      "sha256": "b1b2859e40d64aafa782cf5620dd7e3086ce69cd99162f216407a7a1dd4ee1ba",
+      "valid_json": true
+     },
+     "finish_reason": "tool_calls",
+     "executed": false,
+     "approved": false
+    },
+    "stream_events": {
+     "content_type": "text/event-stream",
+     "chunk_count": 5,
+     "chunk_boundaries": [
+      {
+       "sequence": 1,
+       "length": 52,
+       "sha256": "ac8ecca1dcf25c5ca2d0e361d9dd2c99b28ee4382712a8fcc6845deed8d7cdcb"
+      },
+      {
+       "sequence": 2,
+       "length": 232,
+       "sha256": "40ea218ac0a05ef955cdc29087ced3192644e6e6090bae2ce485feefcd4e7dc5"
+      },
+      {
+       "sequence": 3,
+       "length": 152,
+       "sha256": "f8d1865871feebdd21dd3594a82a62e7dd7cdacb424a74fccfbfde6ed177f9ae"
+      },
+      {
+       "sequence": 4,
+       "length": 63,
+       "sha256": "ca3899cd31f69e1a4a27eec62dde8874b35f89b95217c3e12bd0c22c9a752fc8"
+      },
+      {
+       "sequence": 5,
+       "length": 14,
+       "sha256": "d8d37da081f11203f2af42092a92cb35508f27db75eba643058a0a580454517d"
+      }
+     ]
+    },
+    "request_counts": {
+     "chat_requests": 1,
+     "subsequent_chat_requests": 0,
+     "tool_response_requests": 0
+    },
+    "visible_state": {
+     "assistant_text_rendered": true,
+     "returned_to_ready": true,
+     "no_tool_overlay": true,
+     "no_busy_marker": true,
+     "cleanup": "Ctrl+C exited cleanly with alternate screen and termios restored"
+    }
+   }
+  }
+ ],
+ "unknowns": [
+  "Tool approval, execution, results, retries, malformed/truncated argument handling, multiple tool calls per turn, tool registration/advertising, and follow-up chat requests after a tool-call completion remain unimplemented and unobserved in Hades.",
+  "Hermes' post-[DONE] transition (overlay presentation, transcript persistence, tool.start, clarify invocation, follow-up request, retries, and failures) remains unknown per OBS-0110 and is not reproduced in Hades."
+ ]
+}

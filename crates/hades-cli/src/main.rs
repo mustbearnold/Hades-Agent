@@ -34,7 +34,7 @@ use hades_core::{
     SETUP_STANDALONE_TOOL_CONFIGURATION_LINES, SETUP_STANDALONE_TOOL_CONFIGURATION_TITLE,
     SETUP_STANDALONE_TOOL_PROVIDER_CONTROLS, SETUP_STANDALONE_TOOL_PROVIDER_LINES,
     SETUP_STANDALONE_TOOL_PROVIDER_TITLE, SETUP_TERMINAL_BACKEND_ROWS, SETUP_WIZARD_CHOICES,
-    StandaloneSetupAction, StandaloneSetupState, StartupState, TurnState,
+    StandaloneSetupAction, StandaloneSetupState, StartupState, ToolCallDelta, TurnState,
 };
 use hades_provider::{
     CancellationToken, ChatMessage, ChatRequest, LocalOpenAiTransport, StreamEvent, TransportError,
@@ -977,6 +977,12 @@ fn run_provider_worker(
 fn translate_stream_event(event: StreamEvent) -> ProviderEvent {
     match event {
         StreamEvent::TextDelta(text) => ProviderEvent::TextDelta(text),
+        StreamEvent::ToolCallDelta(delta) => ProviderEvent::ToolCallDelta(ToolCallDelta {
+            index: delta.index,
+            id: delta.id,
+            name: delta.name,
+            arguments: delta.arguments,
+        }),
         StreamEvent::Done => ProviderEvent::Completed,
     }
 }
@@ -1291,6 +1297,20 @@ mod tests {
         assert_eq!(
             translate_stream_event(StreamEvent::TextDelta("hello".to_owned())),
             ProviderEvent::TextDelta("hello".to_owned())
+        );
+        assert_eq!(
+            translate_stream_event(StreamEvent::ToolCallDelta(hades_provider::ToolCallDelta {
+                index: 0,
+                id: Some("call-1".to_owned()),
+                name: Some("clarify".to_owned()),
+                arguments: Some("{\"question\":\"syn".to_owned()),
+            })),
+            ProviderEvent::ToolCallDelta(ToolCallDelta {
+                index: 0,
+                id: Some("call-1".to_owned()),
+                name: Some("clarify".to_owned()),
+                arguments: Some("{\"question\":\"syn".to_owned()),
+            })
         );
         assert_eq!(translate_stream_event(StreamEvent::Done), ProviderEvent::Completed);
     }

@@ -1015,9 +1015,23 @@ pub enum Key {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct ToolCallDelta {
+    /// Per-stream tool-call index; fragments for the same call share it.
+    pub index: usize,
+    /// Optional call identifier supplied on the first delta.
+    pub id: Option<String>,
+    /// Optional function name supplied on the first delta.
+    pub name: Option<String>,
+    /// One JSON argument fragment; later deltas append to the call.
+    pub arguments: Option<String>,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum ProviderEvent {
     Started,
     TextDelta(String),
+    /// One OpenAI-compatible `delta.tool_calls` chunk from the stream.
+    ToolCallDelta(ToolCallDelta),
     Completed,
     Failed(String),
     Cancelled,

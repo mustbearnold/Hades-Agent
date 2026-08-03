@@ -80,6 +80,21 @@ impl HistoryStore {
     }
 }
 
+/// Stable 64-bit FNV-1a digest of the joined tool-call arguments, hex-encoded.
+///
+/// FNV-1a is dependency-free and deterministic across runs, which keeps the
+/// typed tool-call record bounded without copying argument payloads into
+/// fixtures or memory. It is a digest for identity/length evidence, not a
+/// cryptographic guarantee.
+fn fnv1a_hex(value: &str) -> String {
+    let mut hash: u64 = 0xcbf2_9ce4_8422_2325;
+    for byte in value.as_bytes() {
+        hash ^= u64::from(*byte);
+        hash = hash.wrapping_mul(0x0000_0100_0000_01b3);
+    }
+    format!("{hash:016x}")
+}
+
 fn history_timestamp() -> String {
     let elapsed = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or_default();
     let seconds = elapsed.as_secs();
@@ -119,16 +134,39 @@ pub enum DispatchOutcome {
     Quit,
 }
 
+/// One tool call the assistant requested during a completed turn.
+///
+/// This is a typed record only: Hades never executes, approves, or forwards
+/// these calls. The argument payload is reduced to a length and a stable
+/// FNV-1a digest so memory and fixture output stay bounded.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ToolCallRecord {
+    pub name: String,
+    pub argument_length: usize,
+    pub argument_digest: String,
+}
+
 #[derive(Clone, Debug, Eq, PartialEq)]
 struct CompletedTurn {
     user: String,
     assistant: String,
+    tool_calls: Vec<ToolCallRecord>,
+}
+
+/// Argument fragments for one in-flight tool call, accumulated per index.
+#[derive(Clone, Debug, Eq, PartialEq)]
+struct PendingToolCall {
+    index: usize,
+    id: Option<String>,
+    name: Option<String>,
+    arguments: String,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 struct ActiveTurn {
     user: String,
     assistant: String,
+    tool_calls: Vec<PendingToolCall>,
 }
 
 #[derive(Clone, Debug)]
@@ -202,6 +240,13 @@ impl App {
         messages
     }
 
+    /// Typed records of the tool calls the assistant requested in completed
+    /// turns. This is observation/state evidence only; Hades never executes,
+    /// approves, or forwards these calls.
+    pub fn completed_tool_call_records(&self) -> Vec<ToolCallRecord> {
+        self.completed_turns.iter().flat_map(|turn| turn.tool_calls.clone()).collect()
+    }
+
     pub fn submit_editor_draft(&mut self, draft: String) -> DispatchOutcome {
         let content = draft.trim_end().to_owned();
         if content.is_empty() {
@@ -272,10 +317,48 @@ impl App {
                 }
                 self.state.status = "Receiving response.".to_owned();
             }
+            ProviderEvent::ToolCallDelta(delta) => {
+                if let Some(turn) = &mut self.active_turn {
+                    let call = turn.tool_calls.iter_mut().find(|call| call.index == delta.index);
+                    if let Some(call) = call {
+                        if let Some(id) = delta.id {
+                            call.id = Some(id);
+                        }
+                        if let Some(name) = delta.name {
+                            call.name = Some(name);
+                        }
+                        if let Some(arguments) = delta.arguments {
+                            call.arguments.push_str(&arguments);
+                        }
+                    } else {
+                        turn.tool_calls.push(PendingToolCall {
+                            index: delta.index,
+                            id: delta.id,
+                            name: delta.name,
+                            arguments: delta.arguments.unwrap_or_default(),
+                        });
+                    }
+                }
+            }
             ProviderEvent::Completed => {
                 if let Some(turn) = self.active_turn.take() {
-                    self.completed_turns
-                        .push(CompletedTurn { user: turn.user, assistant: turn.assistant });
+                    let tool_calls = turn
+                        .tool_calls
+                        .into_iter()
+                        .filter_map(|call| {
+                            let name = call.name?;
+                            Some(ToolCallRecord {
+                                name,
+                                argument_length: call.arguments.len(),
+                                argument_digest: fnv1a_hex(&call.arguments),
+                            })
+                        })
+                        .collect::<Vec<_>>();
+                    self.completed_turns.push(CompletedTurn {
+                        user: turn.user,
+                        assistant: turn.assistant,
+                        tool_calls,
+                    });
                 }
                 self.state.turn = TurnState::Ready;
                 self.state.status = "Response complete.".to_owned();
@@ -547,7 +630,11 @@ impl App {
         self.clear_notice();
         self.state.messages.push(Message::user(&content));
         self.state.composer.clear();
-        self.active_turn = Some(ActiveTurn { user: content.clone(), assistant: String::new() });
+        self.active_turn = Some(ActiveTurn {
+            user: content.clone(),
+            assistant: String::new(),
+            tool_calls: Vec::new(),
+        });
         self.state.turn = TurnState::Busy;
         self.state.status = "Busy; response adapter not connected.".to_owned();
         DispatchOutcome::Submitted(content)
@@ -711,7 +798,7 @@ mod tests {
     };
 
     use super::*;
-    use hades_core::{InputEvent, Key, StartupState, Surface};
+    use hades_core::{InputEvent, Key, StartupState, Surface, ToolCallDelta};
 
     fn test_history_path(label: &str) -> PathBuf {
         let stamp = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
@@ -896,6 +983,92 @@ mod tests {
         app.handle(InputEvent::Provider(ProviderEvent::Completed));
         assert_eq!(app.state().turn, TurnState::Ready);
         assert_eq!(app.state().status, "Response complete.");
+    }
+
+    #[test]
+    fn tool_call_deltas_accumulate_per_index_into_the_completed_turn() {
+        let mut app = App::new();
+        app.submit_editor_draft("hello".to_owned());
+        app.handle(InputEvent::Provider(ProviderEvent::Started));
+        app.handle(InputEvent::Provider(ProviderEvent::TextDelta("Synthetic handoff".to_owned())));
+        app.handle(InputEvent::Provider(ProviderEvent::ToolCallDelta(ToolCallDelta {
+            index: 0,
+            id: Some("call-a".to_owned()),
+            name: Some("clarify".to_owned()),
+            arguments: Some("{\"question\":\"syn".to_owned()),
+        })));
+        app.handle(InputEvent::Provider(ProviderEvent::ToolCallDelta(ToolCallDelta {
+            index: 0,
+            id: None,
+            name: None,
+            arguments: Some("thetic\"}".to_owned()),
+        })));
+        app.handle(InputEvent::Provider(ProviderEvent::ToolCallDelta(ToolCallDelta {
+            index: 1,
+            id: Some("call-b".to_owned()),
+            name: Some("memory".to_owned()),
+            arguments: Some("[]".to_owned()),
+        })));
+        app.handle(InputEvent::Provider(ProviderEvent::Completed));
+
+        assert_eq!(app.state().turn, TurnState::Ready);
+        assert_eq!(app.state().status, "Response complete.");
+        let conversation = app.provider_conversation();
+        assert_eq!(conversation.len(), 2);
+        assert_eq!(conversation[1].role, hades_core::Role::Assistant);
+        assert_eq!(conversation[1].content, "Synthetic handoff");
+        let tool_calls = app.completed_tool_call_records();
+        assert_eq!(tool_calls.len(), 2);
+        assert_eq!(tool_calls[0].name, "clarify");
+        assert_eq!(tool_calls[0].argument_length, "{\"question\":\"synthetic\"}".len());
+        assert_eq!(tool_calls[0].argument_digest, fnv1a_hex("{\"question\":\"synthetic\"}"));
+        assert_eq!(tool_calls[1].name, "memory");
+        assert_eq!(tool_calls[1].argument_length, 2);
+    }
+
+    #[test]
+    fn fragmented_tool_call_without_text_completes_without_a_message() {
+        let mut app = App::new();
+        app.submit_editor_draft("hello".to_owned());
+        app.handle(InputEvent::Provider(ProviderEvent::Started));
+        app.handle(InputEvent::Provider(ProviderEvent::ToolCallDelta(ToolCallDelta {
+            index: 0,
+            id: Some("call-a".to_owned()),
+            name: Some("clarify".to_owned()),
+            arguments: Some("{}".to_owned()),
+        })));
+        app.handle(InputEvent::Provider(ProviderEvent::Completed));
+
+        assert_eq!(app.state().turn, TurnState::Ready);
+        let tool_calls = app.completed_tool_call_records();
+        assert_eq!(tool_calls.len(), 1);
+        assert_eq!(tool_calls[0].name, "clarify");
+        // No assistant text was fabricated; the transcript keeps only the
+        // system + user messages.
+        assert_eq!(app.provider_conversation().len(), 2);
+    }
+
+    #[test]
+    fn tool_call_deltas_are_dropped_on_failure_and_cancellation() {
+        for terminal in
+            [ProviderEvent::Failed("synthetic error".to_owned()), ProviderEvent::Cancelled]
+        {
+            let mut app = App::new();
+            app.submit_editor_draft("hello".to_owned());
+            app.handle(InputEvent::Provider(ProviderEvent::Started));
+            app.handle(InputEvent::Provider(ProviderEvent::ToolCallDelta(ToolCallDelta {
+                index: 0,
+                id: Some("call-a".to_owned()),
+                name: Some("clarify".to_owned()),
+                arguments: Some("{}".to_owned()),
+            })));
+            app.handle(InputEvent::Provider(terminal.clone()));
+            assert_eq!(app.state().turn, TurnState::Ready);
+            assert_eq!(app.completed_tool_call_records(), Vec::new());
+            assert!(
+                app.provider_conversation().iter().all(|m| m.role != hades_core::Role::Assistant)
+            );
+        }
     }
 
     #[test]

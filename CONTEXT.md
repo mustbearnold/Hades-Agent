@@ -633,6 +633,19 @@ progress from August 1, 2026 through 2027.
   result was observed. Complete-stream handoff, approval, execution, and
   failure behavior remain unknown; this is not a Hades tool implementation.
 
+- HAD-115 implements the safe Hades side of that transport boundary: the
+  provider SSE seam now parses `delta.tool_calls` into typed
+  `ToolCallDelta` events, tool-call-only streams complete without a
+  missing-data error, and the typed core/app seam accumulates argument
+  fragments per call index into a bounded record (name, argument length,
+  stable FNV-1a digest) on the completed turn. A fresh 120x40 direct-PTY
+  replay (OBS-0111) proves the assistant text renders, the process returns to
+  ready with no busy marker or invented tool overlay, no follow-up chat or
+  tool-response request follows completion, and Ctrl+C exits cleanly. Hades
+  never executes, approves, or forwards tool calls in this slice; tool
+  registration, approval policy, execution, results, retries, and multiple
+  calls per turn remain explicit unknowns.
+
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes
 defects, unsafe behavior, or failure cases; fix them and record any deliberate
@@ -647,8 +660,9 @@ evidence-backed deviation.
 - Which Hermes behaviors are stable contracts versus implementation details;
   session recovery remains unobserved beyond input-history persistence.
 - Hades provider/model streaming and tool calls beyond the bounded HAD-053 /
-  HAD-054 / HAD-055 / HAD-057 seams; retries, tool execution, non-loopback
-  providers, HTTPS, and provider discovery remain unimplemented. Hermes
+  HAD-054 / HAD-055 / HAD-057 / HAD-115 seams; tool registration/advertising,
+  approval, execution, results, retries, non-loopback providers, HTTPS, and
+  provider discovery remain unimplemented. Hermes
   subsequent chat-request purpose, exact provider-error copy, retry/backoff
   policy, and terminal-dependent surfaces beyond the captured observations
   remain unknown.

@@ -70,8 +70,21 @@ impl ChatRequest {
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ToolCallDelta {
+    /// Per-stream tool-call index; argument fragments for the same call share it.
+    pub index: usize,
+    /// Optional call identifier supplied on the first delta.
+    pub id: Option<String>,
+    /// Optional function name supplied on the first delta.
+    pub name: Option<String>,
+    /// One JSON argument fragment; later deltas append to the call.
+    pub arguments: Option<String>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum StreamEvent {
     TextDelta(String),
+    ToolCallDelta(ToolCallDelta),
     Done,
 }
 
@@ -167,6 +180,7 @@ pub struct OpenAiStream {
     buffer: Vec<u8>,
     data_lines: Vec<String>,
     saw_text: bool,
+    saw_tool_call: bool,
     done: bool,
     cancellation: CancellationToken,
 }
@@ -270,6 +284,7 @@ impl LocalOpenAiTransport {
             buffer: initial_body.to_vec(),
             data_lines: Vec::new(),
             saw_text: false,
+            saw_tool_call: false,
             done: false,
             cancellation: cancellation.clone(),
         })
@@ -299,12 +314,16 @@ impl OpenAiStream {
                     let event = parse_sse_data(&data)?;
                     if let Some(event) = event {
                         if event == StreamEvent::Done {
-                            if !self.saw_text {
+                            if !self.saw_text && !self.saw_tool_call {
                                 return Err(TransportError::MissingCompletionData);
                             }
                             self.done = true;
-                        } else if matches!(event, StreamEvent::TextDelta(_)) {
-                            self.saw_text = true;
+                        } else {
+                            match event {
+                                StreamEvent::TextDelta(_) => self.saw_text = true,
+                                StreamEvent::ToolCallDelta(_) => self.saw_tool_call = true,
+                                StreamEvent::Done => {}
+                            }
                         }
                         return Ok(Some(event));
                     }
@@ -538,7 +557,10 @@ fn parse_sse(body: &str) -> Result<Vec<StreamEvent>, TransportError> {
     if !saw_done {
         return Err(TransportError::MissingDone);
     }
-    if !events.iter().any(|event| matches!(event, StreamEvent::TextDelta(_))) {
+    let has_content = events
+        .iter()
+        .any(|event| matches!(event, StreamEvent::TextDelta(_) | StreamEvent::ToolCallDelta(_)));
+    if !has_content {
         return Err(TransportError::MissingCompletionData);
     }
     Ok(events)
@@ -554,14 +576,41 @@ fn parse_sse_event(data_lines: &[&str]) -> Result<Option<StreamEvent>, Transport
     }
     let payload: Value = serde_json::from_str(&data)
         .map_err(|error| TransportError::MalformedSse(error.to_string()))?;
-    let text = payload
-        .get("choices")
-        .and_then(Value::as_array)
-        .and_then(|choices| choices.first())
+    let choice =
+        payload.get("choices").and_then(Value::as_array).and_then(|choices| choices.first());
+    let text = choice
         .and_then(|choice| choice.get("delta"))
         .and_then(|delta| delta.get("content"))
         .and_then(Value::as_str);
-    Ok(text.filter(|value| !value.is_empty()).map(|value| StreamEvent::TextDelta(value.to_owned())))
+    if let Some(text) = text.filter(|value| !value.is_empty()) {
+        return Ok(Some(StreamEvent::TextDelta(text.to_owned())));
+    }
+    let tool_calls = choice
+        .and_then(|choice| choice.get("delta"))
+        .and_then(|delta| delta.get("tool_calls"))
+        .and_then(Value::as_array);
+    if let Some(tool_calls) = tool_calls {
+        for call in tool_calls {
+            let index = call.get("index").and_then(Value::as_u64).unwrap_or(0) as usize;
+            let id = call.get("id").and_then(Value::as_str).map(str::to_owned);
+            let function = call.get("function");
+            let name =
+                function.and_then(|f| f.get("name")).and_then(Value::as_str).map(str::to_owned);
+            let arguments = function
+                .and_then(|f| f.get("arguments"))
+                .and_then(Value::as_str)
+                .map(str::to_owned);
+            if id.is_some() || name.is_some() || arguments.is_some() {
+                return Ok(Some(StreamEvent::ToolCallDelta(ToolCallDelta {
+                    index,
+                    id,
+                    name,
+                    arguments,
+                })));
+            }
+        }
+    }
+    Ok(None)
 }
 
 fn parse_sse_data(data: &str) -> Result<Option<StreamEvent>, TransportError> {
@@ -813,5 +862,149 @@ mod tests {
             parse_sse("data: {\"choices\":[]}\n\ndata: [DONE]\n\n"),
             Err(TransportError::MissingCompletionData)
         );
+    }
+
+    #[test]
+    fn sse_parser_emits_typed_tool_call_deltas_and_completes_without_text() {
+        let events = parse_sse(concat!(
+            "data: {\"choices\":[{\"delta\":{\"role\":\"assistant\"}}]}\n\n",
+            r#"data: {"choices":[{"delta":{"tool_calls":[{"index":0,"id":"call-1","type":"function","function":{"name":"clarify","arguments":"{\"question\":\"syn"}}]}}]}"#,
+            "\n\n",
+            r#"data: {"choices":[{"delta":{"tool_calls":[{"index":0,"function":{"arguments":"thetic\"}"}}]}}]}"#,
+            "\n\n",
+            "data: {\"choices\":[{\"delta\":{},\"finish_reason\":\"tool_calls\"}]}\n\n",
+            "data: [DONE]\n\n"
+        ))
+        .unwrap();
+        assert_eq!(
+            events,
+            vec![
+                StreamEvent::ToolCallDelta(ToolCallDelta {
+                    index: 0,
+                    id: Some("call-1".to_owned()),
+                    name: Some("clarify".to_owned()),
+                    arguments: Some("{\"question\":\"syn".to_owned()),
+                }),
+                StreamEvent::ToolCallDelta(ToolCallDelta {
+                    index: 0,
+                    id: None,
+                    name: None,
+                    arguments: Some("thetic\"}".to_owned()),
+                }),
+                StreamEvent::Done,
+            ]
+        );
+    }
+
+    #[test]
+    fn sse_parser_accumulates_per_index_tool_calls_with_mixed_text() {
+        let events = parse_sse(concat!(
+            "data: {\"choices\":[{\"delta\":{\"content\":\"Synthetic handoff\"}}]}\n\n",
+            "data: {\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"id\":\"call-a\",\"function\":{\"name\":\"clarify\",\"arguments\":\"{}\"}}]}}]}\n\n",
+            "data: {\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":1,\"id\":\"call-b\",\"function\":{\"name\":\"memory\",\"arguments\":\"[]\"}}]}}]}\n\n",
+            "data: {\"choices\":[{\"delta\":{},\"finish_reason\":\"tool_calls\"}]}\n\n",
+            "data: [DONE]\n\n"
+        ))
+        .unwrap();
+        assert_eq!(
+            events,
+            vec![
+                StreamEvent::TextDelta("Synthetic handoff".to_owned()),
+                StreamEvent::ToolCallDelta(ToolCallDelta {
+                    index: 0,
+                    id: Some("call-a".to_owned()),
+                    name: Some("clarify".to_owned()),
+                    arguments: Some("{}".to_owned()),
+                }),
+                StreamEvent::ToolCallDelta(ToolCallDelta {
+                    index: 1,
+                    id: Some("call-b".to_owned()),
+                    name: Some("memory".to_owned()),
+                    arguments: Some("[]".to_owned()),
+                }),
+                StreamEvent::Done,
+            ]
+        );
+    }
+
+    #[test]
+    fn sse_parser_skips_empty_tool_call_objects_without_fabricating_events() {
+        let events = parse_sse(concat!(
+            "data: {\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"type\":\"function\",\"function\":{}}]}}]}\n\n",
+            "data: {\"choices\":[{\"delta\":{\"content\":\"only text\"}}]}\n\n",
+            "data: {\"choices\":[{\"delta\":{},\"finish_reason\":\"stop\"}]}\n\n",
+            "data: [DONE]\n\n"
+        ))
+        .unwrap();
+        assert_eq!(events, vec![StreamEvent::TextDelta("only text".to_owned()), StreamEvent::Done]);
+    }
+
+    #[test]
+    fn transport_stream_accepts_tool_call_only_completion() {
+        let listener = TcpListener::bind(("127.0.0.1", 0)).expect("bind loopback fixture");
+        let port = listener.local_addr().unwrap().port();
+        let server = thread::spawn(move || {
+            let (mut stream, _) = listener.accept().expect("accept fixture client");
+            let mut request_bytes = Vec::new();
+            let mut chunk = [0_u8; 4096];
+            loop {
+                let read = stream.read(&mut chunk).expect("read request");
+                request_bytes.extend_from_slice(&chunk[..read]);
+                if request_bytes.windows(4).any(|window| window == b"\r\n\r\n") {
+                    let header_end =
+                        request_bytes.windows(4).position(|window| window == b"\r\n\r\n").unwrap()
+                            + 4;
+                    let header = String::from_utf8_lossy(&request_bytes[..header_end]);
+                    let length = header
+                        .lines()
+                        .find_map(|line| line.strip_prefix("Content-Length: "))
+                        .unwrap()
+                        .parse::<usize>()
+                        .unwrap();
+                    if request_bytes.len() >= header_end + length {
+                        break;
+                    }
+                }
+            }
+            let body = concat!(
+                "data: {\"choices\":[{\"delta\":{\"role\":\"assistant\"}}]}\n\n",
+                r#"data: {"choices":[{"delta":{"tool_calls":[{"index":0,"id":"call-1","function":{"name":"clarify","arguments":"{\"question\":\"syn"}}]}}]}"#,
+                "\n\n",
+                r#"data: {"choices":[{"delta":{"tool_calls":[{"index":0,"function":{"arguments":"thetic\"}"}}]}}]}"#,
+                "\n\n",
+                "data: {\"choices\":[{\"delta\":{},\"finish_reason\":\"tool_calls\"}]}\n\n",
+                "data: [DONE]\n\n"
+            );
+            let response = format!(
+                "HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
+                body.len(),
+                body
+            );
+            stream.write_all(response.as_bytes()).expect("write fixture response");
+            stream.flush().expect("flush fixture response");
+        });
+
+        let transport =
+            LocalOpenAiTransport::new(&format!("http://127.0.0.1:{port}/v1"), None).unwrap();
+        let events = transport.stream_chat(&request()).unwrap();
+        assert_eq!(
+            events,
+            vec![
+                StreamEvent::ToolCallDelta(ToolCallDelta {
+                    index: 0,
+                    id: Some("call-1".to_owned()),
+                    name: Some("clarify".to_owned()),
+                    arguments: Some("{\"question\":\"syn".to_owned()),
+                }),
+                StreamEvent::ToolCallDelta(ToolCallDelta {
+                    index: 0,
+                    id: None,
+                    name: None,
+                    arguments: Some("thetic\"}".to_owned()),
+                }),
+                StreamEvent::Done,
+            ]
+        );
+        server.join().unwrap();
     }
 }

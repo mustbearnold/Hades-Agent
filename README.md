@@ -157,6 +157,7 @@ just replay-osc52-timing-limits # Hades OSC52 timing and bounded-size parity rep
 just replay-osc52-st-termination # Hades ST-terminated OSC52 parity replay
 just replay-osc52-multiplexer # Hades TMUX/STY OSC52 wrapper parity replay
 just replay-local-provider   # loopback provider worker PTY replay
+just replay-tool-call-deltas # safe Hades tool-call delta parse/accumulate replay
 just probe-multi-turn-provider # Hermes multi-turn payload and tool-schema probe
 just probe-tool-schema-semantics # Hermes tool schema semantics without execution
 just probe-tool-call-handoff # Hermes tool-call stream handoff without execution
@@ -301,3 +302,10 @@ The bounded `just probe-tool-call-handoff` probe returns a valid fragmented
 and stops Hermes before tool processing. It records the normalized delta fields,
 argument-fragment boundaries, visible markers, and request counts without
 turning the reference handoff into Hades execution behavior.
+
+The `just replay-tool-call-deltas` replay proves the safe Hades side of that
+boundary: a loopback provider streams assistant text plus a fragmented
+`clarify` tool call with `finish_reason: "tool_calls"`, and Hades parses the
+typed deltas, accumulates the argument fragments, returns to ready with no
+busy marker or invented tool overlay, and sends no follow-up request. Hades
+never executes, approves, or forwards tool calls in this slice.

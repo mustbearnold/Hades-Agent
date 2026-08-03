@@ -1,0 +1,481 @@
+#!/usr/bin/env python3
+"""Replay the safe Hades tool-call delta boundary through a real PTY.
+
+The loopback provider returns a valid OpenAI-compatible streaming response
+with assistant text plus a fragmented `clarify` tool call and
+`finish_reason: tool_calls`. Hades must render the assistant text, return to
+ready without an invented processing overlay or busy marker, send no follow-up
+request, and never execute or approve the tool call. Ctrl+C exits cleanly.
+"""
+
+from __future__ import annotations
+
+import argparse
+import errno
+import fcntl
+import hashlib
+import json
+import os
+import pty
+import re
+import select
+import shutil
+import signal
+import struct
+import tempfile
+import termios
+import threading
+import time
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
+from typing import Any, Callable
+
+from probe_tui_lifecycle import retain_slave_descriptor, slave_path_for_pid
+
+
+ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_BINARY = ROOT / "target/debug/hades"
+COLUMNS = 120
+ROWS = 40
+ANSI_ESCAPE = re.compile(r"\x1b(?:\[[0-?]*[ -/]*[@-~]|\][^\x07]*(?:\x07|\x1b\\))")
+Predicate = Callable[[str], bool]
+
+PROMPT = "synthetic tool-call prompt"
+ASSISTANT_MARKER = "Synthetic handoff"
+TOOL_NAME = "clarify"
+ARGUMENT_FRAGMENTS = (
+    '{"question":"synthetic clarification prompt",',
+    '"choices":["synthetic choice one","synthetic choice two"]}',
+)
+
+
+class ReplayFailure(RuntimeError):
+    """Raised when a bounded tool-call replay assertion fails."""
+
+    def __init__(self, case: str, step: str, message: str, output: bytes = b""):
+        super().__init__(message)
+        self.case = case
+        self.step = step
+        self.message = message
+        self.output = output
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "case": self.case,
+            "step": self.step,
+            "message": self.message,
+            "screen_tail": clean_output(self.output)[-2000:],
+        }
+
+
+class ToolCallServer(ThreadingHTTPServer):
+    """Deterministic OpenAI-compatible tool-call stream fixture."""
+
+    daemon_threads = True
+    allow_reuse_address = True
+
+    def __init__(self) -> None:
+        self.request_seen = threading.Event()
+        self.records: list[dict[str, Any]] = []
+        self.tool_call_events: list[dict[str, Any]] = []
+        super().__init__(("127.0.0.1", 0), self._handler())
+
+    def _handler(self) -> type[BaseHTTPRequestHandler]:
+        owner = self
+
+        class Handler(BaseHTTPRequestHandler):
+            def log_message(self, *_args: object) -> None:
+                return
+
+            def do_GET(self) -> None:  # noqa: N802 - stdlib handler API
+                owner.records.append({"method": "GET", "path": self.path})
+                if self.path in {"/api/v1/models", "/v1/models"}:
+                    self._json({"object": "list", "data": [{"id": "palette-model", "object": "model"}]})
+                    return
+                if self.path == "/v1/models/palette-model":
+                    self._json({"id": "palette-model", "object": "model"})
+                    return
+                if self.path == "/api/tags":
+                    self._json({"models": [{"name": "palette-model"}]})
+                    return
+                self._json({"error": {"message": "synthetic endpoint not found"}}, 404)
+
+            def _json(self, payload: dict[str, Any], status: int = 200) -> None:
+                encoded = json.dumps(payload, separators=(",", ":")).encode()
+                self.send_response(status)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(encoded)))
+                self.end_headers()
+                self.wfile.write(encoded)
+
+            def do_POST(self) -> None:  # noqa: N802 - stdlib handler API
+                length = int(self.headers.get("Content-Length", "0"))
+                body = self.rfile.read(length)
+                payload = json.loads(body.decode("utf-8"))
+                owner.records.append(
+                    {
+                        "method": "POST",
+                        "path": self.path,
+                        "authorization_present": self.headers.get("Authorization") is not None,
+                        "body": payload,
+                    }
+                )
+                owner.request_seen.set()
+                if payload.get("stream") is not True:
+                    self._json(
+                        {
+                            "model": "palette-model",
+                            "choices": [
+                                {
+                                    "index": 0,
+                                    "message": {"role": "assistant", "content": "Synthetic auxiliary response."},
+                                    "finish_reason": "stop",
+                                }
+                            ],
+                        }
+                    )
+                    return
+
+                chunks = [
+                    b'data: {"choices":[{"delta":{"role":"assistant"}}]}\n\n',
+                    (
+                        b'data: {"choices":[{"delta":{"content":"Synthetic handoff",'
+                        b'"tool_calls":[{"index":0,"id":"call_synthetic_clarify","type":"function",'
+                        b'"function":{"name":"clarify","arguments":'
+                        + json.dumps(ARGUMENT_FRAGMENTS[0], separators=(",", ":")).encode()
+                        + b'}}]}}]}\n\n'
+                    ),
+                    (
+                        b'data: {"choices":[{"delta":{"tool_calls":[{"index":0,'
+                        b'"function":{"arguments":'
+                        + json.dumps(ARGUMENT_FRAGMENTS[1], separators=(",", ":")).encode()
+                        + b'}}]}}]}\n\n'
+                    ),
+                    b'data: {"choices":[{"delta":{},"finish_reason":"tool_calls"}]}\n\n',
+                    b"data: [DONE]\n\n",
+                ]
+                for chunk in chunks:
+                    owner.tool_call_events.append(
+                        {
+                            "length": len(chunk),
+                            "sha256": hashlib.sha256(chunk).hexdigest(),
+                        }
+                    )
+                self.send_response(200)
+                self.send_header("Content-Type", "text/event-stream")
+                self.send_header("Connection", "close")
+                self.end_headers()
+                for chunk in chunks:
+                    try:
+                        self.wfile.write(chunk)
+                        self.wfile.flush()
+                    except OSError:
+                        return
+                    time.sleep(0.02)
+
+        return Handler
+
+
+def clean_output(output: bytes) -> str:
+    return ANSI_ESCAPE.sub("", output.decode("utf-8", errors="replace")).replace("\r", "")
+
+
+def marker_present(text: str, marker: str) -> bool:
+    if marker in text:
+        return True
+    compact_text = "".join(text.split())
+    compact_marker = "".join(marker.split())
+    return compact_marker in compact_text
+
+
+def set_window_size(fd: int) -> None:
+    fcntl.ioctl(fd, termios.TIOCSWINSZ, struct.pack("HHHH", ROWS, COLUMNS, 0, 0))
+
+
+def read_available(fd: int, output: bytearray) -> None:
+    while True:
+        try:
+            chunk = os.read(fd, 65_536)
+        except OSError as error:
+            if error.errno in {errno.EAGAIN, errno.EIO}:
+                return
+            raise
+        if not chunk:
+            return
+        output.extend(chunk)
+
+
+def child_done(pid: int) -> tuple[bool, int | None]:
+    waited, status = os.waitpid(pid, os.WNOHANG)
+    return waited != 0, status if waited else None
+
+
+def wait_for(
+    pid: int,
+    fd: int,
+    output: bytearray,
+    case: str,
+    step: str,
+    predicate: Predicate,
+    timeout: float,
+) -> None:
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        read_available(fd, output)
+        if predicate(clean_output(bytes(output))):
+            return
+        done, _ = child_done(pid)
+        if done:
+            read_available(fd, output)
+            raise ReplayFailure(case, step, "Hades exited before the PTY assertion", bytes(output))
+        remaining = deadline - time.monotonic()
+        select.select([fd], [], [], min(0.05, max(0.0, remaining)))
+    read_available(fd, output)
+    raise ReplayFailure(case, step, f"timed out after {timeout:.1f}s", bytes(output))
+
+
+def wait_for_exit(pid: int, fd: int, output: bytearray, timeout: float) -> int:
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        read_available(fd, output)
+        done, status = child_done(pid)
+        if done and status is not None:
+            return status
+        remaining = deadline - time.monotonic()
+        select.select([fd], [], [], min(0.05, max(0.0, remaining)))
+    raise ReplayFailure("cleanup", "exit", f"process did not exit within {timeout:.1f}s", bytes(output))
+
+
+def send(fd: int, payload: bytes) -> None:
+    view = memoryview(payload)
+    while view:
+        written = os.write(fd, view)
+        view = view[written:]
+
+
+def terminal_flags(slave_path: str) -> dict[str, bool]:
+    local_flags = termios.tcgetattr(retain_slave_descriptor(slave_path))[3]
+    return {
+        "canonical": bool(local_flags & termios.ICANON),
+        "echo": bool(local_flags & termios.ECHO),
+    }
+
+
+def spawn(binary: Path, base_url: str) -> tuple[int, int, str, Path]:
+    home = Path(tempfile.mkdtemp(prefix="hades-tool-call-deltas-"))
+    pid, master = pty.fork()
+    if pid == 0:
+        environment = os.environ.copy()
+        environment.update(
+            {
+                "TERM": "xterm-256color",
+                "COLUMNS": str(COLUMNS),
+                "LINES": str(ROWS),
+                "HOME": str(home),
+                "HERMES_HOME": str(home),
+            }
+        )
+        environment.pop("HADES_PROVIDER_API_KEY", None)
+        environment["HADES_PROVIDER_BASE_URL"] = base_url
+        environment["HADES_MODEL"] = "palette-model"
+        os.execve(str(binary), [str(binary)], environment)
+    set_window_size(master)
+    os.set_blocking(master, False)
+    slave_path = slave_path_for_pid(pid)
+    retain_slave_descriptor(slave_path)
+    return pid, master, slave_path, home
+
+
+def stop_process(pid: int, fd: int, reaped: bool) -> None:
+    if not reaped:
+        try:
+            os.kill(pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        try:
+            os.waitpid(pid, 0)
+        except ChildProcessError:
+            pass
+    try:
+        os.close(fd)
+    except OSError:
+        pass
+
+
+def assert_clean_exit(status: int, case: str) -> None:
+    if not os.WIFEXITED(status) or os.WEXITSTATUS(status) != 0:
+        raise ReplayFailure(case, "cleanup", f"unexpected exit status: {status}")
+
+
+def run_tool_call_case(binary: Path, timeout: float) -> dict[str, Any]:
+    case = "tool-call-deltas"
+    server = ToolCallServer()
+    server_thread = threading.Thread(target=server.serve_forever, name="hades-tool-call", daemon=True)
+    server_thread.start()
+    pid, fd, slave_path, home = spawn(binary, f"http://127.0.0.1:{server.server_port}/v1")
+    output = bytearray()
+    reaped = False
+    try:
+        wait_for(
+            pid,
+            fd,
+            output,
+            case,
+            "startup",
+            lambda text: "Hermes Agent" in text and "ready" in text,
+            timeout,
+        )
+        send(fd, PROMPT.encode() + b"\r")
+        wait_for(
+            pid,
+            fd,
+            output,
+            case,
+            "request",
+            lambda _text: server.request_seen.is_set(),
+            timeout,
+        )
+        wait_for(
+            pid,
+            fd,
+            output,
+            case,
+            "response",
+            lambda text: marker_present(text, ASSISTANT_MARKER) and marker_present(text, "ready"),
+            timeout,
+        )
+        # Give the worker a moment to prove no follow-up request arrives after
+        # completion, then verify the process is still alive and ready.
+        time.sleep(0.4)
+        visible = clean_output(bytes(output))
+        if marker_present(visible, "Processing 1 tool call"):
+            raise ReplayFailure(case, "response", "an invented tool-processing overlay was rendered", bytes(output))
+        if marker_present(visible, "tool call") and "ready" not in visible:
+            raise ReplayFailure(case, "response", "tool-call surface left the ready state", bytes(output))
+        if marker_present(visible, "Busy"):
+            raise ReplayFailure(case, "response", "Hades stayed busy after a completed tool-call stream", bytes(output))
+        done, _ = child_done(pid)
+        if done:
+            raise ReplayFailure(case, "response", "Hades exited after a completed tool-call stream", bytes(output))
+        chat_requests = [r for r in server.records if r["method"] == "POST"]
+        if len(chat_requests) != 1:
+            raise ReplayFailure(case, "request", f"expected one chat request, got {len(chat_requests)}", bytes(output))
+
+        joined_arguments = "".join(ARGUMENT_FRAGMENTS)
+        json.loads(joined_arguments)  # prove the joined fragments are valid JSON arguments
+        send(fd, b"\x03")
+        status = wait_for_exit(pid, fd, output, timeout)
+        reaped = True
+        assert_clean_exit(status, case)
+        raw = bytes(output)
+        if b"\x1b[?1049l" not in raw:
+            raise ReplayFailure(case, "cleanup", "alternate screen was not restored", raw)
+        flags = terminal_flags(slave_path)
+        if not flags["canonical"] or not flags["echo"]:
+            raise ReplayFailure(case, "cleanup", f"terminal flags were not restored: {flags}", raw)
+
+        request = chat_requests[0]
+        return {
+            "id": case,
+            "status": "passed",
+            "input_sequence": [
+                {"kind": "text", "value": "<synthetic prompt>"},
+                {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+                {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03"},
+            ],
+            "request": {
+                "method": "POST",
+                "path": request["path"],
+                "authorization_present": request["authorization_present"],
+                "body_keys": sorted(request["body"]),
+                "model": request["body"]["model"],
+                "stream": request["body"]["stream"],
+                "message_roles": [m["role"] for m in request["body"]["messages"]],
+                "tools_present": bool(request["body"]["tools"]),
+                "clarify_present": any(
+                    tool.get("function", {}).get("name") == TOOL_NAME
+                    for tool in request["body"].get("tools", [])
+                ),
+            },
+            "tool_call": {
+                "name": TOOL_NAME,
+                "argument_fragments": [
+                    {
+                        "sequence": index + 1,
+                        "length": len(fragment),
+                        "sha256": hashlib.sha256(fragment.encode()).hexdigest(),
+                    }
+                    for index, fragment in enumerate(ARGUMENT_FRAGMENTS)
+                ],
+                "argument_fragment_count": len(ARGUMENT_FRAGMENTS),
+                "joined_arguments": {
+                    "length": len(joined_arguments),
+                    "sha256": hashlib.sha256(joined_arguments.encode()).hexdigest(),
+                    "valid_json": True,
+                },
+                "finish_reason": "tool_calls",
+                "executed": False,
+                "approved": False,
+            },
+            "stream_events": {
+                "chunk_count": len(server.tool_call_events),
+                "chunk_digests": server.tool_call_events,
+            },
+            "request_counts": {
+                "chat_requests": len(chat_requests),
+                "subsequent_chat_requests": 0,
+                "tool_response_requests": 0,
+            },
+            "visible_state": {
+                "assistant_text_rendered": True,
+                "returned_to_ready": True,
+                "no_tool_overlay": True,
+                "no_busy_marker": True,
+                "cleanup": "Ctrl+C exited cleanly with terminal restored",
+            },
+        }
+    finally:
+        stop_process(pid, fd, reaped)
+        server.shutdown()
+        server.server_close()
+        server_thread.join(timeout=2.0)
+        shutil.rmtree(home, ignore_errors=True)
+
+
+def write_report(report: dict[str, Any], path: Path | None, status: int) -> int:
+    text = json.dumps(report, indent=2, sort_keys=True)
+    if path is not None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text + "\n", encoding="utf-8")
+    print(text)
+    return status
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--binary", type=Path, default=DEFAULT_BINARY)
+    parser.add_argument("--report", type=Path, default=None)
+    parser.add_argument("--timeout", type=float, default=8.0)
+    arguments = parser.parse_args()
+    binary = arguments.binary.resolve()
+    report: dict[str, Any] = {
+        "schema_version": 1,
+        "command": "replay-tool-call-deltas",
+        "binary": str(binary),
+        "dimensions": {"columns": COLUMNS, "rows": ROWS, "emulator": "direct PTY"},
+        "cases": [],
+        "passed": False,
+    }
+    try:
+        if not binary.is_file():
+            raise ReplayFailure("report", "binary", f"binary not found: {binary}")
+        report["cases"] = [run_tool_call_case(binary, arguments.timeout)]
+        report["passed"] = True
+    except (OSError, ReplayFailure, json.JSONDecodeError, KeyError, TypeError, ValueError) as error:
+        report["failure"] = error.as_dict() if isinstance(error, ReplayFailure) else {"message": str(error)}
+        return write_report(report, arguments.report.resolve() if arguments.report else None, 1)
+    return write_report(report, arguments.report.resolve() if arguments.report else None, 0)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
