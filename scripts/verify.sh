@@ -145,6 +145,7 @@ python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0108-her
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0109-hermes-tool-schema-semantics.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0051-hades-local-provider-stream.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0111-hades-tool-call-deltas.json
+python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0113-hades-tool-inventory-advertisement.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0052-hermes-stream-timing.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0053-hades-stream-timing.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0054-hermes-provider-errors.json

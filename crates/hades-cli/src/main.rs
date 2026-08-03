@@ -38,6 +38,7 @@ use hades_core::{
 };
 use hades_provider::{
     CancellationToken, ChatMessage, ChatRequest, LocalOpenAiTransport, StreamEvent, TransportError,
+    hermes_tool_inventory,
 };
 use hades_tui::{draw, draw_standalone_setup, snapshot, standalone_tool_provider_action_status};
 use ratatui::{Terminal, backend::CrosstermBackend};
@@ -905,7 +906,8 @@ fn start_provider(app: &mut App, provider_runtime: &mut Option<ProviderRuntime>)
         }
     };
     let model = provider_request_model(app, &config.model);
-    let request = ChatRequest::new(model, provider_request_messages(app), Vec::new());
+    let request =
+        ChatRequest::new(model, provider_request_messages(app), hermes_tool_inventory().to_vec());
     let cancellation = CancellationToken::new();
     let worker_cancellation = cancellation.clone();
     let (sender, receiver) = mpsc::channel();

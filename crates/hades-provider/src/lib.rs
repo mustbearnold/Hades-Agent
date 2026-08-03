@@ -26,6 +26,18 @@ pub const DEFAULT_TIMEOUT: Duration = Duration::from_secs(10);
 const READ_POLL_INTERVAL: Duration = Duration::from_millis(50);
 const MAX_RESPONSE_HEADER_BYTES: usize = 64 * 1024;
 
+/// The observed Hermes 31-tool inventory (OBS-0112), embedded as public API
+/// schema data from the pinned reference commit. Hades advertises this
+/// inventory on streaming chat requests to match the observed wire contract;
+/// it never executes, approves, or forwards these tools.
+pub fn hermes_tool_inventory() -> &'static [Value] {
+    static TOOLS: std::sync::LazyLock<Vec<Value>> = std::sync::LazyLock::new(|| {
+        serde_json::from_str(include_str!("../assets/hermes-tools.json"))
+            .expect("embedded Hermes tool inventory must be valid JSON")
+    });
+    &TOOLS
+}
+
 #[derive(Clone, Debug, Eq, PartialEq, Serialize)]
 pub struct ChatMessage {
     pub role: String,
@@ -1006,5 +1018,62 @@ mod tests {
             ]
         );
         server.join().unwrap();
+    }
+
+    #[test]
+    fn embedded_inventory_matches_the_observed_hermes_wire_digest() {
+        let tools = hermes_tool_inventory();
+        assert_eq!(tools.len(), 31);
+        let names = tools
+            .iter()
+            .filter_map(|tool| tool.get("function")?.get("name")?.as_str())
+            .collect::<Vec<_>>();
+        assert_eq!(names.first(), Some(&"browser_back"));
+        assert!(names.contains(&"clarify"));
+        assert_eq!(names.last(), Some(&"tool_call"));
+
+        let digest = canonical_sha256(&serde_json::to_value(tools).unwrap());
+        assert_eq!(digest, "b2cbd3f2bf77de3a91cf9a4844b324f6130aab8c72b2924a159cce533f38a220");
+    }
+
+    #[test]
+    fn advertised_inventory_request_carries_the_observed_tools() {
+        let request = ChatRequest::new(
+            "palette-model",
+            vec![ChatMessage::new("user", "synthetic prompt")],
+            hermes_tool_inventory().to_vec(),
+        );
+        assert_eq!(request.tools.len(), 31);
+        let body = serde_json::to_value(WireRequest::from(&request)).unwrap();
+        let tools = body.get("tools").and_then(Value::as_array).unwrap();
+        assert_eq!(tools.len(), 31);
+        assert!(tools.iter().any(|tool| {
+            tool.get("function").and_then(|f| f.get("name")).and_then(Value::as_str)
+                == Some("clarify")
+        }));
+    }
+
+    /// Recursively sort object keys so the digest matches the probe's
+    /// `sort_keys=True` canonical serialization.
+    fn canonical_sort(value: &Value) -> Value {
+        match value {
+            Value::Object(map) => {
+                let mut entries = map
+                    .iter()
+                    .map(|(key, value)| (key.clone(), canonical_sort(value)))
+                    .collect::<Vec<_>>();
+                entries.sort_by(|left, right| left.0.cmp(&right.0));
+                Value::Object(entries.into_iter().collect())
+            }
+            Value::Array(items) => Value::Array(items.iter().map(canonical_sort).collect()),
+            other => other.clone(),
+        }
+    }
+
+    fn canonical_sha256(value: &Value) -> String {
+        use sha2::{Digest, Sha256};
+        let encoded = serde_json::to_string(&canonical_sort(value)).expect("canonical JSON");
+        let digest = Sha256::digest(encoded.as_bytes());
+        digest.iter().map(|byte| format!("{byte:02x}")).collect()
     }
 }

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-03T07:20:57Z",
+  "updated_at": "2026-08-03T07:39:49Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -6385,7 +6385,7 @@
         "scripts/verify.sh",
         ".hades/runtime/hermes-tool-inventory-probe.json"
       ],
-      "ready_at": "2026-08-03T07:01:12Z",
+      "ready_at": "2026-08-03T07:21:48Z",
       "claimed_by": "tool-inventory-observer",
       "claimed_at": "2026-08-03T07:01:12Z",
       "attempts": 1,
@@ -6403,6 +6403,69 @@
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/hermes-tool-inventory-probe.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-117",
+      "title": "Advertise the observed Hermes tool inventory in Hades requests",
+      "status": "complete",
+      "priority": 73,
+      "lane": "behavior",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-116"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "typed_state_tests",
+        "direct_pty_replay",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Embed the OBS-0112 31-tool inventory (public API schemas) as a typed static in the provider crate and send it in every streaming chat request instead of an empty tools array, matching the observed Hermes wire contract.",
+        "Prove the advertised inventory matches the observation: the canonical sort-keys digest equals b2cbd3f2bf77de3a91cf9a4844b324f6130aab8c72b2924a159cce533f38a220 and the normalized marker digest equals the OBS-0109 anchor 90bc20dad34193bb183edab4038f4ca4cf220c63de3ebcec63b90fd9d14470bf.",
+        "Keep tool-call handling unchanged and safe: the tool-call delta parse/accumulate boundary from HAD-115 still never executes, approves, or forwards calls, and no tool overlay or busy marker is rendered.",
+        "Add focused provider/CLI tests and re-capture the direct-PTY replay (OBS-0113): the request carries 31 tools, the assistant text renders, ready returns, one chat request with zero follow-ups, and Ctrl+C exits cleanly.",
+        "Update the parity matrix, context, readme, justfile, and verification gates; run the complete no-skip just verify gate and record evidence before completion."
+      ],
+      "evidence": [
+        "crates/hades-provider/src/lib.rs",
+        "crates/hades-provider/assets/hermes-tools.json",
+        "crates/hades-provider/Cargo.toml",
+        "crates/hades-cli/src/main.rs",
+        "scripts/replay_tool_call_deltas.py",
+        "tests/fixtures/parity/OBS-0113-hades-tool-inventory-advertisement.json",
+        "docs/parity/observations/OBS-0113-hades-tool-inventory-advertisement-2026-08-03.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/tool-call-deltas-replay.json"
+      ],
+      "ready_at": "2026-08-03T07:21:52Z",
+      "claimed_by": "tool-inventory-advertiser",
+      "claimed_at": "2026-08-03T07:21:59Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Hades now advertises the observed OBS-0112 31-tool inventory on every streaming chat request: the public API schemas are embedded as a typed static in the provider crate and the CLI sends them instead of an empty tools array. The canonical sort-keys digest matches the captured wire contract exactly (b2cbd3f2..., count 31, clarify present; normalized marker digest anchored to OBS-0109 90bc20...). Tool-call handling stays unchanged and safe: parse/accumulate only, no execution, approval, or forwarding, no tool overlay or busy marker. Added provider digest/wire tests (sha2 dev-dep) and re-captured the direct-PTY replay as OBS-0113 (31 tools, one request, zero follow-ups, ready return, clean Ctrl+C exit). Parity matrix, context, readme, justfile, and verification gates updated; complete no-skip just verify gate PASS (verification: PASS).",
+        "completed_at": "2026-08-03T07:39:49Z",
+        "evidence": [
+          "crates/hades-provider/src/lib.rs",
+          "crates/hades-provider/assets/hermes-tools.json",
+          "crates/hades-provider/Cargo.toml",
+          "crates/hades-cli/src/main.rs",
+          "scripts/replay_tool_call_deltas.py",
+          "tests/fixtures/parity/OBS-0113-hades-tool-inventory-advertisement.json",
+          "docs/parity/observations/OBS-0113-hades-tool-inventory-advertisement-2026-08-03.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/tool-call-deltas-replay.json"
         ]
       }
     }

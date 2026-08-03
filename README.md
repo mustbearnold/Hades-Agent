@@ -314,5 +314,7 @@ The `just replay-tool-call-deltas` replay proves the safe Hades side of that
 boundary: a loopback provider streams assistant text plus a fragmented
 `clarify` tool call with `finish_reason: "tool_calls"`, and Hades parses the
 typed deltas, accumulates the argument fragments, returns to ready with no
-busy marker or invented tool overlay, and sends no follow-up request. Hades
-never executes, approves, or forwards tool calls in this slice.
+busy marker or invented tool overlay, and sends no follow-up request. The
+request advertises the observed 31-tool inventory (canonical digest
+`b2cbd3f2…`), proving wire-contract parity. Hades never executes, approves,
+or forwards tool calls in this slice.

@@ -656,6 +656,17 @@ progress from August 1, 2026 through 2027.
   credential-shaped token boundary so hyphenated prose like "task-specific"
   no longer false-positives.
 
+- HAD-117 closes the loop on the tool arc: Hades now advertises the observed
+  OBS-0112 31-tool inventory on every streaming chat request (embedded as a
+  typed static in the provider crate), with the canonical sort-keys digest
+  matching the captured wire contract exactly. The OBS-0113 replay proves the
+  advertised inventory (31 tools, digest `b2cbd3f2…`, `clarify` present),
+  unchanged safe tool-call parse/accumulate behavior, ready return with no
+  busy marker or tool overlay, one request with zero follow-ups, and clean
+  Ctrl+C exit. Tool approval, execution, results, retries, and follow-up
+  requests remain explicit unknowns; advertising is wire parity, not
+  capability.
+
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes
 defects, unsafe behavior, or failure cases; fix them and record any deliberate
@@ -670,8 +681,8 @@ evidence-backed deviation.
 - Which Hermes behaviors are stable contracts versus implementation details;
   session recovery remains unobserved beyond input-history persistence.
 - Hades provider/model streaming and tool calls beyond the bounded HAD-053 /
-  HAD-054 / HAD-055 / HAD-057 / HAD-115 seams; tool registration/advertising,
-  approval, execution, results, retries, non-loopback providers, HTTPS, and
+  HAD-054 / HAD-055 / HAD-057 / HAD-115 / HAD-117 seams; tool approval,
+  execution, results, retries, non-loopback providers, HTTPS, and
   provider discovery remain unimplemented. Hermes
   subsequent chat-request purpose, exact provider-error copy, retry/backoff
   policy, and terminal-dependent surfaces beyond the captured observations

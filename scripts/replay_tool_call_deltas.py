@@ -47,6 +47,24 @@ ARGUMENT_FRAGMENTS = (
     '{"question":"synthetic clarification prompt",',
     '"choices":["synthetic choice one","synthetic choice two"]}',
 )
+EXPECTED_TOOL_COUNT = 31
+# Canonical sort-keys SHA-256 of the OBS-0112 31-tool inventory.
+EXPECTED_INVENTORY_DIGEST = "b2cbd3f2bf77de3a91cf9a4844b324f6130aab8c72b2924a159cce533f38a220"
+
+
+def canonical_digest(value: Any) -> str:
+    """Sort object keys recursively and hash the compact serialization,
+    matching the probe/validator canonical digest convention."""
+
+    def sort(node: Any) -> Any:
+        if isinstance(node, dict):
+            return {key: sort(item) for key, item in sorted(node.items())}
+        if isinstance(node, list):
+            return [sort(item) for item in node]
+        return node
+
+    encoded = json.dumps(sort(value), ensure_ascii=False, separators=(",", ":")).encode()
+    return hashlib.sha256(encoded).hexdigest()
 
 
 class ReplayFailure(RuntimeError):
@@ -375,6 +393,22 @@ def run_tool_call_case(binary: Path, timeout: float) -> dict[str, Any]:
             raise ReplayFailure(case, "cleanup", f"terminal flags were not restored: {flags}", raw)
 
         request = chat_requests[0]
+        request_tools = request["body"].get("tools")
+        if not isinstance(request_tools, list) or len(request_tools) != 31:
+            raise ReplayFailure(
+                case,
+                "inventory",
+                f"expected 31 advertised tools, got {len(request_tools) if isinstance(request_tools, list) else request_tools}",
+                raw,
+            )
+        inventory_digest = canonical_digest(request_tools)
+        if inventory_digest != EXPECTED_INVENTORY_DIGEST:
+            raise ReplayFailure(
+                case,
+                "inventory",
+                "advertised tool inventory does not match the OBS-0112 wire digest",
+                raw,
+            )
         return {
             "id": case,
             "status": "passed",
@@ -392,6 +426,8 @@ def run_tool_call_case(binary: Path, timeout: float) -> dict[str, Any]:
                 "stream": request["body"]["stream"],
                 "message_roles": [m["role"] for m in request["body"]["messages"]],
                 "tools_present": bool(request["body"]["tools"]),
+                "tool_count": len(request_tools),
+                "inventory_sha256": inventory_digest,
                 "clarify_present": any(
                     tool.get("function", {}).get("name") == TOOL_NAME
                     for tool in request["body"].get("tools", [])
