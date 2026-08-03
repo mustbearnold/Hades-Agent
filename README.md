@@ -106,6 +106,7 @@ just replay-model-selection   # session model selection -> effective request -> 
 just probe-distinct-model-selection # Hermes alternate-model effectiveness and persistence probe
 just replay-installed-model-selection # release hades/Hades aliases -> same vertical slice
 just replay-unconfigured-help # delayed /help setup-required PTY replay
+just replay-setup-required-actions # post-delay /model /setup safe-boundary replay
 just replay-standalone-setup  # standalone hades setup PTY replay
 just replay-standalone-full-setup # standalone Full setup continuation replay
 just replay-standalone-terminal-platform # standalone platform cancellation replay

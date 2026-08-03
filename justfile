@@ -241,6 +241,10 @@ replay-unconfigured-help:
     cargo build --locked --package hades-cli
     python3 scripts/replay_unconfigured_help.py --binary target/debug/hades --report .hades/runtime/hades-help-setup-required-replay.json --timeout 12
 
+replay-setup-required-actions:
+    cargo build --locked --package hades-cli
+    python3 scripts/replay_setup_required_actions.py --binary target/debug/hades --report .hades/runtime/setup-required-actions-replay.json --timeout 20
+
 replay-standalone-setup:
     cargo build --locked --package hades-cli
     python3 scripts/replay_standalone_setup.py --binary target/debug/hades --report .hades/runtime/hades-standalone-setup-replay.json --timeout 5
@@ -383,6 +387,7 @@ validate-reference:
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0067-hades-help-setup-required.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0068-hermes-setup-required-actions.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0104-hermes-setup-required-actions-revalidation.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0105-hades-setup-required-actions.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0073-hermes-standalone-terminal-platform.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0074-hades-standalone-terminal-platform.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0075-hermes-standalone-tool-configuration.json

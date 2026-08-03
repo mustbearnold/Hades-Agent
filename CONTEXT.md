@@ -585,6 +585,12 @@ progress from August 1, 2026 through 2027.
   keeps the overlay alive and the second exits cleanly. The ready-marker redraw
   is retained as an unresolved underlying detail, not provider readiness. Hades
   action replay remains the next implementation boundary.
+- HAD-109 matches that safe boundary in Hades. Fresh no-provider 120x40 replays
+  leave Setup Required visible through `/model` and `/setup` plus two Enter
+  presses, open no picker or wizard, create no config, and start no provider
+  request. Focused state coverage and the latest-frame PTY oracle prove the first
+  Ctrl+C clears the retained `/help` draft while the overlay stays alive; the
+  second restores the terminal and exits. An actionable route remains unknown.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes

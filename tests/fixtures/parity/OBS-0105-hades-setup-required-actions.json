@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0105",
+  "reference_observation": "OBS-0104",
+  "surface": "hades-post-delay-setup-required-actions",
+  "reference": {
+    "product": "Hades Agent",
+    "version": "workspace",
+    "source_commit": "e617f592497e560a44033cb05972e1b1aa029468",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "fresh direct PTY with normalized ANSI screen model"
+    },
+    "capture": "fresh Hades no-provider processes replayed against the OBS-0104 Setup Required action boundary"
+  },
+  "normalization": [
+    "The Hades binary path, synthetic HOME/HERMES_HOME, PTY path, session identifiers, timestamps, and dynamic redraw bytes are omitted or represented by placeholders.",
+    "Each fresh process removes HADES and OpenAI provider environment variables, submits /help, waits for Setup Required, and probes one safe follow-up command or the Ctrl+C control case.",
+    "The replay inspects the latest normalized screen frame for draft clearing, while the report retains only stable overlay, picker/wizard, provider, config, liveness, and terminal-restoration outcomes.",
+    "The Hermes ready-marker redraw is not treated as a Hades requirement; no actionable /model or /setup route is inferred from the explanatory overlay strings."
+  ],
+  "steps": [
+    {
+      "id": "post-delay-model",
+      "precondition": "Fresh Hades 120x40 direct PTY without a provider endpoint; /help has reached Setup Required.",
+      "input_sequence": [
+        {"kind": "text", "value": "/help", "bytes_hex": "2f 68 65 6c 70"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "wait", "value": "wait for the bounded 8000 ms Setup Required transition"},
+        {"kind": "text", "value": "/model", "bytes_hex": "2f 6d 6f 64 65 6c"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "clear retained draft while overlay remains"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "clean exit"}
+      ],
+      "output": {
+        "setup_required_remained_visible": true,
+        "model_picker_visible": false,
+        "setup_wizard_visible": false,
+        "provider_request_started": false,
+        "config_created": false,
+        "follow_up_remained_on_overlay": true,
+        "first_ctrl_c_kept_process_alive": true,
+        "first_ctrl_c_cleared_draft": true,
+        "exit": {"kind": "exit", "code": 0},
+        "alternate_screen_left": true,
+        "terminal_restored": true
+      }
+    },
+    {
+      "id": "post-delay-setup",
+      "precondition": "Fresh Hades 120x40 direct PTY without a provider endpoint; /help has reached Setup Required.",
+      "input_sequence": [
+        {"kind": "text", "value": "/help", "bytes_hex": "2f 68 65 6c 70"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "wait", "value": "wait for the bounded 8000 ms Setup Required transition"},
+        {"kind": "text", "value": "/setup", "bytes_hex": "2f 73 65 74 75 70"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "clear retained draft while overlay remains"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "clean exit"}
+      ],
+      "output": {
+        "setup_required_remained_visible": true,
+        "model_picker_visible": false,
+        "setup_wizard_visible": false,
+        "provider_request_started": false,
+        "config_created": false,
+        "follow_up_remained_on_overlay": true,
+        "first_ctrl_c_kept_process_alive": true,
+        "first_ctrl_c_cleared_draft": true,
+        "exit": {"kind": "exit", "code": 0},
+        "alternate_screen_left": true,
+        "terminal_restored": true
+      }
+    },
+    {
+      "id": "post-delay-ctrl-c",
+      "precondition": "Fresh Hades 120x40 direct PTY without a provider endpoint; /help has reached Setup Required.",
+      "input_sequence": [
+        {"kind": "text", "value": "/help", "bytes_hex": "2f 68 65 6c 70"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "wait", "value": "wait for the bounded 8000 ms Setup Required transition"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "clear retained draft while overlay remains"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "clean exit"}
+      ],
+      "output": {
+        "setup_required_remained_visible": true,
+        "first_ctrl_c_kept_process_alive": true,
+        "first_ctrl_c_cleared_draft": true,
+        "exit": {"kind": "exit", "code": 0},
+        "alternate_screen_left": true,
+        "terminal_restored": true
+      }
+    }
+  ],
+  "unknowns": [
+    "No provider, credential, OAuth, network, model selection, or setup persistence behavior was exercised.",
+    "The replay covers only the observed no-provider Setup Required boundary at 120x40; configured and deeper setup actions remain separate tasks.",
+    "Exact ANSI byte equivalence and behavior below the tested terminal size remain unknown."
+  ],
+  "passed": true
+}

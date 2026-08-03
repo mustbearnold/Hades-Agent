@@ -75,6 +75,7 @@ python3 scripts/replay_cli_launch.py --binary target/debug/hades --report .hades
 python3 scripts/replay_unconfigured_startup.py --binary target/debug/hades --report .hades/runtime/had064-unconfigured-startup-replay.json
 python3 scripts/replay_unconfigured_input.py --binary target/debug/hades --report .hades/runtime/had066-unconfigured-input-replay.json --timeout 5
 python3 scripts/replay_unconfigured_help.py --binary target/debug/hades --report .hades/runtime/hades-help-setup-required-replay.json --timeout 12
+python3 scripts/replay_setup_required_actions.py --binary target/debug/hades --report .hades/runtime/setup-required-actions-replay.json --timeout 20
 python3 scripts/replay_standalone_setup.py --binary target/debug/hades --report .hades/runtime/hades-standalone-setup-replay.json --timeout 5
 python3 scripts/replay_standalone_full_setup.py --binary target/debug/hades --report .hades/runtime/hades-standalone-full-setup-replay.json --timeout 5
 python3 scripts/replay_standalone_terminal_platform.py --binary target/debug/hades --report .hades/runtime/hades-standalone-terminal-platform-replay.json --timeout 5
@@ -157,6 +158,7 @@ python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0065-her
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0066-hermes-help-setup-timing.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0067-hades-help-setup-required.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0104-hermes-setup-required-actions-revalidation.json
+python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0105-hades-setup-required-actions.json
 python3 scripts/probe_hermes_full_setup_provider_selection.py --report .hades/runtime/hermes-full-setup-provider-selection-probe.json --timeout 30
 python3 scripts/probe_hermes_full_setup_model_default.py --report .hades/runtime/hermes-full-setup-model-default-probe.json --timeout 30
 python3 scripts/probe_hermes_local_provider_stream.py --report .hades/runtime/hermes-local-provider-stream-probe.json --timeout 30

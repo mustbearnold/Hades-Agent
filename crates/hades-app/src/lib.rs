@@ -793,6 +793,48 @@ mod tests {
     }
 
     #[test]
+    fn setup_required_follow_up_commands_stay_on_overlay_and_clear_safely() {
+        for command in ["/model", "/setup"] {
+            let start = Instant::now();
+            let mut app = App::with_startup_state(StartupState::Unconfigured);
+            for character in "/help".chars() {
+                app.handle_at(InputEvent::Key(Key::Char(character)), start);
+            }
+            app.handle_at(InputEvent::Key(Key::Enter), start);
+            app.handle_at(
+                InputEvent::Tick,
+                start + Duration::from_millis(HELP_SETUP_REQUIRED_DELAY_MS),
+            );
+
+            for character in command.chars() {
+                app.handle_at(InputEvent::Key(Key::Char(character)), start);
+            }
+            app.handle_at(InputEvent::Key(Key::Enter), start);
+            app.handle_at(InputEvent::Key(Key::Enter), start);
+
+            assert_eq!(app.state().overlay, Some(Overlay::SetupRequired), "command: {command}");
+            assert_eq!(app.state().composer.text(), "/help", "command: {command}");
+            assert!(app.state().model_picker.is_none(), "command: {command}");
+            assert!(app.state().setup_wizard.is_none(), "command: {command}");
+            assert!(
+                app.state().messages.iter().all(|message| message.role != hades_core::Role::User)
+            );
+
+            assert_eq!(
+                app.handle_at(InputEvent::Key(Key::Ctrl('c')), start),
+                DispatchOutcome::Continue,
+                "command: {command}"
+            );
+            assert_eq!(app.state().overlay, Some(Overlay::SetupRequired), "command: {command}");
+            assert_eq!(app.state().composer.text(), "", "command: {command}");
+            assert_eq!(
+                app.handle_at(InputEvent::Key(Key::Ctrl('c')), start),
+                DispatchOutcome::Quit
+            );
+        }
+    }
+
+    #[test]
     fn unconfigured_help_cancels_if_startup_input_is_cleared_before_deadline() {
         let start = Instant::now();
         let mut app = App::with_startup_state(StartupState::Unconfigured);

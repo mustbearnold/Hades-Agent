@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-03T01:43:33Z",
+  "updated_at": "2026-08-03T02:08:48Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -5921,6 +5921,65 @@
           "docs/parity/observations/OBS-0068-hermes-setup-required-actions-2026-08-02.md",
           "docs/parity/observations/OBS-0104-hermes-setup-required-actions-revalidation-2026-08-03.md",
           ".hades/runtime/hermes-setup-required-actions-probe.json",
+          "justfile",
+          "scripts/verify.sh",
+          "README.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-109",
+      "title": "Match Hades post-delay Setup Required action boundary",
+      "status": "complete",
+      "priority": 81,
+      "lane": "implementation",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-108"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "OBS-0104_reference_contract",
+        "focused_state_test",
+        "direct_pty_replay",
+        "no_provider_activity",
+        "full_verify"
+      ],
+      "acceptance": [
+        "In a fresh Hades no-provider 120x40 PTY, submit /help, wait for Setup Required, and independently send /model and /setup followed by two Enter presses; the overlay remains visible, neither picker nor wizard opens, and no provider request or config file appears.",
+        "Verify the first Ctrl+C keeps Hades alive with Setup Required visible and clears the retained draft, while the second Ctrl+C exits cleanly and restores canonical input, echo, and the alternate screen.",
+        "Add focused app/state coverage and a sanitized direct-PTY Hades fixture/replay linked to OBS-0104; preserve the safe no-op boundary and do not infer or implement an actionable route from Hermes' explanatory strings or ambiguous ready-marker redraw.",
+        "Wire the replay and fixture through just/verify, update matrix/context/readme, and complete the no-skip gate before completion."
+      ],
+      "evidence": [
+        "crates/hades-app/src/lib.rs",
+        "scripts/replay_setup_required_actions.py",
+        "tests/fixtures/parity/OBS-0105-hades-setup-required-actions.json",
+        "docs/parity/observations/OBS-0105-hades-setup-required-actions-2026-08-03.md",
+        ".hades/runtime/setup-required-actions-replay.json",
+        "tests/fixtures/parity/OBS-0104-hermes-setup-required-actions-revalidation.json",
+        "justfile",
+        "scripts/verify.sh",
+        "README.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md"
+      ],
+      "ready_at": "2026-08-03T01:45:00Z",
+      "claimed_by": "hades-setup-required-actions-implementer",
+      "claimed_at": "2026-08-03T01:44:30Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Matched OBS-0104 in Hades: post-delay /model and /setup remain safely on Setup Required with no picker, wizard, provider request, or config activity; focused app coverage, latest-frame PTY replay, and full just verify pass.",
+        "completed_at": "2026-08-03T02:08:48Z",
+        "evidence": [
+          "crates/hades-app/src/lib.rs",
+          "scripts/replay_setup_required_actions.py",
+          "tests/fixtures/parity/OBS-0105-hades-setup-required-actions.json",
+          "docs/parity/observations/OBS-0105-hades-setup-required-actions-2026-08-03.md",
+          ".hades/runtime/setup-required-actions-replay.json",
+          "tests/fixtures/parity/OBS-0104-hermes-setup-required-actions-revalidation.json",
           "justfile",
           "scripts/verify.sh",
           "README.md",
