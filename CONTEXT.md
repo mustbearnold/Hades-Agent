@@ -605,6 +605,15 @@ progress from August 1, 2026 through 2027.
   The sidecar is not read by provider startup detection, so it cannot imply a
   ready provider; credentials, API keys, OAuth, endpoint secrets, and selected
   platforms remain outside the claim. OBS-0107 is the direct-PTY oracle.
+- HAD-112 captures the next Hermes provider boundary in a fresh configured
+  loopback process. Two ordinary prompts produce two streaming requests: the
+  second contains the completed first user/assistant turn, and both requests
+  include the same 31-tool structural schema. Hermes also emits one
+  protocol-correct auxiliary non-stream request with a `temperature` field;
+  its purpose remains unclassified and is not a Hades requirement. No tool
+  action, credential, external network, retry policy, or failure behavior was
+  exercised. OBS-0108 is research evidence for a future safe provider/tool
+  implementation task.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes

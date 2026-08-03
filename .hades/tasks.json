@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-03T03:11:51Z",
+  "updated_at": "2026-08-03T03:49:56Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -6107,6 +6107,63 @@
           "docs/parity/observations/OBS-0107-hades-setup-persistence-2026-08-03.md",
           "scripts/verify.sh",
           "justfile",
+          "README.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-112",
+      "title": "Capture Hermes multi-turn provider request boundary",
+      "status": "complete",
+      "priority": 78,
+      "lane": "research",
+      "owner_role": "observer",
+      "depends_on": [
+        "HAD-052",
+        "HAD-097",
+        "HAD-111"
+      ],
+      "risk": "high",
+      "oracle": [
+        "pinned_hermes_reference",
+        "loopback_request_recorder",
+        "normalized_multi_turn_payload",
+        "tool_schema_boundary",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Against the pinned Hermes source in a fresh synthetic HOME/HERMES_HOME with only a deterministic 127.0.0.1 OpenAI-compatible fixture, submit two ordinary prompts and wait for both bounded streamed responses before clean Ctrl+C cleanup.",
+        "Record normalized chat-request order, model/stream/top-level wire shape, message roles and semantic content markers, and whether tool schemas are sent; preserve exact values only for synthetic markers and omit credentials, authorization values, private paths, and external network activity.",
+        "Determine only what the two isolated requests prove about completed-turn context, system/bootstrap messages, assistant response inclusion, tool-schema presence, and request counts; leave tool-call execution, retries, discovery details, token accounting, persistence, and unobserved behavior unknown.",
+        "Do not trigger a tool call, execute a provider/tool action, reproduce Hermes defects or repeated requests, or turn an observed implementation detail into a Hades requirement without a separate safe implementation task.",
+        "Add a provenance-bearing OBS-0108 fixture, repeatable direct-PTY probe, observation document, parity matrix/context/readme updates, wire fixture validation and the probe through just/verify, and complete the no-skip gate before completion."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_multi_turn_provider.py",
+        ".hades/runtime/hermes-multi-turn-provider-probe.json",
+        "tests/fixtures/parity/OBS-0108-hermes-multi-turn-provider.json",
+        "docs/parity/observations/OBS-0108-hermes-multi-turn-provider-2026-08-03.md",
+        "justfile",
+        "scripts/verify.sh",
+        "README.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md"
+      ],
+      "claimed_by": "hermes-multiturn-boundary-researcher",
+      "claimed_at": "2026-08-03T03:17:13Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Captured Hermes OBS-0108 with two ordinary prompts against a fresh synthetic loopback: the second streamed request includes the completed first user/assistant turn, both streamed requests carry a normalized 31-tool structural schema, and one protocol-correct auxiliary non-stream JSON request was recorded without classifying its purpose. No tool action, credential, OAuth, external network, Hermes defect, or failure case was reproduced; just verify passed.",
+        "completed_at": "2026-08-03T03:49:56Z",
+        "evidence": [
+          "scripts/probe_hermes_multi_turn_provider.py",
+          ".hades/runtime/hermes-multi-turn-provider-probe.json",
+          "tests/fixtures/parity/OBS-0108-hermes-multi-turn-provider.json",
+          "docs/parity/observations/OBS-0108-hermes-multi-turn-provider-2026-08-03.md",
+          "justfile",
+          "scripts/verify.sh",
           "README.md",
           "docs/parity/MATRIX.md",
           "CONTEXT.md"

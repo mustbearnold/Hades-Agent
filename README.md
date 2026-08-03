@@ -157,6 +157,7 @@ just replay-osc52-timing-limits # Hades OSC52 timing and bounded-size parity rep
 just replay-osc52-st-termination # Hades ST-terminated OSC52 parity replay
 just replay-osc52-multiplexer # Hades TMUX/STY OSC52 wrapper parity replay
 just replay-local-provider   # loopback provider worker PTY replay
+just probe-multi-turn-provider # Hermes multi-turn payload and tool-schema probe
 just probe-model-picker-selection # Hermes model selection side-effect boundary
 just agent validate           # validate task/control-plane invariants
 just agent next               # choose the highest-priority ready task
@@ -279,3 +280,10 @@ partial turns remain visible for diagnosis but are excluded from the next
 explicit follow-up. The direct-PTY replay proves the exact request sequence,
 clean terminal restoration, and the absence of bootstrap or credential data in
 the loopback payload.
+
+The reference multi-turn provider boundary is captured separately by
+`just probe-multi-turn-provider`. It records the two streaming requests,
+completed-turn context, the bounded 31-tool schema shape, and one
+protocol-correct auxiliary non-stream request without executing tools or
+promoting its purpose into Hades behavior. Tool-call execution and the safe
+Hades adapter contract remain future work.
