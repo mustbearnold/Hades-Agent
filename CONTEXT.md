@@ -615,6 +615,15 @@ progress from August 1, 2026 through 2027.
   exercised. OBS-0108 is research evidence for a future safe provider/tool
   implementation task.
 
+  OBS-0109 extends that evidence without entering tool execution. A fresh
+  synthetic Hermes process sends the same stable 31-tool inventory on both
+  ordinary streaming turns; the normalized fixture records names, parameter
+  property names/types, required fields, nested shape markers, and description
+  digests while omitting description text and arbitrary values. The auxiliary
+  non-stream request remains purpose-unknown, and Hades does not advertise or
+  execute these tools until a separate task defines safe approval, validation,
+  and failure semantics.
+
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes
 defects, unsafe behavior, or failure cases; fix them and record any deliberate

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-03T03:49:56Z",
+  "updated_at": "2026-08-03T04:24:28Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -6162,6 +6162,61 @@
           ".hades/runtime/hermes-multi-turn-provider-probe.json",
           "tests/fixtures/parity/OBS-0108-hermes-multi-turn-provider.json",
           "docs/parity/observations/OBS-0108-hermes-multi-turn-provider-2026-08-03.md",
+          "justfile",
+          "scripts/verify.sh",
+          "README.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-113",
+      "title": "Capture Hermes tool schema semantics without executing tools",
+      "status": "complete",
+      "priority": 77,
+      "lane": "research",
+      "owner_role": "observer",
+      "depends_on": [
+        "HAD-112"
+      ],
+      "risk": "high",
+      "oracle": [
+        "pinned_hermes_reference",
+        "synthetic_loopback_provider",
+        "normalized_tool_schema",
+        "no_tool_execution",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Against the pinned Hermes source in a fresh synthetic HOME/HERMES_HOME with only a deterministic 127.0.0.1 OpenAI-compatible fixture, submit ordinary prompts and record the complete tool-schema structure Hermes sends without entering a tool-call response path.",
+        "For each observed tool, preserve only non-secret schema semantics needed for a future safe adapter: name, description presence/normalized marker, parameter property names and types, required-property names, enum/array/object shape markers, and stable schema counts; omit credentials, authorization values, private paths, prompt/response payloads, and external network activity.",
+        "Verify whether the schema inventory is stable across the bounded ordinary-turn requests and distinguish observed wire facts from unknown execution, approval, retry, discovery, persistence, and error behavior.",
+        "Do not trigger a tool call, execute a provider/tool action, copy Hermes defects or unsafe behavior, or turn schema evidence into Hades execution behavior without a separate safe implementation task.",
+        "Add a provenance-bearing OBS-0109 fixture, repeatable direct-PTY probe, observation document, parity matrix/context/readme updates, wire fixture validation and probe wiring through just/verify, and complete the no-skip gate before completion."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_tool_schema_semantics.py",
+        ".hades/runtime/hermes-tool-schema-semantics-probe.json",
+        "tests/fixtures/parity/OBS-0109-hermes-tool-schema-semantics.json",
+        "docs/parity/observations/OBS-0109-hermes-tool-schema-semantics-2026-08-03.md",
+        "justfile",
+        "scripts/verify.sh",
+        "README.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md"
+      ],
+      "claimed_by": "hermes-tool-schema-researcher",
+      "claimed_at": "2026-08-03T03:52:34Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Captured Hermes OBS-0109 with two ordinary streamed turns against a fresh synthetic loopback: both carry the same stable 31-tool inventory, including names, parameter properties/types, required fields, nested shape markers, and safe description digests; one auxiliary non-stream JSON request carried no tools. No tool-call response, tool action, credential, OAuth, external network, defect, or failure case was exercised; just verify passed.",
+        "completed_at": "2026-08-03T04:24:28Z",
+        "evidence": [
+          "scripts/probe_hermes_tool_schema_semantics.py",
+          ".hades/runtime/hermes-tool-schema-semantics-probe.json",
+          "tests/fixtures/parity/OBS-0109-hermes-tool-schema-semantics.json",
+          "docs/parity/observations/OBS-0109-hermes-tool-schema-semantics-2026-08-03.md",
           "justfile",
           "scripts/verify.sh",
           "README.md",

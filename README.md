@@ -158,6 +158,7 @@ just replay-osc52-st-termination # Hades ST-terminated OSC52 parity replay
 just replay-osc52-multiplexer # Hades TMUX/STY OSC52 wrapper parity replay
 just replay-local-provider   # loopback provider worker PTY replay
 just probe-multi-turn-provider # Hermes multi-turn payload and tool-schema probe
+just probe-tool-schema-semantics # Hermes tool schema semantics without execution
 just probe-model-picker-selection # Hermes model selection side-effect boundary
 just agent validate           # validate task/control-plane invariants
 just agent next               # choose the highest-priority ready task
@@ -287,3 +288,9 @@ completed-turn context, the bounded 31-tool schema shape, and one
 protocol-correct auxiliary non-stream request without executing tools or
 promoting its purpose into Hades behavior. Tool-call execution and the safe
 Hades adapter contract remain future work.
+
+The companion `just probe-tool-schema-semantics` probe records the stable
+31-tool inventory, names, parameter property names/types, required fields, and
+structural schema markers across two ordinary streamed turns. Descriptions are
+represented only by safe digest markers, and the probe never returns or
+executes a tool call.

@@ -1,0 +1,3209 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0109",
+  "surface": "hermes-tui-tool-schema-semantics-boundary",
+  "reference_observation": "OBS-0108",
+  "reference": {
+    "product": "Hermes Agent",
+    "version": "0.19.1",
+    "display_build": "2026.7.30",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "direct PTY with deterministic loopback HTTP/SSE schema recorder"
+    },
+    "capture": "fresh synthetic-home Hermes TUI process with two ordinary prompts and a normalized schema-only request recorder"
+  },
+  "normalization": [
+    "The reference checkout, synthetic HOME/HERMES_HOME paths, prompt and response text, credentials, authorization values, session identifiers, timestamps, and animated redraw bytes are omitted or represented by stable markers.",
+    "The provider is a deterministic 127.0.0.1 fixture owned by the probe; no external network, OAuth flow, tool action, user credential, or private runtime state is used.",
+    "Tool descriptions are reduced to presence, length, and SHA-256 markers; parameter schemas retain names, types, required names, structural keys, shape markers, and counts without copying description text or arbitrary payload values.",
+    "The two ordinary streaming requests are compared for stable schema inventory. The auxiliary non-stream request is recorded separately and is not classified as a retry or promoted into Hades behavior."
+  ],
+  "steps": [
+    {
+      "id": "two-ordinary-prompts",
+      "precondition": "Fresh Hermes TUI at 120x40 with an isolated synthetic HERMES_HOME and a configured custom provider at the probe-owned loopback endpoint.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "first Hermes schema prompt",
+          "bytes_hex": "66 69 72 73 74 20 48 65 72 6d 65 73 20 73 63 68 65 6d 61 20 70 72 6f 6d 70 74"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "text",
+          "value": "second Hermes schema prompt",
+          "bytes_hex": "73 65 63 6f 6e 64 20 48 65 72 6d 65 73 20 73 63 68 65 6d 61 20 70 72 6f 6d 70 74"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "key",
+          "value": "Ctrl+C",
+          "bytes_hex": "03"
+        }
+      ],
+      "output": {
+        "status": "passed",
+        "request_counts": {
+          "auxiliary_nonstream_requests": 1,
+          "chat_requests": 3,
+          "schema_bearing_streaming_requests": 2,
+          "streaming_chat_requests": 2
+        },
+        "schema_stable_across_streaming_turns": true,
+        "schema_inventory": {
+          "present": true,
+          "count": 31,
+          "inventory_sha256": "90bc20dad34193bb183edab4038f4ca4cf220c63de3ebcec63b90fd9d14470bf",
+          "tools": [
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "browser_back",
+                "description": {
+                  "length": 100,
+                  "present": true,
+                  "sha256": "90e80dfe3defec23e562de634528e590cf033ba56a9b9ca04b96e92a91980f8d"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "type"
+                  ],
+                  "property_names": [],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": []
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "browser_click",
+                "description": {
+                  "length": 209,
+                  "present": true,
+                  "sha256": "773e3401f1c2e91c47e7971a1c5effa623f7cde02f0e92e40b70526c208b8cc6"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "required",
+                    "type"
+                  ],
+                  "property_names": [
+                    "ref"
+                  ],
+                  "required": [
+                    "ref"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "ref",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "browser_console",
+                "description": {
+                  "length": 462,
+                  "present": true,
+                  "sha256": "8266666b93fb3611dbf0060234c04ccb3e324cac53cd54369a1959fe31b17bf3"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "type"
+                  ],
+                  "property_names": [
+                    "clear",
+                    "expression"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "clear",
+                      "schema": {
+                        "type": "boolean",
+                        "top_level_keys": [
+                          "default",
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "expression",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "browser_get_images",
+                "description": {
+                  "length": 179,
+                  "present": true,
+                  "sha256": "f21055172ba5f5890b8081e75f1fa0b69d2be7c18c0a8ebe08e35c44a2dee878"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "type"
+                  ],
+                  "property_names": [],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": []
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "browser_navigate",
+                "description": {
+                  "length": 600,
+                  "present": true,
+                  "sha256": "2fde113e5511cacad2ecc66d45a5e1d75162674632e2d538b6b4d3833c91e7ee"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "required",
+                    "type"
+                  ],
+                  "property_names": [
+                    "url"
+                  ],
+                  "required": [
+                    "url"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "url",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "browser_press",
+                "description": {
+                  "length": 145,
+                  "present": true,
+                  "sha256": "da7c35408f76219adf6769282caaaec704cd41f629d78a4f7277e8962601279c"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "required",
+                    "type"
+                  ],
+                  "property_names": [
+                    "key"
+                  ],
+                  "required": [
+                    "key"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "key",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "browser_scroll",
+                "description": {
+                  "length": 158,
+                  "present": true,
+                  "sha256": "3e7615b74ef659e6910beae3818cc702e38d07a64381e84cb65b395b3a941f10"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "required",
+                    "type"
+                  ],
+                  "property_names": [
+                    "direction"
+                  ],
+                  "required": [
+                    "direction"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "direction",
+                      "schema": {
+                        "type": "string",
+                        "enum_count": 2,
+                        "enum_value_kinds": [
+                          "string"
+                        ],
+                        "top_level_keys": [
+                          "description",
+                          "enum",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "browser_snapshot",
+                "description": {
+                  "length": 652,
+                  "present": true,
+                  "sha256": "cb0c793553eec576cec961b0026a9df6622cd2b117a99233bf63faf21447d218"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "type"
+                  ],
+                  "property_names": [
+                    "full"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "full",
+                      "schema": {
+                        "type": "boolean",
+                        "top_level_keys": [
+                          "default",
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "browser_type",
+                "description": {
+                  "length": 171,
+                  "present": true,
+                  "sha256": "a1a1bffc74fac4a7f8cb3f7433cae870011124cc460832652ce888ecd564bebd"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "required",
+                    "type"
+                  ],
+                  "property_names": [
+                    "ref",
+                    "text"
+                  ],
+                  "required": [
+                    "ref",
+                    "text"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "ref",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "text",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "browser_vision",
+                "description": {
+                  "length": 655,
+                  "present": true,
+                  "sha256": "e70acb5777e067c2b7ea2e060a1e9dcd91ce8177cc4355f482412b940bc0177b"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "required",
+                    "type"
+                  ],
+                  "property_names": [
+                    "annotate",
+                    "question"
+                  ],
+                  "required": [
+                    "question"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "annotate",
+                      "schema": {
+                        "type": "boolean",
+                        "top_level_keys": [
+                          "default",
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "question",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "clarify",
+                "description": {
+                  "length": 1365,
+                  "present": true,
+                  "sha256": "caa7d625f22379cfc66f29f7b50aa6760132df9e392d0c43e6b70cacd5039253"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "required",
+                    "type"
+                  ],
+                  "property_names": [
+                    "choices",
+                    "multi_select",
+                    "question"
+                  ],
+                  "required": [
+                    "question"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "choices",
+                      "schema": {
+                        "type": "array",
+                        "top_level_keys": [
+                          "description",
+                          "items",
+                          "maxItems",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        },
+                        "items": {
+                          "type": "string",
+                          "top_level_keys": [
+                            "type"
+                          ],
+                          "description": {
+                            "present": false
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "name": "multi_select",
+                      "schema": {
+                        "type": "boolean",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "question",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "cronjob",
+                "description": {
+                  "length": 1016,
+                  "present": true,
+                  "sha256": "2b69479dc41c9a67ac0962b26a5fe919aefca5b58595bba9a8947a2d20ee816f"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "required",
+                    "type"
+                  ],
+                  "property_names": [
+                    "action",
+                    "attach_to_session",
+                    "context_from",
+                    "deliver",
+                    "enabled_toolsets",
+                    "job_id",
+                    "name",
+                    "no_agent",
+                    "prompt",
+                    "repeat",
+                    "schedule",
+                    "script",
+                    "skills",
+                    "workdir"
+                  ],
+                  "required": [
+                    "action"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "action",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "attach_to_session",
+                      "schema": {
+                        "type": "boolean",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "context_from",
+                      "schema": {
+                        "type": "array",
+                        "top_level_keys": [
+                          "description",
+                          "items",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        },
+                        "items": {
+                          "type": "string",
+                          "top_level_keys": [
+                            "type"
+                          ],
+                          "description": {
+                            "present": false
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "name": "deliver",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "enabled_toolsets",
+                      "schema": {
+                        "type": "array",
+                        "top_level_keys": [
+                          "description",
+                          "items",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        },
+                        "items": {
+                          "type": "string",
+                          "top_level_keys": [
+                            "type"
+                          ],
+                          "description": {
+                            "present": false
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "name": "job_id",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "name",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "no_agent",
+                      "schema": {
+                        "type": "boolean",
+                        "top_level_keys": [
+                          "default",
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "prompt",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "repeat",
+                      "schema": {
+                        "type": "integer",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "schedule",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "script",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "skills",
+                      "schema": {
+                        "type": "array",
+                        "top_level_keys": [
+                          "description",
+                          "items",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        },
+                        "items": {
+                          "type": "string",
+                          "top_level_keys": [
+                            "type"
+                          ],
+                          "description": {
+                            "present": false
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "name": "workdir",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "delegate_task",
+                "description": {
+                  "length": 3974,
+                  "present": true,
+                  "sha256": "36a7c64618aef6e28cef64f538c2251d463b3d72227d8a1ad8146cf7f4296149"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "type"
+                  ],
+                  "property_names": [
+                    "background",
+                    "context",
+                    "goal",
+                    "role",
+                    "tasks"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "background",
+                      "schema": {
+                        "type": "boolean",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "context",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "goal",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "role",
+                      "schema": {
+                        "type": "string",
+                        "enum_count": 2,
+                        "enum_value_kinds": [
+                          "string"
+                        ],
+                        "top_level_keys": [
+                          "description",
+                          "enum",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "tasks",
+                      "schema": {
+                        "type": "array",
+                        "top_level_keys": [
+                          "description",
+                          "items",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        },
+                        "items": {
+                          "type": "object",
+                          "top_level_keys": [
+                            "properties",
+                            "required",
+                            "type"
+                          ],
+                          "property_names": [
+                            "context",
+                            "goal",
+                            "role"
+                          ],
+                          "required": [
+                            "goal"
+                          ],
+                          "description": {
+                            "present": false
+                          },
+                          "properties": [
+                            {
+                              "name": "context",
+                              "schema": {
+                                "type": "string",
+                                "top_level_keys": [
+                                  "description",
+                                  "type"
+                                ],
+                                "description": {
+                                  "present": true
+                                }
+                              }
+                            },
+                            {
+                              "name": "goal",
+                              "schema": {
+                                "type": "string",
+                                "top_level_keys": [
+                                  "description",
+                                  "type"
+                                ],
+                                "description": {
+                                  "present": true
+                                }
+                              }
+                            },
+                            {
+                              "name": "role",
+                              "schema": {
+                                "type": "string",
+                                "enum_count": 2,
+                                "enum_value_kinds": [
+                                  "string"
+                                ],
+                                "top_level_keys": [
+                                  "description",
+                                  "enum",
+                                  "type"
+                                ],
+                                "description": {
+                                  "present": true
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "execute_code",
+                "description": {
+                  "length": 2032,
+                  "present": true,
+                  "sha256": "6e727fa963383499d7f7fbabb7ce84b54e7b38ee8b64366e601fe6a3f9933c32"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "required",
+                    "type"
+                  ],
+                  "property_names": [
+                    "code"
+                  ],
+                  "required": [
+                    "code"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "code",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "memory",
+                "description": {
+                  "length": 1476,
+                  "present": true,
+                  "sha256": "03064e4ad692ae28d199f5facf4268fd82d1ac14aab699c7faeec500e335c023"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "required",
+                    "type"
+                  ],
+                  "property_names": [
+                    "action",
+                    "content",
+                    "old_text",
+                    "operations",
+                    "target"
+                  ],
+                  "required": [
+                    "target"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "action",
+                      "schema": {
+                        "type": "string",
+                        "enum_count": 3,
+                        "enum_value_kinds": [
+                          "string"
+                        ],
+                        "top_level_keys": [
+                          "description",
+                          "enum",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "content",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "old_text",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "operations",
+                      "schema": {
+                        "type": "array",
+                        "top_level_keys": [
+                          "description",
+                          "items",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        },
+                        "items": {
+                          "type": "object",
+                          "top_level_keys": [
+                            "properties",
+                            "required",
+                            "type"
+                          ],
+                          "property_names": [
+                            "action",
+                            "content",
+                            "old_text"
+                          ],
+                          "required": [
+                            "action"
+                          ],
+                          "description": {
+                            "present": false
+                          },
+                          "properties": [
+                            {
+                              "name": "action",
+                              "schema": {
+                                "type": "string",
+                                "enum_count": 3,
+                                "enum_value_kinds": [
+                                  "string"
+                                ],
+                                "top_level_keys": [
+                                  "enum",
+                                  "type"
+                                ],
+                                "description": {
+                                  "present": false
+                                }
+                              }
+                            },
+                            {
+                              "name": "content",
+                              "schema": {
+                                "type": "string",
+                                "top_level_keys": [
+                                  "description",
+                                  "type"
+                                ],
+                                "description": {
+                                  "present": true
+                                }
+                              }
+                            },
+                            {
+                              "name": "old_text",
+                              "schema": {
+                                "type": "string",
+                                "top_level_keys": [
+                                  "description",
+                                  "type"
+                                ],
+                                "description": {
+                                  "present": true
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "name": "target",
+                      "schema": {
+                        "type": "string",
+                        "enum_count": 2,
+                        "enum_value_kinds": [
+                          "string"
+                        ],
+                        "top_level_keys": [
+                          "description",
+                          "enum",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "patch",
+                "description": {
+                  "length": 483,
+                  "present": true,
+                  "sha256": "74c70876ea754836143d3d74d5a43d07a6521a7f8566577ddd888c562fcd404d"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "required",
+                    "type"
+                  ],
+                  "property_names": [
+                    "cross_profile",
+                    "mode",
+                    "new_string",
+                    "old_string",
+                    "patch",
+                    "path",
+                    "replace_all"
+                  ],
+                  "required": [
+                    "mode"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "cross_profile",
+                      "schema": {
+                        "type": "boolean",
+                        "top_level_keys": [
+                          "default",
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "mode",
+                      "schema": {
+                        "type": "string",
+                        "enum_count": 2,
+                        "enum_value_kinds": [
+                          "string"
+                        ],
+                        "top_level_keys": [
+                          "default",
+                          "description",
+                          "enum",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "new_string",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "old_string",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "patch",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "path",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "replace_all",
+                      "schema": {
+                        "type": "boolean",
+                        "top_level_keys": [
+                          "default",
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "process",
+                "description": {
+                  "length": 358,
+                  "present": true,
+                  "sha256": "6cc66d373d7fcf847daed655a1a876d2be51d35106809cea88c3541bfeffa7a7"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "required",
+                    "type"
+                  ],
+                  "property_names": [
+                    "action",
+                    "data",
+                    "limit",
+                    "offset",
+                    "session_id",
+                    "timeout"
+                  ],
+                  "required": [
+                    "action"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "action",
+                      "schema": {
+                        "type": "string",
+                        "enum_count": 8,
+                        "enum_value_kinds": [
+                          "string"
+                        ],
+                        "top_level_keys": [
+                          "description",
+                          "enum",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "data",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "limit",
+                      "schema": {
+                        "type": "integer",
+                        "top_level_keys": [
+                          "description",
+                          "minimum",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "offset",
+                      "schema": {
+                        "type": "integer",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "session_id",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "timeout",
+                      "schema": {
+                        "type": "integer",
+                        "top_level_keys": [
+                          "description",
+                          "minimum",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "read_file",
+                "description": {
+                  "length": 539,
+                  "present": true,
+                  "sha256": "38833f3fb1c19f8e52cd083e5093ac8620e58783b7a3d9a29067f206d8ea4160"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "required",
+                    "type"
+                  ],
+                  "property_names": [
+                    "limit",
+                    "offset",
+                    "path"
+                  ],
+                  "required": [
+                    "path"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "limit",
+                      "schema": {
+                        "type": "integer",
+                        "top_level_keys": [
+                          "default",
+                          "description",
+                          "maximum",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "offset",
+                      "schema": {
+                        "type": "integer",
+                        "top_level_keys": [
+                          "default",
+                          "description",
+                          "minimum",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "path",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "search_files",
+                "description": {
+                  "length": 435,
+                  "present": true,
+                  "sha256": "cc103111426d1eeaa85488b653769c56bb16b6afe4fe56a71434a7332ac7072b"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "required",
+                    "type"
+                  ],
+                  "property_names": [
+                    "context",
+                    "file_glob",
+                    "limit",
+                    "offset",
+                    "output_mode",
+                    "path",
+                    "pattern",
+                    "target"
+                  ],
+                  "required": [
+                    "pattern"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "context",
+                      "schema": {
+                        "type": "integer",
+                        "top_level_keys": [
+                          "default",
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "file_glob",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "limit",
+                      "schema": {
+                        "type": "integer",
+                        "top_level_keys": [
+                          "default",
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "offset",
+                      "schema": {
+                        "type": "integer",
+                        "top_level_keys": [
+                          "default",
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "output_mode",
+                      "schema": {
+                        "type": "string",
+                        "enum_count": 3,
+                        "enum_value_kinds": [
+                          "string"
+                        ],
+                        "top_level_keys": [
+                          "default",
+                          "description",
+                          "enum",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "path",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "default",
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "pattern",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "target",
+                      "schema": {
+                        "type": "string",
+                        "enum_count": 2,
+                        "enum_value_kinds": [
+                          "string"
+                        ],
+                        "top_level_keys": [
+                          "default",
+                          "description",
+                          "enum",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "session_search",
+                "description": {
+                  "length": 4121,
+                  "present": true,
+                  "sha256": "d3efcb2e57dd3daf399d71a29c80b08edbbc6928ba617be3d3d3398574955dcc"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "type"
+                  ],
+                  "property_names": [
+                    "around_message_id",
+                    "limit",
+                    "profile",
+                    "query",
+                    "role_filter",
+                    "session_id",
+                    "sort",
+                    "window"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "around_message_id",
+                      "schema": {
+                        "type": "integer",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "limit",
+                      "schema": {
+                        "type": "integer",
+                        "top_level_keys": [
+                          "default",
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "profile",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "query",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "role_filter",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "session_id",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "sort",
+                      "schema": {
+                        "type": "string",
+                        "enum_count": 2,
+                        "enum_value_kinds": [
+                          "string"
+                        ],
+                        "top_level_keys": [
+                          "description",
+                          "enum",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "window",
+                      "schema": {
+                        "type": "integer",
+                        "top_level_keys": [
+                          "default",
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "skill_manage",
+                "description": {
+                  "length": 2050,
+                  "present": true,
+                  "sha256": "cfa586d11fe9bc79af9803ed5c89069f90eddef88581f66e8a6e95910ecb6547"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "required",
+                    "type"
+                  ],
+                  "property_names": [
+                    "absorbed_into",
+                    "action",
+                    "category",
+                    "content",
+                    "file_content",
+                    "file_path",
+                    "name",
+                    "new_string",
+                    "old_string",
+                    "replace_all"
+                  ],
+                  "required": [
+                    "action",
+                    "name"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "absorbed_into",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "action",
+                      "schema": {
+                        "type": "string",
+                        "enum_count": 6,
+                        "enum_value_kinds": [
+                          "string"
+                        ],
+                        "top_level_keys": [
+                          "description",
+                          "enum",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "category",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "content",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "file_content",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "file_path",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "name",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "new_string",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "old_string",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "replace_all",
+                      "schema": {
+                        "type": "boolean",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "skill_view",
+                "description": {
+                  "length": 360,
+                  "present": true,
+                  "sha256": "d1af9dcf75512032e2b493744bc7d6e8aa283a3c817fca3677c25cf9587f32d6"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "required",
+                    "type"
+                  ],
+                  "property_names": [
+                    "file_path",
+                    "name"
+                  ],
+                  "required": [
+                    "name"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "file_path",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "name",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "skills_list",
+                "description": {
+                  "length": 86,
+                  "present": true,
+                  "sha256": "8cec811139020378bf270ad2f4ef01ee019471009bb63897f7cc4f6cf96a4746"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "type"
+                  ],
+                  "property_names": [
+                    "category"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "category",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "terminal",
+                "description": {
+                  "length": 2324,
+                  "present": true,
+                  "sha256": "19e25b2c33072c96784017f78aa69d0ea03aaecea68bb8feb016af10374f1d31"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "required",
+                    "type"
+                  ],
+                  "property_names": [
+                    "background",
+                    "command",
+                    "notify_on_complete",
+                    "pty",
+                    "timeout",
+                    "watch_patterns",
+                    "workdir"
+                  ],
+                  "required": [
+                    "command"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "background",
+                      "schema": {
+                        "type": "boolean",
+                        "top_level_keys": [
+                          "default",
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "command",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "notify_on_complete",
+                      "schema": {
+                        "type": "boolean",
+                        "top_level_keys": [
+                          "default",
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "pty",
+                      "schema": {
+                        "type": "boolean",
+                        "top_level_keys": [
+                          "default",
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "timeout",
+                      "schema": {
+                        "type": "integer",
+                        "top_level_keys": [
+                          "description",
+                          "minimum",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "watch_patterns",
+                      "schema": {
+                        "type": "array",
+                        "top_level_keys": [
+                          "description",
+                          "items",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        },
+                        "items": {
+                          "type": "string",
+                          "top_level_keys": [
+                            "type"
+                          ],
+                          "description": {
+                            "present": false
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "name": "workdir",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "text_to_speech",
+                "description": {
+                  "length": 394,
+                  "present": true,
+                  "sha256": "11f9b975086ec4a2f11a1092d7959ec7f032d03730ff92b8a489def2309e4f50"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "required",
+                    "type"
+                  ],
+                  "property_names": [
+                    "instructions",
+                    "output_path",
+                    "provider",
+                    "speed",
+                    "text"
+                  ],
+                  "required": [
+                    "text"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "instructions",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "output_path",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "provider",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "speed",
+                      "schema": {
+                        "type": "number",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "text",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "todo",
+                "description": {
+                  "length": 647,
+                  "present": true,
+                  "sha256": "c784f08091eae99e5cbf6b22d1b8f7a502355b344f3fc1a5367bf3d7f57700cb"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "type"
+                  ],
+                  "property_names": [
+                    "merge",
+                    "todos"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "merge",
+                      "schema": {
+                        "type": "boolean",
+                        "top_level_keys": [
+                          "default",
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "todos",
+                      "schema": {
+                        "type": "array",
+                        "top_level_keys": [
+                          "description",
+                          "items",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        },
+                        "items": {
+                          "type": "object",
+                          "top_level_keys": [
+                            "properties",
+                            "required",
+                            "type"
+                          ],
+                          "property_names": [
+                            "content",
+                            "id",
+                            "status"
+                          ],
+                          "required": [
+                            "content",
+                            "id",
+                            "status"
+                          ],
+                          "description": {
+                            "present": false
+                          },
+                          "properties": [
+                            {
+                              "name": "content",
+                              "schema": {
+                                "type": "string",
+                                "top_level_keys": [
+                                  "description",
+                                  "type"
+                                ],
+                                "description": {
+                                  "present": true
+                                }
+                              }
+                            },
+                            {
+                              "name": "id",
+                              "schema": {
+                                "type": "string",
+                                "top_level_keys": [
+                                  "description",
+                                  "type"
+                                ],
+                                "description": {
+                                  "present": true
+                                }
+                              }
+                            },
+                            {
+                              "name": "status",
+                              "schema": {
+                                "type": "string",
+                                "enum_count": 4,
+                                "enum_value_kinds": [
+                                  "string"
+                                ],
+                                "top_level_keys": [
+                                  "description",
+                                  "enum",
+                                  "type"
+                                ],
+                                "description": {
+                                  "present": true
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "vision_analyze",
+                "description": {
+                  "length": 468,
+                  "present": true,
+                  "sha256": "2a4639eb2acab81d225fa497ef67414b556e207d4efba718bb6e2947fdc4fba2"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "required",
+                    "type"
+                  ],
+                  "property_names": [
+                    "image_url",
+                    "question"
+                  ],
+                  "required": [
+                    "image_url",
+                    "question"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "image_url",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "question",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "write_file",
+                "description": {
+                  "length": 387,
+                  "present": true,
+                  "sha256": "54b75c0d90d292707b5fabb35755cb4a56053fe95952c2b8be2122f722371a5e"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "required",
+                    "type"
+                  ],
+                  "property_names": [
+                    "content",
+                    "cross_profile",
+                    "path"
+                  ],
+                  "required": [
+                    "content",
+                    "path"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "content",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "cross_profile",
+                      "schema": {
+                        "type": "boolean",
+                        "top_level_keys": [
+                          "default",
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "path",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "tool_search",
+                "description": {
+                  "length": 834,
+                  "present": true,
+                  "sha256": "7a6fe82fa04dbc25094a5de4dc26832b415bc869b21dd26a0c6b06817c408a65"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "required",
+                    "type"
+                  ],
+                  "property_names": [
+                    "limit",
+                    "query"
+                  ],
+                  "required": [
+                    "query"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "limit",
+                      "schema": {
+                        "type": "integer",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "query",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "tool_describe",
+                "description": {
+                  "length": 131,
+                  "present": true,
+                  "sha256": "b2f092561772715aa1b6fc1d27a3b8fef050893847fe5d2f4c63962abf2f4660"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "required",
+                    "type"
+                  ],
+                  "property_names": [
+                    "name"
+                  ],
+                  "required": [
+                    "name"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "name",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "top_level_keys": [
+                "function",
+                "type"
+              ],
+              "type": "function",
+              "function": {
+                "keys": [
+                  "description",
+                  "name",
+                  "parameters"
+                ],
+                "name": "tool_call",
+                "description": {
+                  "length": 194,
+                  "present": true,
+                  "sha256": "e57f8c7908c34e2b56ed8aaea76ab3c8dbbf140e46426d3a345767b593f8003b"
+                },
+                "strict": null,
+                "parameters": {
+                  "type": "object",
+                  "top_level_keys": [
+                    "properties",
+                    "required",
+                    "type"
+                  ],
+                  "property_names": [
+                    "arguments",
+                    "name"
+                  ],
+                  "required": [
+                    "arguments",
+                    "name"
+                  ],
+                  "description": {
+                    "present": false
+                  },
+                  "properties": [
+                    {
+                      "name": "arguments",
+                      "schema": {
+                        "type": "object",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    },
+                    {
+                      "name": "name",
+                      "schema": {
+                        "type": "string",
+                        "top_level_keys": [
+                          "description",
+                          "type"
+                        ],
+                        "description": {
+                          "present": true
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "request_order": [
+          {
+            "request_kind": "streaming-chat",
+            "prompt_marker": "first-user",
+            "path": "/v1/chat/completions",
+            "content_type": "application/json",
+            "authorization_present": true,
+            "body_keys": [
+              "max_tokens",
+              "messages",
+              "model",
+              "stream",
+              "stream_options",
+              "tools"
+            ],
+            "model": "palette-model",
+            "stream": true,
+            "message_roles": [
+              "system",
+              "user"
+            ],
+            "message_count": 2,
+            "tools": {
+              "present": true,
+              "count": 31,
+              "inventory_sha256": "90bc20dad34193bb183edab4038f4ca4cf220c63de3ebcec63b90fd9d14470bf"
+            }
+          },
+          {
+            "request_kind": "auxiliary-nonstream",
+            "prompt_marker": "unknown",
+            "path": "/v1/chat/completions",
+            "content_type": "application/json",
+            "authorization_present": true,
+            "body_keys": [
+              "messages",
+              "model",
+              "temperature"
+            ],
+            "model": "palette-model",
+            "stream": null,
+            "message_roles": [
+              "system",
+              "user"
+            ],
+            "message_count": 2,
+            "tools": {
+              "present": false,
+              "count": 0,
+              "inventory_sha256": null
+            }
+          },
+          {
+            "request_kind": "streaming-chat",
+            "prompt_marker": "second-user",
+            "path": "/v1/chat/completions",
+            "content_type": "application/json",
+            "authorization_present": true,
+            "body_keys": [
+              "max_tokens",
+              "messages",
+              "model",
+              "stream",
+              "stream_options",
+              "tools"
+            ],
+            "model": "palette-model",
+            "stream": true,
+            "message_roles": [
+              "system",
+              "user",
+              "assistant",
+              "user"
+            ],
+            "message_count": 4,
+            "tools": {
+              "present": true,
+              "count": 31,
+              "inventory_sha256": "90bc20dad34193bb183edab4038f4ca4cf220c63de3ebcec63b90fd9d14470bf"
+            }
+          }
+        ],
+        "responses": [
+          {
+            "answer_marker": "first-assistant",
+            "chunk_count": 3,
+            "content_type": "text/event-stream",
+            "done_marker_sent": true,
+            "path": "/v1/chat/completions",
+            "response_kind": "streaming-sse"
+          },
+          {
+            "answer_marker": "auxiliary",
+            "chunk_count": 1,
+            "content_type": "application/json",
+            "done_marker_sent": false,
+            "path": "/v1/chat/completions",
+            "response_kind": "auxiliary-json"
+          },
+          {
+            "answer_marker": "second-assistant",
+            "chunk_count": 3,
+            "content_type": "text/event-stream",
+            "done_marker_sent": true,
+            "path": "/v1/chat/completions",
+            "response_kind": "streaming-sse"
+          }
+        ],
+        "visible_answers": [
+          "first-assistant",
+          "second-assistant"
+        ],
+        "clean_exit": true,
+        "terminal_restoration": "bounded Ctrl+C cleanup returned the PTY to the reference clean-exit boundary"
+      }
+    }
+  ],
+  "unknowns": [
+    "Tool-call response handling, execution, approval, retries, discovery details, persistence, token accounting, and behavior outside two ordinary completed turns remain unobserved.",
+    "Description text is represented by presence, length, and a digest; private or dynamic description payloads are not copied into the fixture."
+  ]
+}
