@@ -1,0 +1,246 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0116",
+  "reference_observation": "OBS-0114",
+  "surface": "hermes-tui-clarify-question-surface-interaction",
+  "reference": {
+    "product": "Hermes Agent",
+    "version": "0.19.1",
+    "display_build": "2026.7.30",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "direct PTY with deterministic loopback HTTP/SSE completed tool-call fixture"
+    },
+    "capture": "fresh synthetic-home Hermes TUI process with one ordinary prompt, a complete clarify tool-call stream, bounded arrow navigation and one Enter selection on the rendered question surface, and a bounded post-answer observation window"
+  },
+  "normalization": [
+      "The reference checkout, synthetic HOME/HERMES_HOME paths, prompt text, assistant text, tool arguments, credentials, authorization values, session identifiers, timestamps, and redraw bytes are omitted or represented by stable markers or digests.",
+      "The provider is a deterministic 127.0.0.1 fixture owned by the probe; all recorded HTTP traffic stayed on that loopback endpoint and no external network, OAuth flow, browser, tool response, or user credential was used.",
+      "The response retains OpenAI-compatible tool-call delta shape and argument-fragment lengths/digests without copying argument payloads; the [DONE] marker completes the stream so the post-completion question surface can be interacted with.",
+      "clarify is interactive-only; exercising its TUI question surface with arrow navigation and one Enter selection involves no external side effect and does not turn the reference handoff into Hades execution behavior.",
+      "The real Hermes tool-result content is recorded only as normalized shape (role, content kind, length, digest, structural markers and JSON top-level keys); the content itself is never persisted.",
+      "The probe harness strips desktop-app environment leakage (HERMES_DESKTOP, PYTHONPATH) from the reference child so the observation matches the plain-CLI reference environment; the request advertises the anchored 31-tool inventory."
+  ],
+  "steps": [
+    {
+      "id": "clarify-question-surface-interaction",
+      "precondition": "Fresh Hermes TUI at 120x40 with an isolated synthetic HERMES_HOME and a configured custom provider at the probe-owned loopback endpoint.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "<synthetic prompt>",
+          "bytes_hex": "3c 73 79 6e 74 68 65 74 69 63 20 70 72 6f 6d 70 74 3e"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "wait",
+          "value": "clarify question surface rendered (question and choice markers visible)"
+        },
+        {
+          "kind": "key",
+          "value": "ArrowDown",
+          "bytes_hex": "1b 5b 42"
+        },
+        {
+          "kind": "wait",
+          "value": "bounded navigation window (350 ms)"
+        },
+        {
+          "kind": "key",
+          "value": "ArrowUp",
+          "bytes_hex": "1b 5b 41"
+        },
+        {
+          "kind": "wait",
+          "value": "bounded navigation window (350 ms)"
+        },
+        {
+          "kind": "key",
+          "value": "Enter (select first choice)",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "wait",
+          "value": "follow-up answer rendered after selection"
+        }
+      ],
+      "output": {
+        "status": "passed",
+        "provider_request": {
+          "path": "/v1/chat/completions",
+          "authorization_present": true,
+          "request_kind": "streaming-chat",
+          "model": "palette-model",
+          "message_roles": [
+            "system",
+            "user"
+          ],
+          "tools": {
+            "clarify_present": true,
+            "count": 31,
+            "present": true
+          }
+        },
+        "tool_call": {
+          "name": "clarify",
+          "argument_fragments": [
+            {
+              "length": 47,
+              "sequence": 1,
+              "sha256": "71ec2c51d16418579ced336014d10f0311cb371d1aa6b758bb8eb2593b3fe6d1"
+            },
+            {
+              "length": 58,
+              "sequence": 2,
+              "sha256": "23eeb8e9123a40e76902a5d02799f6a686dcad597f76c950793ccf1f372e0f80"
+            }
+          ],
+          "joined_arguments": {
+            "length": 105,
+            "sha256": "45123b5078b8789613e947a1445e1d218b52656d146bc1034d4a15114392735b",
+            "valid_json": true
+          },
+          "finish_reason": "tool_calls",
+          "done_marker_sent": true
+        },
+        "interaction_steps": [
+          {
+            "input": "down",
+            "bytes_hex": "1b 5b 42",
+            "observation_window_ms": 350,
+            "markers": {
+              "question_marker": true,
+              "choice_one_marker": true,
+              "choice_two_marker": true,
+              "tool_call_row": true,
+              "answer_marker": false
+            }
+          },
+          {
+            "input": "up",
+            "bytes_hex": "1b 5b 41",
+            "observation_window_ms": 350,
+            "markers": {
+              "question_marker": true,
+              "choice_one_marker": true,
+              "choice_two_marker": true,
+              "tool_call_row": true,
+              "answer_marker": false
+            }
+          },
+          {
+            "input": "enter-choice-one",
+            "bytes_hex": "0d",
+            "observation_window_ms": 350,
+            "markers": {
+              "question_marker": true,
+              "choice_one_marker": true,
+              "choice_two_marker": false,
+              "tool_call_row": true,
+              "answer_marker": true
+            }
+          }
+        ],
+        "visible_surface_markers": {
+          "assistant_text": true,
+          "answer_text": true,
+          "question_marker": true,
+          "choice_one_marker": true,
+          "choice_two_marker": false,
+          "ready_marker": true
+        },
+        "request_counts": {
+          "chat_requests": 3,
+          "subsequent_chat_requests": 2,
+          "tool_result_requests": 1,
+          "loopback_http_requests": 8
+        },
+        "follow_up_requests": [
+          {
+            "sequence": 2,
+            "request_kind": "streaming-chat",
+            "model": "palette-model",
+            "message_count": 4,
+            "message_roles": [
+              "system",
+              "user",
+              "assistant",
+              "tool"
+            ],
+            "message_content_kinds": [
+              "string",
+              "string",
+              "string",
+              "string"
+            ],
+            "tool_calls_in_history": [
+              false,
+              false,
+              true,
+              false
+            ]
+          },
+          {
+            "sequence": 3,
+            "request_kind": "auxiliary-nonstream",
+            "model": "palette-model",
+            "message_count": 2,
+            "message_roles": [
+              "system",
+              "user"
+            ],
+            "message_content_kinds": [
+              "string",
+              "string"
+            ],
+            "tool_calls_in_history": [
+              false,
+              false
+            ]
+          }
+        ],
+        "real_tool_result_content": {
+          "recorded": true,
+          "content_kind": "string",
+          "length": 158,
+          "sha256": "7336fd6d3442cf141a48045e10672c62d2010fa2720481787488fd93ebfb5d81",
+          "empty": false,
+          "starts_with_brace": true,
+          "json_parseable": true,
+          "json_top_level_keys": [
+            "choices_offered",
+            "question",
+            "user_response"
+          ],
+          "contains_choice_one": true,
+          "contains_choice_two": true,
+          "matches_choice_one": false,
+          "matches_choice_two": false
+        },
+        "side_effect_boundary": {
+          "provider_endpoint": "127.0.0.1 loopback owned by probe",
+          "external_network": "none observed; all recorded HTTP traffic stayed on the synthetic loopback",
+          "credentials": "none; only a synthetic key was placed in the throwaway config and auth values were reduced to presence booleans",
+          "oauth": "not entered",
+          "browser": "not started",
+          "filesystem": "reference runtime state was confined to the throwaway HOME/HERMES_HOME and removed after the probe; no tool-specific path or result was observed",
+          "tool_action": "clarify is interactive-only; only arrow navigation and one Enter selection on the TUI question surface were exercised, with no external side effect"
+        },
+        "clean_exit": true
+      }
+    }
+  ],
+  "unknowns": [
+    "Whether the observed question-surface cursor semantics and tool-result shape are stable across reference restarts; the exact completion/approval/failure semantics remain intentionally bounded by this single fresh observation.",
+    "Provider-specific retries, malformed or truncated argument handling, multiple calls per turn, approval policy, and post-handoff failure behavior remain unknown.",
+    "The purpose of the auxiliary non-stream request seen in OBS-0108/0109/0114/0116 remains unclassified and is not a Hades requirement.",
+    "Cursor-row marker granularity on the question surface was not isolated at cell level in this bounded observation; choice presence/absence markers were recorded instead.",
+    "The reference child environment is sanitized of desktop-app leakage (HERMES_DESKTOP, PYTHONPATH) so the request advertises the anchored 31-tool inventory; other environment-dependent schema text may still vary and remains outside this fixture's claim."
+  ]
+}
