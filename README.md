@@ -158,6 +158,7 @@ just replay-osc52-st-termination # Hades ST-terminated OSC52 parity replay
 just replay-osc52-multiplexer # Hades TMUX/STY OSC52 wrapper parity replay
 just replay-local-provider   # loopback provider worker PTY replay
 just replay-tool-call-deltas # safe Hades tool-call delta parse/accumulate replay
+just prepare-reference     # provision the pinned Hermes reference locally
 just probe-multi-turn-provider # Hermes multi-turn payload and tool-schema probe
 just probe-tool-schema-semantics # Hermes tool schema semantics without execution
 just probe-tool-inventory # Hermes exact 31-tool inventory with descriptions

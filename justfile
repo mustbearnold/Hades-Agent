@@ -5,6 +5,9 @@ check:
 
 verify: check
 
+prepare-reference:
+    bash scripts/prepare_hermes_reference.sh
+
 run *args:
     cargo run --locked --package hades-cli -- {{args}}
 
