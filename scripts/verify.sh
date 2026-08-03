@@ -27,6 +27,7 @@ python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0035-had
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0036-hermes-slash-command-surfaces.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0098-hermes-help-catalog.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0099-hades-configured-help.json
+python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0100-hermes-help-lifecycle.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0038-hermes-model-picker-model-stage.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0039-hades-model-picker-model-stage.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0093-hermes-model-picker-selection.json
@@ -119,6 +120,7 @@ python3 scripts/probe_hermes_osc52_timing_limits.py --report .hades/runtime/herm
 python3 scripts/probe_hermes_terminal_palette.py --report .hades/runtime/hermes-terminal-palette-probe.json --timeout 30
 python3 scripts/probe_hermes_slash_commands.py --report .hades/runtime/hermes-slash-commands-probe.json --timeout 30
 python3 scripts/probe_hermes_help_catalog.py --report .hades/runtime/hermes-help-catalog-probe.json --timeout 60
+python3 scripts/probe_hermes_help_lifecycle.py --report .hades/runtime/hermes-help-lifecycle-probe.json --timeout 60
 python3 scripts/probe_hermes_model_picker.py --report .hades/runtime/hermes-model-picker-probe.json --timeout 30
 python3 scripts/probe_hermes_model_picker_selection.py --report .hades/runtime/hermes-model-picker-selection-probe.json --timeout 30
 python3 scripts/probe_hermes_distinct_model_selection.py --report .hades/runtime/hermes-distinct-model-selection-probe.json --timeout 60

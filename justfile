@@ -147,6 +147,9 @@ probe-slash-commands:
 probe-help-catalog:
     python3 scripts/probe_hermes_help_catalog.py --report .hades/runtime/hermes-help-catalog-probe.json --timeout 60
 
+probe-help-lifecycle:
+    python3 scripts/probe_hermes_help_lifecycle.py --report .hades/runtime/hermes-help-lifecycle-probe.json --timeout 60
+
 probe-model-picker:
     python3 scripts/probe_hermes_model_picker.py --report .hades/runtime/hermes-model-picker-probe.json --timeout 30
 

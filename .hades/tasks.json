@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-02T23:46:46Z",
+  "updated_at": "2026-08-03T00:05:38Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -5679,6 +5679,61 @@
           "scripts/replay_terminal_palette.py",
           ".hades/runtime/differential-replay.json",
           ".hades/runtime/hades-terminal-palette-replay.json",
+          "justfile",
+          "scripts/verify.sh",
+          "README.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-105",
+      "title": "Capture Hermes configured /help lifecycle and safe close boundaries",
+      "status": "complete",
+      "priority": 85,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-104"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "pinned_hermes_reference",
+        "safe_non_side_effecting_key_sequence",
+        "normalized_screen_trace",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Against the pinned Hermes source in a fresh synthetic home and absent loopback endpoint, submit only /help, wait for the stable panel, and probe one safe Escape lifecycle boundary before bounded Ctrl+C cleanup.",
+        "Record whether Escape closes, preserves, or otherwise changes the help panel and composer, separating stable behavior from redraw timing and the still-unknown complete catalog.",
+        "Do not execute side-effecting slash commands, provider requests, credentials, OAuth, external network activity, or inferred command arguments.",
+        "Add provenance-bearing OBS-0100 fixture, repeatable direct-PTY probe, observation document, matrix/context/readme/just/verify wiring, and complete the no-skip gate."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_help_lifecycle.py",
+        "tests/fixtures/parity/OBS-0100-hermes-help-lifecycle.json",
+        "docs/parity/observations/OBS-0100-hermes-help-lifecycle-2026-08-03.md",
+        ".hades/runtime/hermes-help-lifecycle-probe.json",
+        "justfile",
+        "scripts/verify.sh",
+        "README.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md"
+      ],
+      "ready_at": "2026-08-02T23:48:16Z",
+      "claimed_by": "hermes-help-lifecycle-researcher",
+      "claimed_at": "2026-08-02T23:48:31Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Captured Hermes configured /help Escape lifecycle in OBS-0100: one Escape preserves the stable double-bordered help panel and /help composer while the process remains alive; bounded Ctrl+C exits cleanly. The normalized ready-footer marker is absent after Escape and remains an unresolved redraw/state detail. No side-effecting command or provider behavior was exercised; full just verify passes.",
+        "completed_at": "2026-08-03T00:05:38Z",
+        "evidence": [
+          "scripts/probe_hermes_help_lifecycle.py",
+          "tests/fixtures/parity/OBS-0100-hermes-help-lifecycle.json",
+          "docs/parity/observations/OBS-0100-hermes-help-lifecycle-2026-08-03.md",
+          ".hades/runtime/hermes-help-lifecycle-probe.json",
           "justfile",
           "scripts/verify.sh",
           "README.md",

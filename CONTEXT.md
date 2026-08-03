@@ -563,6 +563,11 @@ progress from August 1, 2026 through 2027.
   no provider request, and restores the terminal on Ctrl+C. The unconfigured
   delayed `/help` Setup Required route remains separately covered; Escape is a
   safe convenience, not a claimed Hermes observation.
+- HAD-105 captures the missing configured Hermes `/help` Escape boundary in
+  OBS-0100: one Escape preserves the double-bordered help panel and `/help`
+  composer while the process remains alive, followed by bounded Ctrl+C cleanup.
+  Hermes does not retain the normalized ready-footer marker in that redraw;
+  this is recorded as an unresolved state detail, not provider readiness.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes

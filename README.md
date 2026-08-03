@@ -119,6 +119,7 @@ just replay-differential     # visual + behavioral parity replay
 just replay-composer         # composer editing/history/multiline PTY replay
 just replay-completion       # slash completion and Tab application PTY replay
 just probe-help-catalog      # Hermes stable /help panel reference probe
+just probe-help-lifecycle    # Hermes configured /help Escape lifecycle probe
 just replay-paste            # bracketed paste PTY replay
 just replay-editor             # unchanged-draft editor handoff PTY replay
 just replay-modified-enter     # native modified-Enter direct-PTY replay
@@ -231,6 +232,11 @@ proves the bordered `/help Show available commands` row, the returned `❯ /help
 composer, the ready state, and clean Ctrl+C cleanup without executing another
 command or contacting a provider. Dynamic counts and the complete command
 catalog remain explicitly unknown.
+
+The safe configured `/help` lifecycle is captured by `just probe-help-lifecycle`.
+It proves that one Escape preserves the stable help panel and `/help` composer
+while Hermes remains alive; Ctrl+C remains the bounded cleanup route. Other
+focus, navigation, close, and repeated-help behavior remains unknown.
 
 The installed command path is covered by just replay-installed-model-selection.
 It resolves both hades and Hades in clean Bash and Fish shells, then runs the
