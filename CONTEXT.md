@@ -572,6 +572,13 @@ progress from August 1, 2026 through 2027.
   composer on Escape, matching the stable OBS-0100 lifecycle boundary. Ctrl+C
   remains the proven cleanup path; the unconfigured delayed Setup Required
   route and all other help focus/catalog behavior remain unchanged or unknown.
+- HAD-107 captures OBS-0102 and matches the configured Help resize boundary.
+  Hermes keeps the three-row double-bordered panel one cell from each
+  horizontal edge and immediately above the composer at 120x40, 100x30, and
+  160x50. Hades now uses the responsive Hermes startup surface at those sizes,
+  preserves the typed ready state and `/help` composer, and keeps the bounded
+  no-provider/Ctrl+C lifecycle; smaller-terminal clipping and other Help
+  interactions remain unknown.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes

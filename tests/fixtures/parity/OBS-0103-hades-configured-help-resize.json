@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0103",
+  "surface": "hades-configured-help-resize",
+  "reference": {
+    "product": "Hermes TUI",
+    "version": "0.19.1 (2026.7.30)",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "resize_cases": ["100x30", "160x50"]
+    },
+    "capture": "Hades configured /help resize replay against OBS-0102"
+  },
+  "normalization": [
+    "Binary paths, synthetic HOME/HERMES_HOME paths, loopback ports, timestamps, ANSI redraw bytes, and runtime identifiers are omitted or represented by stable markers.",
+    "The configured endpoint is an absent loopback port; the replay must not issue a provider request or use credentials.",
+    "The oracle checks only the observed Help geometry, composer retention, process liveness, and Ctrl+C terminal cleanup at the three requested sizes.",
+    "Minimum-size clipping, focus/navigation, repeated-help behavior, dynamic catalog behavior, and provider behavior remain unknown."
+  ],
+  "steps": [
+    {
+      "id": "configured-help-resize",
+      "input_sequence": [
+        {"kind": "text", "value": "/help", "bytes_hex": "2f 68 65 6c 70"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "resize", "value": "100x30", "bytes_hex": "54 49 4f 43 53 57 49 4e 5a"},
+        {"kind": "resize", "value": "160x50", "bytes_hex": "54 49 4f 43 53 57 49 4e 5a"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03"}
+      ],
+      "output": {
+        "status": "passed",
+        "panels": [
+          {"columns": 120, "rows": 40, "x": 1, "y": 36, "width": 118, "height": 3, "composer_y": 39},
+          {"columns": 100, "rows": 30, "x": 1, "y": 26, "width": 98, "height": 3, "composer_y": 29},
+          {"columns": 160, "rows": 50, "x": 1, "y": 46, "width": 158, "height": 3, "composer_y": 49}
+        ],
+        "command": "/help Show available commands",
+        "composer": "❯ /help",
+        "process_alive_until": "bounded Ctrl+C cleanup",
+        "provider_request": "not observed",
+        "terminal_restored": true
+      }
+    }
+  ],
+  "unknowns": [
+    "Only the OBS-0102 120x40, 100x30, and 160x50 geometry boundaries are claimed.",
+    "No provider request, credential, OAuth flow, external network, or side-effecting command was exercised."
+  ]
+}

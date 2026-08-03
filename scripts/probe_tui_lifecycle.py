@@ -256,7 +256,7 @@ def run_case(
                         master,
                         output,
                         f"{name}: resize",
-                        lambda text: "Terminal size: 100x30." in text,
+                        lambda text: marker_present(text, "Terminal size: 100x30."),
                         timeout / 3,
                     )
                     resized = True

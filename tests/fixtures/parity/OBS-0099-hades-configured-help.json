@@ -16,7 +16,7 @@
   "normalization": [
     "Binary paths, synthetic HOME/HERMES_HOME paths, loopback ports, timestamps, ANSI redraw bytes, and runtime identifiers are omitted or represented by stable markers.",
     "The configured provider endpoint is an absent loopback port; the replay uses no credential and must not issue a provider request.",
-    "The implementation oracle checks only the OBS-0098 stable bordered command row, main-surface landmarks, ready state, composer, and terminal cleanup.",
+    "The implementation oracle checks only the OBS-0098 stable bordered command row, main-surface landmarks, configured ready state, composer, and terminal cleanup; the bottom Help panel may cover the visible ready footer.",
     "The complete slash-command catalog, aliases, arguments, dynamic inventories, and command-specific behavior remain outside this replay."
   ],
   "steps": [
@@ -57,7 +57,7 @@
           "composer": "❯ /help"
         },
         "stable_samples": 3,
-        "state": "ready",
+        "state": "configured ready state; the bottom help panel covers the visible ready footer",
         "provider_request": "not observed; configured endpoint was an absent loopback port",
         "side_effects": "No provider request, credential, OAuth flow, external network, or other slash command was exercised",
         "clean_exit": true,

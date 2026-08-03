@@ -27,7 +27,6 @@ use ratatui::{
     widgets::{Block, BorderType, Borders, Clear, Paragraph, Wrap},
 };
 
-const HERMES_STARTUP_WIDTH: u16 = 120;
 const HERMES_STARTUP_HEIGHT: u16 = 40;
 const HERMES_STARTUP_FRAME: &str = include_str!("../assets/hermes-startup-120x40.txt");
 const HERMES_BUSY_FOOTER: &str = " ─ musing… │ mulling… │ mock model │ <seconds>s │ voice off │ 1 session                                      ─ <reference-cwd> (main)";
@@ -38,7 +37,6 @@ const HERMES_UNCONFIGURED_MODEL: &str = " │ glm-5.2 · Nous Research          
 const HERMES_UNCONFIGURED_FOOTER: &str = " ─ starting agent… │ glm5.2 │ 0s │ voice off │ 1 session                                      ─ <reference-cwd> (main)";
 const HERMES_CLIPBOARD_MISS: &str = "No image found in clipboard";
 const HERMES_COMPOSER_MAX_CHARS: usize = 117;
-const HERMES_HELP_PANEL_WIDTH: u16 = 118;
 const HERMES_HELP_PANEL_HEIGHT: u16 = 3;
 const HERMES_HELP_COMMAND: &str = "/help Show available commands";
 
@@ -86,7 +84,7 @@ impl HermesPalette {
 }
 
 pub fn draw(frame: &mut Frame<'_>, app: &App) {
-    if frame.area().width == HERMES_STARTUP_WIDTH && frame.area().height == HERMES_STARTUP_HEIGHT {
+    if frame.area().width >= 100 && frame.area().height >= 30 {
         draw_hermes_startup(frame, app);
     } else {
         draw_bootstrap(frame, app);
@@ -285,58 +283,114 @@ fn draw_standalone_terminal_backend_fallback(frame: &mut Frame<'_>) {
 }
 
 fn draw_hermes_startup(frame: &mut Frame<'_>, app: &App) {
-    let mut rows: Vec<String> = HERMES_STARTUP_FRAME.lines().map(str::to_owned).collect();
+    let height = usize::from(frame.area().height);
+    let footer_row = height.saturating_sub(2);
+    let composer_row = height.saturating_sub(1);
+    let template_rows = HERMES_STARTUP_FRAME.lines().collect::<Vec<_>>();
+    let mut rows = vec![String::new(); height];
+    for (row, destination) in rows.iter_mut().enumerate().take(footer_row) {
+        if let Some(template) = template_rows.get(row) {
+            *destination = (*template).to_owned();
+        }
+    }
+    if let Some(footer) = template_rows.get(HERMES_STARTUP_HEIGHT as usize - 2)
+        && let Some(row) = rows.get_mut(footer_row)
+    {
+        *row = (*footer).to_owned();
+    }
+    if let Some(composer) = template_rows.last()
+        && let Some(row) = rows.get_mut(composer_row)
+    {
+        *row = (*composer).to_owned();
+    }
 
     if app.state().startup == StartupState::Unconfigured {
-        rows[26] = HERMES_UNCONFIGURED_MODEL.to_owned();
-        rows[38] = HERMES_UNCONFIGURED_FOOTER.to_owned();
+        if let Some(row) = rows.get_mut(26) {
+            *row = HERMES_UNCONFIGURED_MODEL.to_owned();
+        }
+        if let Some(row) = rows.get_mut(footer_row) {
+            *row = HERMES_UNCONFIGURED_FOOTER.to_owned();
+        }
         if app.state().composer.text().is_empty() {
-            rows[39].clear();
+            if let Some(row) = rows.get_mut(composer_row) {
+                row.clear();
+            }
         } else {
-            draw_hermes_composer(&mut rows, app.state().composer.text());
+            draw_hermes_composer(&mut rows, app.state().composer.text(), composer_row);
         }
     } else if app.state().turn == TurnState::Busy {
-        rows[38] = HERMES_BUSY_FOOTER.to_owned();
-        rows[39] = HERMES_INTERRUPT_PROMPT.to_owned();
+        if let Some(row) = rows.get_mut(footer_row) {
+            *row = HERMES_BUSY_FOOTER.to_owned();
+        }
+        if let Some(row) = rows.get_mut(composer_row) {
+            *row = HERMES_INTERRUPT_PROMPT.to_owned();
+        }
     } else if !app.state().composer.text().is_empty() {
-        draw_hermes_composer(&mut rows, app.state().composer.text());
+        draw_hermes_composer(&mut rows, app.state().composer.text(), composer_row);
     } else if app.state().status == "Interrupted." {
-        rows[37] = HERMES_INTERRUPTED_MARKER.to_owned();
-        rows[38] = HERMES_INTERRUPTED_FOOTER.to_owned();
-        rows[39] = " ❯ <prompt-placeholder>".to_owned();
+        if let Some(row) = rows.get_mut(footer_row.saturating_sub(1)) {
+            *row = HERMES_INTERRUPTED_MARKER.to_owned();
+        }
+        if let Some(row) = rows.get_mut(footer_row) {
+            *row = HERMES_INTERRUPTED_FOOTER.to_owned();
+        }
+        if let Some(row) = rows.get_mut(composer_row) {
+            *row = " ❯ <prompt-placeholder>".to_owned();
+        }
     }
 
-    draw_hermes_response(&mut rows, app);
+    if app.state().status.starts_with("Terminal size:")
+        && let Some(row) = rows.get_mut(footer_row)
+    {
+        *row = format!(" {}", app.state().status);
+    }
+
+    draw_hermes_response(&mut rows, app, footer_row);
 
     if app.state().completion.is_visible() {
-        draw_hermes_completion(&mut rows, app.state().completion.items());
+        draw_hermes_completion(&mut rows, app.state().completion.items(), footer_row);
     }
-    if app.state().status == HERMES_CLIPBOARD_MISS {
-        rows[37] = format!(" │ {HERMES_CLIPBOARD_MISS}");
+    if app.state().status == HERMES_CLIPBOARD_MISS
+        && let Some(row) = rows.get_mut(footer_row.saturating_sub(1))
+    {
+        *row = format!(" │ {HERMES_CLIPBOARD_MISS}");
     }
-    if let Some(model_status) = app.state().status.strip_prefix("model → ") {
-        rows[37] = format!(" │ model → {model_status}");
+    if let Some(model_status) = app.state().status.strip_prefix("model → ")
+        && let Some(row) = rows.get_mut(footer_row.saturating_sub(1))
+    {
+        *row = format!(" │ model → {model_status}");
     }
     if let Some(Notice::UnknownCommand { command }) = &app.state().notice {
-        rows[36] = format!(" Unknown command: {command}");
-        rows[37] = " Type /help for available commands".to_owned();
+        if let Some(row) = rows.get_mut(footer_row.saturating_sub(2)) {
+            *row = format!(" Unknown command: {command}");
+        }
+        if let Some(row) = rows.get_mut(footer_row.saturating_sub(1)) {
+            *row = " Type /help for available commands".to_owned();
+        }
     }
     match &app.state().notice {
         Some(Notice::ProviderError { message }) => {
-            rows[36] = format!(" Provider error: {}", bounded_composer_line(message));
+            if let Some(row) = rows.get_mut(footer_row.saturating_sub(2)) {
+                *row = format!(" Provider error: {}", bounded_composer_line(message));
+            }
         }
         Some(Notice::ProviderCancelled) => {
-            rows[36] = " Provider response cancelled".to_owned();
+            if let Some(row) = rows.get_mut(footer_row.saturating_sub(2)) {
+                *row = " Provider response cancelled".to_owned();
+            }
         }
         _ => {}
     }
 
-    let styled_rows =
-        rows.iter().enumerate().map(|(row, line)| style_hermes_line(row, line)).collect::<Vec<_>>();
+    let styled_rows = rows
+        .iter()
+        .enumerate()
+        .map(|(row, line)| style_hermes_line(row, line, footer_row, composer_row))
+        .collect::<Vec<_>>();
     frame.render_widget(Paragraph::new(Text::from(styled_rows)), frame.area());
 }
 
-fn draw_hermes_response(rows: &mut [String], app: &App) {
+fn draw_hermes_response(rows: &mut [String], app: &App, footer_row: usize) {
     let Some(message) =
         app.state().messages.iter().rev().find(|message| message.role == Role::Assistant)
     else {
@@ -344,20 +398,21 @@ fn draw_hermes_response(rows: &mut [String], app: &App) {
     };
 
     let lines = message.content.split('\n').collect::<Vec<_>>();
-    let end = 37usize.min(rows.len().saturating_sub(1));
-    let available = end.saturating_sub(32) + 1;
+    let end = footer_row.saturating_sub(1).min(rows.len().saturating_sub(1));
+    let start_row = end.saturating_sub(5);
+    let available = end.saturating_sub(start_row) + 1;
     let start = lines.len().saturating_sub(available);
     for (offset, line) in lines[start..].iter().enumerate() {
-        let row = 32 + offset;
+        let row = start_row + offset;
         if row <= end {
             rows[row] = format!(" {}", bounded_composer_line(line));
         }
     }
 }
 
-fn draw_hermes_composer(rows: &mut [String], input: &str) {
+fn draw_hermes_composer(rows: &mut [String], input: &str, composer_row: usize) {
     let lines: Vec<&str> = input.split('\n').collect();
-    let start = 39usize.saturating_sub(lines.len().saturating_sub(1));
+    let start = composer_row.saturating_sub(lines.len().saturating_sub(1));
     if start >= rows.len() {
         return;
     }
@@ -382,8 +437,8 @@ fn bounded_composer_line(line: &str) -> String {
     line.chars().rev().take(HERMES_COMPOSER_MAX_CHARS).collect::<String>().chars().rev().collect()
 }
 
-fn draw_hermes_completion(rows: &mut [String], items: &[String]) {
-    let header_row = 33usize;
+fn draw_hermes_completion(rows: &mut [String], items: &[String], footer_row: usize) {
+    let header_row = footer_row.saturating_sub(5);
     if header_row < rows.len() {
         rows[header_row] = "  completions".to_owned();
     }
@@ -399,21 +454,26 @@ fn draw_hermes_completion(rows: &mut [String], items: &[String]) {
     }
 }
 
-fn style_hermes_line(row: usize, line: &str) -> Line<'static> {
+fn style_hermes_line(
+    row: usize,
+    line: &str,
+    footer_row: usize,
+    composer_row: usize,
+) -> Line<'static> {
     let mut markers = Vec::new();
     match row {
         7 => markers.push(("Nous Research", HERMES_PALETTE.secondary())),
         11 => markers.push(("Hermes Agent", HERMES_PALETTE.brand())),
         14 => markers.push(("Available Tools", HERMES_PALETTE.brand())),
         25 => markers.push(("Available Skills", HERMES_PALETTE.brand())),
-        38 => {
+        _ if row == footer_row => {
             markers.push(("ready", HERMES_PALETTE.ready()));
             markers.push(("✓", HERMES_PALETTE.secondary()));
         }
-        39 if line.contains("Ctrl+C to interrupt") => {
+        _ if row == composer_row && line.contains("Ctrl+C to interrupt") => {
             markers.push(("Ctrl+C to interrupt", HERMES_PALETTE.busy_interrupt()));
         }
-        39 if line.contains("❯ ") => {
+        _ if row == composer_row && line.contains("❯ ") => {
             return Line::styled(line.to_owned(), HERMES_PALETTE.composer());
         }
         _ => {}
@@ -497,10 +557,20 @@ fn draw_setup_required_overlay(frame: &mut Frame<'_>, app: &App) {
 }
 
 fn draw_help_overlay(frame: &mut Frame<'_>) {
-    let area = centered_rect(frame.area(), HERMES_HELP_PANEL_WIDTH, HERMES_HELP_PANEL_HEIGHT);
+    let frame_area = frame.area();
+    let height = HERMES_HELP_PANEL_HEIGHT.min(frame_area.height);
+    let width = frame_area.width.saturating_sub(2);
+    let area = Rect {
+        x: frame_area.x + frame_area.width.saturating_sub(width) / 2,
+        y: frame_area.y + frame_area.height.saturating_sub(height + 1),
+        width,
+        height,
+    };
     let panel = Paragraph::new(Line::raw(HERMES_HELP_COMMAND))
         .block(Block::default().borders(Borders::ALL).border_type(BorderType::Double));
-    frame.render_widget(Clear, area);
+    let clear_area =
+        Rect { x: frame_area.x, y: area.y, width: frame_area.width, height: area.height };
+    frame.render_widget(Clear, clear_area);
     frame.render_widget(panel, area);
 }
 
@@ -920,6 +990,8 @@ mod tests {
 
     use super::*;
 
+    const HERMES_STARTUP_WIDTH: u16 = 120;
+
     fn hermes_cell_style(app: &App, column: u16, row: u16) -> (Color, Color, Modifier) {
         let backend = TestBackend::new(HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
         let mut terminal = Terminal::new(backend).expect("TestBackend construction is infallible");
@@ -1315,7 +1387,7 @@ mod tests {
         assert!(rendered.lines().any(|line| line.contains(HERMES_HELP_COMMAND)));
         assert!(rendered.lines().any(|line| line.contains(&bottom_border)));
         assert!(rendered.contains("❯ /help"));
-        assert!(rendered.contains("─ ready │"));
+        assert_eq!(app.state().turn, TurnState::Ready);
         assert!(!rendered.contains("Setup Required"));
 
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Escape));
@@ -1324,6 +1396,31 @@ mod tests {
         assert!(after_escape.contains(HERMES_HELP_COMMAND));
         assert!(after_escape.contains("❯ /help"));
         assert!(!after_escape.contains("Setup Required"));
+    }
+
+    #[test]
+    fn configured_help_panel_tracks_bottom_geometry_at_resized_surfaces() {
+        let mut app = App::new();
+        for character in "/help".chars() {
+            app.handle(hades_core::InputEvent::Key(hades_core::Key::Char(character)));
+        }
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
+
+        for (columns, rows) in [(100usize, 30usize), (160, 50)] {
+            let rendered = snapshot(&app, columns as u16, rows as u16);
+            let lines = rendered.lines().collect::<Vec<_>>();
+            let top_border = format!("╔{}╗", "═".repeat(columns - 4));
+            let bottom_border = format!("╚{}╝", "═".repeat(columns - 4));
+            let command_row = lines
+                .iter()
+                .position(|line| line.contains(HERMES_HELP_COMMAND))
+                .expect("help command row");
+
+            assert_eq!(command_row, rows - 3);
+            assert!(lines[command_row - 1].contains(&top_border));
+            assert!(lines[command_row + 1].contains(&bottom_border));
+            assert_eq!(lines[rows - 1].trim(), "❯ /help");
+        }
     }
 
     #[test]

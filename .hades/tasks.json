@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-03T00:42:08Z",
+  "updated_at": "2026-08-03T01:16:52Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -5794,6 +5794,74 @@
           "tests/fixtures/parity/OBS-0101-hades-configured-help-lifecycle.json",
           "docs/parity/observations/OBS-0101-hades-help-lifecycle-2026-08-03.md",
           ".hades/runtime/configured-help-lifecycle-replay.json",
+          "justfile",
+          "scripts/verify.sh",
+          "README.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-107",
+      "title": "Capture and match configured Help resize boundaries",
+      "status": "complete",
+      "priority": 83,
+      "lane": "parity",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-106"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "pinned_hermes_reference",
+        "safe_pty_resize_trace",
+        "normalized_geometry_fixture",
+        "focused_tui_snapshot",
+        "configured_help_resize_replay",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Against the pinned Hermes source in a fresh synthetic home and absent loopback endpoint, submit only /help at 120x40, wait for the stable panel, then apply safe PTY resizes to 100x30 and 160x50 before bounded Ctrl+C cleanup.",
+        "Record normalized Help panel width, height, position, bordered command row, /help composer, liveness, and terminal restoration at each observed size; keep minimum-size clipping, focus, catalog, and redraw timing outside the claim unless directly stable in the capture.",
+        "Replay the same safe size sequence against Hades and make the typed Help overlay responsive at the observed seam if it differs; preserve the configured ready state, composer, no-provider boundary, unconfigured delayed Setup Required route, and Rust performance without copying Hermes defects.",
+        "Add provenance-bearing OBS-0102 reference and Hades fixtures, repeatable direct-PTY probe/replay, focused geometry tests, matrix/context/readme/just/verify wiring, and complete the no-skip gate before completion."
+      ],
+      "evidence": [
+        "crates/hades-tui/src/lib.rs",
+        "scripts/probe_hermes_help_resize.py",
+        "tests/fixtures/parity/OBS-0102-hermes-help-resize.json",
+        "docs/parity/observations/OBS-0102-hermes-help-resize-2026-08-03.md",
+        "scripts/replay_configured_help_resize.py",
+        "tests/fixtures/parity/OBS-0103-hades-configured-help-resize.json",
+        "docs/parity/observations/OBS-0103-hades-help-resize-2026-08-03.md",
+        ".hades/runtime/hermes-help-resize-probe.json",
+        ".hades/runtime/configured-help-resize-replay.json",
+        "scripts/probe_tui_lifecycle.py",
+        "justfile",
+        "scripts/verify.sh",
+        "README.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md"
+      ],
+      "ready_at": "2026-08-03T00:48:00Z",
+      "claimed_by": "hades-help-resize-implementer",
+      "claimed_at": "2026-08-03T00:46:49Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Captured Hermes configured Help resize geometry and matched it in Hades responsive rendering; focused tests, replays, probes, and full just verify pass.",
+        "completed_at": "2026-08-03T01:16:52Z",
+        "evidence": [
+          "crates/hades-tui/src/lib.rs",
+          "scripts/probe_hermes_help_resize.py",
+          "tests/fixtures/parity/OBS-0102-hermes-help-resize.json",
+          "docs/parity/observations/OBS-0102-hermes-help-resize-2026-08-03.md",
+          "scripts/replay_configured_help_resize.py",
+          "tests/fixtures/parity/OBS-0103-hades-configured-help-resize.json",
+          "docs/parity/observations/OBS-0103-hades-help-resize-2026-08-03.md",
+          ".hades/runtime/hermes-help-resize-probe.json",
+          ".hades/runtime/configured-help-resize-replay.json",
+          "scripts/probe_tui_lifecycle.py",
           "justfile",
           "scripts/verify.sh",
           "README.md",

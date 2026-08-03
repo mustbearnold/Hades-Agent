@@ -100,6 +100,8 @@ just replay-fresh-shell-launch # fresh Bash/Fish command resolution and installe
 just replay-vertical-slice    # setup -> local provider/model -> prompt -> streamed answer
 just replay-configured-help   # configured /help panel parity replay
 just replay-configured-help-lifecycle # configured /help Escape lifecycle replay
+just probe-help-resize         # Hermes configured /help geometry across safe resizes
+just replay-configured-help-resize # Hades configured /help resize parity replay
 just replay-model-selection   # session model selection -> effective request -> fresh-process reset
 just probe-distinct-model-selection # Hermes alternate-model effectiveness and persistence probe
 just replay-installed-model-selection # release hades/Hades aliases -> same vertical slice
@@ -216,6 +218,11 @@ catalog and dynamic inventory remain explicitly unknown.
 The matching lifecycle replay is `just replay-configured-help-lifecycle`. It
 proves the OBS-0100 Escape boundary: the Help overlay and `/help` composer stay
 visible while Hades remains alive, then Ctrl+C restores the terminal and exits.
+
+Resize parity is covered by `just probe-help-resize` and
+`just replay-configured-help-resize`. They verify the bottom-anchored Help
+panel and final-row composer at 120x40, 100x30, and 160x50 without making a
+provider request.
 
 Model selection is covered by the focused model-selection replay. It selects
 palette-model in one configured process, proves that the next explicit request

@@ -22,8 +22,10 @@ The child runs in a fresh synthetic `HOME`/`HERMES_HOME` at 120x40 with a
 configured but intentionally absent loopback endpoint and no credentials. It
 submits only `/help`, waits for three identical screen samples, then sends the
 observed Ctrl+C cleanup key. The replay proves the four stable main-surface
-markers, exact double-border landmarks, ready state, no setup-required overlay,
-and canonical/echo terminal restoration.
+markers, exact double-border landmarks, configured ready state, no
+setup-required overlay, and canonical/echo terminal restoration. The bottom
+Help panel covers the visible ready footer at this geometry, matching the
+reference lifecycle boundary.
 
 No provider request, credential, OAuth flow, external network, or other slash
 command is exercised.

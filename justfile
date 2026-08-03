@@ -44,6 +44,13 @@ replay-configured-help-lifecycle:
     cargo build --locked --package hades-cli
     python3 scripts/replay_configured_help_lifecycle.py --binary target/debug/hades --report .hades/runtime/configured-help-lifecycle-replay.json --timeout 60
 
+probe-help-resize:
+    python3 scripts/probe_hermes_help_resize.py --report .hades/runtime/hermes-help-resize-probe.json --timeout 60
+
+replay-configured-help-resize:
+    cargo build --locked --package hades-cli
+    python3 scripts/replay_configured_help_resize.py --binary target/debug/hades --report .hades/runtime/configured-help-resize-replay.json --timeout 60
+
 replay-provider-recovery:
     cargo build --locked --package hades-cli
     python3 scripts/replay_provider_recovery.py --binary target/debug/hades --report .hades/runtime/provider-recovery-replay.json
