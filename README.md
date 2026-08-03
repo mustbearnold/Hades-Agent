@@ -99,6 +99,7 @@ just replay-cli-launch        # no-argument and explicit-tui PTY launch replay
 just replay-fresh-shell-launch # fresh Bash/Fish command resolution and installed TUI lifecycle
 just replay-vertical-slice    # setup -> local provider/model -> prompt -> streamed answer
 just replay-configured-help   # configured /help panel parity replay
+just replay-configured-help-lifecycle # configured /help Escape lifecycle replay
 just replay-model-selection   # session model selection -> effective request -> fresh-process reset
 just probe-distinct-model-selection # Hermes alternate-model effectiveness and persistence probe
 just replay-installed-model-selection # release hades/Hades aliases -> same vertical slice
@@ -211,6 +212,10 @@ replays the OBS-0098 stable bordered command row in a fresh configured process,
 keeps the session ready without a provider request, preserves the `/help`
 composer, and verifies clean Ctrl+C terminal restoration. The complete command
 catalog and dynamic inventory remain explicitly unknown.
+
+The matching lifecycle replay is `just replay-configured-help-lifecycle`. It
+proves the OBS-0100 Escape boundary: the Help overlay and `/help` composer stay
+visible while Hades remains alive, then Ctrl+C restores the terminal and exits.
 
 Model selection is covered by the focused model-selection replay. It selects
 palette-model in one configured process, proves that the next explicit request

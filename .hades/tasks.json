@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-03T00:05:38Z",
+  "updated_at": "2026-08-03T00:42:08Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -5734,6 +5734,66 @@
           "tests/fixtures/parity/OBS-0100-hermes-help-lifecycle.json",
           "docs/parity/observations/OBS-0100-hermes-help-lifecycle-2026-08-03.md",
           ".hades/runtime/hermes-help-lifecycle-probe.json",
+          "justfile",
+          "scripts/verify.sh",
+          "README.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-106",
+      "title": "Preserve configured Hades /help on Escape",
+      "status": "complete",
+      "priority": 84,
+      "lane": "implementation",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-105"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "typed_overlay_transition",
+        "focused_state_test",
+        "configured_help_lifecycle_replay",
+        "ctrl_c_cleanup",
+        "unconfigured_help_regression",
+        "full_verify"
+      ],
+      "acceptance": [
+        "In a configured Hades session, submitting /help and pressing Escape preserves the typed Help overlay, bordered command row, /help composer, and live ready process exactly at the OBS-0100 stable boundary.",
+        "Keep Ctrl+C as the bounded clean exit path, issue no provider request, and leave the unconfigured delayed Setup Required route unchanged.",
+        "Add focused app/TUI regression tests plus a sanitized direct-PTY Hades lifecycle fixture/replay wired into just/verify; do not infer other close, focus, catalog, or command semantics.",
+        "Run the complete no-skip gate and record implementation and replay evidence before completion."
+      ],
+      "evidence": [
+        "crates/hades-app/src/lib.rs",
+        "crates/hades-tui/src/lib.rs",
+        "scripts/replay_configured_help_lifecycle.py",
+        "tests/fixtures/parity/OBS-0101-hades-configured-help-lifecycle.json",
+        "docs/parity/observations/OBS-0101-hades-help-lifecycle-2026-08-03.md",
+        ".hades/runtime/configured-help-lifecycle-replay.json",
+        "justfile",
+        "scripts/verify.sh",
+        "README.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md"
+      ],
+      "ready_at": "2026-08-03T00:06:23Z",
+      "claimed_by": "hades-help-escape-implementer",
+      "claimed_at": "2026-08-03T00:06:38Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Implemented configured Hades /help Escape preservation, added the Hermes lifecycle replay boundary, and passed the complete verification gate.",
+        "completed_at": "2026-08-03T00:42:08Z",
+        "evidence": [
+          "crates/hades-app/src/lib.rs",
+          "crates/hades-tui/src/lib.rs",
+          "scripts/replay_configured_help_lifecycle.py",
+          "tests/fixtures/parity/OBS-0101-hades-configured-help-lifecycle.json",
+          "docs/parity/observations/OBS-0101-hades-help-lifecycle-2026-08-03.md",
+          ".hades/runtime/configured-help-lifecycle-replay.json",
           "justfile",
           "scripts/verify.sh",
           "README.md",

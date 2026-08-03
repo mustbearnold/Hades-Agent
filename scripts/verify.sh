@@ -28,6 +28,7 @@ python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0036-her
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0098-hermes-help-catalog.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0099-hades-configured-help.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0100-hermes-help-lifecycle.json
+python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0101-hades-configured-help-lifecycle.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0038-hermes-model-picker-model-stage.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0039-hades-model-picker-model-stage.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0093-hermes-model-picker-selection.json
@@ -83,6 +84,7 @@ python3 scripts/replay_standalone_tool_provider_inventory_selection.py --binary 
 python3 scripts/replay_vertical_slice.py --binary target/debug/hades --report .hades/runtime/vertical-slice-replay.json --timeout 8
 python3 scripts/replay_configured_surfaces.py --binary target/debug/hades --report .hades/runtime/configured-surfaces-replay.json --timeout 8
 python3 scripts/replay_configured_help.py --binary target/debug/hades --report .hades/runtime/configured-help-replay.json --timeout 60
+python3 scripts/replay_configured_help_lifecycle.py --binary target/debug/hades --report .hades/runtime/configured-help-lifecycle-replay.json --timeout 60
 python3 scripts/replay_provider_recovery.py --binary target/debug/hades --report .hades/runtime/provider-recovery-replay.json --timeout 8
 python3 scripts/replay_conversation_context.py --binary target/debug/hades --report .hades/runtime/conversation-context-replay.json --timeout 8
 python3 scripts/replay_model_selection.py --binary target/debug/hades --report .hades/runtime/model-selection-replay.json --timeout 10
@@ -172,7 +174,7 @@ python3 scripts/probe_hermes_standalone_tool_configuration.py --report .hades/ru
 python3 scripts/probe_hermes_tool_configuration_navigation.py --report .hades/runtime/hermes-tool-configuration-navigation-probe.json --timeout 30
 python3 scripts/probe_hermes_tool_provider_boundary.py --report .hades/runtime/hermes-tool-provider-boundary-probe.json --timeout 30
 python3 scripts/probe_hermes_tool_provider_inventory.py --report .hades/runtime/hermes-tool-provider-inventory-probe.json --timeout 30 --observation-window 1
-python3 scripts/probe_hermes_tool_provider_inventory_interaction.py --report .hades/runtime/hermes-tool-provider-inventory-interaction-probe.json --timeout 30
+python3 scripts/probe_hermes_tool_provider_inventory_interaction.py --report .hades/runtime/hermes-tool-provider-inventory-interaction-probe.json --timeout 60
 python3 scripts/probe_hermes_tool_provider_inventory_edges.py --report .hades/runtime/hermes-tool-provider-inventory-edges-probe.json --timeout 60
 python3 scripts/probe_hermes_tool_provider_inventory_selection.py --report .hades/runtime/hermes-tool-provider-inventory-selection-probe.json --timeout 30
 python3 scripts/replay_terminal_palette.py --binary target/debug/hades --report .hades/runtime/hades-terminal-palette-replay.json

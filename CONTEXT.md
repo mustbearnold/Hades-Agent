@@ -568,6 +568,10 @@ progress from August 1, 2026 through 2027.
   composer while the process remains alive, followed by bounded Ctrl+C cleanup.
   Hermes does not retain the normalized ready-footer marker in that redraw;
   this is recorded as an unresolved state detail, not provider readiness.
+- HAD-106 makes configured Hades preserve its typed Help overlay and `/help`
+  composer on Escape, matching the stable OBS-0100 lifecycle boundary. Ctrl+C
+  remains the proven cleanup path; the unconfigured delayed Setup Required
+  route and all other help focus/catalog behavior remain unchanged or unknown.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes

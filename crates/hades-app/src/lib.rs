@@ -335,11 +335,6 @@ impl App {
                     _ => DispatchOutcome::Continue,
                 },
                 Overlay::Help => match key {
-                    Key::Escape => {
-                        self.state.overlay = None;
-                        self.state.status = "Help closed.".to_owned();
-                        DispatchOutcome::Continue
-                    }
                     Key::Ctrl('c') => self.quit(),
                     _ => DispatchOutcome::Continue,
                 },
@@ -1040,7 +1035,7 @@ mod tests {
     }
 
     #[test]
-    fn configured_help_escape_closes_overlay_without_changing_ready_state() {
+    fn configured_help_escape_preserves_overlay_and_composer() {
         let mut app = App::new();
         for character in "/help".chars() {
             app.handle(InputEvent::Key(Key::Char(character)));
@@ -1048,7 +1043,7 @@ mod tests {
         app.handle(InputEvent::Key(Key::Enter));
 
         assert_eq!(app.handle(InputEvent::Key(Key::Escape)), DispatchOutcome::Continue);
-        assert_eq!(app.state().overlay, None);
+        assert_eq!(app.state().overlay, Some(Overlay::Help));
         assert_eq!(app.state().startup, StartupState::Ready);
         assert_eq!(app.state().turn, TurnState::Ready);
         assert_eq!(app.state().composer.text(), "/help");

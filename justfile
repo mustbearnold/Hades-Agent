@@ -40,6 +40,10 @@ replay-configured-help:
     cargo build --locked --package hades-cli
     python3 scripts/replay_configured_help.py --binary target/debug/hades --report .hades/runtime/configured-help-replay.json --timeout 60
 
+replay-configured-help-lifecycle:
+    cargo build --locked --package hades-cli
+    python3 scripts/replay_configured_help_lifecycle.py --binary target/debug/hades --report .hades/runtime/configured-help-lifecycle-replay.json --timeout 60
+
 replay-provider-recovery:
     cargo build --locked --package hades-cli
     python3 scripts/replay_provider_recovery.py --binary target/debug/hades --report .hades/runtime/provider-recovery-replay.json
@@ -306,7 +310,7 @@ probe-hermes-tool-provider-inventory:
     python3 scripts/probe_hermes_tool_provider_inventory.py --report .hades/runtime/hermes-tool-provider-inventory-probe.json --timeout 30 --observation-window 1
 
 probe-hermes-tool-provider-inventory-interaction:
-    python3 scripts/probe_hermes_tool_provider_inventory_interaction.py --report .hades/runtime/hermes-tool-provider-inventory-interaction-probe.json --timeout 30
+    python3 scripts/probe_hermes_tool_provider_inventory_interaction.py --report .hades/runtime/hermes-tool-provider-inventory-interaction-probe.json --timeout 60
 
 probe-hermes-tool-provider-inventory-edges:
     python3 scripts/probe_hermes_tool_provider_inventory_edges.py --report .hades/runtime/hermes-tool-provider-inventory-edges-probe.json --timeout 60

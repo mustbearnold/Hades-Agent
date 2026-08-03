@@ -1317,6 +1317,13 @@ mod tests {
         assert!(rendered.contains("❯ /help"));
         assert!(rendered.contains("─ ready │"));
         assert!(!rendered.contains("Setup Required"));
+
+        app.handle(hades_core::InputEvent::Key(hades_core::Key::Escape));
+        let after_escape = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        assert_eq!(app.state().overlay, Some(Overlay::Help));
+        assert!(after_escape.contains(HERMES_HELP_COMMAND));
+        assert!(after_escape.contains("❯ /help"));
+        assert!(!after_escape.contains("Setup Required"));
     }
 
     #[test]
