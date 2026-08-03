@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-03T09:55:21Z",
+  "updated_at": "2026-08-03T22:06:18Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -6587,6 +6587,444 @@
           ".hades/runtime/tool-call-deltas-replay.json"
         ]
       }
+    },
+    {
+      "id": "HAD-120",
+      "title": "Observe Hermes clarify question surface interaction",
+      "status": "in_progress",
+      "priority": 70,
+      "lane": "research",
+      "owner_role": "observer",
+      "depends_on": [
+        "HAD-119"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "pinned_hermes_reference",
+        "direct_pty_probe",
+        "sanitized_fixture",
+        "bounded_process_stop",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Against the pinned Hermes source in a fresh synthetic HOME/HERMES_HOME with a deterministic loopback provider, submit one ordinary prompt and return a complete streaming tool-call response (fragmented clarify arguments, finish_reason tool_calls, and the terminal [DONE] marker), then wait for the rendered clarify question surface.",
+        "Send only bounded non-submitting inputs on that surface (arrow navigation and one Enter selection of a visible choice) and record exact input bytes, rendered question/choice/cursor markers, request counts including the follow-up chat request carrying the real tool-result content, and the resulting answer; stop before any second clarify turn.",
+        "Record the normalized shape of the real Hermes tool-result content (role, content kind, length, digest) that HAD-119 substituted with a synthetic marker, plus the side-effect boundary; classify any unstable or unobserved transition as explicit unknown rather than guessing.",
+        "Stop the isolated Hermes process with bounded cleanup; do not reproduce a Hermes defect, and do not turn the observed question surface into Hades execution, approval, or forwarding behavior.",
+        "Add a provenance-bearing OBS-0116 fixture, repeatable direct-PTY/loopback probe, observation document, parity matrix/context/readme updates, wire fixture validation and probe wiring through just verify, and complete the no-skip gate before completion."
+      ],
+      "evidence": [],
+      "ready_at": "2026-08-03T10:23:30Z",
+      "claimed_by": "clarify-question-surface-observer",
+      "claimed_at": "2026-08-03T10:23:30Z",
+      "attempts": 1
+    },
+    {
+      "id": "HAD-122",
+      "title": "Fix tall-terminal startup rendering and give the Hades surface its own identity",
+      "status": "complete",
+      "priority": 69,
+      "lane": "visual",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-120"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "typed_state_tests",
+        "snapshot_test",
+        "direct_pty_replay",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Fix the startup-surface rendering bug on terminals taller than the 40-row template: the template body copy must stop before the template's own footer/composer rows so the footer and composer appear exactly once, at the bottom of the screen.",
+        "Give the startup surface a uniquely Hades identity as owner-directed: replace the Hermes branding (HERMES AGENT logo, Nous Research tagline, Hermes Agent title, mock-model \u00b7 Nous Research line) with the Hades-owned frame (HADES AGENT logo, `\u2620 Hades \u00b7 Lord of the Digital Underworld` tagline, `Hades Agent v0.1.0` title, `mock-model \u00b7 Hades` provider line, `glm-5.2 \u00b7 Hades` unconfigured line).",
+        "Document the branding change as a deliberate deviation from the OBS-0001 reference frame (layout/geometry parity preserved); update Hades-facing replay markers, the differential golden, the parity matrix, context, and readme accordingly. Hermes-side probes and reference fixtures keep their Hermes markers.",
+        "Add focused snapshot tests: the product frame matches the Hades-owned asset, the surface is Hades-branded (no Hermes/Nous text), and tall terminals render a single footer/composer at the bottom.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "evidence": [
+        ".hades/runtime/differential-replay.json",
+        ".hades/runtime/cli-launch-replay.json",
+        ".hades/runtime/fresh-shell-launch-replay.json",
+        ".hades/runtime/terminal-palette-replay.json",
+        "crates/hades-tui/assets/hades-startup-120x40.txt"
+      ],
+      "claimed_by": "hades-underworld-implementer",
+      "claimed_at": "2026-08-03T12:17:41Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Fixed the tall-terminal startup rendering bug (template body copy stops before the template's own footer/composer rows) and gave the startup surface its own owner-directed Hades identity (HADES AGENT logo, \u2620 Hades \u00b7 Lord of the Digital Underworld tagline, Hades Agent v0.1.0 title, mock-model \u00b7 Hades provider line, glm-5.2 \u00b7 Hades unconfigured line). Deliberate, documented deviation from OBS-0001 branding; layout/geometry parity preserved; Hades-facing replay markers, differential golden, and OBS-0035 palette fixture updated; Hermes-side probes keep Hermes markers.",
+        "completed_at": "2026-08-03T12:45:01Z",
+        "evidence": [
+          ".hades/runtime/differential-replay.json",
+          ".hades/runtime/cli-launch-replay.json",
+          ".hades/runtime/fresh-shell-launch-replay.json",
+          ".hades/runtime/terminal-palette-replay.json",
+          "crates/hades-tui/assets/hades-startup-120x40.txt"
+        ]
+      }
+    },
+    {
+      "id": "HAD-123",
+      "title": "Migrate dev tooling to Rust: harness foundation crate (hades-dev)",
+      "status": "complete",
+      "priority": 68,
+      "lane": "tooling",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-122"
+      ],
+      "risk": "high",
+      "oracle": [
+        "unit_tests",
+        "full_verify"
+      ],
+      "acceptance": [
+        "New workspace crate crates/hades-dev provides the shared harness primitives: ANSI terminal screen emulator (Screen, Cell, Style, SGR parsing), PTY spawn/control (window sizing, raw mode, terminal flags), and wait/drain/write/stop harness.",
+        "The screen emulator parses the same escape sequences the Python harness parses and is unit-tested against representative captured sequences (SGR colors, cursor movement, clear, alternate screen).",
+        "The Python harness still passes just verify unchanged; the Rust foundation is additive and not yet wired into the gate.",
+        "ADR-0008 records the all-Rust decision and phase plan.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "evidence": [
+        "docs/decisions/ADR-0008-rust-only-development-tooling.md",
+        "crates/hades-dev/src/screen.rs",
+        "crates/hades-dev/src/pty.rs",
+        "scripts/check_screen_parity.py",
+        "crates/hades-dev/src/bin/screen_diff.rs"
+      ],
+      "attempts": 1,
+      "claimed_by": "rust-tooling-migrator",
+      "claimed_at": "2026-08-03T12:47:41Z",
+      "result": {
+        "summary": "Foundation crate for the all-Rust migration (ADR-0008): crates/hades-dev hosts the shared harness primitives every probe and replay depends on. The Rust ANSI screen emulator (Screen, Cell, Style, SGR parsing, cursor motion, erase modes, East Asian Width semantics) and PTY spawn/control harness (openpt/grantpt/unlockpt, window sizing, non-blocking reads, poll-based wait_for, drain, write, stop) are faithful ports of the Python harness. A differential parity check (scripts/check_screen_parity.py, wired into verify-fast and verify) feeds live Hades PTY output through both screen models and requires identical lines, style inventory, and marker styles; it caught and fixed two real semantic differences (braille is narrow per Unicode EAW; marker lookup converts byte to char indices). 14 crate tests + full workspace suite green.",
+        "completed_at": "2026-08-03T20:48:04Z",
+        "evidence": [
+          "docs/decisions/ADR-0008-rust-only-development-tooling.md",
+          "crates/hades-dev/src/screen.rs",
+          "crates/hades-dev/src/pty.rs",
+          "scripts/check_screen_parity.py",
+          "crates/hades-dev/src/bin/screen_diff.rs"
+        ]
+      }
+    },
+    {
+      "id": "HAD-124",
+      "title": "Migrate dev tooling to Rust: fixture validation subcommand",
+      "status": "complete",
+      "priority": 67,
+      "lane": "tooling",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-123"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "unit_tests",
+        "full_verify"
+      ],
+      "acceptance": [
+        "hades-dev validate-fixture reproduces validate_reference_fixture.py semantics: schema_version, provenance, sanitization, and normalization contracts.",
+        "All tests/fixtures/parity/*.json validate identically through the Rust subcommand and the Python validator.",
+        "verify.sh runs the Rust validator for fixtures whose Python validator is removed, with identical report shape.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "evidence": [
+        "crates/hades-dev/src/bin/validate_fixture.rs",
+        "scripts/check_fixture_parity.py",
+        "scripts/verify.sh"
+      ],
+      "attempts": 1,
+      "ready_at": "2026-08-03T20:48:04Z",
+      "claimed_by": "rust-tooling-migrator",
+      "claimed_at": "2026-08-03T20:53:37Z",
+      "result": {
+        "summary": "Ported the reference fixture validator to Rust as the hades-dev validate-fixture subcommand (crates/hades-dev/src/bin/validate_fixture.rs), enforcing identical contracts to scripts/validate_reference_fixture.py: schema_version, provenance (40-char lowercase source_commit, positive terminal geometry), normalization/unknowns string lists, non-empty steps with unique ids, input-event shapes (wait vs bytes_hex hex-digit parity), and the credential scan with the sk- token-boundary regex. A differential check (scripts/check_fixture_parity.py) proves both validators agree on all 111 checked-in fixtures (identical exit codes and JSON summaries); verify.sh and the validate-reference justfile target now run the Rust binary over every fixture, then keep the Python validator until the final migration phase retires it. 7 focused unit tests cover valid, invalid, and credential-boundary cases.",
+        "completed_at": "2026-08-03T20:59:02Z",
+        "evidence": [
+          "crates/hades-dev/src/bin/validate_fixture.rs",
+          "scripts/check_fixture_parity.py",
+          "scripts/verify.sh"
+        ]
+      }
+    },
+    {
+      "id": "HAD-125",
+      "title": "Migrate dev tooling to Rust: control plane subcommand",
+      "status": "complete",
+      "priority": 66,
+      "lane": "tooling",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-123"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "unit_tests",
+        "full_verify"
+      ],
+      "acceptance": [
+        "hades-dev control-plane reproduces scripts/agent/control_plane.py semantics: validate, next, show, claim, complete, block, cancel over .hades/tasks.json with the same JSON outputs and validation errors.",
+        "just agent targets delegate to the Rust subcommand; the Python control plane is removed only after parity is demonstrated on the live ledger.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "evidence": [
+        "crates/hades-dev/src/bin/control_plane.rs",
+        "scripts/check_control_plane_parity.py",
+        "scripts/verify.sh",
+        "justfile"
+      ],
+      "attempts": 1,
+      "ready_at": "2026-08-03T20:48:04Z",
+      "claimed_by": "rust-tooling-migrator",
+      "claimed_at": "2026-08-03T21:00:03Z",
+      "result": {
+        "summary": "Ported the development control plane to Rust as the hades-dev control-plane subcommand, replacing scripts/agent/control_plane.py for just agent and the gate. Reproduces all seven commands (validate, next, show, claim, complete, block, cancel) with identical JSON output and validation errors: schema/status/risk checks, per-task field validation, evidence path rules, dependency existence and cycle detection, required-file and config.toml checks, flock-based exclusive locking with atomic temp-file replace, dependency promotion of queued tasks, and eligibility ordering by priority then id. A parity check (scripts/check_control_plane_parity.py) proves identical validate/next/show output and identical error paths on the live ledger; just agent and verify.sh delegate to the Rust binary. 8 focused unit tests cover validation rules, promotion, cycle detection, duplicate ids, evidence matching, eligibility ordering, and the UTC timestamp format. The full just verify gate (including all three Rust migrations: harness, fixture validator, control plane) passes.",
+        "completed_at": "2026-08-03T21:17:21Z",
+        "evidence": [
+          "crates/hades-dev/src/bin/control_plane.rs",
+          "scripts/check_control_plane_parity.py",
+          "scripts/verify.sh",
+          "justfile"
+        ]
+      }
+    },
+    {
+      "id": "HAD-126",
+      "title": "Migrate dev tooling to Rust: shared replay runtime (spawn/wait/terminal-flags/report)",
+      "status": "complete",
+      "priority": 65,
+      "lane": "tooling",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-125"
+      ],
+      "risk": "high",
+      "oracle": [
+        "unit_tests",
+        "full_verify"
+      ],
+      "acceptance": [
+        "hades-dev provides the shared replay runtime the Python replays import from probe_tui_lifecycle: spawn-with-arguments on a PTY (120x40, TERM/COLUMNS/LINES/HERMES_HOME), wait_for with early-exit detection and output tail diagnostics, wait_for_exit returning a describe_status-shaped value, terminal_flags (canonical/echo via tcgetattr), slave_path_for_pid via /proc resolution, retain/release slave descriptors, marker_present with compact whitespace matching, and ANSI-stripped clean_output.",
+        "The runtime is unit-tested with real subprocesses (echo, stty, sleep) covering spawn, window sizing, early-exit detection, marker matching, and exit status shapes.",
+        "A differential parity script proves the Rust runtime agrees with probe_tui_lifecycle on representative behaviors.",
+        "The Python harness still passes just verify unchanged; the Rust runtime is additive.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "evidence": [
+        "crates/hades-dev/src/replay.rs",
+        "scripts/check_replay_runtime_parity.py",
+        "crates/hades-dev/src/bin/replay_runtime_diff.rs",
+        "scripts/verify.sh"
+      ],
+      "attempts": 1,
+      "ready_at": "2026-08-04T00:00:00Z",
+      "claimed_by": "rust-tooling-migrator",
+      "claimed_at": "2026-08-03T21:29:48Z",
+      "result": {
+        "summary": "Ported the shared replay runtime to Rust as hades-dev::replay: the helpers every Python replay imports from probe_tui_lifecycle \u2014 spawn-with-arguments on a 120x40 PTY with the standard replay environment, slave_path_for_pid resolution via /proc, retained slave descriptors for termios inspection, terminal_flags (canonical/echo), ANSI-stripped clean_output, compact marker_present matching, wait_for with early-exit detection and output-tail diagnostics, wait_for_exit returning describe_status-shaped exit values, send, and write_ready_config. A differential parity check (scripts/check_replay_runtime_parity.py, wired into verify.sh) proves the Rust runtime agrees with the Python helpers on clean output, marker matching, and real-subprocess exit shapes; 8 focused unit tests cover the same behaviors against live subprocesses. The Python harness still passes just verify unchanged; the runtime is additive.",
+        "completed_at": "2026-08-03T21:35:49Z",
+        "evidence": [
+          "crates/hades-dev/src/replay.rs",
+          "scripts/check_replay_runtime_parity.py",
+          "crates/hades-dev/src/bin/replay_runtime_diff.rs",
+          "scripts/verify.sh"
+        ]
+      }
+    },
+    {
+      "id": "HAD-127",
+      "title": "Migrate dev tooling to Rust: replay_cli_launch as hades-dev replay-cli-launch",
+      "status": "complete",
+      "priority": 64,
+      "lane": "tooling",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-126"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "unit_tests",
+        "full_verify"
+      ],
+      "acceptance": [
+        "hades-dev replay-cli-launch reproduces replay_cli_launch.py semantics: no-argument and explicit-tui launch forms, startup markers, raw-mode flags, alternate-screen enter/leave sequences, and exit status, with the same report JSON shape.",
+        "A differential parity check proves the Rust replay and the Python replay produce identical reports on the same binary.",
+        "verify.sh runs the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "evidence": [
+        "crates/hades-dev/src/bin/replay_cli_launch.rs",
+        "scripts/check_cli_launch_parity.py",
+        "scripts/verify.sh",
+        "justfile"
+      ],
+      "attempts": 1,
+      "ready_at": "2026-08-04T00:00:00Z",
+      "claimed_by": "rust-tooling-migrator",
+      "claimed_at": "2026-08-03T21:36:04Z",
+      "result": {
+        "summary": "Ported replay_cli_launch to Rust as hades-dev replay-cli-launch: no-argument and explicit-tui launch forms, startup landmarks, raw-mode flags, alternate-screen enter/leave sequences, Ctrl+C exit status, and terminal restoration, with the same report JSON shape (probe/binary/dimensions/cases/passed). A differential check (scripts/check_cli_launch_parity.py) proves the Rust and Python replays produce identical reports on the same binary; verify.sh and just replay-cli-launch now run the Rust binary as the gate replay.",
+        "completed_at": "2026-08-03T21:40:04Z",
+        "evidence": [
+          "crates/hades-dev/src/bin/replay_cli_launch.rs",
+          "scripts/check_cli_launch_parity.py",
+          "scripts/verify.sh",
+          "justfile"
+        ]
+      }
+    },
+    {
+      "id": "HAD-128",
+      "title": "Migrate dev tooling to Rust: replay_unconfigured_startup",
+      "status": "complete",
+      "priority": 63,
+      "lane": "tooling",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-127"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "unit_tests",
+        "full_verify"
+      ],
+      "acceptance": [
+        "hades-dev replay-unconfigured-startup reproduces replay_unconfigured_startup.py semantics against the OBS-0060 contract: unconfigured startup markers, model line, absent ready state, and the same report JSON shape.",
+        "A differential parity check proves the Rust replay and the Python replay produce identical reports on the same binary.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "evidence": [
+        "crates/hades-dev/src/bin/replay_unconfigured_startup.rs",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile"
+      ],
+      "attempts": 1,
+      "ready_at": "2026-08-04T00:00:00Z",
+      "claimed_by": "rust-tooling-migrator",
+      "claimed_at": "2026-08-03T21:44:59Z",
+      "result": {
+        "summary": "Ported replay_unconfigured_startup to Rust as hades-dev replay-unconfigured-startup: provider-env stripping, unconfigured markers (glm-5.2 \u00b7 Hades, starting agent), absent ready footer and prompt placeholder, raw mode, alternate-screen sequences, and Ctrl+C exit, with the same report JSON shape (probe/binary/dimensions/cases/passed). A differential check (scripts/check_replay_parity.py) proves the Rust and Python replays produce identical reports on the same binary; verify.sh and just replay-unconfigured-startup now run the Rust binary as the gate replay.",
+        "completed_at": "2026-08-03T21:53:32Z",
+        "evidence": [
+          "crates/hades-dev/src/bin/replay_unconfigured_startup.rs",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile"
+        ]
+      }
+    },
+    {
+      "id": "HAD-129",
+      "title": "Migrate dev tooling to Rust: replay_unconfigured_input",
+      "status": "complete",
+      "priority": 62,
+      "lane": "tooling",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-127"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "unit_tests",
+        "full_verify"
+      ],
+      "acceptance": [
+        "hades-dev replay-unconfigured-input reproduces replay_unconfigured_input.py semantics against the OBS-0062 contract: queued input during unconfigured startup, draft visibility, Ctrl+C clearing, and the same report JSON shape.",
+        "A differential parity check proves the Rust replay and the Python replay produce identical reports on the same binary.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "evidence": [
+        "crates/hades-dev/src/bin/replay_unconfigured_input.rs",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile"
+      ],
+      "attempts": 1,
+      "ready_at": "2026-08-04T00:00:00Z",
+      "claimed_by": "rust-tooling-migrator",
+      "claimed_at": "2026-08-03T21:56:58Z",
+      "result": {
+        "summary": "Ported replay_unconfigured_input to Rust as hades-dev replay-unconfigured-input: queued input during unconfigured startup with the composer marker, first Ctrl+C clearing the draft while keeping the process alive, second Ctrl+C exiting cleanly, and the empty-startup exit case, with the same report JSON shape. A differential check (scripts/check_replay_parity.py) proves the Rust and Python replays produce identical reports on the same binary; verify.sh and just replay-unconfigured-input now run the Rust binary as the gate replay.",
+        "completed_at": "2026-08-03T21:56:58Z",
+        "evidence": [
+          "crates/hades-dev/src/bin/replay_unconfigured_input.rs",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile"
+        ]
+      }
+    },
+    {
+      "id": "HAD-130",
+      "title": "Migrate dev tooling to Rust: replay_unconfigured_help",
+      "status": "complete",
+      "priority": 61,
+      "lane": "tooling",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-129"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "unit_tests",
+        "full_verify"
+      ],
+      "acceptance": [
+        "hades-dev replay-unconfigured-help reproduces replay_unconfigured_help.py semantics: /help during unconfigured startup opening the Setup Required surface, the 8000ms route deadline, model/setup/Ctrl+C options, and the same report JSON shape.",
+        "A differential parity check proves the Rust replay and the Python replay produce identical reports on the same binary.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "evidence": [
+        "crates/hades-dev/src/bin/replay_unconfigured_help.rs",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile"
+      ],
+      "attempts": 1,
+      "ready_at": "2026-08-04T00:00:00Z",
+      "claimed_by": "rust-tooling-migrator",
+      "claimed_at": "2026-08-03T21:57:20Z",
+      "result": {
+        "summary": "Ported replay_unconfigured_help to Rust as hades-dev replay-unconfigured-help: the delayed unconfigured /help setup-required route \u2014 /help retained during the 8000ms pre-delay window, delayed Setup Required overlay with /model//setup/Ctrl+C, bounded transition timing (7000-11000ms), first Ctrl+C clearing the overlay without exiting, second Ctrl+C exiting cleanly, and the stable-terminal-flags retry on the post-exec ioctl race (errno 25). The report matches the Python shape; the differential check normalizes the two run-to-run timing fields while both replays assert the same bounds. verify.sh and the justfile targets (replay-unconfigured-help, replay-installed-help) now run the Rust binary as the gate replay for the debug binary and both installed launchers.",
+        "completed_at": "2026-08-03T22:06:18Z",
+        "evidence": [
+          "crates/hades-dev/src/bin/replay_unconfigured_help.rs",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile"
+        ]
+      }
+    },
+    {
+      "id": "HAD-131",
+      "title": "Migrate dev tooling to Rust: replay_vertical_slice",
+      "status": "ready",
+      "priority": 60,
+      "lane": "tooling",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-129"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "unit_tests",
+        "full_verify"
+      ],
+      "acceptance": [
+        "hades-dev replay-vertical-slice reproduces replay_vertical_slice.py semantics: configured loopback journey (/he completion, /model, Ctrl+X sessions, history persistence, clipboard paste, final streamed request), with the same report JSON shape.",
+        "A differential parity check proves the Rust replay and the Python replay produce identical reports on the same binary.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "evidence": [],
+      "attempts": 0,
+      "ready_at": "2026-08-04T00:00:00Z"
     }
   ]
 }

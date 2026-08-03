@@ -99,7 +99,7 @@ def run_first_process(
             fd,
             output,
             "startup",
-            lambda text: "Hermes Agent" in text and marker_present(text, "ready"),
+            lambda text: "Hades Agent" in text and marker_present(text, "ready"),
             timeout,
         )
 
@@ -232,7 +232,7 @@ def run_history_restart(
             fd,
             output,
             "history-restart-startup",
-            lambda text: "Hermes Agent" in text and marker_present(text, "ready"),
+            lambda text: "Hades Agent" in text and marker_present(text, "ready"),
             timeout,
         )
         before_history_request_count = len(server.records)
@@ -287,7 +287,7 @@ def run_clipboard_process(
             fd,
             output,
             "clipboard-startup",
-            lambda text: "Hermes Agent" in text and marker_present(text, "ready"),
+            lambda text: "Hades Agent" in text and marker_present(text, "ready"),
             timeout,
         )
         send(fd, b"\x16")

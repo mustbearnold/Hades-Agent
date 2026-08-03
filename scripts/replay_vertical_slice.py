@@ -289,7 +289,7 @@ def run_chat(binary: Path, home: Path, server: VerticalSliceServer, timeout: flo
             fd,
             output,
             "startup",
-            lambda text: "Hermes Agent" in text and marker_present(text, "ready"),
+            lambda text: "Hades Agent" in text and marker_present(text, "ready"),
             timeout,
         )
         startup = clean_output(bytes(output))

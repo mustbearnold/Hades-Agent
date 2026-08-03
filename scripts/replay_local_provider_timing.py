@@ -115,7 +115,7 @@ def run_case(binary: Path, interrupt: bool, timeout: float) -> dict[str, Any]:
     output = bytearray()
     reaped = False
     try:
-        wait_for(pid, fd, output, case, "startup", lambda text: "Hermes Agent" in text and "ready" in text, timeout)
+        wait_for(pid, fd, output, case, "startup", lambda text: "Hades Agent" in text and "ready" in text, timeout)
         send(fd, b"stream timing probe\r")
         wait_for(pid, fd, output, case, "request", lambda _text: server.request_seen.is_set(), timeout)
         wait_for(pid, fd, output, case, "first-write", lambda _text: server.first_sent.is_set(), timeout)

@@ -364,7 +364,7 @@ def run_tool_call_case(binary: Path, timeout: float) -> dict[str, Any]:
             output,
             case,
             "startup",
-            lambda text: "Hermes Agent" in text and "ready" in text,
+            lambda text: "Hades Agent" in text and "ready" in text,
             timeout,
         )
         send(fd, PROMPT.encode() + b"\r")

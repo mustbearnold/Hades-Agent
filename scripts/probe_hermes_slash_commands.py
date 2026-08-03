@@ -89,7 +89,26 @@ def safe_environment(reference: Path, home: Path) -> dict[str, str]:
             "UV_NO_CONFIG": "1",
         }
     )
-    for key in ("TMUX", "STY", "WAYLAND_DISPLAY", "WSL_INTEROP", "WSL_DISTRO_NAME"):
+    for key in (
+        "TMUX",
+        "STY",
+        "WAYLAND_DISPLAY",
+        "WSL_INTEROP",
+        "WSL_DISTRO_NAME",
+        # GUI-only marker: the pinned reference gates its four desktop tools
+        # (read_terminal/close_terminal/open_preview/focus_pane) on
+        # HERMES_DESKTOP. When this harness runs from inside the Hermes
+        # desktop app, the live environment leaks the marker into the
+        # reference child and the advertised tool inventory drifts from the
+        # anchored 31-tool contract. Strip it so observations match the
+        # plain-CLI reference environment.
+        "HERMES_DESKTOP",
+        # Desktop-app install path: the desktop app exports PYTHONPATH pointing
+        # at its own hermes-agent copy, which would shadow the pinned
+        # checkout's modules (different tool descriptions/schemas) in the
+        # reference child. Strip it so the reference resolves its own code.
+        "PYTHONPATH",
+    ):
         environment.pop(key, None)
     return environment
 

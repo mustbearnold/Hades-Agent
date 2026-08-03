@@ -29,7 +29,7 @@ from probe_tui_lifecycle import (
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_TRACE = ROOT / "tests/fixtures/parity/OBS-0003-submit-interrupt.json"
-DEFAULT_GOLDEN = ROOT / "tests/fixtures/parity/OBS-0001-startup-120x40.txt"
+DEFAULT_GOLDEN = ROOT / "crates/hades-tui/assets/hades-startup-120x40.txt"
 DEFAULT_VISUAL_CONTRACT = ROOT / "tests/fixtures/parity/OBS-0006-busy-interrupt-visual.json"
 DEFAULT_SESSION_TRACE = ROOT / "tests/fixtures/parity/OBS-0007-session-switcher.json"
 DEFAULT_SESSION_CONTRACT = ROOT / "tests/fixtures/parity/OBS-0007-session-switcher.json"
@@ -256,8 +256,8 @@ def run_behavior(
 
     try:
         startup_markers = (
-            "Hermes Agent",
-            "Nous Research",
+            "Hades Agent",
+            "Underworld",
             "Available Tools",
             "Available Skills",
         )
@@ -538,8 +538,8 @@ def run_session_overlay(
 
     try:
         startup_markers = (
-            "Hermes Agent",
-            "Nous Research",
+            "Hades Agent",
+            "Underworld",
             "Available Tools",
             "Available Skills",
         )
@@ -718,8 +718,8 @@ def run_setup_required(
 
     try:
         startup_markers = (
-            "Hermes Agent",
-            "Nous Research",
+            "Hades Agent",
+            "Underworld",
             "Available Tools",
             "Available Skills",
         )

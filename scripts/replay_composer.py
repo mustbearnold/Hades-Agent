@@ -282,7 +282,7 @@ def run_case(
             owned_history_home = Path(tempfile.mkdtemp(prefix=f"{session_prefix}-history-"))
             effective_environment["HERMES_HOME"] = str(owned_history_home)
         start_session(binary, session, effective_environment)
-        startup_markers = ("Hermes Agent", "Nous Research", "Available Tools", "Available Skills")
+        startup_markers = ("Hades Agent", "Underworld", "Available Tools", "Available Skills")
         wait_for_screen(
             session,
             "startup",

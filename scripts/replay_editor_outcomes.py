@@ -98,7 +98,7 @@ def run_case(
                 "EDITOR": case["editor"],
             },
         )
-        startup_markers = ("Hermes Agent", "Nous Research", "Available Tools", "Available Skills")
+        startup_markers = ("Hades Agent", "Underworld", "Available Tools", "Available Skills")
         wait_for_screen(
             session,
             "startup",

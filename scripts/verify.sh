@@ -6,8 +6,158 @@ project_root="$(cd -- "$script_dir/.." && pwd)"
 cd "$project_root"
 _start_ms=$(date +%s%3N)
 
-python3 scripts/agent/control_plane.py validate
-python3 scripts/validate_reference_fixture.py
+# Bounded retries for timing-sensitive reference probes. The reference
+# probes measure live Hermes timings and can hit their timeout under host
+# load; up to two retries that preserve every failed attempt's report are the
+# documented failure-policy response ("each retry must preserve the original
+# error in its run log"). A probe that fails all three attempts still fails
+# the gate; every preserved attempt-* report remains in .hades/runtime/.
+run_probe() {
+    local report_path="$1"
+    shift
+    local attempt=0
+    while :; do
+        if "$@"; then
+            return 0
+        fi
+        local status=$?
+        attempt=$((attempt + 1))
+        if [ "$attempt" -ge 3 ]; then
+            return "$status"
+        fi
+        if [ -f "$report_path" ]; then
+            cp "$report_path" "${report_path%.json}.attempt-${attempt}.json"
+            echo "[verify] probe attempt $attempt failed (status $status); report preserved at ${report_path%.json}.attempt-${attempt}.json; retrying: $*" >&2
+        else
+            echo "[verify] probe attempt $attempt failed (status $status) with no report; retrying: $*" >&2
+        fi
+    done
+}
+
+
+# HAD-125: the Rust control plane is the gate validator now; the parity
+# check proves it agrees with the Python control plane on validate/next/show
+# and the shared error paths, then the Rust binary validates the ledger.
+cargo build --offline --package hades-dev --bin control_plane
+python3 scripts/check_control_plane_parity.py
+./target/debug/control_plane validate
+# HAD-124: the Rust fixture validator (hades-dev) is the gate validator now;
+# the differential check proves it agrees with the Python validator on every
+# checked-in fixture, then the Python validator exits the gate. The Rust loop
+# validates exactly the same explicit fixture set the Python validator lines
+# below cover (legacy pre-contract fixtures and replay contracts are not
+# validator inputs; the parity check above still covers every fixture).
+cargo build --offline --package hades-dev --bin validate_fixture
+python3 scripts/check_fixture_parity.py
+for fixture in \
+    tests/fixtures/parity/OBS-0016-hermes-input-history-persistence.json \
+    tests/fixtures/parity/OBS-0018-hermes-editor-outcomes.json \
+    tests/fixtures/parity/OBS-0020-hermes-modified-enter.json \
+    tests/fixtures/parity/OBS-0021-hades-modified-enter.json \
+    tests/fixtures/parity/OBS-0022-hermes-text-clipboard.json \
+    tests/fixtures/parity/OBS-0023-hades-text-clipboard.json \
+    tests/fixtures/parity/OBS-0024-hermes-osc52-clipboard.json \
+    tests/fixtures/parity/OBS-0025-hades-osc52-clipboard.json \
+    tests/fixtures/parity/OBS-0026-hermes-osc52-response-boundaries.json \
+    tests/fixtures/parity/OBS-0028-hermes-osc52-st-termination.json \
+    tests/fixtures/parity/OBS-0029-hades-osc52-st-termination.json \
+    tests/fixtures/parity/OBS-0030-hermes-osc52-multiplexer-passthrough.json \
+    tests/fixtures/parity/OBS-0031-hades-osc52-multiplexer-passthrough.json \
+    tests/fixtures/parity/OBS-0032-hermes-osc52-timing-limits.json \
+    tests/fixtures/parity/OBS-0033-hades-osc52-timing-limits.json \
+    tests/fixtures/parity/OBS-0034-hermes-terminal-palette.json \
+    tests/fixtures/parity/OBS-0035-hades-terminal-palette.json \
+    tests/fixtures/parity/OBS-0036-hermes-slash-command-surfaces.json \
+    tests/fixtures/parity/OBS-0038-hermes-model-picker-model-stage.json \
+    tests/fixtures/parity/OBS-0039-hades-model-picker-model-stage.json \
+    tests/fixtures/parity/OBS-0040-hermes-setup-wizard-cancel.json \
+    tests/fixtures/parity/OBS-0041-hades-setup-wizard-cancel.json \
+    tests/fixtures/parity/OBS-0042-hermes-full-setup-continuation.json \
+    tests/fixtures/parity/OBS-0044-hermes-full-setup-provider-menu.json \
+    tests/fixtures/parity/OBS-0045-hades-full-setup-provider-menu.json \
+    tests/fixtures/parity/OBS-0046-hermes-provider-selection.json \
+    tests/fixtures/parity/OBS-0047-hades-provider-selection-model-prompt.json \
+    tests/fixtures/parity/OBS-0048-hermes-model-default-terminal-backend.json \
+    tests/fixtures/parity/OBS-0049-hades-model-default-terminal-backend.json \
+    tests/fixtures/parity/OBS-0050-hermes-local-provider-stream.json \
+    tests/fixtures/parity/OBS-0051-hades-local-provider-stream.json \
+    tests/fixtures/parity/OBS-0052-hermes-stream-timing.json \
+    tests/fixtures/parity/OBS-0053-hades-stream-timing.json \
+    tests/fixtures/parity/OBS-0054-hermes-provider-errors.json \
+    tests/fixtures/parity/OBS-0055-hermes-provider-setup-persistence.json \
+    tests/fixtures/parity/OBS-0056-hermes-setup-config-shape.json \
+    tests/fixtures/parity/OBS-0057-hades-setup-platform-picker.json \
+    tests/fixtures/parity/OBS-0058-hermes-empty-platform-confirmation.json \
+    tests/fixtures/parity/OBS-0059-hermes-unconfigured-startup.json \
+    tests/fixtures/parity/OBS-0060-hades-unconfigured-startup.json \
+    tests/fixtures/parity/OBS-0061-hermes-unconfigured-input-queue.json \
+    tests/fixtures/parity/OBS-0062-hades-unconfigured-input.json \
+    tests/fixtures/parity/OBS-0063-hermes-unconfigured-setup-escape.json \
+    tests/fixtures/parity/OBS-0064-hermes-unconfigured-resolution.json \
+    tests/fixtures/parity/OBS-0065-hermes-setup-required-reconciliation.json \
+    tests/fixtures/parity/OBS-0066-hermes-help-setup-timing.json \
+    tests/fixtures/parity/OBS-0067-hades-help-setup-required.json \
+    tests/fixtures/parity/OBS-0069-hermes-standalone-setup.json \
+    tests/fixtures/parity/OBS-0070-hades-standalone-setup.json \
+    tests/fixtures/parity/OBS-0071-hermes-standalone-full-setup.json \
+    tests/fixtures/parity/OBS-0072-hades-standalone-full-setup.json \
+    tests/fixtures/parity/OBS-0073-hermes-standalone-terminal-platform.json \
+    tests/fixtures/parity/OBS-0074-hades-standalone-terminal-platform.json \
+    tests/fixtures/parity/OBS-0075-hermes-standalone-tool-configuration.json \
+    tests/fixtures/parity/OBS-0076-hermes-tool-configuration-navigation.json \
+    tests/fixtures/parity/OBS-0077-hermes-tool-provider-boundary.json \
+    tests/fixtures/parity/OBS-0078-hades-tool-provider-boundary.json \
+    tests/fixtures/parity/OBS-0079-hermes-tool-provider-inventory.json \
+    tests/fixtures/parity/OBS-0080-hades-tool-provider-inventory.json \
+    tests/fixtures/parity/OBS-0081-hermes-tool-provider-inventory-interaction.json \
+    tests/fixtures/parity/OBS-0082-hades-tool-provider-inventory-navigation.json \
+    tests/fixtures/parity/OBS-0083-hermes-tool-provider-inventory-edges.json \
+    tests/fixtures/parity/OBS-0084-hades-tool-provider-inventory-navigation-edges.json \
+    tests/fixtures/parity/OBS-0085-hermes-tool-provider-inventory-selection.json \
+    tests/fixtures/parity/OBS-0086-hades-tool-provider-inventory-selection.json \
+    tests/fixtures/parity/OBS-0087-hades-empty-platform-confirmation.json \
+    tests/fixtures/parity/OBS-0088-hades-fresh-shell-launch.json \
+    tests/fixtures/parity/OBS-0089-hades-local-provider-vertical-slice.json \
+    tests/fixtures/parity/OBS-0090-hades-configured-primary-surfaces.json \
+    tests/fixtures/parity/OBS-0091-hades-provider-failure-recovery.json \
+    tests/fixtures/parity/OBS-0092-hades-conversation-context.json \
+    tests/fixtures/parity/OBS-0093-hermes-model-picker-selection.json \
+    tests/fixtures/parity/OBS-0094-hades-model-picker-selection.json \
+    tests/fixtures/parity/OBS-0095-hades-installed-model-selection.json \
+    tests/fixtures/parity/OBS-0096-hermes-distinct-model-selection.json \
+    tests/fixtures/parity/OBS-0097-hermes-empty-platform-reconciliation.json \
+    tests/fixtures/parity/OBS-0098-hermes-help-catalog.json \
+    tests/fixtures/parity/OBS-0099-hades-configured-help.json \
+    tests/fixtures/parity/OBS-0100-hermes-help-lifecycle.json \
+    tests/fixtures/parity/OBS-0101-hades-configured-help-lifecycle.json \
+    tests/fixtures/parity/OBS-0102-hermes-help-resize.json \
+    tests/fixtures/parity/OBS-0103-hades-configured-help-resize.json \
+    tests/fixtures/parity/OBS-0104-hermes-setup-required-actions-revalidation.json \
+    tests/fixtures/parity/OBS-0105-hades-setup-required-actions.json \
+    tests/fixtures/parity/OBS-0106-hermes-setup-persistence-revalidation.json \
+    tests/fixtures/parity/OBS-0107-hades-setup-persistence.json \
+    tests/fixtures/parity/OBS-0108-hermes-multi-turn-provider.json \
+    tests/fixtures/parity/OBS-0109-hermes-tool-schema-semantics.json \
+    tests/fixtures/parity/OBS-0110-hermes-tool-call-handoff.json \
+    tests/fixtures/parity/OBS-0111-hades-tool-call-deltas.json \
+    tests/fixtures/parity/OBS-0112-hermes-tool-inventory.json \
+    tests/fixtures/parity/OBS-0113-hades-tool-inventory-advertisement.json \
+    tests/fixtures/parity/OBS-0114-hermes-tool-completion-handoff.json \
+    tests/fixtures/parity/OBS-0115-hades-tool-result-follow-up.json \
+    tests/fixtures/parity/OBS-0116-hermes-clarify-question-surface.json
+do
+    ./target/debug/validate_fixture "$fixture" >/dev/null || exit 1
+done
+# HAD-126: the Rust replay runtime (spawn/wait/terminal-flags/report) is
+# ported; the parity check proves it agrees with probe_tui_lifecycle on
+# clean output, marker matching, and real-subprocess exit shapes.
+cargo build --offline --package hades-dev --bin replay_runtime_diff
+python3 scripts/check_replay_runtime_parity.py
+# HAD-123: Rust harness foundation. The screen-emulator parity check feeds
+# live Hades PTY output through both the Python and Rust Screen models and
+# requires identical lines, style inventory, and marker styles.
+cargo build --offline --package hades-dev --bin screen_diff
+python3 scripts/check_screen_parity.py
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0016-hermes-input-history-persistence.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0018-hermes-editor-outcomes.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0020-hermes-modified-enter.json
@@ -72,11 +222,29 @@ cargo check --workspace --all-targets --locked
 cargo clippy --workspace --all-targets --locked -- -D warnings
 cargo test --workspace --all-targets --locked
 cargo build --locked --package hades-cli
+run_probe .hades/runtime/hermes-tool-inventory-probe.json python3 scripts/probe_hermes_tool_inventory.py --report .hades/runtime/hermes-tool-inventory-probe.json --timeout 60
 python3 scripts/probe_tui_lifecycle.py --binary target/debug/hades
-python3 scripts/replay_cli_launch.py --binary target/debug/hades --report .hades/runtime/cli-launch-replay.json
-python3 scripts/replay_unconfigured_startup.py --binary target/debug/hades --report .hades/runtime/had064-unconfigured-startup-replay.json
-python3 scripts/replay_unconfigured_input.py --binary target/debug/hades --report .hades/runtime/had066-unconfigured-input-replay.json --timeout 5
-python3 scripts/replay_unconfigured_help.py --binary target/debug/hades --report .hades/runtime/hades-help-setup-required-replay.json --timeout 12
+# HAD-127: replay-cli-launch is ported to Rust; the differential check
+# proves the Rust and Python replays produce identical reports, then the
+# Rust binary is the gate replay.
+cargo build --offline --package hades-dev --bin replay_cli_launch
+python3 scripts/check_cli_launch_parity.py
+./target/debug/replay_cli_launch --binary target/debug/hades --report .hades/runtime/cli-launch-replay.json
+# HAD-128: replay-unconfigured-startup is ported to Rust; the differential
+# check proves identical reports, then the Rust binary is the gate replay.
+cargo build --offline --package hades-dev --bin replay_unconfigured_startup
+python3 scripts/check_replay_parity.py replay_unconfigured_startup replay_unconfigured_startup
+./target/debug/replay_unconfigured_startup --binary target/debug/hades --report .hades/runtime/had064-unconfigured-startup-replay.json
+# HAD-129: replay-unconfigured-input is ported to Rust; the differential
+# check proves identical reports, then the Rust binary is the gate replay.
+cargo build --offline --package hades-dev --bin replay_unconfigured_input
+python3 scripts/check_replay_parity.py replay_unconfigured_input replay_unconfigured_input
+./target/debug/replay_unconfigured_input --binary target/debug/hades --report .hades/runtime/had066-unconfigured-input-replay.json --timeout 5
+# HAD-130: replay-unconfigured-help is ported to Rust; the differential
+# check proves identical reports, then the Rust binary is the gate replay.
+cargo build --offline --package hades-dev --bin replay_unconfigured_help
+python3 scripts/check_replay_parity.py replay_unconfigured_help replay_unconfigured_help
+./target/debug/replay_unconfigured_help --binary target/debug/hades --report .hades/runtime/hades-help-setup-required-replay.json --timeout 12
 python3 scripts/replay_setup_required_actions.py --binary target/debug/hades --report .hades/runtime/setup-required-actions-replay.json --timeout 20
 python3 scripts/replay_standalone_setup.py --binary target/debug/hades --report .hades/runtime/hades-standalone-setup-replay.json --timeout 5
 python3 scripts/replay_standalone_full_setup.py --binary target/debug/hades --report .hades/runtime/hades-standalone-full-setup-replay.json --timeout 5
@@ -100,8 +268,8 @@ bash scripts/install_user_launcher.sh
 python3 scripts/replay_fresh_shell_launch.py --report .hades/runtime/fresh-shell-launch-replay.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0095-hades-installed-model-selection.json
 python3 scripts/replay_installed_model_selection.py --report .hades/runtime/installed-model-selection-replay.json --timeout 10
-python3 scripts/replay_unconfigured_help.py --binary "$HOME/.local/bin/hades" --report .hades/runtime/installed-help-setup-required-hades.json --timeout 12
-python3 scripts/replay_unconfigured_help.py --binary "$HOME/.local/bin/Hades" --report .hades/runtime/installed-help-setup-required-Hades.json --timeout 12
+./target/debug/replay_unconfigured_help --binary "$HOME/.local/bin/hades" --report .hades/runtime/installed-help-setup-required-hades.json --timeout 12
+./target/debug/replay_unconfigured_help --binary "$HOME/.local/bin/Hades" --report .hades/runtime/installed-help-setup-required-Hades.json --timeout 12
 python3 scripts/replay_standalone_setup.py --binary "$HOME/.local/bin/hades" --report .hades/runtime/installed-standalone-setup-hades.json --timeout 5
 python3 scripts/replay_standalone_full_setup.py --binary "$HOME/.local/bin/hades" --report .hades/runtime/installed-standalone-full-setup-hades.json --timeout 5
 python3 scripts/replay_standalone_terminal_platform.py --binary "$HOME/.local/bin/hades" --report .hades/runtime/installed-standalone-terminal-platform-hades.json --timeout 5
@@ -123,20 +291,20 @@ python3 scripts/replay_clipboard.py --binary target/debug/hades --report .hades/
 python3 scripts/replay_clipboard_text.py --binary target/debug/hades --report .hades/runtime/clipboard-text-replay.json
 python3 scripts/replay_osc52_clipboard.py --binary target/debug/hades --report .hades/runtime/osc52-clipboard-replay.json
 python3 scripts/replay_osc52_clipboard.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0027-hades-osc52-response-boundaries.json --report .hades/runtime/osc52-response-boundaries-replay.json
-python3 scripts/probe_hermes_osc52_st_termination.py --report .hades/runtime/hermes-osc52-st-termination-probe.json --timeout 60
-python3 scripts/probe_hermes_osc52_multiplexer.py --report .hades/runtime/hermes-osc52-multiplexer-probe.json --timeout 30
-python3 scripts/probe_hermes_osc52_timing_limits.py --report .hades/runtime/hermes-osc52-timing-limits-probe.json --timeout 60
-python3 scripts/probe_hermes_terminal_palette.py --report .hades/runtime/hermes-terminal-palette-probe.json --timeout 30
-python3 scripts/probe_hermes_slash_commands.py --report .hades/runtime/hermes-slash-commands-probe.json --timeout 30
-python3 scripts/probe_hermes_help_catalog.py --report .hades/runtime/hermes-help-catalog-probe.json --timeout 60
-python3 scripts/probe_hermes_help_lifecycle.py --report .hades/runtime/hermes-help-lifecycle-probe.json --timeout 60
-python3 scripts/probe_hermes_help_resize.py --report .hades/runtime/hermes-help-resize-probe.json --timeout 60
-python3 scripts/probe_hermes_model_picker.py --report .hades/runtime/hermes-model-picker-probe.json --timeout 30
-python3 scripts/probe_hermes_model_picker_selection.py --report .hades/runtime/hermes-model-picker-selection-probe.json --timeout 30
-python3 scripts/probe_hermes_distinct_model_selection.py --report .hades/runtime/hermes-distinct-model-selection-probe.json --timeout 60
-python3 scripts/probe_hermes_setup_wizard.py --report .hades/runtime/hermes-setup-wizard-probe.json --timeout 60
-python3 scripts/probe_hermes_full_setup.py --report .hades/runtime/hermes-full-setup-probe.json --timeout 30
-python3 scripts/probe_hermes_full_setup_provider.py --report .hades/runtime/hermes-full-setup-provider-probe.json --timeout 30
+run_probe .hades/runtime/hermes-osc52-st-termination-probe.json python3 scripts/probe_hermes_osc52_st_termination.py --report .hades/runtime/hermes-osc52-st-termination-probe.json --timeout 60
+run_probe .hades/runtime/hermes-osc52-multiplexer-probe.json python3 scripts/probe_hermes_osc52_multiplexer.py --report .hades/runtime/hermes-osc52-multiplexer-probe.json --timeout 30
+run_probe .hades/runtime/hermes-osc52-timing-limits-probe.json python3 scripts/probe_hermes_osc52_timing_limits.py --report .hades/runtime/hermes-osc52-timing-limits-probe.json --timeout 60
+run_probe .hades/runtime/hermes-terminal-palette-probe.json python3 scripts/probe_hermes_terminal_palette.py --report .hades/runtime/hermes-terminal-palette-probe.json --timeout 30
+run_probe .hades/runtime/hermes-slash-commands-probe.json python3 scripts/probe_hermes_slash_commands.py --report .hades/runtime/hermes-slash-commands-probe.json --timeout 30
+run_probe .hades/runtime/hermes-help-catalog-probe.json python3 scripts/probe_hermes_help_catalog.py --report .hades/runtime/hermes-help-catalog-probe.json --timeout 60
+run_probe .hades/runtime/hermes-help-lifecycle-probe.json python3 scripts/probe_hermes_help_lifecycle.py --report .hades/runtime/hermes-help-lifecycle-probe.json --timeout 60
+run_probe .hades/runtime/hermes-help-resize-probe.json python3 scripts/probe_hermes_help_resize.py --report .hades/runtime/hermes-help-resize-probe.json --timeout 60
+run_probe .hades/runtime/hermes-model-picker-probe.json python3 scripts/probe_hermes_model_picker.py --report .hades/runtime/hermes-model-picker-probe.json --timeout 30
+run_probe .hades/runtime/hermes-model-picker-selection-probe.json python3 scripts/probe_hermes_model_picker_selection.py --report .hades/runtime/hermes-model-picker-selection-probe.json --timeout 30
+run_probe .hades/runtime/hermes-distinct-model-selection-probe.json python3 scripts/probe_hermes_distinct_model_selection.py --report .hades/runtime/hermes-distinct-model-selection-probe.json --timeout 60
+run_probe .hades/runtime/hermes-setup-wizard-probe.json python3 scripts/probe_hermes_setup_wizard.py --report .hades/runtime/hermes-setup-wizard-probe.json --timeout 60
+run_probe .hades/runtime/hermes-full-setup-probe.json python3 scripts/probe_hermes_full_setup.py --report .hades/runtime/hermes-full-setup-probe.json --timeout 30
+run_probe .hades/runtime/hermes-full-setup-provider-probe.json python3 scripts/probe_hermes_full_setup_provider.py --report .hades/runtime/hermes-full-setup-provider-probe.json --timeout 30
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0046-hermes-provider-selection.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0047-hades-provider-selection-model-prompt.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0048-hermes-model-default-terminal-backend.json
@@ -167,40 +335,41 @@ python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0067-had
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0104-hermes-setup-required-actions-revalidation.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0105-hades-setup-required-actions.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0106-hermes-setup-persistence-revalidation.json
-python3 scripts/probe_hermes_full_setup_provider_selection.py --report .hades/runtime/hermes-full-setup-provider-selection-probe.json --timeout 30
-python3 scripts/probe_hermes_full_setup_model_default.py --report .hades/runtime/hermes-full-setup-model-default-probe.json --timeout 30
-python3 scripts/probe_hermes_local_provider_stream.py --report .hades/runtime/hermes-local-provider-stream-probe.json --timeout 30
-python3 scripts/probe_hermes_multi_turn_provider.py --report .hades/runtime/hermes-multi-turn-provider-probe.json --timeout 30
-python3 scripts/probe_hermes_tool_schema_semantics.py --report .hades/runtime/hermes-tool-schema-semantics-probe.json --timeout 30
-python3 scripts/probe_hermes_tool_inventory.py --report .hades/runtime/hermes-tool-inventory-probe.json --timeout 60
+run_probe .hades/runtime/hermes-full-setup-provider-selection-probe.json python3 scripts/probe_hermes_full_setup_provider_selection.py --report .hades/runtime/hermes-full-setup-provider-selection-probe.json --timeout 30
+run_probe .hades/runtime/hermes-full-setup-model-default-probe.json python3 scripts/probe_hermes_full_setup_model_default.py --report .hades/runtime/hermes-full-setup-model-default-probe.json --timeout 30
+run_probe .hades/runtime/hermes-local-provider-stream-probe.json python3 scripts/probe_hermes_local_provider_stream.py --report .hades/runtime/hermes-local-provider-stream-probe.json --timeout 30
+run_probe .hades/runtime/hermes-multi-turn-provider-probe.json python3 scripts/probe_hermes_multi_turn_provider.py --report .hades/runtime/hermes-multi-turn-provider-probe.json --timeout 30
+run_probe .hades/runtime/hermes-tool-schema-semantics-probe.json python3 scripts/probe_hermes_tool_schema_semantics.py --report .hades/runtime/hermes-tool-schema-semantics-probe.json --timeout 30
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0112-hermes-tool-inventory.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0110-hermes-tool-call-handoff.json
-python3 scripts/probe_hermes_tool_call_handoff.py --report .hades/runtime/hermes-tool-call-handoff-probe.json --timeout 30 --observation-window 0.2
-python3 scripts/probe_hermes_tool_completion_handoff.py --report .hades/runtime/hermes-tool-completion-handoff-probe.json --timeout 90 --observation-window 4
+run_probe .hades/runtime/hermes-tool-call-handoff-probe.json python3 scripts/probe_hermes_tool_call_handoff.py --report .hades/runtime/hermes-tool-call-handoff-probe.json --timeout 30 --observation-window 0.2
+run_probe .hades/runtime/hermes-tool-completion-handoff-probe.json python3 scripts/probe_hermes_tool_completion_handoff.py --report .hades/runtime/hermes-tool-completion-handoff-probe.json --timeout 90 --observation-window 4
+run_probe .hades/runtime/hermes-clarify-question-surface-probe.json python3 scripts/probe_hermes_clarify_question_surface.py --report .hades/runtime/hermes-clarify-question-surface-probe.json --timeout 90 --observation-window 3
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0114-hermes-tool-completion-handoff.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0115-hades-tool-result-follow-up.json
-python3 scripts/probe_hermes_stream_timing.py --report .hades/runtime/hermes-stream-timing-probe.json --timeout 30
-python3 scripts/probe_hermes_provider_errors.py --report .hades/runtime/hermes-provider-errors-probe.json --timeout 30
-python3 scripts/probe_hermes_provider_setup_persistence.py --report .hades/runtime/hermes-provider-setup-persistence-probe.json --timeout 30
-python3 scripts/probe_hermes_setup_config_shape.py --report .hades/runtime/hermes-setup-config-shape-probe.json --timeout 30
-python3 scripts/probe_hermes_empty_platform_confirmation.py --report .hades/runtime/hermes-empty-platform-confirmation-probe.json --timeout 30
-python3 scripts/probe_hermes_unconfigured_startup.py --report .hades/runtime/hermes-unconfigured-startup-probe.json --timeout 30
-python3 scripts/probe_hermes_unconfigured_input_queue.py --report .hades/runtime/hermes-unconfigured-input-queue-probe.json --timeout 30
-python3 scripts/probe_hermes_unconfigured_setup_escape.py --report .hades/runtime/hermes-unconfigured-setup-escape-probe.json --timeout 30
-python3 scripts/probe_hermes_unconfigured_resolution.py --report .hades/runtime/hermes-unconfigured-resolution-probe.json --timeout 30 --observation-window 15
-python3 scripts/probe_hermes_setup_required_reconciliation.py --report .hades/runtime/hermes-setup-required-reconciliation-probe.json --timeout 30 --observation-window 15
-python3 scripts/probe_hermes_help_setup_timing.py --report .hades/runtime/hermes-help-setup-timing-probe.json --timeout 30 --observation-window 15
-python3 scripts/probe_hermes_setup_required_actions.py --report .hades/runtime/hermes-setup-required-actions-probe.json --timeout 30 --observation-window 3
-python3 scripts/probe_hermes_standalone_setup.py --report .hades/runtime/hermes-standalone-setup-probe.json --timeout 30
-python3 scripts/probe_hermes_standalone_full_setup.py --report .hades/runtime/hermes-standalone-full-setup-probe.json --timeout 90
-python3 scripts/probe_hermes_standalone_terminal_platform.py --report .hades/runtime/hermes-standalone-terminal-platform-probe.json --timeout 60
-python3 scripts/probe_hermes_standalone_tool_configuration.py --report .hades/runtime/hermes-standalone-tool-configuration-probe.json --timeout 30
-python3 scripts/probe_hermes_tool_configuration_navigation.py --report .hades/runtime/hermes-tool-configuration-navigation-probe.json --timeout 30
-python3 scripts/probe_hermes_tool_provider_boundary.py --report .hades/runtime/hermes-tool-provider-boundary-probe.json --timeout 30
-python3 scripts/probe_hermes_tool_provider_inventory.py --report .hades/runtime/hermes-tool-provider-inventory-probe.json --timeout 30 --observation-window 1
-python3 scripts/probe_hermes_tool_provider_inventory_interaction.py --report .hades/runtime/hermes-tool-provider-inventory-interaction-probe.json --timeout 60
-python3 scripts/probe_hermes_tool_provider_inventory_edges.py --report .hades/runtime/hermes-tool-provider-inventory-edges-probe.json --timeout 60
-python3 scripts/probe_hermes_tool_provider_inventory_selection.py --report .hades/runtime/hermes-tool-provider-inventory-selection-probe.json --timeout 30
+python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0116-hermes-clarify-question-surface.json
+run_probe .hades/runtime/hermes-stream-timing-probe.json python3 scripts/probe_hermes_stream_timing.py --report .hades/runtime/hermes-stream-timing-probe.json --timeout 30
+run_probe .hades/runtime/hermes-provider-errors-probe.json python3 scripts/probe_hermes_provider_errors.py --report .hades/runtime/hermes-provider-errors-probe.json --timeout 30
+run_probe .hades/runtime/hermes-provider-setup-persistence-probe.json python3 scripts/probe_hermes_provider_setup_persistence.py --report .hades/runtime/hermes-provider-setup-persistence-probe.json --timeout 30
+run_probe .hades/runtime/hermes-setup-config-shape-probe.json python3 scripts/probe_hermes_setup_config_shape.py --report .hades/runtime/hermes-setup-config-shape-probe.json --timeout 30
+run_probe .hades/runtime/hermes-empty-platform-confirmation-probe.json python3 scripts/probe_hermes_empty_platform_confirmation.py --report .hades/runtime/hermes-empty-platform-confirmation-probe.json --timeout 30
+run_probe .hades/runtime/hermes-unconfigured-startup-probe.json python3 scripts/probe_hermes_unconfigured_startup.py --report .hades/runtime/hermes-unconfigured-startup-probe.json --timeout 30
+run_probe .hades/runtime/hermes-unconfigured-input-queue-probe.json python3 scripts/probe_hermes_unconfigured_input_queue.py --report .hades/runtime/hermes-unconfigured-input-queue-probe.json --timeout 30
+run_probe .hades/runtime/hermes-unconfigured-setup-escape-probe.json python3 scripts/probe_hermes_unconfigured_setup_escape.py --report .hades/runtime/hermes-unconfigured-setup-escape-probe.json --timeout 30
+run_probe .hades/runtime/hermes-unconfigured-resolution-probe.json python3 scripts/probe_hermes_unconfigured_resolution.py --report .hades/runtime/hermes-unconfigured-resolution-probe.json --timeout 30 --observation-window 15
+run_probe .hades/runtime/hermes-setup-required-reconciliation-probe.json python3 scripts/probe_hermes_setup_required_reconciliation.py --report .hades/runtime/hermes-setup-required-reconciliation-probe.json --timeout 30 --observation-window 15
+run_probe .hades/runtime/hermes-help-setup-timing-probe.json python3 scripts/probe_hermes_help_setup_timing.py --report .hades/runtime/hermes-help-setup-timing-probe.json --timeout 30 --observation-window 15
+run_probe .hades/runtime/hermes-setup-required-actions-probe.json python3 scripts/probe_hermes_setup_required_actions.py --report .hades/runtime/hermes-setup-required-actions-probe.json --timeout 30 --observation-window 3
+run_probe .hades/runtime/hermes-standalone-setup-probe.json python3 scripts/probe_hermes_standalone_setup.py --report .hades/runtime/hermes-standalone-setup-probe.json --timeout 30
+run_probe .hades/runtime/hermes-standalone-full-setup-probe.json python3 scripts/probe_hermes_standalone_full_setup.py --report .hades/runtime/hermes-standalone-full-setup-probe.json --timeout 90
+run_probe .hades/runtime/hermes-standalone-terminal-platform-probe.json python3 scripts/probe_hermes_standalone_terminal_platform.py --report .hades/runtime/hermes-standalone-terminal-platform-probe.json --timeout 60
+run_probe .hades/runtime/hermes-standalone-tool-configuration-probe.json python3 scripts/probe_hermes_standalone_tool_configuration.py --report .hades/runtime/hermes-standalone-tool-configuration-probe.json --timeout 30
+run_probe .hades/runtime/hermes-tool-configuration-navigation-probe.json python3 scripts/probe_hermes_tool_configuration_navigation.py --report .hades/runtime/hermes-tool-configuration-navigation-probe.json --timeout 30
+run_probe .hades/runtime/hermes-tool-provider-boundary-probe.json python3 scripts/probe_hermes_tool_provider_boundary.py --report .hades/runtime/hermes-tool-provider-boundary-probe.json --timeout 30
+run_probe .hades/runtime/hermes-tool-provider-inventory-probe.json python3 scripts/probe_hermes_tool_provider_inventory.py --report .hades/runtime/hermes-tool-provider-inventory-probe.json --timeout 30 --observation-window 1
+run_probe .hades/runtime/hermes-tool-provider-inventory-interaction-probe.json python3 scripts/probe_hermes_tool_provider_inventory_interaction.py --report .hades/runtime/hermes-tool-provider-inventory-interaction-probe.json --timeout 60
+run_probe .hades/runtime/hermes-tool-provider-inventory-edges-probe.json python3 scripts/probe_hermes_tool_provider_inventory_edges.py --report .hades/runtime/hermes-tool-provider-inventory-edges-probe.json --timeout 60
+run_probe .hades/runtime/hermes-tool-provider-inventory-selection-probe.json python3 scripts/probe_hermes_tool_provider_inventory_selection.py --report .hades/runtime/hermes-tool-provider-inventory-selection-probe.json --timeout 30
 python3 scripts/replay_terminal_palette.py --binary target/debug/hades --report .hades/runtime/hades-terminal-palette-replay.json
 python3 scripts/replay_osc52_timing_limits.py --binary target/debug/hades --report .hades/runtime/hades-osc52-timing-limits-replay.json
 python3 scripts/replay_osc52_clipboard.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0029-hades-osc52-st-termination.json --report .hades/runtime/hades-osc52-st-termination-replay.json

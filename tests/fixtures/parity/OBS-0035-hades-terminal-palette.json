@@ -33,23 +33,11 @@
       "output": {
         "status": "ready",
         "landmark_styles": {
-          "Hermes Agent": {
+          "Hades Agent": {
             "style": {
               "fg": "indexed(220)",
               "bg": "default",
               "bold": true,
-              "dim": false,
-              "italic": false,
-              "underline": false,
-              "reverse": false,
-              "strike": false
-            }
-          },
-          "Nous Research": {
-            "style": {
-              "fg": "indexed(178)",
-              "bg": "default",
-              "bold": false,
               "dim": false,
               "italic": false,
               "underline": false,
@@ -84,6 +72,18 @@
           "ready": {
             "style": {
               "fg": "indexed(72)",
+              "bg": "default",
+              "bold": false,
+              "dim": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false,
+              "strike": false
+            }
+          },
+          "Hades": {
+            "style": {
+              "fg": "indexed(178)",
               "bg": "default",
               "bold": false,
               "dim": false,

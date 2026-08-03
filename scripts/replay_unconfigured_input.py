@@ -31,11 +31,11 @@ from probe_tui_lifecycle import (
 COLUMNS = 120
 ROWS = 40
 STARTUP_MARKERS = (
-    "Hermes Agent",
-    "Nous Research",
+    "Hades Agent",
+    "Underworld",
     "Available Tools",
     "Available Skills",
-    "glm-5.2 · Nous Research",
+    "glm-5.2 · Hades",
     "starting agent",
 )
 INPUT_TEXT = "queued hello"
@@ -208,7 +208,7 @@ def run_empty_case(binary: Path, arguments: list[str], timeout: float) -> dict[s
             master,
             output,
             f"{case}: startup",
-            lambda text: marker_present(text, "Hermes Agent") and marker_present(text, "starting agent"),
+            lambda text: marker_present(text, "Hades Agent") and marker_present(text, "starting agent"),
             timeout,
         )
         startup_flags = terminal_flags(slave_path)

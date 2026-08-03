@@ -38,7 +38,7 @@ ROWS = 40
 RESIZE_CASES = ((120, 40), (100, 30), (160, 50))
 HELP_COMMAND = "/help Show available commands"
 MAIN_SURFACE_MARKERS = (
-    "Hermes Agent",
+    "Hades Agent",
     "Available Tools",
     "Available Skills",
     "/help for commands",

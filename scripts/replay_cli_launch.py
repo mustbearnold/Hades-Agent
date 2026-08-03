@@ -49,7 +49,7 @@ def run_case(binary: Path, name: str, arguments: list[str], timeout: float) -> d
     output = bytearray()
     reaped = False
     try:
-        startup_markers = ("Hermes Agent", "Nous Research", "Available Tools", "Available Skills")
+        startup_markers = ("Hades Agent", "Underworld", "Available Tools", "Available Skills")
         wait_for(
             pid,
             master,

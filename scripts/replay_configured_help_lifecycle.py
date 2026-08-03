@@ -61,7 +61,7 @@ def run_case(binary: Path, timeout: float) -> dict[str, Any]:
             fd,
             output,
             "startup",
-            lambda text: marker_present(text, "Hermes Agent") and marker_present(text, "ready"),
+            lambda text: marker_present(text, "Hades Agent") and marker_present(text, "ready"),
             timeout,
         )
         send(fd, b"/help\r")

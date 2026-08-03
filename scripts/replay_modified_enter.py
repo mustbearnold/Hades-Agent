@@ -217,7 +217,7 @@ def run_case(binary: Path, case: dict[str, Any], timeout: float, ordinal: int) -
     provider, provider_thread = start_hold_provider()
     try:
         pid, fd = spawn(binary, home, hold_provider_environment(provider))
-        startup_markers = ("Hermes Agent", "Nous Research", "Available Tools", "Available Skills")
+        startup_markers = ("Hades Agent", "Underworld", "Available Tools", "Available Skills")
         buffer = wait_for(
             pid,
             fd,

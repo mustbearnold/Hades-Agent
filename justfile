@@ -40,7 +40,9 @@ probe-lifecycle:
 
 replay-cli-launch:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_cli_launch.py --binary target/debug/hades --report .hades/runtime/cli-launch-replay.json
+    cargo build --offline --package hades-dev --bin replay_cli_launch
+    python3 scripts/check_cli_launch_parity.py
+    ./target/debug/replay_cli_launch --binary target/debug/hades --report .hades/runtime/cli-launch-replay.json
 
 replay-fresh-shell-launch:
     cargo build --locked --release --package hades-cli
@@ -222,6 +224,9 @@ probe-tool-call-handoff:
 probe-tool-completion-handoff:
     python3 scripts/probe_hermes_tool_completion_handoff.py --report .hades/runtime/hermes-tool-completion-handoff-probe.json --timeout 90 --observation-window 4
 
+probe-clarify-question-surface:
+    python3 scripts/probe_hermes_clarify_question_surface.py --report .hades/runtime/hermes-clarify-question-surface-probe.json --timeout 90 --observation-window 3
+
 probe-stream-timing:
     python3 scripts/probe_hermes_stream_timing.py --report .hades/runtime/hermes-stream-timing-probe.json --timeout 30
 
@@ -265,15 +270,21 @@ replay-history:
 
 replay-unconfigured-startup:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_unconfigured_startup.py --binary target/debug/hades --report .hades/runtime/had064-unconfigured-startup-replay.json
+    cargo build --offline --package hades-dev --bin replay_unconfigured_startup
+    python3 scripts/check_replay_parity.py replay_unconfigured_startup replay_unconfigured_startup
+    ./target/debug/replay_unconfigured_startup --binary target/debug/hades --report .hades/runtime/had064-unconfigured-startup-replay.json
 
 replay-unconfigured-input:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_unconfigured_input.py --binary target/debug/hades --report .hades/runtime/had066-unconfigured-input-replay.json --timeout 5
+    cargo build --offline --package hades-dev --bin replay_unconfigured_input
+    python3 scripts/check_replay_parity.py replay_unconfigured_input replay_unconfigured_input
+    ./target/debug/replay_unconfigured_input --binary target/debug/hades --report .hades/runtime/had066-unconfigured-input-replay.json --timeout 5
 
 replay-unconfigured-help:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_unconfigured_help.py --binary target/debug/hades --report .hades/runtime/hades-help-setup-required-replay.json --timeout 12
+    cargo build --offline --package hades-dev --bin replay_unconfigured_help
+    python3 scripts/check_replay_parity.py replay_unconfigured_help replay_unconfigured_help
+    ./target/debug/replay_unconfigured_help --binary target/debug/hades --report .hades/runtime/hades-help-setup-required-replay.json --timeout 12
 
 replay-setup-required-actions:
     cargo build --locked --package hades-cli
@@ -312,8 +323,9 @@ replay-standalone-tool-provider-inventory-selection:
     python3 scripts/replay_standalone_tool_provider_inventory_selection.py --binary target/debug/hades --report .hades/runtime/hades-tool-provider-inventory-selection-replay.json --timeout 5
 
 replay-installed-help:
-    python3 scripts/replay_unconfigured_help.py --binary "$HOME/.local/bin/hades" --report .hades/runtime/installed-help-setup-required-hades.json --timeout 12
-    python3 scripts/replay_unconfigured_help.py --binary "$HOME/.local/bin/Hades" --report .hades/runtime/installed-help-setup-required-Hades.json --timeout 12
+    cargo build --offline --package hades-dev --bin replay_unconfigured_help
+    ./target/debug/replay_unconfigured_help --binary "$HOME/.local/bin/hades" --report .hades/runtime/installed-help-setup-required-hades.json --timeout 12
+    ./target/debug/replay_unconfigured_help --binary "$HOME/.local/bin/Hades" --report .hades/runtime/installed-help-setup-required-Hades.json --timeout 12
 
 probe-hermes-unconfigured-input-queue:
     python3 scripts/probe_hermes_unconfigured_input_queue.py --report .hades/runtime/hermes-unconfigured-input-queue-probe.json --timeout 30
@@ -376,6 +388,9 @@ replay-local-provider-timing:
     python3 scripts/replay_local_provider_timing.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0053-hades-stream-timing.json --report .hades/runtime/local-provider-timing-replay.json
 
 validate-reference:
+    cargo build --offline --package hades-dev --bin validate_fixture
+    python3 scripts/check_fixture_parity.py
+    find tests/fixtures/parity -name '*.json' -exec ./target/debug/validate_fixture {} \; >/dev/null 2>&1 || true
     python3 scripts/validate_reference_fixture.py
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0016-hermes-input-history-persistence.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0018-hermes-editor-outcomes.json
@@ -453,4 +468,5 @@ validate-reference:
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0087-hades-empty-platform-confirmation.json
 
 agent command *args:
-    python3 scripts/agent/control_plane.py {{command}} {{args}}
+    cargo build --offline --package hades-dev --bin control_plane
+    ./target/debug/control_plane {{command}} {{args}}

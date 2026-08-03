@@ -160,7 +160,7 @@ def run_selected_process(
             fd,
             output,
             "selected-startup",
-            lambda text: "Hermes Agent" in text and marker_present(text, "ready"),
+            lambda text: "Hades Agent" in text and marker_present(text, "ready"),
             timeout,
         )
         open_and_select_model(pid, fd, output, server, timeout)
@@ -229,7 +229,7 @@ def run_fresh_process(
             fd,
             output,
             "fresh-startup",
-            lambda text: "Hermes Agent" in text and marker_present(text, "ready"),
+            lambda text: "Hades Agent" in text and marker_present(text, "ready"),
             timeout,
         )
         send(fd, b"fresh process prompt\r")

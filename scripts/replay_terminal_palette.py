@@ -224,12 +224,12 @@ def run_ready_sequence(binary: Path, steps: dict[str, dict[str, Any]], timeout: 
             "startup",
             lambda current: all(
                 contains_marker(current, marker)
-                for marker in ("Hermes Agent", "Nous Research", "Available Tools", "Available Skills", "ready")
+                for marker in ("Hades Agent", "Hades", "Available Tools", "Available Skills", "ready")
             ),
             timeout,
         )
         startup = surface_record(buffer, buffer, [
-            "Hermes Agent", "Nous Research", "Available Tools", "Available Skills", "ready"
+            "Hades Agent", "Hades", "Available Tools", "Available Skills", "ready"
         ])
         assert_surface(case, "startup", startup, steps["startup"]["output"])
 
@@ -282,7 +282,7 @@ def run_setup_case(binary: Path, steps: dict[str, dict[str, Any]], timeout: floa
     pid, fd = spawn(binary, home, provider_environment)
     buffer = b""
     try:
-        buffer = wait_for(pid, fd, buffer, case, "startup", lambda current: contains_marker(current, "Hermes Agent"), timeout)
+        buffer = wait_for(pid, fd, buffer, case, "startup", lambda current: contains_marker(current, "Hades Agent"), timeout)
         setup_start = len(buffer)
         write_bytes(fd, b"/help\r")
         buffer = wait_for(

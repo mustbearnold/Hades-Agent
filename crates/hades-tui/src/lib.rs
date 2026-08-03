@@ -27,13 +27,13 @@ use ratatui::{
     widgets::{Block, BorderType, Borders, Clear, Paragraph, Wrap},
 };
 
-const HERMES_STARTUP_HEIGHT: u16 = 40;
-const HERMES_STARTUP_FRAME: &str = include_str!("../assets/hermes-startup-120x40.txt");
+const HADES_STARTUP_HEIGHT: u16 = 40;
+const HADES_STARTUP_FRAME: &str = include_str!("../assets/hades-startup-120x40.txt");
 const HERMES_BUSY_FOOTER: &str = " ─ musing… │ mulling… │ mock model │ <seconds>s │ voice off │ 1 session                                      ─ <reference-cwd> (main)";
 const HERMES_INTERRUPT_PROMPT: &str = " ❯ Ctrl+C to interrupt…";
 const HERMES_INTERRUPTED_MARKER: &str = " │ interrupted";
 const HERMES_INTERRUPTED_FOOTER: &str = " ─ ready │ mock model │ ✓ <seconds>s │ voice off │ 1 session                                      ─ <reference-cwd> (main)";
-const HERMES_UNCONFIGURED_MODEL: &str = " │ glm-5.2 · Nous Research          31 tools · 66 skills · /help for commands                                   │";
+const HADES_UNCONFIGURED_MODEL: &str = " │ glm-5.2 · Hades          31 tools · 66 skills · /help for commands                                   │";
 const HERMES_UNCONFIGURED_FOOTER: &str = " ─ starting agent… │ glm5.2 │ 0s │ voice off │ 1 session                                      ─ <reference-cwd> (main)";
 const HERMES_CLIPBOARD_MISS: &str = "No image found in clipboard";
 const HERMES_COMPOSER_MAX_CHARS: usize = 117;
@@ -286,14 +286,18 @@ fn draw_hermes_startup(frame: &mut Frame<'_>, app: &App) {
     let height = usize::from(frame.area().height);
     let footer_row = height.saturating_sub(2);
     let composer_row = height.saturating_sub(1);
-    let template_rows = HERMES_STARTUP_FRAME.lines().collect::<Vec<_>>();
+    let template_rows = HADES_STARTUP_FRAME.lines().collect::<Vec<_>>();
     let mut rows = vec![String::new(); height];
-    for (row, destination) in rows.iter_mut().enumerate().take(footer_row) {
+    // Copy only the template body (rows 0..38), never the template's own
+    // footer/composer rows: on terminals taller than the 40-row template,
+    // copying them mid-screen duplicated the footer and prompt (HAD-122).
+    let body_rows = (HADES_STARTUP_HEIGHT as usize - 2).min(footer_row);
+    for (row, destination) in rows.iter_mut().enumerate().take(body_rows) {
         if let Some(template) = template_rows.get(row) {
             *destination = (*template).to_owned();
         }
     }
-    if let Some(footer) = template_rows.get(HERMES_STARTUP_HEIGHT as usize - 2)
+    if let Some(footer) = template_rows.get(HADES_STARTUP_HEIGHT as usize - 2)
         && let Some(row) = rows.get_mut(footer_row)
     {
         *row = (*footer).to_owned();
@@ -306,7 +310,7 @@ fn draw_hermes_startup(frame: &mut Frame<'_>, app: &App) {
 
     if app.state().startup == StartupState::Unconfigured {
         if let Some(row) = rows.get_mut(26) {
-            *row = HERMES_UNCONFIGURED_MODEL.to_owned();
+            *row = HADES_UNCONFIGURED_MODEL.to_owned();
         }
         if let Some(row) = rows.get_mut(footer_row) {
             *row = HERMES_UNCONFIGURED_FOOTER.to_owned();
@@ -462,8 +466,8 @@ fn style_hermes_line(
 ) -> Line<'static> {
     let mut markers = Vec::new();
     match row {
-        7 => markers.push(("Nous Research", HERMES_PALETTE.secondary())),
-        11 => markers.push(("Hermes Agent", HERMES_PALETTE.brand())),
+        7 => markers.push(("Hades", HERMES_PALETTE.secondary())),
+        11 => markers.push(("Hades Agent", HERMES_PALETTE.brand())),
         14 => markers.push(("Available Tools", HERMES_PALETTE.brand())),
         25 => markers.push(("Available Skills", HERMES_PALETTE.brand())),
         _ if row == footer_row => {
@@ -993,7 +997,7 @@ mod tests {
     const HERMES_STARTUP_WIDTH: u16 = 120;
 
     fn hermes_cell_style(app: &App, column: u16, row: u16) -> (Color, Color, Modifier) {
-        let backend = TestBackend::new(HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let backend = TestBackend::new(HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         let mut terminal = Terminal::new(backend).expect("TestBackend construction is infallible");
         terminal.draw(|frame| draw(frame, app)).expect("rendering is infallible");
         let cell = terminal
@@ -1016,14 +1020,14 @@ mod tests {
 
     #[test]
     fn standalone_setup_surface_renders_the_reference_choice_landmarks() {
-        let backend = TestBackend::new(HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let backend = TestBackend::new(HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         let mut terminal = Terminal::new(backend).expect("TestBackend construction is infallible");
         let wizard = StandaloneSetupState::default();
         terminal
             .draw(|frame| draw_standalone_setup(frame, &wizard))
             .expect("rendering is infallible");
 
-        let rendered = (0..HERMES_STARTUP_HEIGHT)
+        let rendered = (0..HADES_STARTUP_HEIGHT)
             .map(|row| {
                 (0..HERMES_STARTUP_WIDTH)
                     .map(|column| {
@@ -1049,7 +1053,7 @@ mod tests {
 
     #[test]
     fn standalone_full_setup_renders_the_reference_continuation_landmarks() {
-        let backend = TestBackend::new(HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let backend = TestBackend::new(HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         let mut terminal = Terminal::new(backend).expect("TestBackend construction is infallible");
         let mut wizard = StandaloneSetupState::default();
         wizard.handle_key(hades_core::Key::Down);
@@ -1073,7 +1077,7 @@ mod tests {
 
     #[test]
     fn standalone_terminal_backend_renders_and_preserves_the_default_cursor() {
-        let backend = TestBackend::new(HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let backend = TestBackend::new(HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         let mut terminal = Terminal::new(backend).expect("TestBackend construction is infallible");
         let mut wizard = StandaloneSetupState::default();
         wizard.handle_key(hades_core::Key::Down);
@@ -1098,7 +1102,7 @@ mod tests {
 
     #[test]
     fn standalone_platform_picker_renders_observed_unconfigured_rows() {
-        let backend = TestBackend::new(HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let backend = TestBackend::new(HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         let mut terminal = Terminal::new(backend).expect("TestBackend construction is infallible");
         let mut wizard = StandaloneSetupState::default();
         wizard.handle_key(hades_core::Key::Down);
@@ -1127,7 +1131,7 @@ mod tests {
 
     #[test]
     fn standalone_tool_configuration_renders_the_observed_cancel_surface() {
-        let backend = TestBackend::new(HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let backend = TestBackend::new(HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         let mut terminal = Terminal::new(backend).expect("TestBackend construction is infallible");
         let mut wizard = StandaloneSetupState::default();
         wizard.handle_key(hades_core::Key::Down);
@@ -1157,7 +1161,7 @@ mod tests {
 
     #[test]
     fn standalone_tool_checklist_renders_observed_title_controls_and_rows() {
-        let backend = TestBackend::new(HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let backend = TestBackend::new(HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         let mut terminal = Terminal::new(backend).expect("TestBackend construction is infallible");
         let mut wizard = StandaloneSetupState::default();
         wizard.handle_key(hades_core::Key::Down);
@@ -1191,7 +1195,7 @@ mod tests {
 
     #[test]
     fn standalone_tool_provider_boundary_renders_the_observed_landmarks() {
-        let backend = TestBackend::new(HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let backend = TestBackend::new(HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         let mut terminal = Terminal::new(backend).expect("TestBackend construction is infallible");
         let mut wizard = StandaloneSetupState::default();
         wizard.handle_key(hades_core::Key::Down);
@@ -1244,7 +1248,7 @@ mod tests {
 
     #[test]
     fn standalone_tool_provider_boundary_renders_cyclic_edges() {
-        let backend = TestBackend::new(HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let backend = TestBackend::new(HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         let mut terminal = Terminal::new(backend).expect("TestBackend construction is infallible");
         let mut wizard = StandaloneSetupState::default();
         wizard.handle_key(hades_core::Key::Down);
@@ -1302,22 +1306,33 @@ mod tests {
     }
 
     #[test]
-    fn hermes_startup_surface_matches_normalized_golden_frame() {
-        let rendered = snapshot(&App::new(), HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
-        let golden = include_str!("../../../tests/fixtures/parity/OBS-0001-startup-120x40.txt");
+    fn hades_startup_surface_matches_normalized_product_frame() {
+        let rendered = snapshot(&App::new(), HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
+        let golden = include_str!("../assets/hades-startup-120x40.txt");
 
         assert_eq!(
-            normalize_cells(&rendered, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT),
-            normalize_cells(golden, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT)
+            normalize_cells(&rendered, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT),
+            normalize_cells(golden, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT)
         );
+    }
+
+    #[test]
+    fn hades_startup_surface_is_hades_branded() {
+        let rendered = snapshot(&App::new(), HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
+        assert!(rendered.contains("Hades Agent v0.1.0"));
+        assert!(rendered.contains("Hades · Lord of the Digital Underworld"));
+        // Deliberate owner-directed deviation from the Hermes reference:
+        // the startup surface must not carry Hermes branding.
+        assert!(!rendered.contains("Nous Research"));
+        assert!(!rendered.contains("Hermes Agent"));
     }
 
     #[test]
     fn hermes_startup_surface_renders_the_unconfigured_boundary() {
         let app = App::with_startup_state(StartupState::Unconfigured);
-        let rendered = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let rendered = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
 
-        assert!(rendered.contains("glm-5.2 · Nous Research"));
+        assert!(rendered.contains("glm-5.2 · Hades"));
         assert!(rendered.contains("starting agent…"));
         assert!(!rendered.contains("─ ready │"));
         assert!(!rendered.contains("<prompt-placeholder>"));
@@ -1331,15 +1346,42 @@ mod tests {
         }
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
 
-        let with_draft = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let with_draft = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         assert!(with_draft.contains("❯ queued hello"));
         assert!(with_draft.contains("starting agent…"));
         assert!(!with_draft.contains("─ ready │"));
 
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Ctrl('c')));
-        let after_clear = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let after_clear = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         assert!(!after_clear.contains("❯ queued hello"));
         assert!(after_clear.contains("starting agent…"));
+    }
+
+    #[test]
+    fn startup_surface_on_a_tall_terminal_does_not_duplicate_footer_or_composer() {
+        // HAD-122: on terminals taller than the 40-row template, the body copy
+        // must stop before the template's own footer/composer rows, otherwise
+        // the footer and prompt appear twice (mid-screen and at the bottom).
+        for height in [41u16, 48, 50, 60] {
+            let rendered = snapshot(&App::new(), HERMES_STARTUP_WIDTH, height);
+            let lines = rendered.lines().collect::<Vec<_>>();
+            assert_eq!(lines.len(), usize::from(height));
+            let footer_lines =
+                lines.iter().filter(|line| line.contains("─ ready │ mock model")).count();
+            assert_eq!(
+                footer_lines, 1,
+                "height {height}: expected exactly one footer line, got {footer_lines}"
+            );
+            let composer_lines =
+                lines.iter().filter(|line| line.trim_start().starts_with("❯ ")).count();
+            assert_eq!(
+                composer_lines, 1,
+                "height {height}: expected exactly one composer line, got {composer_lines}"
+            );
+            // The single footer/composer live at the very bottom of the screen.
+            assert!(lines[usize::from(height) - 2].contains("─ ready │ mock model"));
+            assert!(lines[usize::from(height) - 1].trim_start().starts_with("❯ "));
+        }
     }
 
     #[test]
@@ -1351,7 +1393,7 @@ mod tests {
         }
         app.handle_at(hades_core::InputEvent::Key(hades_core::Key::Enter), start);
 
-        let waiting = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let waiting = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         assert!(waiting.contains("❯ /help"));
         assert!(waiting.contains("starting agent…"));
         assert!(!waiting.contains("Setup Required"));
@@ -1360,7 +1402,7 @@ mod tests {
             hades_core::InputEvent::Tick,
             start + Duration::from_millis(hades_core::HELP_SETUP_REQUIRED_DELAY_MS),
         );
-        let setup_required = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let setup_required = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         assert!(setup_required.contains("Setup Required"));
         assert!(setup_required.contains("/model"));
         assert!(setup_required.contains("/setup"));
@@ -1379,7 +1421,7 @@ mod tests {
         }
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
 
-        let rendered = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let rendered = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         let top_border = format!("╔{}╗", "═".repeat(116));
         let bottom_border = format!("╚{}╝", "═".repeat(116));
         assert_eq!(app.state().overlay, Some(Overlay::Help));
@@ -1391,7 +1433,7 @@ mod tests {
         assert!(!rendered.contains("Setup Required"));
 
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Escape));
-        let after_escape = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let after_escape = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         assert_eq!(app.state().overlay, Some(Overlay::Help));
         assert!(after_escape.contains(HERMES_HELP_COMMAND));
         assert!(after_escape.contains("❯ /help"));
@@ -1429,15 +1471,15 @@ mod tests {
         for character in "hello".chars() {
             app.handle(hades_core::InputEvent::Key(hades_core::Key::Char(character)));
         }
-        assert!(snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT).contains("hello"));
+        assert!(snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT).contains("hello"));
 
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
-        let busy = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let busy = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         assert!(busy.contains("musing…"));
         assert!(busy.contains("mulling…"));
         assert!(busy.contains("Ctrl+C to interrupt…"));
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Ctrl('c')));
-        let interrupted = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let interrupted = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         assert!(interrupted.contains("interrupted"));
         assert!(interrupted.contains("✓ <seconds>s"));
     }
@@ -1458,7 +1500,7 @@ mod tests {
         )));
         app.handle(hades_core::InputEvent::Provider(hades_core::ProviderEvent::Completed));
 
-        let rendered = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let rendered = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         assert!(rendered.contains("Synthetic response."));
         assert!(!rendered.contains("musing…"));
         assert_eq!(app.state().turn, TurnState::Ready);
@@ -1473,7 +1515,7 @@ mod tests {
             "loopback offline".to_owned(),
         )));
         assert!(
-            snapshot(&failed, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT)
+            snapshot(&failed, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT)
                 .contains("Provider error: loopback offline")
         );
 
@@ -1482,7 +1524,7 @@ mod tests {
         cancelled.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
         cancelled.handle(hades_core::InputEvent::Provider(hades_core::ProviderEvent::Cancelled));
         assert!(
-            snapshot(&cancelled, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT)
+            snapshot(&cancelled, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT)
                 .contains("Provider response cancelled")
         );
     }
@@ -1526,7 +1568,7 @@ mod tests {
         let mut app = App::new();
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Ctrl('x')));
 
-        let overlay = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let overlay = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         for marker in [
             "Sessions",
             "live 1",
@@ -1543,7 +1585,7 @@ mod tests {
         }
 
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Escape));
-        let closed = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let closed = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         assert!(!closed.contains("current session"));
         assert!(closed.contains("<prompt-placeholder>"));
     }
@@ -1561,7 +1603,7 @@ mod tests {
             start + Duration::from_millis(hades_core::HELP_SETUP_REQUIRED_DELAY_MS),
         );
 
-        let setup = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let setup = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         for marker in [
             "Setup Required",
             "Hermes needs a model provider before the TUI can start a session.",
@@ -1574,7 +1616,7 @@ mod tests {
         }
 
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Ctrl('c')));
-        let cleared = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let cleared = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         assert!(cleared.contains("Setup Required"));
         assert!(!cleared.contains("/help"));
     }
@@ -1588,7 +1630,7 @@ mod tests {
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
 
-        let provider = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let provider = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         for marker in [
             "Select provider (step 1/2)",
             "Current: palette-model",
@@ -1604,11 +1646,11 @@ mod tests {
             app.handle(hades_core::InputEvent::Key(hades_core::Key::Char(character)));
         }
         assert!(
-            snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT).contains("filter: palette")
+            snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT).contains("filter: palette")
         );
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
 
-        let model = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let model = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         for marker in [
             "Select model (step 2/2)",
             "palette-loopback",
@@ -1625,21 +1667,21 @@ mod tests {
             app.handle(hades_core::InputEvent::Key(hades_core::Key::Char(character)));
         }
         assert!(
-            snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT).contains("filter: palette")
+            snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT).contains("filter: palette")
         );
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Escape));
-        let cleared = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let cleared = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         assert!(cleared.contains("Select model (step 2/2)"));
         assert!(cleared.contains("type to filter"));
         assert!(!cleared.contains("filter: palette"));
 
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Escape));
         assert!(
-            snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT)
+            snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT)
                 .contains("Select provider (step 1/2)")
         );
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Char('q')));
-        let closed = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let closed = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         assert!(!closed.contains("Select provider (step 1/2)"));
         assert!(closed.contains("─ ready │ mock model"));
     }
@@ -1658,7 +1700,7 @@ mod tests {
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
 
-        let selected = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let selected = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         assert!(selected.contains("model → palette-model"));
         assert!(app.state().overlay.is_none());
     }
@@ -1672,7 +1714,7 @@ mod tests {
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
 
-        let initial = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let initial = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         for marker in [
             "Hermes Agent Setup Wizard",
             "Let's configure your Hermes Agent installation.",
@@ -1689,12 +1731,12 @@ mod tests {
         assert!(initial.contains("→ (●) Quick Setup"));
 
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Down));
-        let moved = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let moved = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         assert!(moved.contains("→ (○) Full setup"));
         assert!(moved.contains("(●) Quick Setup"));
 
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Escape));
-        let fallback = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let fallback = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         assert!(fallback.contains("Enter for default (1)  Ctrl+C to exit"));
         assert!(fallback.contains("Select [1-3] (1):"));
         assert!(!fallback.contains("ESC cancel"));
@@ -1716,7 +1758,7 @@ mod tests {
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Down));
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
 
-        let provider = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let provider = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         for marker in [
             "Configuration Location",
             "Config file: <config-path>",
@@ -1743,7 +1785,7 @@ mod tests {
         assert!(!provider.contains("API key"));
 
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Down));
-        let moved = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let moved = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         assert!(moved.contains("→ (○) Custom endpoint"));
         assert!(moved.contains("(●) palette-loopback"));
         assert_eq!(
@@ -1764,7 +1806,7 @@ mod tests {
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
 
-        let prompt = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let prompt = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         for marker in [
             "Inference Provider",
             "Current model: palette-model",
@@ -1796,7 +1838,7 @@ mod tests {
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
 
-        let picker = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let picker = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         for marker in [
             "Select terminal backend:",
             "Local - run directly on this machine (default)",
@@ -1840,7 +1882,7 @@ mod tests {
             app.handle(hades_core::InputEvent::Key(key));
         }
 
-        let picker = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let picker = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         for marker in [
             "Select platforms to configure:",
             "SPACE toggle",
@@ -1868,7 +1910,7 @@ mod tests {
         }
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
 
-        let rendered = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let rendered = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         assert!(rendered.contains("Unknown command: /not-a-real-hermes-command"));
         assert!(rendered.contains("Type /help for available commands"));
         assert!(rendered.contains("─ ready │ mock model"));
@@ -1887,7 +1929,7 @@ mod tests {
             app.handle(hades_core::InputEvent::Key(hades_core::Key::Char(character)));
         }
 
-        let rendered = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let rendered = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         assert!(rendered.contains("line-one"));
         assert!(rendered.contains("line-two"));
     }
@@ -1897,7 +1939,7 @@ mod tests {
         let mut app = App::new();
         app.handle(hades_core::InputEvent::Paste("paste-one\npaste-two".to_owned()));
 
-        let rendered = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let rendered = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         assert!(rendered.contains("paste-one"));
         assert!(rendered.contains("paste-two"));
         assert!(!rendered.contains("musing…"));
@@ -1910,7 +1952,7 @@ mod tests {
             format!("{}large-response-end", "l".repeat(256),),
         ));
 
-        let rendered = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let rendered = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         let line = rendered
             .lines()
             .find(|line| line.contains("large-response-end"))
@@ -1925,7 +1967,7 @@ mod tests {
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Char('x')));
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Ctrl('v')));
 
-        let rendered = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let rendered = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         assert!(rendered.contains("x"));
         assert!(rendered.contains("No image found in clipboard"));
         assert!(!rendered.contains("musing…"));
@@ -1938,13 +1980,13 @@ mod tests {
             app.handle(hades_core::InputEvent::Key(hades_core::Key::Char(character)));
         }
 
-        let completion = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let completion = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         for marker in ["completions", "/help", "/hermes-agent", "/hermes-agent-skill-authoring"] {
             assert!(completion.contains(marker), "missing completion marker: {marker}");
         }
 
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Tab));
-        let applied = snapshot(&app, HERMES_STARTUP_WIDTH, HERMES_STARTUP_HEIGHT);
+        let applied = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         assert!(applied.contains("❯ /help"));
         assert!(!applied.contains("/hermes-agent"));
         assert!(!app.state().completion.is_visible());

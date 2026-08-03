@@ -15,10 +15,15 @@ just agent next
 just snapshot
 ```
 
-`just snapshot` renders the normalized Hermes startup surface at 120x40
-without requiring an interactive terminal. `just run` launches the TUI. The
-installed `hades` or `Hades` command launches the TUI with no arguments, and
-`hades tui` / `Hades tui` are explicit aliases for the same path.
+`just snapshot` renders the normalized Hades startup surface at 120x40
+without requiring an interactive terminal. The startup frame carries Hades'
+own owner-directed identity — the HADES AGENT logo, the
+`☠ Hades · Lord of the Digital Underworld` tagline, and the
+`Hades Agent v0.1.0 (2026.8.3)` title — a deliberate, documented deviation
+from the Hermes reference branding (layout/geometry parity is preserved).
+`just run` launches the TUI. The installed `hades` or `Hades` command launches
+the TUI with no arguments, and `hades tui` / `Hades tui` are explicit aliases
+for the same path.
 `hades setup` keeps its bounded Full setup baseline and, after accepting the
 displayed local backend, persists only the Hades-owned non-secret setup
 boundary sidecar; it does not make a provider ready or store credentials.
@@ -167,6 +172,7 @@ just probe-tool-schema-semantics # Hermes tool schema semantics without executio
 just probe-tool-inventory # Hermes exact 31-tool inventory with descriptions
 just probe-tool-call-handoff # Hermes tool-call stream handoff without execution
 just probe-tool-completion-handoff # Hermes post-[DONE] clarify handoff observation
+just probe-clarify-question-surface # Hermes clarify question surface interaction observation
 just probe-model-picker-selection # Hermes model selection side-effect boundary
 just agent validate           # validate task/control-plane invariants
 just agent next               # choose the highest-priority ready task
@@ -217,6 +223,19 @@ OAuth, platform selection, backend alternatives, and later setup remain outside
 the clone contract. The local setup command is an explicit Hades vertical-slice
 extension; it does not claim Hermes provider-persistence parity or reproduce
 Hermes failure cases.
+
+Per ADR-0008, Hades Agent is entirely Rust — including the development
+tooling. The migration begins with the `hades-dev` workspace crate, which
+hosts the shared harness primitives (ANSI screen emulation, PTY control) that
+every probe and replay depends on. `scripts/check_screen_parity.py` (wired
+into `just verify`) feeds live Hades PTY output through both the Python and
+Rust screen models and requires identical lines, style inventory, and marker
+styles; the fixture validator (`hades-dev validate-fixture`) and the control
+plane (`hades-dev control-plane`) have already migrated, with differential
+checks (`scripts/check_fixture_parity.py`,
+`scripts/check_control_plane_parity.py`) proving byte-for-byte agreement
+with the Python implementations they replace. `just agent` and the gate
+delegate to the Rust binaries.
 
 The next configured journey is covered by `just replay-configured-surfaces`.
 It starts from that saved sidecar and proves the useful interaction loop around
@@ -316,6 +335,8 @@ argument-fragment boundaries, visible markers, and request counts without
 turning the reference handoff into Hades execution behavior.
 
 The `just probe-tool-completion-handoff` probe completes the stream with `[DONE]` and observes the bounded post-completion handoff: the interactive-only `clarify` question surface (question + choices) renders, the tool result is sent back to the model in a follow-up request (`system, user, assistant, tool` roles), the purpose-unknown auxiliary non-stream request appears, and the process exits cleanly with no external side effect.
+
+The `just probe-clarify-question-surface` probe goes one safe step further and exercises that surface: arrow navigation keeps the question surface alive without submitting, Enter on the first choice closes it and produces the follow-up answer, and the real Hermes tool-result content is recorded by normalized shape — a 158-byte JSON string with top-level keys `question`, `choices_offered`, `user_response` (stable digest across fresh runs), the exact contract HAD-119 substituted with a synthetic marker.
 
 The `just replay-tool-call-deltas` replay proves the safe Hades tool-call
 side of the OBS-0114 boundary: a loopback provider streams assistant text

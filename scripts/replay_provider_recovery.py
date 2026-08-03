@@ -212,7 +212,7 @@ def run_case(binary: Path, home: Path, server: RecoveryServer, case: str, timeou
             fd,
             output,
             f"{case}-startup",
-            lambda text: "Hermes Agent" in text and marker_present(text, "ready"),
+            lambda text: "Hades Agent" in text and marker_present(text, "ready"),
             timeout,
         )
         send(fd, FIRST_PROMPT.encode())

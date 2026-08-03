@@ -39,7 +39,7 @@ HELP_COMMAND = "/help Show available commands"
 HELP_TOP_BORDER = f"╔{'═' * 116}╗"
 HELP_BOTTOM_BORDER = f"╚{'═' * 116}╝"
 MAIN_SURFACE_MARKERS = (
-    "Hermes Agent",
+    "Hades Agent",
     "Available Tools",
     "Available Skills",
     "/help for commands",
@@ -154,7 +154,7 @@ def run_case(binary: Path, timeout: float) -> dict[str, Any]:
             fd,
             output,
             "startup",
-            lambda text: marker_present(text, "Hermes Agent") and marker_present(text, "ready"),
+            lambda text: marker_present(text, "Hades Agent") and marker_present(text, "ready"),
             timeout,
         )
         send(fd, b"/help\r")

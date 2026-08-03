@@ -239,7 +239,7 @@ def run_case(binary: Path, case: dict[str, Any], timeout: float, ordinal: int) -
     buffer = b""
     try:
         pid, fd = spawn(binary, home, provider_dir, payload_path, log_path)
-        startup_markers = ("Hermes Agent", "Nous Research", "Available Tools", "Available Skills")
+        startup_markers = ("Hades Agent", "Underworld", "Available Tools", "Available Skills")
         buffer = wait_for(
             pid,
             fd,

@@ -33,11 +33,11 @@ COLUMNS = 120
 ROWS = 40
 HELP_SETUP_REQUIRED_DELAY_MS = 8_000
 STARTUP_MARKERS = (
-    "Hermes Agent",
-    "Nous Research",
+    "Hades Agent",
+    "Underworld",
     "Available Tools",
     "Available Skills",
-    "glm-5.2 · Nous Research",
+    "glm-5.2 · Hades",
     "starting agent",
 )
 

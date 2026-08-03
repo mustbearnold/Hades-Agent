@@ -691,6 +691,125 @@ progress from August 1, 2026 through 2027.
   and tool_calls dropped the tool call (unit tests had fed events directly).
   The clarify question surface and the real Hermes tool-result content remain
   unobserved and are not reproduced.
+- HAD-120 observes the clarify question surface interaction in OBS-0116: the
+  surface renders question and choice markers after [DONE], ArrowDown/ArrowUp
+  navigation keeps the surface alive without submitting, and Enter on the
+  first choice closes it and produces the follow-up answer. The real Hermes
+  tool-result content is a 158-byte JSON string with top-level keys
+  `question`, `choices_offered`, `user_response` (digest `7336fd6d…`, stable
+  across fresh runs and unaffected by the harness environment fix). The
+  follow-up request shape (system, user, assistant with tool call, tool role)
+  and the auxiliary non-stream request match OBS-0114. The observation also
+  fixed a probe-harness environment leak: running from inside the Hermes
+  desktop app leaked `HERMES_DESKTOP` and `PYTHONPATH` into the reference
+  child, drifting the advertised tool inventory from the anchored 31 to 35
+  tools and shadowing pinned module schemas; `safe_environment` now strips
+  both so observations match the plain-CLI reference environment. The Hades
+  question surface and the real tool-result shape remain unimplemented; the
+  observation establishes the interaction and content contract without
+  turning it into execution, approval, or forwarding behavior.
+- HAD-122 gives the Hades startup surface its own owner-directed identity and
+  fixes a tall-terminal rendering bug. The product-owned startup frame now
+  renders a HADES AGENT logo, the `☠ Hades · Lord of the Digital Underworld`
+  tagline, `Hades Agent v0.1.0 (2026.8.3)` title, and `mock-model · Hades`
+  provider line, replacing the Hermes branding; the unconfigured model line
+  reads `glm-5.2 · Hades`. This is a deliberate, documented deviation from the
+  OBS-0001 reference frame (layout/geometry parity is preserved; Hades-facing
+  replay markers and the differential golden were updated to the product-owned
+  Hades frame). The bug fix stops the startup body copy before the template's
+  own footer/composer rows, so terminals taller than 40 rows no longer show a
+  duplicated footer and prompt mid-screen; the standalone setup wizard
+  surfaces keep their captured Hermes reference text and fixtures.
+- ADR-0008 records the owner direction that Hades Agent is entirely Rust,
+  including development tooling, and HAD-123 begins the migration: a new
+  `hades-dev` workspace crate hosts the shared harness primitives that every
+  probe and replay depends on. The Rust ANSI screen emulator (`Screen`,
+  `Cell`, `Style`, SGR parsing) and PTY spawn/control harness are faithful
+  ports of the Python harness, verified by a differential parity check
+  (`scripts/check_screen_parity.py`, wired into `verify-fast`) that feeds
+  live Hades PTY output through both the Python and Rust screen models and
+  requires identical lines, style inventory, and marker styles. The
+  differential check caught two real semantic differences during the port
+  (braille is narrow per Unicode East Asian Width, and marker lookup must
+  convert byte indices to char indices), fixing them before the Rust harness
+  was wired into the gate. Fixture validation (HAD-124) and the control
+  plane (HAD-125) migrate in subsequent phases.
+- HAD-124 ports the reference fixture validator to Rust as the
+  `hades-dev validate-fixture` subcommand. It enforces the identical
+  contracts as `scripts/validate_reference_fixture.py` — schema_version,
+  provenance (40-char lowercase source_commit, positive terminal geometry),
+  normalization/unknowns string lists, non-empty steps with unique ids,
+  input-event shapes (wait vs bytes_hex), and the credential scan including
+  the `sk-` token-boundary regex. A differential check
+  (`scripts/check_fixture_parity.py`) proves both validators agree on all
+  111 checked-in fixtures (identical exit codes and JSON summaries), then
+  the gate validates every fixture through the Rust binary; the Python
+  validator remains in the gate until the migration's final phase retires
+  it.
+- HAD-125 ports the development control plane to Rust as the
+  `hades-dev control-plane` subcommand, replacing `scripts/agent/control_plane.py`
+  for `just agent` and the gate. It reproduces all seven commands
+  (validate, next, show, claim, complete, block, cancel) with identical JSON
+  output and validation errors, flock-based exclusive locking with an
+  atomic temp-file replace, dependency promotion of queued tasks, and
+  eligibility ordering by priority then id. A parity check
+  (`scripts/check_control_plane_parity.py`) proves identical
+  validate/next/show output and identical error paths on the live ledger;
+  `just agent` and `verify.sh` now delegate to the Rust binary. 8 focused
+  unit tests cover validation rules, promotion, cycle detection, and the
+  UTC timestamp format.
+- HAD-126 ports the shared replay runtime to Rust
+  (`hades-dev::replay`): the helpers every Python replay imports from
+  `probe_tui_lifecycle` — spawn-with-arguments on a 120x40 PTY with the
+  standard environment, slave-path resolution via /proc, retained slave
+  descriptors for termios inspection, terminal flags (canonical/echo),
+  ANSI-stripped clean output, compact marker matching, wait_for with
+  early-exit detection, wait_for_exit with describe_status-shaped exit
+  values, output tails, and send. A differential parity check
+  (`scripts/check_replay_runtime_parity.py`, wired into `verify-fast`) proves
+  the Rust runtime agrees with the Python helpers on clean output, marker
+  matching, and real-subprocess exit shapes; 8 focused unit tests cover the
+  same behaviors against live subprocesses.
+- HAD-127 ports the first replay to Rust: `hades-dev replay-cli-launch`
+  reproduces `replay_cli_launch.py` — no-argument and explicit-tui launch
+  forms, startup landmarks, raw-mode flags, alternate-screen enter/leave
+  sequences, Ctrl+C exit status, and terminal restoration, with the same
+  report JSON shape (`probe`, `binary`, `dimensions`, `cases`, `passed`).
+  A differential check (`scripts/check_cli_launch_parity.py`, wired into
+  `verify.sh` and `just replay-cli-launch`) proves the Rust and Python
+  replays produce identical reports on the same binary; the Rust binary is
+  now the gate replay.
+- HAD-128 ports the unconfigured startup replay to Rust:
+  `hades-dev replay-unconfigured-startup` reproduces
+  `replay_unconfigured_startup.py` — provider-env stripping, unconfigured
+  markers (`glm-5.2 · Hades`, `starting agent`), absent ready footer and
+  prompt placeholder, raw mode, alternate-screen sequences, and Ctrl+C
+  exit, with the same report JSON shape. A differential check
+  (`scripts/check_replay_parity.py`) proves the Rust and Python replays
+  produce identical reports on the same binary; the Rust binary is now the
+  gate replay.
+- HAD-129 ports the unconfigured input replay to Rust:
+  `hades-dev replay-unconfigured-input` reproduces
+  `replay_unconfigured_input.py` — queued input during unconfigured
+  startup with the `❯ queued hello` composer marker, first Ctrl+C clearing
+  the draft while keeping the process alive, second Ctrl+C exiting
+  cleanly, and the empty-startup exit case, with the same report JSON
+  shape (schema_version/probe/binary/dimensions/cases/passed). A
+  differential check (`scripts/check_replay_parity.py`) proves the Rust and
+  Python replays produce identical reports on the same binary; the Rust
+  binary is now the gate replay.
+- HAD-130 ports the delayed unconfigured /help route to Rust:
+  `hades-dev replay-unconfigured-help` reproduces
+  `replay_unconfigured_help.py` — /help retained during the 8000ms
+  pre-delay window, the delayed Setup Required overlay with
+  /model//setup/Ctrl+C, bounded transition timing (7000–11000ms), first
+  Ctrl+C clearing the overlay without exiting, second Ctrl+C exiting
+  cleanly, and the stable-terminal-flags retry on the post-exec ioctl race
+  (errno 25). The report matches the Python shape; the differential check
+  normalizes the two run-to-run timing fields (`pre_delay_ms`,
+  `observed_transition_ms`) while both replays assert the same bounds. The
+  Rust binary is now the gate replay for the debug binary and both
+  installed launchers.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes

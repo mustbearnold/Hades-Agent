@@ -91,7 +91,7 @@ def run_case(binary: Path, case: dict[str, Any], timeout: float, ordinal: int) -
     )
     replayed_steps: list[dict[str, Any]] = []
     try:
-        startup_markers = ("Hermes Agent", "Nous Research", "Available Tools", "Available Skills")
+        startup_markers = ("Hades Agent", "Underworld", "Available Tools", "Available Skills")
         wait_for_screen(
             session,
             "startup",

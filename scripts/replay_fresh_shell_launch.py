@@ -27,7 +27,7 @@ from probe_tui_lifecycle import (
 
 
 ROOT = Path(__file__).resolve().parents[1]
-STARTUP_MARKERS = ("Hermes Agent", "Nous Research", "Available Tools", "Available Skills")
+STARTUP_MARKERS = ("Hades Agent", "Underworld", "Available Tools", "Available Skills")
 
 
 def runtime_environment(launcher_dir: Path, home: Path) -> dict[str, str]:

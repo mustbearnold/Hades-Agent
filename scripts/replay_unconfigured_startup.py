@@ -28,11 +28,11 @@ from probe_tui_lifecycle import (
 COLUMNS = 120
 ROWS = 40
 STARTUP_MARKERS = (
-    "Hermes Agent",
-    "Nous Research",
+    "Hades Agent",
+    "Underworld",
     "Available Tools",
     "Available Skills",
-    "glm-5.2 · Nous Research",
+    "glm-5.2 · Hades",
     "starting agent",
 )
 
@@ -119,7 +119,7 @@ def run_case(binary: Path, name: str, arguments: list[str], timeout: float) -> d
             "arguments": arguments,
             "startup": {
                 "landmarks": list(STARTUP_MARKERS),
-                "model_provider": "glm-5.2 · Nous Research",
+                "model_provider": "glm-5.2 · Hades",
                 "status": "starting agent",
                 "ready_footer": False,
                 "prompt_placeholder": False,

@@ -265,7 +265,7 @@ def run_stream_case(binary: Path, timeout: float) -> dict[str, Any]:
     output = bytearray()
     reaped = False
     try:
-        wait_for(pid, fd, output, case, "startup", lambda text: "Hermes Agent" in text and "ready" in text, timeout)
+        wait_for(pid, fd, output, case, "startup", lambda text: "Hades Agent" in text and "ready" in text, timeout)
         send(fd, b"sanitized prompt\r")
         wait_for(pid, fd, output, case, "request", lambda _text: server.request_seen.is_set(), timeout)
         wait_for(
@@ -345,7 +345,7 @@ def run_missing_config_case(binary: Path, timeout: float) -> dict[str, Any]:
             output,
             case,
             "startup",
-            lambda text: "Hermes Agent" in text and marker_present(text, "starting agent"),
+            lambda text: "Hades Agent" in text and marker_present(text, "starting agent"),
             timeout,
         )
         send(fd, b"missing endpoint\r")
@@ -391,7 +391,7 @@ def run_interrupt_case(binary: Path, timeout: float) -> dict[str, Any]:
     output = bytearray()
     reaped = False
     try:
-        wait_for(pid, fd, output, case, "startup", lambda text: "Hermes Agent" in text and "ready" in text, timeout)
+        wait_for(pid, fd, output, case, "startup", lambda text: "Hades Agent" in text and "ready" in text, timeout)
         send(fd, b"interrupt me\r")
         wait_for(pid, fd, output, case, "request", lambda _text: server.request_seen.is_set(), timeout)
         send(fd, b"\x03")

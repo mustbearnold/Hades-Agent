@@ -33,7 +33,7 @@ DEFAULT_CONTRACT = ROOT / "tests/fixtures/parity/OBS-0017-hades-input-history-pe
 DEFAULT_BINARY = ROOT / "target/debug/hades"
 SNAPSHOT_COLUMNS = 120
 SNAPSHOT_ROWS = 40
-STARTUP_MARKERS = ("Hermes Agent", "Nous Research", "Available Tools", "Available Skills")
+STARTUP_MARKERS = ("Hades Agent", "Underworld", "Available Tools", "Available Skills")
 
 
 def load_contract(path: Path) -> dict[str, Any]:
