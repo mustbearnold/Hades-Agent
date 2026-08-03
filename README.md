@@ -135,7 +135,7 @@ just probe-osc52-multiplexer # Hermes TMUX/STY OSC52 wrapper reference probe
 just probe-osc52-timing-limits # Hermes OSC52 timing and bounded-size reference probe
 just probe-terminal-palette    # Hermes SGR palette and cell-style reference probe
 just probe-hermes-help-setup-timing # timed /help setup-required reference probe
-just probe-hermes-setup-required-actions # post-delay /model /setup action probe
+just probe-hermes-setup-required-actions # post-delay /model /setup action probe (OBS-0104 revalidation)
 just probe-hermes-standalone-setup # standalone hermes setup first-run probe
 just probe-hermes-standalone-full-setup # standalone Full setup continuation probe
 just probe-hermes-standalone-terminal-platform # standalone backend/platform boundary probe

@@ -579,6 +579,12 @@ progress from August 1, 2026 through 2027.
   preserves the typed ready state and `/help` composer, and keeps the bounded
   no-provider/Ctrl+C lifecycle; smaller-terminal clipping and other Help
   interactions remain unknown.
+- HAD-108 revalidates OBS-0104 against the pinned Hermes checkout. After delayed
+  Setup Required, `/model` and `/setup` remain on the explanatory overlay through
+  two Enter presses with no provider request or config change; the first Ctrl+C
+  keeps the overlay alive and the second exits cleanly. The ready-marker redraw
+  is retained as an unresolved underlying detail, not provider readiness. Hades
+  action replay remains the next implementation boundary.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes

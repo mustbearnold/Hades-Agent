@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0104",
+  "reference_observation": "OBS-0068",
+  "surface": "hermes-post-delay-setup-required-actions-revalidation",
+  "reference": {
+    "product": "Hermes Agent",
+    "version": "0.19.1 (2026.7.30)",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "fresh direct PTY with normalized ANSI screen model"
+    },
+    "capture": "fresh no-config/no-provider cases re-running the bounded delayed /help Setup Required action probe"
+  },
+  "normalization": [
+    "Reference checkout, synthetic HOME/HERMES_HOME paths, PTY paths, session identifiers, timestamps, config values, credentials, and raw redraw bytes are omitted or represented by placeholders.",
+    "Each fresh case submits /help, waits for Setup Required, then probes only /model or /setup with two Enter presses; no credentials, OAuth, external network, provider value, model choice, or setup selection is entered.",
+    "The control case sends Ctrl+C once, verifies the process remains alive with Setup Required visible, then uses the bounded second press for clean exit and terminal restoration.",
+    "The observed ready-marker redraw after follow-up Enter presses is retained as an unresolved screen detail and is not interpreted as provider readiness or successful setup."
+  ],
+  "steps": [
+    {
+      "id": "revalidated-post-delay-model",
+      "precondition": "Fresh Hermes 120x40 direct PTY without config or provider endpoint; /help has reached Setup Required.",
+      "input_sequence": [
+        {"kind": "text", "value": "/help", "bytes_hex": "2f 68 65 6c 70"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "wait", "value": "wait for the bounded delayed Setup Required surface"},
+        {"kind": "text", "value": "/model", "bytes_hex": "2f 6d 6f 64 65 6c"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "bounded cleanup"}
+      ],
+      "output": {
+        "status": "passed",
+        "setup_required_remained_visible": true,
+        "model_picker_visible": false,
+        "setup_wizard_visible": false,
+        "provider_request_started": false,
+        "config_changed": false,
+        "ready_marker_redraw_observed": true,
+        "clean_exit": true,
+        "terminal_restored": true
+      }
+    },
+    {
+      "id": "revalidated-post-delay-setup",
+      "precondition": "Fresh Hermes 120x40 direct PTY without config or provider endpoint; /help has reached Setup Required.",
+      "input_sequence": [
+        {"kind": "text", "value": "/help", "bytes_hex": "2f 68 65 6c 70"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "wait", "value": "wait for the bounded delayed Setup Required surface"},
+        {"kind": "text", "value": "/setup", "bytes_hex": "2f 73 65 74 75 70"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "bounded cleanup"}
+      ],
+      "output": {
+        "status": "passed",
+        "setup_required_remained_visible": true,
+        "model_picker_visible": false,
+        "setup_wizard_visible": false,
+        "provider_request_started": false,
+        "config_changed": false,
+        "ready_marker_redraw_observed": true,
+        "clean_exit": true,
+        "terminal_restored": true
+      }
+    },
+    {
+      "id": "revalidated-post-delay-ctrl-c",
+      "precondition": "Fresh Hermes 120x40 direct PTY without config or provider endpoint; /help has reached Setup Required.",
+      "input_sequence": [
+        {"kind": "text", "value": "/help", "bytes_hex": "2f 68 65 6c 70"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d"},
+        {"kind": "wait", "value": "wait for the bounded delayed Setup Required surface"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "clear the retained draft while the overlay remains"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "clean exit"}
+      ],
+      "output": {
+        "status": "passed",
+        "first_ctrl_c_kept_process_alive": true,
+        "first_ctrl_c_overlay_remained": true,
+        "second_ctrl_c_exited": true,
+        "config_changed": false,
+        "clean_exit": true,
+        "terminal_restored": true
+      }
+    }
+  ],
+  "unknowns": [
+    "The bounded /model and /setup inputs did not open a picker or wizard; behavior after another focus/key path or after provider configuration remains unknown.",
+    "Provider setup, credentials, OAuth, model selection, persistence, external network behavior, and configured prompt behavior were not exercised.",
+    "Exact full-screen ANSI equivalence and terminal-dependent behavior outside the 120x40 direct PTY remain unknown."
+  ],
+  "passed": true
+}

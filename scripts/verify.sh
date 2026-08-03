@@ -156,6 +156,7 @@ python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0064-her
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0065-hermes-setup-required-reconciliation.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0066-hermes-help-setup-timing.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0067-hades-help-setup-required.json
+python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0104-hermes-setup-required-actions-revalidation.json
 python3 scripts/probe_hermes_full_setup_provider_selection.py --report .hades/runtime/hermes-full-setup-provider-selection-probe.json --timeout 30
 python3 scripts/probe_hermes_full_setup_model_default.py --report .hades/runtime/hermes-full-setup-model-default-probe.json --timeout 30
 python3 scripts/probe_hermes_local_provider_stream.py --report .hades/runtime/hermes-local-provider-stream-probe.json --timeout 30

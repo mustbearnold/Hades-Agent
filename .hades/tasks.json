@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-03T01:16:52Z",
+  "updated_at": "2026-08-03T01:43:33Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -5862,6 +5862,65 @@
           ".hades/runtime/hermes-help-resize-probe.json",
           ".hades/runtime/configured-help-resize-replay.json",
           "scripts/probe_tui_lifecycle.py",
+          "justfile",
+          "scripts/verify.sh",
+          "README.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-108",
+      "title": "Capture Hermes post-delay Setup Required actions",
+      "status": "complete",
+      "priority": 82,
+      "lane": "parity",
+      "owner_role": "researcher",
+      "depends_on": [
+        "HAD-107"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "pinned_hermes_reference",
+        "safe_setup_required_action_trace",
+        "normalized_screen_trace",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Against the pinned Hermes source in a fresh synthetic home and absent loopback endpoint, submit /help, wait for the stable Setup Required surface, and independently probe /model, /setup, and the observed safe Ctrl+C boundary before bounded cleanup.",
+        "Record which action surface appears, whether the process remains alive, what input and visible landmarks persist, and any stable exit status or terminal restoration; separate timing, focus, catalog, and provider behavior that the bounded capture does not establish.",
+        "Do not enter credentials, OAuth, provider/model values, side-effecting commands, or external network activity; never turn a Hermes defect or ambiguous redraw into a Hades requirement.",
+        "Add provenance-bearing OBS-0104 fixture, repeatable direct-PTY probe, observation document, matrix/context/readme/just/verify wiring, and complete the no-skip gate before completion."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_setup_required_actions.py",
+        "tests/fixtures/parity/OBS-0068-hermes-setup-required-actions.json",
+        "tests/fixtures/parity/OBS-0104-hermes-setup-required-actions-revalidation.json",
+        "docs/parity/observations/OBS-0068-hermes-setup-required-actions-2026-08-02.md",
+        "docs/parity/observations/OBS-0104-hermes-setup-required-actions-revalidation-2026-08-03.md",
+        ".hades/runtime/hermes-setup-required-actions-probe.json",
+        "justfile",
+        "scripts/verify.sh",
+        "README.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md"
+      ],
+      "ready_at": "2026-08-03T01:18:00Z",
+      "claimed_by": "hermes-setup-required-actions-researcher",
+      "claimed_at": "2026-08-03T01:19:17Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Revalidated Hermes post-delay Setup Required actions: /model and /setup remain on the explanatory overlay without provider/config activity; bounded Ctrl+C cleanup remains stable. Full just verify passed on retry after one isolated transient OSC52 timing failure.",
+        "completed_at": "2026-08-03T01:43:33Z",
+        "evidence": [
+          "scripts/probe_hermes_setup_required_actions.py",
+          "tests/fixtures/parity/OBS-0068-hermes-setup-required-actions.json",
+          "tests/fixtures/parity/OBS-0104-hermes-setup-required-actions-revalidation.json",
+          "docs/parity/observations/OBS-0068-hermes-setup-required-actions-2026-08-02.md",
+          "docs/parity/observations/OBS-0104-hermes-setup-required-actions-revalidation-2026-08-03.md",
+          ".hades/runtime/hermes-setup-required-actions-probe.json",
           "justfile",
           "scripts/verify.sh",
           "README.md",
