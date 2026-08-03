@@ -7,7 +7,10 @@ oracle.
 The repository is ready for autonomous development. Start with:
 
 ```bash
-just verify
+just verify          # full completion gate (~15 min, includes Hermes reference probes)
+just verify-fast     # iteration gate without reference probes (~3 min)
+just test            # sub-minute unit loop (fmt + clippy + tests)
+just prepare-reference  # provision the pinned Hermes reference locally
 just agent next
 just snapshot
 ```

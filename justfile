@@ -5,6 +5,19 @@ check:
 
 verify: check
 
+# Fast iteration gate: same checks as verify minus the ~40 Hermes reference
+# probes (which need the pinned reference and dominate gate wall time).
+# Full `just verify` remains the only completion gate.
+verify-fast:
+    bash scripts/verify_fast.sh
+
+# Sub-minute unit loop for tight implementation feedback.
+test:
+    python3 scripts/agent/control_plane.py validate
+    cargo fmt --all -- --check
+    cargo clippy --workspace --all-targets --locked -- -D warnings
+    cargo test --workspace --all-targets --locked
+
 prepare-reference:
     bash scripts/prepare_hermes_reference.sh
 
