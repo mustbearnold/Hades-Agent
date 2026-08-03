@@ -166,6 +166,7 @@ just probe-multi-turn-provider # Hermes multi-turn payload and tool-schema probe
 just probe-tool-schema-semantics # Hermes tool schema semantics without execution
 just probe-tool-inventory # Hermes exact 31-tool inventory with descriptions
 just probe-tool-call-handoff # Hermes tool-call stream handoff without execution
+just probe-tool-completion-handoff # Hermes post-[DONE] clarify handoff observation
 just probe-model-picker-selection # Hermes model selection side-effect boundary
 just agent validate           # validate task/control-plane invariants
 just agent next               # choose the highest-priority ready task
@@ -313,6 +314,8 @@ The bounded `just probe-tool-call-handoff` probe returns a valid fragmented
 and stops Hermes before tool processing. It records the normalized delta fields,
 argument-fragment boundaries, visible markers, and request counts without
 turning the reference handoff into Hades execution behavior.
+
+The `just probe-tool-completion-handoff` probe completes the stream with `[DONE]` and observes the bounded post-completion handoff: the interactive-only `clarify` question surface (question + choices) renders, the tool result is sent back to the model in a follow-up request (`system, user, assistant, tool` roles), the purpose-unknown auxiliary non-stream request appears, and the process exits cleanly with no external side effect.
 
 The `just replay-tool-call-deltas` replay proves the safe Hades side of that
 boundary: a loopback provider streams assistant text plus a fragmented

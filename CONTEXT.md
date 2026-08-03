@@ -667,6 +667,16 @@ progress from August 1, 2026 through 2027.
   requests remain explicit unknowns; advertising is wire parity, not
   capability.
 
+  OBS-0114 observes the post-completion handoff OBS-0110 deliberately
+  withheld: with `[DONE]` sent, Hermes renders the interactive-only
+  `clarify` question surface (question + choices markers), then sends the
+  tool result back to the model in a follow-up request with
+  `system, user, assistant, tool` roles (assistant message carries the tool
+  call), plus the purpose-unknown auxiliary non-stream request, then returns
+  to ready and exits cleanly with no external side effect. Hades still does
+  not reproduce the tool-result follow-up or question surface; they remain
+  the next implementation frontier after safe parse/advertise.
+
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes
 defects, unsafe behavior, or failure cases; fix them and record any deliberate

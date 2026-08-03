@@ -219,6 +219,9 @@ probe-tool-inventory:
 probe-tool-call-handoff:
     python3 scripts/probe_hermes_tool_call_handoff.py --report .hades/runtime/hermes-tool-call-handoff-probe.json --timeout 30 --observation-window 0.2
 
+probe-tool-completion-handoff:
+    python3 scripts/probe_hermes_tool_completion_handoff.py --report .hades/runtime/hermes-tool-completion-handoff-probe.json --timeout 90 --observation-window 4
+
 probe-stream-timing:
     python3 scripts/probe_hermes_stream_timing.py --report .hades/runtime/hermes-stream-timing-probe.json --timeout 30
 
@@ -409,6 +412,7 @@ validate-reference:
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0051-hades-local-provider-stream.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0111-hades-tool-call-deltas.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0113-hades-tool-inventory-advertisement.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0114-hermes-tool-completion-handoff.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0052-hermes-stream-timing.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0053-hades-stream-timing.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0054-hermes-provider-errors.json

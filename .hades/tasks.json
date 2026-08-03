@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-03T07:39:49Z",
+  "updated_at": "2026-08-03T09:14:17Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -6466,6 +6466,62 @@
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/tool-call-deltas-replay.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-118",
+      "title": "Observe Hermes post-completion tool-call handoff with clarify",
+      "status": "complete",
+      "priority": 72,
+      "lane": "research",
+      "owner_role": "observer",
+      "depends_on": [
+        "HAD-117"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "pinned_hermes_reference",
+        "direct_pty_probe",
+        "sanitized_fixture",
+        "bounded_process_stop",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Against the pinned Hermes source in a fresh synthetic HOME/HERMES_HOME with a deterministic loopback provider, submit one ordinary prompt and return a complete streaming tool-call response (fragmented clarify arguments, finish_reason tool_calls, and the terminal [DONE] marker).",
+        "Observe the bounded post-completion handoff: any visible clarify question/approval/processing surface, transcript or status markers, and the exact stop point, without allowing any network, credential, OAuth, browser, filesystem, or installer side effect (clarify is interactive-only and its execution is confined to the TUI question surface).",
+        "Record normalized screen markers, request counts (including any follow-up chat requests), and the side-effect boundary; classify any unstable or unobserved transition as explicit unknown rather than guessing.",
+        "Stop the isolated Hermes process with bounded cleanup; do not reproduce a Hermes defect or turn the reference handoff into Hades execution behavior.",
+        "Add a provenance-bearing OBS-0114 fixture, repeatable direct-PTY/loopback probe, observation document, parity matrix/context/readme updates, wire fixture validation and probe wiring through just verify, and complete the no-skip gate before completion."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_tool_completion_handoff.py",
+        "tests/fixtures/parity/OBS-0114-hermes-tool-completion-handoff.json",
+        "docs/parity/observations/OBS-0114-hermes-tool-completion-handoff-2026-08-03.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hermes-tool-completion-handoff-probe.json"
+      ],
+      "ready_at": "2026-08-03T08:34:59Z",
+      "claimed_by": "tool-handoff-observer",
+      "claimed_at": "2026-08-03T08:34:59Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Observed the pinned Hermes post-completion tool-call handoff OBS-0110 withheld: with [DONE] sent, the interactive-only clarify question surface renders (question + choices markers, tool name visible, no Processing marker), then Hermes sends the tool result back to the model in a follow-up request (roles system, user, assistant, tool; assistant message carries the tool call), plus the purpose-unknown auxiliary non-stream request, then returns to ready and exits cleanly with 8 loopback-only HTTP requests and no external side effect. The fixture answers follow-up streaming requests plainly so the agent loop terminates. Sanitized OBS-0114 fixture, repeatable direct-PTY probe, observation document, matrix/context/readme updates, and just verify wiring added; bumped the standalone full-setup reference probe gate timeout to 90s for shared-sandbox load robustness. Complete no-skip just verify gate PASS (verification: PASS, 845981 ms).",
+        "completed_at": "2026-08-03T09:14:17Z",
+        "evidence": [
+          "scripts/probe_hermes_tool_completion_handoff.py",
+          "tests/fixtures/parity/OBS-0114-hermes-tool-completion-handoff.json",
+          "docs/parity/observations/OBS-0114-hermes-tool-completion-handoff-2026-08-03.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hermes-tool-completion-handoff-probe.json"
         ]
       }
     }
