@@ -254,7 +254,11 @@ python3 scripts/replay_standalone_tool_provider_boundary.py --binary target/debu
 python3 scripts/replay_standalone_tool_provider_inventory.py --binary target/debug/hades --report .hades/runtime/hades-tool-provider-inventory-replay.json --timeout 5
 python3 scripts/replay_standalone_tool_provider_inventory_navigation.py --binary target/debug/hades --report .hades/runtime/hades-tool-provider-inventory-navigation-edges-replay.json --timeout 5
 python3 scripts/replay_standalone_tool_provider_inventory_selection.py --binary target/debug/hades --report .hades/runtime/hades-tool-provider-inventory-selection-replay.json --timeout 5
-python3 scripts/replay_vertical_slice.py --binary target/debug/hades --report .hades/runtime/vertical-slice-replay.json --timeout 8
+# HAD-131: replay-vertical-slice is ported to Rust; the differential
+# check proves identical reports, then the Rust binary is the gate replay.
+cargo build --offline --package hades-dev --bin replay_vertical_slice
+python3 scripts/check_replay_parity.py replay_vertical_slice replay_vertical_slice
+./target/debug/replay_vertical_slice --binary target/debug/hades --report .hades/runtime/vertical-slice-replay.json --timeout 8
 python3 scripts/replay_configured_surfaces.py --binary target/debug/hades --report .hades/runtime/configured-surfaces-replay.json --timeout 8
 python3 scripts/replay_configured_help.py --binary target/debug/hades --report .hades/runtime/configured-help-replay.json --timeout 60
 python3 scripts/replay_configured_help_lifecycle.py --binary target/debug/hades --report .hades/runtime/configured-help-lifecycle-replay.json --timeout 60

@@ -810,6 +810,20 @@ progress from August 1, 2026 through 2027.
   `observed_transition_ms`) while both replays assert the same bounds. The
   Rust binary is now the gate replay for the debug binary and both
   installed launchers.
+- HAD-131 ports the configured vertical-slice replay to Rust:
+  `hades-dev replay-vertical-slice` reproduces
+  `replay_vertical_slice.py` — `hades setup --local <loopback-url>
+  vertical-model` persisting a sanitized local-provider sidecar (no
+  config.yaml, no persisted credential), a fresh TUI process reaching
+  ready without re-running setup, one streamed provider request to the
+  in-process loopback SSE server (first delta visible before completion,
+  final answer held until release), the sanitized-boundary request
+  assertions (no Authorization header, exact path/content-type, persisted
+  model, system/user roles, delivered prompt), and a clean Ctrl+C exit
+  with terminal restoration. The report matches the Python shape; the
+  differential check proves identical reports on the same binary. The Rust
+  binary is now the gate replay (verify.sh + justfile); the Python replay
+  stays until the final migration phase retires it.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes

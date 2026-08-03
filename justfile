@@ -51,7 +51,9 @@ replay-fresh-shell-launch:
 
 replay-vertical-slice:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_vertical_slice.py --binary target/debug/hades --report .hades/runtime/vertical-slice-replay.json
+    cargo build --offline --package hades-dev --bin replay_vertical_slice
+    python3 scripts/check_replay_parity.py replay_vertical_slice replay_vertical_slice
+    ./target/debug/replay_vertical_slice --binary target/debug/hades --report .hades/runtime/vertical-slice-replay.json --timeout 8
 
 replay-configured-surfaces:
     cargo build --locked --package hades-cli
