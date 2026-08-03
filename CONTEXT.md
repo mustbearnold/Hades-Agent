@@ -624,6 +624,15 @@ progress from August 1, 2026 through 2027.
   execute these tools until a separate task defines safe approval, validation,
   and failure semantics.
 
+  OBS-0110 captures the next transport boundary with one ordinary prompt and a
+  valid fragmented `clarify` tool call. The probe records the registered tool,
+  call-id/name fields, argument-fragment lengths and digests, and
+  `finish_reason: "tool_calls"`, then withholds `[DONE]` and stops the live
+  synthetic process before tool processing. No tool response, follow-up chat
+  request, external network, OAuth, browser, or tool-specific filesystem
+  result was observed. Complete-stream handoff, approval, execution, and
+  failure behavior remain unknown; this is not a Hades tool implementation.
+
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes
 defects, unsafe behavior, or failure cases; fix them and record any deliberate

@@ -30,6 +30,7 @@ COLUMNS = 120
 ROWS = 40
 SOURCE_COMMIT = "e444d165807f489b5c1ab8e4a612c8d09c2e67a2"
 BASE_URL = "http://127.0.0.1:8765/v1"
+SENSITIVE_ENV_PARTS = ("API_KEY", "TOKEN", "SECRET", "PASSWORD", "PRIVATE_KEY", "ACCESS_KEY")
 STYLE_SEQUENCE = re.compile(rb"\x1b\[[0-9:;?]*m")
 ANSI_SEQUENCE = re.compile(
     rb"\x1b(?:\[[0-?]*[ -/]*[@-~]|\][^\x07]*(?:\x07|\x1b\\)|[()][0-2A-Z])"
@@ -457,7 +458,11 @@ def spawn(reference: Path, home: Path, configured: bool) -> tuple[int, int]:
         write_ready_config(home)
     pid, fd = pty.fork()
     if pid == 0:
-        environment = os.environ.copy()
+        environment = {
+            key: value
+            for key, value in os.environ.items()
+            if not any(part in key.upper() for part in SENSITIVE_ENV_PARTS)
+        }
         environment.update(
             {
                 "TERM": "xterm-256color",

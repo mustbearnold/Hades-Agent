@@ -168,6 +168,8 @@ python3 scripts/probe_hermes_full_setup_model_default.py --report .hades/runtime
 python3 scripts/probe_hermes_local_provider_stream.py --report .hades/runtime/hermes-local-provider-stream-probe.json --timeout 30
 python3 scripts/probe_hermes_multi_turn_provider.py --report .hades/runtime/hermes-multi-turn-provider-probe.json --timeout 30
 python3 scripts/probe_hermes_tool_schema_semantics.py --report .hades/runtime/hermes-tool-schema-semantics-probe.json --timeout 30
+python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0110-hermes-tool-call-handoff.json
+python3 scripts/probe_hermes_tool_call_handoff.py --report .hades/runtime/hermes-tool-call-handoff-probe.json --timeout 30 --observation-window 0.2
 python3 scripts/probe_hermes_stream_timing.py --report .hades/runtime/hermes-stream-timing-probe.json --timeout 30
 python3 scripts/probe_hermes_provider_errors.py --report .hades/runtime/hermes-provider-errors-probe.json --timeout 30
 python3 scripts/probe_hermes_provider_setup_persistence.py --report .hades/runtime/hermes-provider-setup-persistence-probe.json --timeout 30

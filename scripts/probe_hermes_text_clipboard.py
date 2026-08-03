@@ -25,6 +25,7 @@ from typing import Any
 DEFAULT_REFERENCE = Path("/tmp/hades-hermes-ref-X3bLd0")
 COLUMNS = 120
 ROWS = 40
+SENSITIVE_ENV_PARTS = ("API_KEY", "TOKEN", "SECRET", "PASSWORD", "PRIVATE_KEY", "ACCESS_KEY")
 ANSI_SEQUENCE = re.compile(r"\x1b(?:\[[0-?]*[ -/]*[@-~]|\][^\x07]*(?:\x07|\x1b\\)|[()][0-2A-Z])")
 
 
@@ -78,7 +79,11 @@ def wait_for(pid: int, fd: int, buffer: bytes, markers: list[str], timeout: floa
 def spawn(reference: Path, home: Path, fake_bin: Path, payload: str, log: Path) -> tuple[int, int]:
     pid, fd = pty.fork()
     if pid == 0:
-        environment = os.environ.copy()
+        environment = {
+            key: value
+            for key, value in os.environ.items()
+            if not any(part in key.upper() for part in SENSITIVE_ENV_PARTS)
+        }
         environment.update(
             {
                 "TERM": "xterm-256color",

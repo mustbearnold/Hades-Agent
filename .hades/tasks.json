@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-03T04:24:28Z",
+  "updated_at": "2026-08-03T06:29:23Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -6222,6 +6222,67 @@
           "README.md",
           "docs/parity/MATRIX.md",
           "CONTEXT.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-114",
+      "title": "Capture Hermes tool-call response handoff without execution",
+      "status": "complete",
+      "priority": 76,
+      "lane": "research",
+      "owner_role": "observer",
+      "depends_on": [
+        "HAD-113"
+      ],
+      "risk": "high",
+      "oracle": [
+        "pinned_hermes_reference",
+        "synthetic_tool_call_stream",
+        "bounded_process_stop",
+        "no_tool_execution",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Against the pinned Hermes source in a fresh synthetic HOME/HERMES_HOME with a deterministic loopback provider, submit one ordinary prompt and return a valid OpenAI-compatible streaming tool-call response using a registered harmless Hermes tool such as clarify with synthetic arguments.",
+        "Record the normalized tool-call delta fields, call identifier/name/argument-fragment boundaries, finish reason, visible handoff markers, subsequent request count, and the exact bounded stop point without persisting prompt/argument payloads or authorization values.",
+        "Stop the isolated Hermes process before any tool response or tool action can occur; prove no external network, credential, OAuth, filesystem, browser, or other side effect was triggered and classify all post-handoff behavior as unknown.",
+        "Do not reproduce a Hermes defect or turn the reference handoff into Hades execution behavior. The result is transport evidence for a separate safe parser/approval implementation task.",
+        "Add a provenance-bearing OBS-0110 fixture, repeatable direct-PTY/loopback probe, observation document, parity matrix/context/readme updates, wire fixture validation and probe wiring through just/verify, and complete the no-skip gate before completion."
+      ],
+      "evidence": [
+        "scripts/probe_hermes_tool_call_handoff.py",
+        "tests/fixtures/parity/OBS-0110-hermes-tool-call-handoff.json",
+        "docs/parity/observations/OBS-0110-hermes-tool-call-handoff-2026-08-03.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/hermes-tool-call-handoff-probe.json",
+        "scripts/probe_hermes_osc52_clipboard.py",
+        "scripts/probe_hermes_terminal_palette.py",
+        "scripts/probe_hermes_text_clipboard.py"
+      ],
+      "claimed_by": "hermes-tool-call-handoff-researcher",
+      "claimed_at": "2026-08-03T04:26:49Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Captured the pinned Hermes tool-call response handoff in a fresh 120x40 direct PTY: one ordinary prompt returns a valid fragmented clarify tool call with call-id/name fields, two argument fragments (lengths and SHA-256 digests only), and finish_reason tool_calls; [DONE] was withheld and the live synthetic process was SIGTERMed before any tool response or action. No subsequent chat or tool-response request, external network, OAuth, browser, credential, or tool-specific filesystem result was observed; the request carried the same 31-function inventory including clarify. Sanitized OBS-0110 fixture and repeatable probe wired through just verify; complete no-skip just verify gate PASS (verification: PASS).",
+        "completed_at": "2026-08-03T06:29:23Z",
+        "evidence": [
+          "scripts/probe_hermes_tool_call_handoff.py",
+          "tests/fixtures/parity/OBS-0110-hermes-tool-call-handoff.json",
+          "docs/parity/observations/OBS-0110-hermes-tool-call-handoff-2026-08-03.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/hermes-tool-call-handoff-probe.json",
+          "scripts/probe_hermes_osc52_clipboard.py",
+          "scripts/probe_hermes_terminal_palette.py",
+          "scripts/probe_hermes_text_clipboard.py"
         ]
       }
     }

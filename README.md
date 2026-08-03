@@ -159,6 +159,7 @@ just replay-osc52-multiplexer # Hades TMUX/STY OSC52 wrapper parity replay
 just replay-local-provider   # loopback provider worker PTY replay
 just probe-multi-turn-provider # Hermes multi-turn payload and tool-schema probe
 just probe-tool-schema-semantics # Hermes tool schema semantics without execution
+just probe-tool-call-handoff # Hermes tool-call stream handoff without execution
 just probe-model-picker-selection # Hermes model selection side-effect boundary
 just agent validate           # validate task/control-plane invariants
 just agent next               # choose the highest-priority ready task
@@ -294,3 +295,9 @@ The companion `just probe-tool-schema-semantics` probe records the stable
 structural schema markers across two ordinary streamed turns. Descriptions are
 represented only by safe digest markers, and the probe never returns or
 executes a tool call.
+
+The bounded `just probe-tool-call-handoff` probe returns a valid fragmented
+`clarify` tool call and `finish_reason: "tool_calls"`, then withholds `[DONE]`
+and stops Hermes before tool processing. It records the normalized delta fields,
+argument-fragment boundaries, visible markers, and request counts without
+turning the reference handoff into Hades execution behavior.
