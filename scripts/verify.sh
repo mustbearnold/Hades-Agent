@@ -47,6 +47,7 @@ python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0071-her
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0072-hades-standalone-full-setup.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0073-hermes-standalone-terminal-platform.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0074-hades-standalone-terminal-platform.json
+python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0107-hades-setup-persistence.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0075-hermes-standalone-tool-configuration.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0076-hermes-tool-configuration-navigation.json
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0077-hermes-tool-provider-boundary.json

@@ -389,6 +389,7 @@ validate-reference:
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0104-hermes-setup-required-actions-revalidation.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0105-hades-setup-required-actions.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0106-hermes-setup-persistence-revalidation.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0107-hades-setup-persistence.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0073-hermes-standalone-terminal-platform.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0074-hades-standalone-terminal-platform.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0075-hermes-standalone-tool-configuration.json

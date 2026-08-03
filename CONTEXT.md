@@ -597,7 +597,14 @@ progress from August 1, 2026 through 2027.
   backend is accepted, and returns ready in a fresh process. The normalized
   shape includes `_config_version`, model/custom-provider paths, and bounded
   agent/display/session-reset additions; values, secrets, OAuth, and later
-  platform behavior remain unknown. Hades persistence is still unimplemented.
+  platform behavior remain unknown.
+- HAD-111 adds an explicit Hades-owned setup boundary sidecar after accepting
+  the displayed local backend. It preserves the existing non-secret baseline,
+  writes only normalized structural markers atomically, does not mutate on
+  backend cancellation, and remains unchanged through platform cancellation.
+  The sidecar is not read by provider startup detection, so it cannot imply a
+  ready provider; credentials, API keys, OAuth, endpoint secrets, and selected
+  platforms remain outside the claim. OBS-0107 is the direct-PTY oracle.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes

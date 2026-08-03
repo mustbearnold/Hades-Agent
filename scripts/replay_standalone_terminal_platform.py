@@ -52,6 +52,12 @@ TERMINAL_BACKEND_MARKERS = (
     "Select terminal backend:",
     "Keep current (local)",
 )
+FALLBACK_MARKERS = (
+    "Select terminal backend:",
+    "Enter for default (8)",
+    "Ctrl+C to exit",
+    "Select [1-8] (8):",
+)
 PLATFORM_MARKERS = (
     "Mattermost",
     "Signal",
@@ -63,6 +69,14 @@ TOOL_CONFIGURATION_MARKERS = (
     "Hermes Tool Configuration",
     "Enable or disable tools per platform.",
     "Tools that need API keys will be configured when enabled.",
+)
+SETUP_STATE_FILE = "hades-setup-boundary.conf"
+SETUP_STATE_MARKERS = (
+    "schema=1",
+    "setup_mode=full",
+    "terminal_backend=local",
+    "platform_selection=none",
+    "provider=unconfigured",
 )
 
 
@@ -115,7 +129,28 @@ def config_shape(path: Path) -> dict[str, object]:
     }
 
 
-def run_case(binary: Path, timeout: float) -> dict[str, object]:
+def setup_state_shape(home: Path) -> dict[str, object]:
+    path = home / SETUP_STATE_FILE
+    if not path.is_file():
+        return {"exists": False, "bytes": 0, "temporary_files": []}
+    text = path.read_text(encoding="utf-8")
+    temporary_files = sorted(
+        candidate.name
+        for candidate in home.iterdir()
+        if candidate.name.startswith(f".{SETUP_STATE_FILE}.")
+    )
+    return {
+        "exists": True,
+        "bytes": len(text.encode("utf-8")),
+        "contains_expected_structure": all(marker in text for marker in SETUP_STATE_MARKERS),
+        "contains_credential_like_field": any(
+            marker in text.lower() for marker in ("api_key", "oauth", "token")
+        ),
+        "temporary_files": temporary_files,
+    }
+
+
+def run_case(binary: Path, timeout: float, *, accept_backend: bool) -> dict[str, object]:
     home = Path(tempfile.mkdtemp(prefix="hades-standalone-terminal-platform-home-"))
     pid, master, slave_path = spawn_setup(binary, home)
     output = bytearray()
@@ -145,6 +180,9 @@ def run_case(binary: Path, timeout: float) -> dict[str, object]:
         )
         continuation_flags = terminal_flags(slave_path)
         config_at_continuation = config_shape(home / "config.yaml")
+        setup_state_at_continuation = setup_state_shape(home)
+        if setup_state_at_continuation["exists"]:
+            raise ProbeError("Full setup persisted backend/platform state before backend acceptance")
 
         send(master, b"\x03")
         wait_for(
@@ -162,6 +200,89 @@ def run_case(binary: Path, timeout: float) -> dict[str, object]:
                 f"{terminal_backend_flags}"
             )
 
+        if not accept_backend:
+            send(master, b"\x03")
+            wait_for(
+                pid,
+                master,
+                output,
+                "standalone numbered fallback after backend cancellation",
+                lambda text: all(marker_present(text, marker) for marker in FALLBACK_MARKERS),
+                timeout,
+            )
+            fallback_flags = terminal_flags(slave_path)
+            if not fallback_flags["canonical"] or not fallback_flags["echo"]:
+                raise ProbeError(
+                    f"backend cancellation did not restore terminal flags: {fallback_flags}"
+                )
+            state_after_backend_cancel = setup_state_shape(home)
+            if state_after_backend_cancel["exists"]:
+                raise ProbeError("backend cancellation unexpectedly persisted setup state")
+
+            send(master, b"\x03")
+            status = wait_for_exit(pid, master, output, timeout)
+            reaped = True
+            exit_status = describe_status(status)
+            if exit_status != {"kind": "exit", "code": 1}:
+                raise ProbeError(f"unexpected backend-cancellation status: {exit_status}")
+            cleanup_flags = terminal_flags(slave_path)
+            if not cleanup_flags["canonical"] or not cleanup_flags["echo"]:
+                raise ProbeError(f"terminal was not restored after cleanup: {cleanup_flags}")
+            config_after = config_shape(home / "config.yaml")
+            if config_after != config_at_continuation:
+                raise ProbeError("backend cancellation changed the bounded setup config")
+            cleaned = clean_output(output)
+            if "Provider error" in cleaned or "HADES_PROVIDER_BASE_URL" in cleaned:
+                raise ProbeError("backend cancellation unexpectedly started provider behavior")
+
+            return {
+                "case": "standalone-terminal-backend-cancel",
+                "arguments": ["setup"],
+                "dimensions": {"columns": COLUMNS, "rows": ROWS},
+                "startup": {"markers": list(INITIAL_MARKERS), "terminal_flags": initial_flags},
+                "continuation": {
+                    "markers": list(CONTINUATION_MARKERS),
+                    "terminal_flags": continuation_flags,
+                    "config": config_at_continuation,
+                    "setup_state": setup_state_at_continuation,
+                },
+                "terminal_backend": {
+                    "markers": list(TERMINAL_BACKEND_MARKERS),
+                    "terminal_flags": terminal_backend_flags,
+                },
+                "fallback_after_backend_cancel": {
+                    "markers": list(FALLBACK_MARKERS),
+                    "terminal_flags": fallback_flags,
+                    "setup_state": state_after_backend_cancel,
+                },
+                "cancellation": {
+                    "input": [
+                        "j",
+                        "Enter",
+                        "Ctrl+C (skip provider)",
+                        "Ctrl+C (cancel Keep current local backend)",
+                        "Ctrl+C (cancel numbered fallback)",
+                    ],
+                    "backend_cancel_added_no_state": True,
+                    "exit": exit_status,
+                    "alternate_screen_entered": b"\x1b[?1049h" in bytes(output),
+                    "alternate_screen_left": b"\x1b[?1049l" in bytes(output),
+                    "terminal_flags": cleanup_flags,
+                    "credentials_entered": False,
+                    "oauth_started": False,
+                    "network_requested": False,
+                },
+                "persistence": {
+                    "config_before": config_before,
+                    "config_after": config_after,
+                    "config_unchanged_after_backend_cancel": config_after == config_at_continuation,
+                    "setup_state_created": False,
+                    "secrets_file_created": False,
+                },
+                "provider_started": False,
+                "status": "passed",
+            }
+
         send(master, b"\r")
         wait_for(
             pid,
@@ -172,6 +293,15 @@ def run_case(binary: Path, timeout: float) -> dict[str, object]:
             timeout,
         )
         platform_flags = terminal_flags(slave_path)
+        setup_state_at_platform = setup_state_shape(home)
+        if not setup_state_at_platform["exists"]:
+            raise ProbeError("accepted local backend did not persist Hades setup state")
+        if not setup_state_at_platform["contains_expected_structure"]:
+            raise ProbeError("persisted Hades setup state missed a bounded structural marker")
+        if setup_state_at_platform["contains_credential_like_field"]:
+            raise ProbeError("persisted Hades setup state contained a credential-like field")
+        if setup_state_at_platform["temporary_files"]:
+            raise ProbeError("atomic setup-state write left a temporary file")
         leaves_before_cancel = bytes(output).count(b"\x1b[?1049l")
 
         send(master, b"\x03")
@@ -204,6 +334,9 @@ def run_case(binary: Path, timeout: float) -> dict[str, object]:
         config_after = config_shape(home / "config.yaml")
         if config_after != config_at_continuation:
             raise ProbeError("platform cancellation changed the bounded setup config")
+        setup_state_after_platform_cancel = setup_state_shape(home)
+        if setup_state_after_platform_cancel != setup_state_at_platform:
+            raise ProbeError("platform cancellation changed the persisted Hades setup state")
         if (home / ".env").exists():
             raise ProbeError("platform cancellation created a secrets file")
         cleaned = clean_output(output)
@@ -219,6 +352,7 @@ def run_case(binary: Path, timeout: float) -> dict[str, object]:
                 "markers": list(CONTINUATION_MARKERS),
                 "terminal_flags": continuation_flags,
                 "config": config_at_continuation,
+                "setup_state": setup_state_at_continuation,
             },
             "terminal_backend": {
                 "markers": list(TERMINAL_BACKEND_MARKERS),
@@ -255,6 +389,11 @@ def run_case(binary: Path, timeout: float) -> dict[str, object]:
                 "config_before": config_before,
                 "config_after": config_after,
                 "config_unchanged_after_platform_cancel": config_after == config_at_continuation,
+                "setup_state_at_platform": setup_state_at_platform,
+                "setup_state_after_platform_cancel": setup_state_after_platform_cancel,
+                "setup_state_unchanged_after_platform_cancel": (
+                    setup_state_after_platform_cancel == setup_state_at_platform
+                ),
                 "secrets_file_created": False,
             },
             "provider_started": False,
@@ -293,7 +432,10 @@ def main() -> int:
         return 2
 
     try:
-        report["cases"] = [run_case(binary, args.timeout)]
+        report["cases"] = [
+            run_case(binary, args.timeout, accept_backend=False),
+            run_case(binary, args.timeout, accept_backend=True),
+        ]
         report["passed"] = True
     except (OSError, ProbeError) as error:
         report.update({"passed": False, "error": str(error)})

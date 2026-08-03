@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-03T02:40:53Z",
+  "updated_at": "2026-08-03T03:11:51Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -6049,6 +6049,64 @@
           ".hades/runtime/hermes-setup-config-shape-probe.json",
           "justfile",
           "scripts/verify.sh",
+          "README.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md"
+        ]
+      }
+    },
+    {
+      "id": "HAD-111",
+      "title": "Persist bounded non-secret Hades setup structure",
+      "status": "complete",
+      "priority": 79,
+      "lane": "implementation",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-110"
+      ],
+      "risk": "high",
+      "oracle": [
+        "OBS-0106_reference_contract",
+        "non_secret_config_shape",
+        "backend_cancel_boundary",
+        "platform_cancel_readback",
+        "fresh_setup_replay",
+        "full_verify"
+      ],
+      "acceptance": [
+        "Extend the Hades standalone Full setup continuation so only the observed non-secret configuration structure is persisted at the safe local/backend/platform seams: retain the existing baseline, add normalized structural markers at the accepted Keep current (local) backend boundary, and preserve them through platform cancellation.",
+        "Keep the implementation Hades-owned and explicit rather than claiming exact Hermes YAML values; never read, create, persist, or display credentials, API keys, OAuth material, endpoint secrets, or unobserved platform selections, and do not make config alone imply a ready provider session.",
+        "Prove atomic/recoverable writes, duplicate-safe readback, terminal-backend cancellation without an extra mutation, platform-cancel persistence, absence of credential-like fields, and clean terminal restoration with focused tests plus a sanitized direct-PTY replay.",
+        "Add OBS-0107 Hades fixture/document linked to OBS-0106, wire the replay and validation through just/verify, update matrix/context/readme, and complete the no-skip gate before completion."
+      ],
+      "evidence": [
+        "crates/hades-cli/src/main.rs",
+        "scripts/replay_standalone_terminal_platform.py",
+        ".hades/runtime/hades-standalone-terminal-platform-replay.json",
+        "tests/fixtures/parity/OBS-0107-hades-setup-persistence.json",
+        "docs/parity/observations/OBS-0107-hades-setup-persistence-2026-08-03.md",
+        "scripts/verify.sh",
+        "justfile",
+        "README.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md"
+      ],
+      "ready_at": "2026-08-03T02:43:00Z",
+      "claimed_by": "hades-setup-persistence-implementer",
+      "claimed_at": "2026-08-03T02:42:38Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Implemented Hades-owned bounded setup persistence: standalone Full setup writes only hades-setup-boundary.conf after accepting the observed local backend boundary, using a unique temporary file, sync_all, and same-directory replacement; backend cancellation remains write-free, platform cancellation preserves the sidecar, and provider readiness remains opt-in. Added focused atomic/duplicate/no-secret tests, two-case direct PTY replay, OBS-0107 fixture and observation document, project wiring, and a passing just verify gate.",
+        "completed_at": "2026-08-03T03:11:51Z",
+        "evidence": [
+          "crates/hades-cli/src/main.rs",
+          "scripts/replay_standalone_terminal_platform.py",
+          ".hades/runtime/hades-standalone-terminal-platform-replay.json",
+          "tests/fixtures/parity/OBS-0107-hades-setup-persistence.json",
+          "docs/parity/observations/OBS-0107-hades-setup-persistence-2026-08-03.md",
+          "scripts/verify.sh",
+          "justfile",
           "README.md",
           "docs/parity/MATRIX.md",
           "CONTEXT.md"

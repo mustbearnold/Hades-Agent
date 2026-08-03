@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0107",
+  "reference_observations": ["OBS-0106", "OBS-0074"],
+  "surface": "hades-bounded-setup-persistence-extension",
+  "reference": {
+    "product": "Hades Agent",
+    "version": "workspace",
+    "source_commit": "424a7f4c0e11e5d82cb1537bd3e0d832e147c7c3",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "direct PTY with focused persistence and terminal-restoration oracles"
+    },
+    "capture": "fresh Hades debug processes launched with standalone setup and isolated synthetic homes"
+  },
+  "binary": "<hades-binary>",
+  "terminal": {
+    "columns": 120,
+    "rows": 40,
+    "capture": "direct PTY with normalized stable markers"
+  },
+  "normalization": [
+    "Binary paths, synthetic HOME/HERMES_HOME paths, PTY paths, timestamps, raw redraw bytes, and setup-state contents are omitted or represented by stable structural markers.",
+    "The replay enters only Full setup, skips the unconfigured provider, and either cancels the displayed local backend or accepts it before cancelling at the platform picker; no provider value, model value, credentials, OAuth action, endpoint secret, or platform selection is entered.",
+    "The existing config assertion remains limited to the Hades non-secret baseline. The new sidecar is an explicit Hades-owned extension and is represented only by its known structural markers, byte stability, and temporary-file absence; it is not claimed as Hermes YAML parity.",
+    "The two fresh cases separate backend cancellation from accepted-backend platform cancellation so a later boundary cannot hide an earlier mutation."
+  ],
+  "unknowns": [
+    "Hermes exact scalar values, YAML ordering, backup contents, platform-specific setup, provider discovery, credentials, OAuth, network behavior, and successful later setup remain unknown.",
+    "Hades does not read this sidecar to establish provider readiness; config alone and the sidecar alone must not imply a ready provider session.",
+    "The sidecar records only the observed bounded local backend and empty platform boundary; selected platforms and all later platform persistence remain unknown."
+  ],
+  "steps": [
+    {
+      "id": "backend-cancel-no-extra-mutation",
+      "precondition": "Fresh Hades 120x40 standalone setup process with an isolated synthetic home and no provider environment.",
+      "input_sequence": [
+        {"kind": "command", "value": "hades setup", "bytes_hex": "68 61 64 65 73 20 73 65 74 75 70"},
+        {"kind": "key", "value": "j", "bytes_hex": "6a", "meaning": "move from Quick Setup to Full setup"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d", "meaning": "submit Full setup"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "skip the unconfigured provider step"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "cancel Keep current (local) at the terminal-backend picker"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "cancel the numbered fallback"}
+      ],
+      "output": {
+        "status": "passed",
+        "baseline_config_non_secret": true,
+        "setup_state_at_full_continuation_exists": false,
+        "setup_state_after_backend_cancel_exists": false,
+        "config_unchanged_after_backend_cancel": true,
+        "credential_like_fields": false,
+        "provider_started": false,
+        "exit": {"kind": "exit", "code": 1},
+        "terminal_restored": true
+      }
+    },
+    {
+      "id": "accepted-backend-platform-cancel-readback",
+      "precondition": "Fresh Hades 120x40 standalone setup process with an isolated synthetic home and no provider environment.",
+      "input_sequence": [
+        {"kind": "command", "value": "hades setup", "bytes_hex": "68 61 64 65 73 20 73 65 74 75 70"},
+        {"kind": "key", "value": "j", "bytes_hex": "6a", "meaning": "move from Quick Setup to Full setup"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d", "meaning": "submit Full setup"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "skip the unconfigured provider step"},
+        {"kind": "key", "value": "Enter", "bytes_hex": "0d", "meaning": "accept Keep current (local)"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "leave the platform picker without selecting a platform"},
+        {"kind": "key", "value": "Ctrl+C", "bytes_hex": "03", "meaning": "send SIGINT from the restored terminal surface"}
+      ],
+      "output": {
+        "status": "passed",
+        "setup_state_structural_markers": [
+          "schema=1",
+          "setup_mode=full",
+          "terminal_backend=local",
+          "platform_selection=none",
+          "provider=unconfigured"
+        ],
+        "setup_state_created_only_after_backend_acceptance": true,
+        "setup_state_unchanged_after_platform_cancel": true,
+        "atomic_temporary_files_left": false,
+        "credential_like_fields": false,
+        "config_unchanged_after_platform_cancel": true,
+        "provider_started": false,
+        "exit": {"kind": "exit", "code": 130},
+        "terminal_restored": true
+      }
+    }
+  ],
+  "passed": true
+}

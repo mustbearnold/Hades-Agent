@@ -16,6 +16,9 @@ just snapshot
 without requiring an interactive terminal. `just run` launches the TUI. The
 installed `hades` or `Hades` command launches the TUI with no arguments, and
 `hades tui` / `Hades tui` are explicit aliases for the same path.
+`hades setup` keeps its bounded Full setup baseline and, after accepting the
+displayed local backend, persists only the Hades-owned non-secret setup
+boundary sidecar; it does not make a provider ready or store credentials.
 `just probe-lifecycle` runs the actual binary in a PTY and verifies startup,
 resize, exit, and terminal restoration. `just replay-differential` compares
 the normalized startup frame and replays the checked-in submit/interrupt,
@@ -109,7 +112,7 @@ just replay-unconfigured-help # delayed /help setup-required PTY replay
 just replay-setup-required-actions # post-delay /model /setup safe-boundary replay
 just replay-standalone-setup  # standalone hades setup PTY replay
 just replay-standalone-full-setup # standalone Full setup continuation replay
-just replay-standalone-terminal-platform # standalone platform cancellation replay
+just replay-standalone-terminal-platform # standalone backend/platform cancellation and persistence replay
 just replay-standalone-empty-platform # bounded empty-platform confirmation replay
 just probe-empty-platform-confirmation # Hermes empty-platform boundary and reconciliation probe
 just replay-standalone-tool-provider # standalone tool checklist/provider boundary replay

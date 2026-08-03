@@ -48,6 +48,13 @@ const PROVIDER_BASE_URL_ENV: &str = "HADES_PROVIDER_BASE_URL";
 const PROVIDER_MODEL_ENV: &str = "HADES_MODEL";
 const PROVIDER_API_KEY_ENV: &str = "HADES_PROVIDER_API_KEY";
 const LOCAL_PROVIDER_CONFIG_FILE: &str = "hades-local-provider.conf";
+const STANDALONE_SETUP_STATE_FILE: &str = "hades-setup-boundary.conf";
+const STANDALONE_SETUP_STATE_CONTENT: &str = "# Hades Agent setup boundary (Hades-owned, non-secret)\n\
+     schema=1\n\
+     setup_mode=full\n\
+     terminal_backend=local\n\
+     platform_selection=none\n\
+     provider=unconfigured\n";
 const PROVIDER_SYSTEM_PROMPT: &str = "You are Hades Agent. Respond concisely to the user.";
 
 #[derive(Debug, Eq, PartialEq)]
@@ -268,10 +275,12 @@ fn setup_choice_loop(
             StandaloneSetupAction::EnteredToolConfiguration => {
                 return Ok(SetupTransition::ToolConfiguration(wizard));
             }
+            StandaloneSetupAction::EnteredPlatformPicker => {
+                persist_standalone_setup_state()?;
+            }
             StandaloneSetupAction::Continue
             | StandaloneSetupAction::Moved
             | StandaloneSetupAction::SkippedProvider
-            | StandaloneSetupAction::EnteredPlatformPicker
             | StandaloneSetupAction::ConfirmedEmptyPlatformSelection
             | StandaloneSetupAction::EnteredToolChecklist
             | StandaloneSetupAction::EnteredToolProviderBoundary
@@ -536,6 +545,47 @@ fn standalone_setup_config_path_from(
     hermes_home
         .or_else(|| home.map(|path| path.join(".hermes")))
         .map(|path| path.join("config.yaml"))
+}
+
+fn persist_standalone_setup_state() -> io::Result<()> {
+    let Some(path) = standalone_setup_state_path_from(
+        env::var_os("HERMES_HOME").map(PathBuf::from),
+        env::var_os("HOME").map(PathBuf::from),
+    ) else {
+        return Ok(());
+    };
+    write_standalone_setup_state_at(&path)
+}
+
+fn standalone_setup_state_path_from(
+    hermes_home: Option<PathBuf>,
+    home: Option<PathBuf>,
+) -> Option<PathBuf> {
+    standalone_setup_config_path_from(hermes_home, home)
+        .and_then(|path| path.parent().map(|parent| parent.join(STANDALONE_SETUP_STATE_FILE)))
+}
+
+fn write_standalone_setup_state_at(path: &std::path::Path) -> io::Result<()> {
+    let Some(parent) = path.parent() else {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidInput,
+            "standalone setup state path has no parent",
+        ));
+    };
+    fs::create_dir_all(parent)?;
+    let stamp = SystemTime::now().duration_since(UNIX_EPOCH).map_err(io::Error::other)?.as_nanos();
+    let temporary =
+        parent.join(format!(".{STANDALONE_SETUP_STATE_FILE}.{}.{stamp}.tmp", process::id()));
+    let result = (|| -> io::Result<()> {
+        let mut file = OpenOptions::new().create_new(true).write(true).open(&temporary)?;
+        file.write_all(STANDALONE_SETUP_STATE_CONTENT.as_bytes())?;
+        file.sync_all()?;
+        fs::rename(&temporary, path)
+    })();
+    if result.is_err() {
+        let _ = fs::remove_file(&temporary);
+    }
+    result
 }
 
 fn local_provider_config_path() -> Option<PathBuf> {
@@ -1127,6 +1177,45 @@ mod tests {
             Some(PathBuf::from("/synthetic/home/.hermes/config.yaml"))
         );
         assert_eq!(standalone_setup_config_path_from(None, None), None);
+    }
+
+    #[test]
+    fn standalone_setup_state_path_is_a_hades_owned_sidecar() {
+        assert_eq!(
+            standalone_setup_state_path_from(
+                Some(PathBuf::from("/synthetic/hermes")),
+                Some(PathBuf::from("/synthetic/home")),
+            ),
+            Some(PathBuf::from("/synthetic/hermes/hades-setup-boundary.conf"))
+        );
+        assert_eq!(
+            standalone_setup_state_path_from(None, Some(PathBuf::from("/synthetic/home"))),
+            Some(PathBuf::from("/synthetic/home/.hermes/hades-setup-boundary.conf"))
+        );
+        assert_eq!(standalone_setup_state_path_from(None, None), None);
+    }
+
+    #[test]
+    fn standalone_setup_state_write_is_atomic_duplicate_safe_and_non_secret() {
+        let stamp = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
+        let directory = env::temp_dir().join(format!("hades-setup-state-test-{stamp}"));
+        let path = directory.join(STANDALONE_SETUP_STATE_FILE);
+
+        write_standalone_setup_state_at(&path).unwrap();
+        let first = fs::read_to_string(&path).unwrap();
+        assert_eq!(first, STANDALONE_SETUP_STATE_CONTENT);
+        assert!(!first.contains("api_key"));
+        assert!(!first.to_lowercase().contains("oauth"));
+        assert!(!first.to_lowercase().contains("token"));
+
+        write_standalone_setup_state_at(&path).unwrap();
+        let second = fs::read_to_string(&path).unwrap();
+        assert_eq!(second, first);
+        let entries = fs::read_dir(&directory).unwrap().collect::<Result<Vec<_>, _>>().unwrap();
+        assert_eq!(entries.len(), 1);
+        assert_eq!(entries[0].file_name(), STANDALONE_SETUP_STATE_FILE);
+
+        fs::remove_dir_all(directory).unwrap();
     }
 
     #[test]
