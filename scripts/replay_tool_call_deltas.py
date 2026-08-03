@@ -96,6 +96,7 @@ class ToolCallServer(ThreadingHTTPServer):
         self.request_seen = threading.Event()
         self.records: list[dict[str, Any]] = []
         self.tool_call_events: list[dict[str, Any]] = []
+        self.streaming_requests = 0
         super().__init__(("127.0.0.1", 0), self._handler())
 
     def _handler(self) -> type[BaseHTTPRequestHandler]:
@@ -152,6 +153,29 @@ class ToolCallServer(ThreadingHTTPServer):
                             ],
                         }
                     )
+                    return
+
+                owner.streaming_requests += 1
+                if owner.streaming_requests > 1:
+                    # Tool-result follow-up: answer plainly so the bounded
+                    # one-hop loop terminates and no third request arrives.
+                    chunks = [
+                        b'data: {"choices":[{"delta":{"role":"assistant"}}]}\n\n',
+                        b'data: {"choices":[{"delta":{"content":"Synthetic completion."}}]}\n\n',
+                        b'data: {"choices":[{"delta":{},"finish_reason":"stop"}]}\n\n',
+                        b"data: [DONE]\n\n",
+                    ]
+                    self.send_response(200)
+                    self.send_header("Content-Type", "text/event-stream")
+                    self.send_header("Connection", "close")
+                    self.end_headers()
+                    for chunk in chunks:
+                        try:
+                            self.wfile.write(chunk)
+                            self.wfile.flush()
+                        except OSError:
+                            return
+                        time.sleep(0.02)
                     return
 
                 chunks = [
@@ -362,22 +386,34 @@ def run_tool_call_case(binary: Path, timeout: float) -> dict[str, Any]:
             lambda text: marker_present(text, ASSISTANT_MARKER) and marker_present(text, "ready"),
             timeout,
         )
-        # Give the worker a moment to prove no follow-up request arrives after
-        # completion, then verify the process is still alive and ready.
+        # Wait for the bounded tool-result follow-up and its answer, then prove
+        # no third request arrives.
+        wait_for(
+            pid,
+            fd,
+            output,
+            case,
+            "follow-up-answer",
+            lambda text: marker_present(text, "Synthetic completion.") and marker_present(text, "ready"),
+            timeout,
+        )
         time.sleep(0.4)
         visible = clean_output(bytes(output))
         if marker_present(visible, "Processing 1 tool call"):
             raise ReplayFailure(case, "response", "an invented tool-processing overlay was rendered", bytes(output))
-        if marker_present(visible, "tool call") and "ready" not in visible:
-            raise ReplayFailure(case, "response", "tool-call surface left the ready state", bytes(output))
         if marker_present(visible, "Busy"):
-            raise ReplayFailure(case, "response", "Hades stayed busy after a completed tool-call stream", bytes(output))
+            raise ReplayFailure(case, "response", "Hades stayed busy after the follow-up completed", bytes(output))
         done, _ = child_done(pid)
         if done:
-            raise ReplayFailure(case, "response", "Hades exited after a completed tool-call stream", bytes(output))
+            raise ReplayFailure(case, "response", "Hades exited after the follow-up completed", bytes(output))
         chat_requests = [r for r in server.records if r["method"] == "POST"]
-        if len(chat_requests) != 1:
-            raise ReplayFailure(case, "request", f"expected one chat request, got {len(chat_requests)}", bytes(output))
+        if len(chat_requests) != 2:
+            raise ReplayFailure(
+                case,
+                "request",
+                f"expected exactly two chat requests (initial + one follow-up), got {len(chat_requests)}",
+                bytes(output),
+            )
 
         joined_arguments = "".join(ARGUMENT_FRAGMENTS)
         json.loads(joined_arguments)  # prove the joined fragments are valid JSON arguments
@@ -393,6 +429,25 @@ def run_tool_call_case(binary: Path, timeout: float) -> dict[str, Any]:
             raise ReplayFailure(case, "cleanup", f"terminal flags were not restored: {flags}", raw)
 
         request = chat_requests[0]
+        follow_up = chat_requests[1]
+        follow_up_roles = [m["role"] for m in follow_up["body"].get("messages", [])]
+        if follow_up_roles != ["system", "user", "assistant", "tool"]:
+            raise ReplayFailure(
+                case,
+                "follow-up",
+                f"follow-up roles {follow_up_roles} do not match the observed system/user/assistant/tool shape",
+                raw,
+            )
+        follow_up_messages = follow_up["body"].get("messages", [])
+        assistant_message = follow_up_messages[2]
+        if not assistant_message.get("tool_calls"):
+            raise ReplayFailure(case, "follow-up", "follow-up assistant message lacks tool_calls", raw)
+        tool_call_payload = assistant_message["tool_calls"][0]
+        if tool_call_payload.get("function", {}).get("name") != TOOL_NAME:
+            raise ReplayFailure(case, "follow-up", "follow-up tool call name mismatch", raw)
+        tool_message = follow_up_messages[3]
+        if tool_message.get("role") != "tool" or not tool_message.get("tool_call_id"):
+            raise ReplayFailure(case, "follow-up", "tool result message missing role/tool_call_id", raw)
         request_tools = request["body"].get("tools")
         if not isinstance(request_tools, list) or len(request_tools) != 31:
             raise ReplayFailure(
@@ -459,14 +514,27 @@ def run_tool_call_case(binary: Path, timeout: float) -> dict[str, Any]:
             },
             "request_counts": {
                 "chat_requests": len(chat_requests),
-                "subsequent_chat_requests": 0,
-                "tool_response_requests": 0,
+                "subsequent_chat_requests": 1,
+                "tool_response_requests": 1,
+            },
+            "follow_up": {
+                "path": follow_up["path"],
+                "message_roles": follow_up_roles,
+                "assistant_tool_calls_present": True,
+                "assistant_tool_call_name": TOOL_NAME,
+                "tool_result_role": "tool",
+                "tool_result_marker": "Hades-owned synthetic marker (no execution)",
+                "tool_result_sha256": hashlib.sha256(
+                    str(tool_message.get("content", "")).encode()
+                ).hexdigest(),
             },
             "visible_state": {
                 "assistant_text_rendered": True,
+                "follow_up_answer_rendered": True,
                 "returned_to_ready": True,
                 "no_tool_overlay": True,
                 "no_busy_marker": True,
+                "no_loop": True,
                 "cleanup": "Ctrl+C exited cleanly with terminal restored",
             },
         }

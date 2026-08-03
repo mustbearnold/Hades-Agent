@@ -413,6 +413,7 @@ validate-reference:
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0111-hades-tool-call-deltas.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0113-hades-tool-inventory-advertisement.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0114-hermes-tool-completion-handoff.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0115-hades-tool-result-follow-up.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0052-hermes-stream-timing.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0053-hades-stream-timing.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0054-hermes-provider-errors.json

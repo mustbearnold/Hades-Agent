@@ -458,6 +458,7 @@ dependencies = [
  "hades-tui",
  "ratatui",
  "rustix",
+ "serde_json",
  "signal-hook",
 ]
 

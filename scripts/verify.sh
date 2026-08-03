@@ -178,6 +178,7 @@ python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0110-her
 python3 scripts/probe_hermes_tool_call_handoff.py --report .hades/runtime/hermes-tool-call-handoff-probe.json --timeout 30 --observation-window 0.2
 python3 scripts/probe_hermes_tool_completion_handoff.py --report .hades/runtime/hermes-tool-completion-handoff-probe.json --timeout 90 --observation-window 4
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0114-hermes-tool-completion-handoff.json
+python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0115-hades-tool-result-follow-up.json
 python3 scripts/probe_hermes_stream_timing.py --report .hades/runtime/hermes-stream-timing-probe.json --timeout 30
 python3 scripts/probe_hermes_provider_errors.py --report .hades/runtime/hermes-provider-errors-probe.json --timeout 30
 python3 scripts/probe_hermes_provider_setup_persistence.py --report .hades/runtime/hermes-provider-setup-persistence-probe.json --timeout 30

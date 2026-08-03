@@ -17,6 +17,7 @@ hades-core = { path = "../hades-core" }
 hades-provider = { path = "../hades-provider" }
 hades-tui = { path = "../hades-tui" }
 ratatui.workspace = true
+serde_json.workspace = true
 signal-hook.workspace = true
 
 [target.'cfg(unix)'.dependencies]

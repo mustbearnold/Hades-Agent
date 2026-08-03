@@ -947,6 +947,7 @@ fn run_provider_worker(
     if sender.send(ProviderEvent::Started).is_err() {
         return;
     }
+    let mut tool_calls: Vec<AccumulatedToolCall> = Vec::new();
     let mut stream = match transport.open_stream(&request, &cancellation) {
         Ok(stream) => stream,
         Err(TransportError::Cancelled) => return,
@@ -959,11 +960,14 @@ fn run_provider_worker(
         match stream.next_event() {
             Ok(Some(event)) => {
                 let is_done = event == StreamEvent::Done;
+                if let StreamEvent::ToolCallDelta(delta) = &event {
+                    accumulate_tool_call(&mut tool_calls, delta);
+                }
                 if sender.send(translate_stream_event(event)).is_err() {
                     return;
                 }
                 if is_done {
-                    return;
+                    break;
                 }
             }
             Ok(None) => return,
@@ -974,6 +978,142 @@ fn run_provider_worker(
             }
         }
     }
+    if tool_calls.is_empty() {
+        return;
+    }
+    // Bounded one-hop follow-up with the observed OBS-0114 request shape:
+    // the assistant tool-call message and a Hades-owned tool result message.
+    let Some(follow_up) = tool_result_follow_up(&request, &tool_calls) else {
+        return;
+    };
+    if sender.send(ProviderEvent::Started).is_err() {
+        return;
+    }
+    let mut stream = match transport.open_stream(&follow_up, &cancellation) {
+        Ok(stream) => stream,
+        Err(TransportError::Cancelled) => return,
+        Err(error) => {
+            let _ = sender.send(ProviderEvent::Failed(error.to_string()));
+            return;
+        }
+    };
+    let mut follow_up_tool_calls: Vec<AccumulatedToolCall> = Vec::new();
+    loop {
+        match stream.next_event() {
+            Ok(Some(event)) => {
+                let is_done = event == StreamEvent::Done;
+                if let StreamEvent::ToolCallDelta(delta) = &event {
+                    accumulate_tool_call(&mut follow_up_tool_calls, delta);
+                }
+                if sender.send(translate_stream_event(event)).is_err() {
+                    return;
+                }
+                if is_done {
+                    break;
+                }
+            }
+            Ok(None) => return,
+            Err(TransportError::Cancelled) => return,
+            Err(error) => {
+                let _ = sender.send(ProviderEvent::Failed(error.to_string()));
+                return;
+            }
+        }
+    }
+    // Never loop: a second tool-call response is recorded and the worker
+    // stops. Follow-up tool calls are intentionally not re-sent.
+    let _ = follow_up_tool_calls;
+}
+
+/// Per-index argument fragments accumulated while a stream is running.
+#[derive(Clone, Debug)]
+struct AccumulatedToolCall {
+    index: usize,
+    id: Option<String>,
+    name: Option<String>,
+    arguments: String,
+}
+
+/// Cap each accumulated tool-call argument payload (bounded follow-up).
+const MAX_TOOL_ARGUMENTS_BYTES: usize = 64 * 1024;
+
+fn accumulate_tool_call(
+    calls: &mut Vec<AccumulatedToolCall>,
+    delta: &hades_provider::ToolCallDelta,
+) {
+    if let Some(call) = calls.iter_mut().find(|call| call.index == delta.index) {
+        if let Some(id) = &delta.id {
+            call.id = Some(id.clone());
+        }
+        if let Some(name) = &delta.name {
+            call.name = Some(name.clone());
+        }
+        if let Some(arguments) = &delta.arguments
+            && call.arguments.len() < MAX_TOOL_ARGUMENTS_BYTES
+        {
+            let room = MAX_TOOL_ARGUMENTS_BYTES - call.arguments.len();
+            call.arguments.push_str(&arguments.chars().take(room).collect::<String>());
+        }
+    } else {
+        calls.push(AccumulatedToolCall {
+            index: delta.index,
+            id: delta.id.clone(),
+            name: delta.name.clone(),
+            arguments: delta
+                .arguments
+                .clone()
+                .unwrap_or_default()
+                .chars()
+                .take(MAX_TOOL_ARGUMENTS_BYTES)
+                .collect(),
+        });
+    }
+}
+
+/// Hades-owned tool result marker. The observed Hermes result content is
+/// unknown, so this is explicit Hades behavior, not a parity claim.
+const TOOL_RESULT_MARKER: &str =
+    "Tool call completed without execution. Hades does not execute tools.";
+
+/// Build the bounded tool-result follow-up request with the observed OBS-0114
+/// message shape: system/user history, an assistant tool-call message, and a
+/// `tool` role result message. Returns None when a call lacks a name.
+fn tool_result_follow_up(
+    request: &ChatRequest,
+    tool_calls: &[AccumulatedToolCall],
+) -> Option<ChatRequest> {
+    let mut messages = request.messages.clone();
+    let wire_calls = tool_calls
+        .iter()
+        .filter_map(|call| {
+            let name = call.name.clone()?;
+            let id = call.id.clone().unwrap_or_else(|| format!("call_hades_{}", call.index));
+            Some(serde_json::json!({
+                "id": id,
+                "type": "function",
+                "function": {
+                    "name": name,
+                    "arguments": call.arguments,
+                }
+            }))
+        })
+        .collect::<Vec<_>>();
+    if wire_calls.is_empty() {
+        return None;
+    }
+    messages.push(ChatMessage::new("assistant", "").with_tool_calls(wire_calls));
+    for call in tool_calls {
+        if let Some(id) = call.id.clone() {
+            messages.push(ChatMessage::new("tool", TOOL_RESULT_MARKER).with_tool_call_id(id));
+        }
+    }
+    Some(ChatRequest {
+        model: request.model.clone(),
+        messages,
+        tools: request.tools.clone(),
+        max_tokens: request.max_tokens,
+        include_usage: request.include_usage,
+    })
 }
 
 fn translate_stream_event(event: StreamEvent) -> ProviderEvent {

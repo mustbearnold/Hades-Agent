@@ -317,11 +317,12 @@ turning the reference handoff into Hades execution behavior.
 
 The `just probe-tool-completion-handoff` probe completes the stream with `[DONE]` and observes the bounded post-completion handoff: the interactive-only `clarify` question surface (question + choices) renders, the tool result is sent back to the model in a follow-up request (`system, user, assistant, tool` roles), the purpose-unknown auxiliary non-stream request appears, and the process exits cleanly with no external side effect.
 
-The `just replay-tool-call-deltas` replay proves the safe Hades side of that
-boundary: a loopback provider streams assistant text plus a fragmented
-`clarify` tool call with `finish_reason: "tool_calls"`, and Hades parses the
-typed deltas, accumulates the argument fragments, returns to ready with no
-busy marker or invented tool overlay, and sends no follow-up request. The
-request advertises the observed 31-tool inventory (canonical digest
-`b2cbd3f2…`), proving wire-contract parity. Hades never executes, approves,
-or forwards tool calls in this slice.
+The `just replay-tool-call-deltas` replay proves the safe Hades tool-call
+side of the OBS-0114 boundary: a loopback provider streams assistant text
+plus a fragmented `clarify` tool call with `finish_reason: "tool_calls"`,
+and Hades parses the typed deltas, accumulates the argument fragments, sends
+exactly one bounded tool-result follow-up (system/user/assistant/tool roles
+with the Hades-owned synthetic result marker), renders the second answer,
+and returns to ready with no busy marker or invented tool overlay and no
+loop. The request advertises the observed 31-tool inventory (canonical
+digest `b2cbd3f2…`). Hades never executes, approves, or forwards tool calls.

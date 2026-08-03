@@ -341,6 +341,8 @@ impl App {
                 }
             }
             ProviderEvent::Completed => {
+                let had_tool_calls =
+                    self.active_turn.as_ref().is_some_and(|turn| !turn.tool_calls.is_empty());
                 if let Some(turn) = self.active_turn.take() {
                     let tool_calls = turn
                         .tool_calls
@@ -360,8 +362,15 @@ impl App {
                         tool_calls,
                     });
                 }
-                self.state.turn = TurnState::Ready;
-                self.state.status = "Response complete.".to_owned();
+                if had_tool_calls {
+                    // The worker follows up once with the tool result; stay in
+                    // the typed busy state until that follow-up completes.
+                    self.state.turn = TurnState::Busy;
+                    self.state.status = "Tool call recorded.".to_owned();
+                } else {
+                    self.state.turn = TurnState::Ready;
+                    self.state.status = "Response complete.".to_owned();
+                }
             }
             ProviderEvent::Failed(message) => {
                 self.active_turn = None;
@@ -1011,8 +1020,10 @@ mod tests {
         })));
         app.handle(InputEvent::Provider(ProviderEvent::Completed));
 
-        assert_eq!(app.state().turn, TurnState::Ready);
-        assert_eq!(app.state().status, "Response complete.");
+        // A completed turn with tool calls stays in the typed busy state so
+        // the worker can send the bounded tool-result follow-up.
+        assert_eq!(app.state().turn, TurnState::Busy);
+        assert_eq!(app.state().status, "Tool call recorded.");
         let conversation = app.provider_conversation();
         assert_eq!(conversation.len(), 2);
         assert_eq!(conversation[1].role, hades_core::Role::Assistant);
@@ -1024,6 +1035,15 @@ mod tests {
         assert_eq!(tool_calls[0].argument_digest, fnv1a_hex("{\"question\":\"synthetic\"}"));
         assert_eq!(tool_calls[1].name, "memory");
         assert_eq!(tool_calls[1].argument_length, 2);
+
+        // The follow-up stream (no new tool calls) returns to ready.
+        app.handle(InputEvent::Provider(ProviderEvent::Started));
+        app.handle(InputEvent::Provider(ProviderEvent::TextDelta(
+            "Synthetic completion.".to_owned(),
+        )));
+        app.handle(InputEvent::Provider(ProviderEvent::Completed));
+        assert_eq!(app.state().turn, TurnState::Ready);
+        assert_eq!(app.state().status, "Response complete.");
     }
 
     #[test]
@@ -1039,7 +1059,8 @@ mod tests {
         })));
         app.handle(InputEvent::Provider(ProviderEvent::Completed));
 
-        assert_eq!(app.state().turn, TurnState::Ready);
+        assert_eq!(app.state().turn, TurnState::Busy);
+        assert_eq!(app.state().status, "Tool call recorded.");
         let tool_calls = app.completed_tool_call_records();
         assert_eq!(tool_calls.len(), 1);
         assert_eq!(tool_calls[0].name, "clarify");

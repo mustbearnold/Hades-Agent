@@ -677,6 +677,21 @@ progress from August 1, 2026 through 2027.
   not reproduce the tool-result follow-up or question surface; they remain
   the next implementation frontier after safe parse/advertise.
 
+- HAD-119 implements the bounded tool-result follow-up observed in OBS-0114:
+  after a completed turn with tool calls, Hades sends exactly one follow-up
+  streaming request whose history matches the observed shape (system, user,
+  assistant with the tool-call name/arguments, and a tool role message with a
+  Hades-owned synthetic result marker), stays in the typed busy state across
+  the follow-up, renders the second answer, and returns to ready. The follow-up
+  is one hop: a follow-up response that itself requests tool calls is recorded
+  and stopped (no unbounded loop), arguments are capped at 64 KiB, and nothing
+  is executed, approved, or forwarded. The OBS-0115 replay proves the two
+  requests, the observed follow-up shape, ready return, and clean exit; the
+  fix also repaired a live-path parser gap where deltas carrying both content
+  and tool_calls dropped the tool call (unit tests had fed events directly).
+  The clarify question surface and the real Hermes tool-result content remain
+  unobserved and are not reproduced.
+
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes
 defects, unsafe behavior, or failure cases; fix them and record any deliberate

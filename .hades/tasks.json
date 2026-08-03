@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-03T09:14:17Z",
+  "updated_at": "2026-08-03T09:55:21Z",
   "tasks": [
     {
       "id": "HAD-088",
@@ -6522,6 +6522,69 @@
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/hermes-tool-completion-handoff-probe.json"
+        ]
+      }
+    },
+    {
+      "id": "HAD-119",
+      "title": "Implement bounded tool-result follow-up request",
+      "status": "complete",
+      "priority": 71,
+      "lane": "behavior",
+      "owner_role": "implementer",
+      "depends_on": [
+        "HAD-118"
+      ],
+      "risk": "medium",
+      "oracle": [
+        "typed_state_tests",
+        "direct_pty_replay",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "acceptance": [
+        "After a completed streaming turn with tool calls, Hades sends exactly one follow-up streaming request whose message history matches the observed OBS-0114 shape: system, user, assistant (with the tool-call name/arguments), and a tool role message with a Hades-owned synthetic result marker.",
+        "Keep the follow-up bounded: one hop only; if the follow-up response itself contains tool calls, record them and stop (no unbounded loop); tool arguments are capped at 64 KiB per call and never executed, approved, or forwarded to any external side effect.",
+        "The app stays in a typed busy state across the follow-up and returns to ready only after the follow-up completes; the clarify question surface remains unimplemented because its Hermes layout is unobserved (explicit unknown, not guessed).",
+        "Add focused provider/app/CLI tests and a fresh 120x40 direct-PTY replay (OBS-0115): exactly two chat requests, the follow-up carries the observed message/tool-call shape, the second assistant answer renders, ready returns, and Ctrl+C exits cleanly with no loop.",
+        "Update the parity matrix, context, readme, justfile, and verification gates; run the complete no-skip just verify gate and record evidence before completion."
+      ],
+      "evidence": [
+        "crates/hades-provider/src/lib.rs",
+        "crates/hades-cli/src/main.rs",
+        "crates/hades-cli/Cargo.toml",
+        "crates/hades-app/src/lib.rs",
+        "scripts/replay_tool_call_deltas.py",
+        "tests/fixtures/parity/OBS-0115-hades-tool-result-follow-up.json",
+        "docs/parity/observations/OBS-0115-hades-tool-result-follow-up-2026-08-03.md",
+        "docs/parity/MATRIX.md",
+        "CONTEXT.md",
+        "README.md",
+        "justfile",
+        "scripts/verify.sh",
+        ".hades/runtime/tool-call-deltas-replay.json"
+      ],
+      "ready_at": "2026-08-03T09:31:38Z",
+      "claimed_by": "tool-followup-implementer",
+      "claimed_at": "2026-08-03T09:31:38Z",
+      "attempts": 1,
+      "result": {
+        "summary": "Implemented the bounded tool-result follow-up observed in OBS-0114: after a completed turn with tool calls, the worker sends exactly one follow-up streaming request with the observed message shape (system, user, assistant carrying the tool-call name/arguments, tool role message with a Hades-owned synthetic result marker); the app stays in the typed busy state across the follow-up, renders the second answer, and returns to ready. One hop only (a follow-up tool-call response is recorded and stopped), arguments capped at 64 KiB, nothing executed/approved/forwarded. Fixed a live-path SSE parser gap: deltas carrying both content and tool_calls dropped the tool call (unit tests fed events directly); the parser now emits both, with a regression test. OBS-0115 replay proves two requests, follow-up roles system/user/assistant/tool, clarify tool call present, ready return, no loop, clean Ctrl+C exit. Matrix/context/readme/justfile/verify wiring updated; complete no-skip just verify gate PASS (verification: PASS, 915222 ms).",
+        "completed_at": "2026-08-03T09:55:21Z",
+        "evidence": [
+          "crates/hades-provider/src/lib.rs",
+          "crates/hades-cli/src/main.rs",
+          "crates/hades-cli/Cargo.toml",
+          "crates/hades-app/src/lib.rs",
+          "scripts/replay_tool_call_deltas.py",
+          "tests/fixtures/parity/OBS-0115-hades-tool-result-follow-up.json",
+          "docs/parity/observations/OBS-0115-hades-tool-result-follow-up-2026-08-03.md",
+          "docs/parity/MATRIX.md",
+          "CONTEXT.md",
+          "README.md",
+          "justfile",
+          "scripts/verify.sh",
+          ".hades/runtime/tool-call-deltas-replay.json"
         ]
       }
     }
