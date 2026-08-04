@@ -7186,10 +7186,21 @@
         "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
         "Run the targeted tests and the complete no-skip just verify gate before completion."
       ],
+      "attempts": 1,
+      "claimed_at": "2026-08-04T00:33:09Z",
+      "claimed_by": "hermes-agent",
       "depends_on": [
         "HAD-132"
       ],
-      "evidence": [],
+      "evidence": [
+        "crates/hades-dev/src/bin/replay_terminal_palette.rs",
+        "Cargo.toml",
+        "crates/hades-dev/Cargo.toml",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile",
+        "CONTEXT.md"
+      ],
       "id": "HAD-135",
       "lane": "tooling",
       "oracle": [
@@ -7200,10 +7211,23 @@
       "owner_role": "implementer",
       "priority": 56,
       "ready_at": "2026-08-04T00:00:00Z",
+      "result": {
+        "completed_at": "2026-08-04T00:44:17Z",
+        "evidence": [
+          "crates/hades-dev/src/bin/replay_terminal_palette.rs",
+          "Cargo.toml",
+          "crates/hades-dev/Cargo.toml",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile",
+          "CONTEXT.md"
+        ],
+        "summary": "Ported replay_terminal_palette to Rust as hades-dev replay-terminal-palette: OBS-0035 step contract against a direct-PTY Hades process behind the hold provider, landmark marker styles and required SGR sequences per surface, raw-delta sha256/byte-length/SGR inventory, and the same report JSON shape. Poll-based wait reads (like Python select) match the raw-delta boundary exactly; the differential check proves identical reports. verify.sh and justfile run the Rust binary as the gate replay."
+      },
       "risk": "high",
-      "status": "ready",
+      "status": "complete",
       "title": "Migrate dev tooling to Rust: replay_terminal_palette"
     }
   ],
-  "updated_at": "2026-08-04T00:33:09Z"
+  "updated_at": "2026-08-04T00:44:17Z"
 }

@@ -853,6 +853,18 @@ progress from August 1, 2026 through 2027.
   same report JSON shape (checks with per-step observed records). The
   differential check proves identical reports on the same binary; the Rust
   binary is now the gate replay.
+- HAD-135 ports the terminal-palette replay to Rust:
+  `hades-dev replay-terminal-palette` reproduces
+  `replay_terminal_palette.py` — the OBS-0035 step contract (startup /
+  composer / busy / interrupted / setup-required) against a direct-PTY
+  Hades process behind the hold provider, landmark marker styles and
+  required SGR sequences per surface, raw-delta sha256/byte-length/SGR
+  sequence inventory, and the same report JSON shape. The palette's
+  `normalized` (with charset-sequence stripping) and case-insensitive
+  `contains_marker` variants are ported alongside the Screen model; the
+  wait loop uses poll-based reads (like Python's select) so the raw-delta
+  boundary matches exactly. The differential check proves identical
+  reports; the Rust binary is now the gate replay.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes

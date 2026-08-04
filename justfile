@@ -255,7 +255,9 @@ probe-unconfigured-startup:
 
 replay-terminal-palette:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_terminal_palette.py --binary target/debug/hades --report .hades/runtime/hades-terminal-palette-replay.json
+    cargo build --offline --package hades-dev --bin replay_terminal_palette
+    python3 scripts/check_replay_parity.py replay_terminal_palette replay_terminal_palette
+    ./target/debug/replay_terminal_palette --binary target/debug/hades --report .hades/runtime/hades-terminal-palette-replay.json
 
 replay-osc52-timing-limits:
     cargo build --locked --package hades-cli
