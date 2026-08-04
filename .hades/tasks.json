@@ -7936,7 +7936,13 @@
       "depends_on": [
         "HAD-131"
       ],
-      "evidence": [],
+      "evidence": [
+        "crates/hades-dev/src/bin/replay_configured_surfaces.rs",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile",
+        "CONTEXT.md"
+      ],
       "id": "HAD-151",
       "lane": "tooling",
       "oracle": [
@@ -7947,8 +7953,19 @@
       "owner_role": "implementer",
       "priority": 63,
       "ready_at": "2026-08-04T12:23:15Z",
+      "result": {
+        "completed_at": "2026-08-04T12:55:40Z",
+        "evidence": [
+          "crates/hades-dev/src/bin/replay_configured_surfaces.rs",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile",
+          "CONTEXT.md"
+        ],
+        "summary": "Ported replay_configured_surfaces to Rust as hades-dev replay-configured-surfaces: OBS-0090 configured primary surfaces (4 steps via hold-provider loopback: setup, overlay surfaces without provider requests, history up/down + persistence + restart recall verified by request, Ctrl+V clipboard via synthetic xclip, config.yaml boundary). Differential parity check proves identical reports (4 cases); verify.sh and justfile run the Rust binary as the gate replay."
+      },
       "risk": "low",
-      "status": "in_progress",
+      "status": "complete",
       "title": "Migrate dev tooling to Rust: replay_configured_surfaces"
     },
     {
@@ -8781,5 +8798,5 @@
       "title": "Retire the Python harness and orchestrate verify in Rust"
     }
   ],
-  "updated_at": "2026-08-04T12:54:29Z"
+  "updated_at": "2026-08-04T12:55:40Z"
 }

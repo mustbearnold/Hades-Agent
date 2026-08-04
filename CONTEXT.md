@@ -940,6 +940,14 @@ progress from August 1, 2026 through 2027.
   ignored `--binary` so the parity checker can compare both sides). The
   differential check proves identical reports; the Rust binary is now
   the gate replay.
+- HAD-151 ports replay_configured_surfaces to Rust: `hades-dev
+  replay-configured-surfaces` reproduces the OBS-0090 configured primary
+  surfaces replay (4 steps through the hold-provider loopback: setup,
+  slash-completion/model-overlay/sessions-overlay without provider
+  requests, history up/down and persistence, history recall after
+  restart verified by request, Ctrl+V clipboard insertion through a
+  synthetic xclip, config.yaml boundary). The differential check proves
+  identical reports (4 cases); the Rust binary is now the gate replay.
 - HAD-152 ports replay_conversation_context to Rust: `hades-dev
   replay-conversation-context` reproduces the OBS-0092 conversation
   lifecycle contract (multi-turn request shape, failed-turn isolation)

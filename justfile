@@ -59,7 +59,9 @@ replay-vertical-slice:
 
 replay-configured-surfaces:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_configured_surfaces.py --binary target/debug/hades --report .hades/runtime/configured-surfaces-replay.json
+    cargo build --offline --package hades-dev --bin replay_configured_surfaces
+    python3 scripts/check_replay_parity.py replay_configured_surfaces replay_configured_surfaces --timeout 8
+    ./target/debug/replay_configured_surfaces --binary target/debug/hades --report .hades/runtime/configured-surfaces-replay.json --timeout 8
 
 replay-configured-help:
     cargo build --locked --package hades-cli

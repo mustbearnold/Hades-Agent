@@ -265,7 +265,11 @@ python3 scripts/replay_standalone_tool_provider_inventory_selection.py --binary 
 cargo build --offline --package hades-dev --bin replay_vertical_slice
 python3 scripts/check_replay_parity.py replay_vertical_slice replay_vertical_slice
 ./target/debug/replay_vertical_slice --binary target/debug/hades --report .hades/runtime/vertical-slice-replay.json --timeout 8
-python3 scripts/replay_configured_surfaces.py --binary target/debug/hades --report .hades/runtime/configured-surfaces-replay.json --timeout 8
+# HAD-151: replay-configured-surfaces is ported to Rust; the differential
+# check proves identical reports, then the Rust binary is the gate replay.
+cargo build --offline --package hades-dev --bin replay_configured_surfaces
+python3 scripts/check_replay_parity.py replay_configured_surfaces replay_configured_surfaces --timeout 8
+./target/debug/replay_configured_surfaces --binary target/debug/hades --report .hades/runtime/configured-surfaces-replay.json --timeout 8
 # HAD-148: replay-configured-help is ported to Rust; the differential
 # check proves identical reports, then the Rust binary is the gate replay.
 cargo build --offline --package hades-dev --bin replay_configured_help
