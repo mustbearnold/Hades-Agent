@@ -23,6 +23,12 @@ use serde_json::Value;
 
 pub const DEFAULT_MAX_TOKENS: u32 = 65_536;
 pub const DEFAULT_TIMEOUT: Duration = Duration::from_secs(10);
+/// Ceiling for waiting on response headers once a request is sent.
+///
+/// Local providers (Ollama, llama.cpp, ...) may take tens of seconds to
+/// load a model into VRAM before they emit the first response byte, so
+/// the header wait must be generous even though connect/write stay tight.
+const HEADER_READ_TIMEOUT: Duration = Duration::from_secs(120);
 const READ_POLL_INTERVAL: Duration = Duration::from_millis(50);
 const MAX_RESPONSE_HEADER_BYTES: usize = 64 * 1024;
 
@@ -206,7 +212,18 @@ pub struct LocalOpenAiTransport {
 
 pub struct OpenAiStream {
     stream: TcpStream,
+    /// Raw wire bytes read from the socket (may include HTTP chunked
+    /// transfer framing when the provider streams with
+    /// `Transfer-Encoding: chunked`).
     buffer: Vec<u8>,
+    /// De-chunked SSE body bytes, ready for line parsing.
+    body: Vec<u8>,
+    /// True when the response headers declared `Transfer-Encoding: chunked`.
+    chunked: bool,
+    /// Data bytes still expected in the current chunk before its CRLF.
+    chunk_remaining: usize,
+    /// True once the terminating zero-length chunk was consumed.
+    chunk_done: bool,
     data_lines: Vec<String>,
     pending_events: std::collections::VecDeque<StreamEvent>,
     saw_text: bool,
@@ -288,7 +305,7 @@ impl LocalOpenAiTransport {
             .and_then(|_| stream.write_all(&body))
             .map_err(|error| TransportError::Io(error.to_string()))?;
 
-        let response_bytes = read_http_headers(&mut stream, cancellation, self.timeout)?;
+        let response_bytes = read_http_headers(&mut stream, cancellation, HEADER_READ_TIMEOUT)?;
         let header_end = response_bytes
             .windows(4)
             .position(|window| window == b"\r\n\r\n")
@@ -312,6 +329,10 @@ impl LocalOpenAiTransport {
         Ok(OpenAiStream {
             stream,
             buffer: initial_body.to_vec(),
+            body: Vec::new(),
+            chunked: header.chunked,
+            chunk_remaining: 0,
+            chunk_done: false,
             data_lines: Vec::new(),
             pending_events: std::collections::VecDeque::new(),
             saw_text: false,
@@ -323,6 +344,62 @@ impl LocalOpenAiTransport {
 }
 
 impl OpenAiStream {
+    /// Move de-chunked bytes from `buffer` (raw wire bytes) into `body`.
+    ///
+    /// When the provider streams with `Transfer-Encoding: chunked`, the
+    /// body is framed as `{size-hex}\r\n{data}\r\n...0\r\n\r\n`. The SSE
+    /// parser must never see the framing lines, so they are stripped here
+    /// before line parsing. Non-chunked responses pass through untouched.
+    fn dechunk(&mut self) {
+        if !self.chunked {
+            // Plain Content-Length body: pass bytes straight through.
+            self.body.append(&mut self.buffer);
+            return;
+        }
+        if self.chunk_done {
+            return;
+        }
+        loop {
+            if self.chunk_remaining > 0 {
+                // Need the chunk data plus its trailing CRLF.
+                let needed = self.chunk_remaining + 2;
+                if self.buffer.len() < needed {
+                    break;
+                }
+                self.body.extend_from_slice(&self.buffer[..self.chunk_remaining]);
+                self.buffer.drain(..needed);
+                self.chunk_remaining = 0;
+                continue;
+            }
+            // Read a chunk-size line: hex digits, optional `;extensions`,
+            // terminated by CRLF.
+            let Some(size_line_end) = self.buffer.windows(2).position(|window| window == b"\r\n")
+            else {
+                break;
+            };
+            let size_line = &self.buffer[..size_line_end];
+            let size_hex = size_line.split(|byte| *byte == b';').next().unwrap_or(size_line);
+            let size_text =
+                std::str::from_utf8(size_hex).map(|text| text.trim()).unwrap_or_default();
+            let Ok(size) = usize::from_str_radix(size_text, 16) else {
+                // Not a valid chunk size: stop de-chunking and let the SSE
+                // parser surface the malformed framing as its own error.
+                self.chunk_done = true;
+                return;
+            };
+            self.buffer.drain(..size_line_end + 2);
+            if size == 0 {
+                // Terminating chunk; consume the trailer section's CRLF.
+                if self.buffer.starts_with(b"\r\n") {
+                    self.buffer.drain(..2);
+                }
+                self.chunk_done = true;
+                return;
+            }
+            self.chunk_remaining = size;
+        }
+    }
+
     pub fn next_event(&mut self) -> Result<Option<StreamEvent>, TransportError> {
         if self.done && self.pending_events.is_empty() {
             return Ok(None);
@@ -335,8 +412,9 @@ impl OpenAiStream {
             if self.cancellation.is_cancelled() {
                 return Err(TransportError::Cancelled);
             }
-            if let Some(newline) = self.buffer.iter().position(|byte| *byte == b'\n') {
-                let line = self.buffer.drain(..=newline).collect::<Vec<_>>();
+            self.dechunk();
+            if let Some(newline) = self.body.iter().position(|byte| *byte == b'\n') {
+                let line = self.body.drain(..=newline).collect::<Vec<_>>();
                 let line = line.strip_suffix(b"\n").unwrap_or(&line);
                 let line = line.strip_suffix(b"\r").unwrap_or(line);
                 if line.is_empty() {
@@ -435,6 +513,7 @@ struct ParsedBaseUrl {
 struct HttpHeader {
     status: u16,
     content_type: Option<String>,
+    chunked: bool,
 }
 
 fn parse_base_url(base_url: &str) -> Result<ParsedBaseUrl, TransportError> {
@@ -527,7 +606,14 @@ fn parse_http_header(header_bytes: &[u8]) -> Result<HttpHeader, TransportError> 
         let (name, value) = line.split_once(':')?;
         (name.eq_ignore_ascii_case("content-type")).then_some(value.trim())
     });
-    Ok(HttpHeader { status, content_type: content_type.map(str::to_owned) })
+    let transfer_encoding = header.lines().find_map(|line| {
+        let (name, value) = line.split_once(':')?;
+        (name.eq_ignore_ascii_case("transfer-encoding")).then_some(value.trim())
+    });
+    let chunked = transfer_encoding.is_some_and(|value| {
+        value.split(',').any(|part| part.trim().eq_ignore_ascii_case("chunked"))
+    });
+    Ok(HttpHeader { status, content_type: content_type.map(str::to_owned), chunked })
 }
 
 fn read_to_end_with_cancellation(
@@ -753,6 +839,67 @@ mod tests {
             events,
             vec![
                 StreamEvent::TextDelta("Synthetic loopback response.".to_owned()),
+                StreamEvent::Done,
+            ]
+        );
+        server.join().unwrap();
+    }
+
+    #[test]
+    fn local_transport_parses_chunked_transfer_encoding_streams() {
+        let listener = TcpListener::bind(("127.0.0.1", 0)).expect("bind loopback fixture");
+        let port = listener.local_addr().unwrap().port();
+        let server = thread::spawn(move || {
+            let (mut stream, _) = listener.accept().expect("accept fixture client");
+            let mut request_bytes = Vec::new();
+            let mut chunk = [0_u8; 4096];
+            loop {
+                let read = stream.read(&mut chunk).expect("read request");
+                request_bytes.extend_from_slice(&chunk[..read]);
+                if request_bytes.windows(4).any(|window| window == b"\r\n\r\n") {
+                    let header_end =
+                        request_bytes.windows(4).position(|window| window == b"\r\n\r\n").unwrap()
+                            + 4;
+                    let header = String::from_utf8_lossy(&request_bytes[..header_end]);
+                    let length = header
+                        .lines()
+                        .find_map(|line| line.strip_prefix("Content-Length: "))
+                        .unwrap()
+                        .parse::<usize>()
+                        .unwrap();
+                    if request_bytes.len() >= header_end + length {
+                        break;
+                    }
+                }
+            }
+            // Respond with a chunked-transfer-encoded SSE body, exactly the
+            // framing local providers like Ollama emit on the wire.
+            let sse = concat!(
+                "data: {\"choices\":[{\"delta\":{\"role\":\"assistant\"}}]}\n\n",
+                "data: {\"choices\":[{\"delta\":{\"content\":\"Chunked loopback response.\"}}]}\n\n",
+                "data: [DONE]\n\n"
+            );
+            let response = format!(
+                "HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\n\
+                 Transfer-Encoding: chunked\r\nConnection: close\r\n\r\n\
+                 {:x}\r\n{}\r\n0\r\n\r\n",
+                sse.len(),
+                sse
+            );
+            stream.write_all(response.as_bytes()).expect("write fixture response");
+            stream.flush().expect("flush fixture response");
+        });
+
+        let transport = LocalOpenAiTransport::new(
+            &format!("http://127.0.0.1:{port}/v1"),
+            Some("synthetic-key".to_owned()),
+        )
+        .unwrap();
+        let events = transport.stream_chat(&request()).unwrap();
+        assert_eq!(
+            events,
+            vec![
+                StreamEvent::TextDelta("Chunked loopback response.".to_owned()),
                 StreamEvent::Done,
             ]
         );
