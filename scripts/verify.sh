@@ -17,10 +17,15 @@ run_probe() {
     shift
     local attempt=0
     while :; do
-        if "$@"; then
+        # NOTE: capture the probe's exit status DIRECTLY. `if "$@"; then
+        # return 0; fi` would mask a failed probe: an if with no else
+        # clause exits 0 when the condition is false, so `local status=$?`
+        # would always read 0 and the gate could never fail on a probe.
+        "$@"
+        local status=$?
+        if [ "$status" -eq 0 ]; then
             return 0
         fi
-        local status=$?
         attempt=$((attempt + 1))
         if [ "$attempt" -ge 3 ]; then
             return "$status"
