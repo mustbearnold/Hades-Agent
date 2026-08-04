@@ -923,6 +923,13 @@ progress from August 1, 2026 through 2027.
   reproduces the OBS-0039 model-stage contract through `hades_dev::setup`
   (the setup-family key set already covers Escape). The differential check
   proves identical reports; the Rust binary is now the gate replay.
+- HAD-149 ports replay_configured_help_lifecycle to Rust:
+  `hades-dev replay-configured-help-lifecycle` reproduces the OBS-0100
+  configured /help Escape lifecycle: /help opening the stable bordered
+  panel, Escape preserving the panel and the /help composer with the
+  process alive, and a clean Ctrl+C exit with terminal restoration. The
+  differential check proves identical reports (1 case); the Rust binary
+  is now the gate replay.
 - HAD-148 ports replay_configured_help to Rust: `hades-dev replay-configured-help`
   reproduces the OBS-0098 configured /help panel contract in a direct
   120x40 PTY against an absent loopback endpoint: /help opening the stable

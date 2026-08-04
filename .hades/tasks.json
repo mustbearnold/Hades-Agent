@@ -7838,11 +7838,19 @@
         "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
         "Run the targeted tests and the complete no-skip just verify gate before completion."
       ],
-      "attempts": 0,
+      "attempts": 1,
+      "claimed_at": "2026-08-04T12:35:20Z",
+      "claimed_by": "hermes-agent",
       "depends_on": [
         "HAD-133"
       ],
-      "evidence": [],
+      "evidence": [
+        "crates/hades-dev/src/bin/replay_configured_help_lifecycle.rs",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile",
+        "CONTEXT.md"
+      ],
       "id": "HAD-149",
       "lane": "tooling",
       "oracle": [
@@ -7853,8 +7861,19 @@
       "owner_role": "implementer",
       "priority": 65,
       "ready_at": "2026-08-04T12:23:15Z",
+      "result": {
+        "completed_at": "2026-08-04T12:36:11Z",
+        "evidence": [
+          "crates/hades-dev/src/bin/replay_configured_help_lifecycle.rs",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile",
+          "CONTEXT.md"
+        ],
+        "summary": "Ported replay_configured_help_lifecycle to Rust as hades-dev replay-configured-help-lifecycle: OBS-0100 configured /help Escape lifecycle (stable panel, Escape preserves panel + composer with process alive, clean Ctrl+C exit + terminal restoration). Differential parity check proves identical reports (1 case); verify.sh and justfile run the Rust binary as the gate replay."
+      },
       "risk": "low",
-      "status": "ready",
+      "status": "complete",
       "title": "Migrate dev tooling to Rust: replay_configured_help_lifecycle"
     },
     {
@@ -8619,5 +8638,5 @@
       "title": "Retire the Python harness and orchestrate verify in Rust"
     }
   ],
-  "updated_at": "2026-08-04T12:34:46Z"
+  "updated_at": "2026-08-04T12:36:11Z"
 }
