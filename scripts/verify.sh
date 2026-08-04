@@ -293,7 +293,11 @@ python3 scripts/replay_provider_recovery.py --binary target/debug/hades --report
 cargo build --offline --package hades-dev --bin replay_conversation_context
 python3 scripts/check_replay_parity.py replay_conversation_context replay_conversation_context --timeout 8
 ./target/debug/replay_conversation_context --binary target/debug/hades --report .hades/runtime/conversation-context-replay.json --timeout 8
-python3 scripts/replay_tool_call_deltas.py --binary target/debug/hades --report .hades/runtime/tool-call-deltas-replay.json --timeout 8
+# HAD-170: replay-tool-call-deltas is ported to Rust; the differential
+# check proves identical reports, then the Rust binary is the gate replay.
+cargo build --offline --package hades-dev --bin replay_tool_call_deltas
+python3 scripts/check_replay_parity.py replay_tool_call_deltas replay_tool_call_deltas --timeout 8
+./target/debug/replay_tool_call_deltas --binary target/debug/hades --report .hades/runtime/tool-call-deltas-replay.json --timeout 8
 # HAD-157: replay-model-selection is ported to Rust; the differential
 # check proves identical reports, then the Rust binary is the gate replay.
 cargo build --offline --package hades-dev --bin replay_model_selection

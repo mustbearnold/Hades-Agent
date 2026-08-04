@@ -8588,7 +8588,13 @@
       "depends_on": [
         "HAD-131"
       ],
-      "evidence": [],
+      "evidence": [
+        "crates/hades-dev/src/bin/replay_tool_call_deltas.rs",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile",
+        "CONTEXT.md"
+      ],
       "id": "HAD-170",
       "lane": "tooling",
       "oracle": [
@@ -8599,8 +8605,19 @@
       "owner_role": "implementer",
       "priority": 44,
       "ready_at": "2026-08-04T12:23:15Z",
+      "result": {
+        "completed_at": "2026-08-04T13:00:11Z",
+        "evidence": [
+          "crates/hades-dev/src/bin/replay_tool_call_deltas.rs",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile",
+          "CONTEXT.md"
+        ],
+        "summary": "Ported replay_tool_call_deltas to Rust as hades-dev replay-tool-call-deltas: synthetic tool-call stream contract (role delta, JSON-encoded argument fragments, finish_reason tool_calls, DONE, bounded follow-up, no tool execution) via the loopback provider. Subagent draft completed by the orchestrator (fixed the SSE chunk construction). Differential parity check proves identical reports (1 case); verify.sh and justfile run the Rust binary as the gate replay."
+      },
       "risk": "low",
-      "status": "in_progress",
+      "status": "complete",
       "title": "Migrate dev tooling to Rust: replay_tool_call_deltas"
     },
     {
@@ -8818,5 +8835,5 @@
       "title": "Retire the Python harness and orchestrate verify in Rust"
     }
   ],
-  "updated_at": "2026-08-04T12:58:04Z"
+  "updated_at": "2026-08-04T13:00:11Z"
 }
