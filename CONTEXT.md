@@ -923,6 +923,13 @@ progress from August 1, 2026 through 2027.
   reproduces the OBS-0039 model-stage contract through `hades_dev::setup`
   (the setup-family key set already covers Escape). The differential check
   proves identical reports; the Rust binary is now the gate replay.
+- HAD-148 ports replay_configured_help to Rust: `hades-dev replay-configured-help`
+  reproduces the OBS-0098 configured /help panel contract in a direct
+  120x40 PTY against an absent loopback endpoint: /help opening the stable
+  bordered command row (3 consecutive identical samples), main-surface
+  landmarks still rendered, no setup-required state, and a clean Ctrl+C
+  exit with terminal restoration. The differential check proves identical
+  reports (1 case); the Rust binary is now the gate replay.
 - HAD-147 ports replay_clipboard_text to Rust: `hades-dev replay-clipboard-text`
   reproduces the OBS-0023 successful-text clipboard contract in a direct
   120x40 PTY with a synthetic xclip provider (records argv to a log, echoes

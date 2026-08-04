@@ -82,6 +82,12 @@ Every run has exactly one terminal outcome: `complete`, `blocked`, or
   explicit test adapter.
 - Reference unknowns stay unknown until observed. Do not infer exact keymaps,
   timings, copy, colors, or error handling from convention.
+- Frozen evidence: `docs/parity/observations/`, `tests/fixtures/parity/`, and
+  the `scripts/probe_hermes_*.py` reference-observation instruments are
+  captured provenance, not dead code. Do not delete, refactor, or "clean up"
+  them; they are retired one-shot instruments kept for reproducibility.
+  Replays awaiting migration live in `scripts/replay_*.py` and stay gate
+  citizens until their Rust twin passes differential parity (HAD-147+).
 - Reference observations define the intended compatibility contract, not a
   mandate to reproduce defects. Do not intentionally rebuild Hermes bugs,
   unsafe behavior, or failure cases in Hades; fix them and document any

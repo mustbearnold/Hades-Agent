@@ -7793,11 +7793,19 @@
         "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
         "Run the targeted tests and the complete no-skip just verify gate before completion."
       ],
-      "attempts": 0,
+      "attempts": 1,
+      "claimed_at": "2026-08-04T12:28:32Z",
+      "claimed_by": "hermes-agent",
       "depends_on": [
         "HAD-133"
       ],
-      "evidence": [],
+      "evidence": [
+        "crates/hades-dev/src/bin/replay_configured_help.rs",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile",
+        "CONTEXT.md"
+      ],
       "id": "HAD-148",
       "lane": "tooling",
       "oracle": [
@@ -7808,8 +7816,19 @@
       "owner_role": "implementer",
       "priority": 66,
       "ready_at": "2026-08-04T12:23:15Z",
+      "result": {
+        "completed_at": "2026-08-04T12:34:46Z",
+        "evidence": [
+          "crates/hades-dev/src/bin/replay_configured_help.rs",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile",
+          "CONTEXT.md"
+        ],
+        "summary": "Ported replay_configured_help to Rust as hades-dev replay-configured-help: OBS-0098 stable bordered /help panel (3 consecutive identical samples), main-surface landmarks, no setup-required state, clean Ctrl+C exit with terminal restoration. Differential parity check proves identical reports (1 case); verify.sh and justfile run the Rust binary as the gate replay."
+      },
       "risk": "low",
-      "status": "ready",
+      "status": "complete",
       "title": "Migrate dev tooling to Rust: replay_configured_help"
     },
     {
@@ -7897,7 +7916,9 @@
         "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
         "Run the targeted tests and the complete no-skip just verify gate before completion."
       ],
-      "attempts": 0,
+      "attempts": 1,
+      "claimed_at": "2026-08-04T12:29:09Z",
+      "claimed_by": "hermes-agent",
       "depends_on": [
         "HAD-131"
       ],
@@ -7913,7 +7934,7 @@
       "priority": 62,
       "ready_at": "2026-08-04T12:23:15Z",
       "risk": "low",
-      "status": "ready",
+      "status": "in_progress",
       "title": "Migrate dev tooling to Rust: replay_conversation_context"
     },
     {
@@ -7975,7 +7996,9 @@
         "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
         "Run the targeted tests and the complete no-skip just verify gate before completion."
       ],
-      "attempts": 0,
+      "attempts": 1,
+      "claimed_at": "2026-08-04T12:29:09Z",
+      "claimed_by": "hermes-agent",
       "depends_on": [
         "HAD-131"
       ],
@@ -7991,7 +8014,7 @@
       "priority": 59,
       "ready_at": "2026-08-04T12:23:15Z",
       "risk": "low",
-      "status": "ready",
+      "status": "in_progress",
       "title": "Migrate dev tooling to Rust: replay_local_provider"
     },
     {
@@ -8027,7 +8050,9 @@
         "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
         "Run the targeted tests and the complete no-skip just verify gate before completion."
       ],
-      "attempts": 0,
+      "attempts": 1,
+      "claimed_at": "2026-08-04T12:29:09Z",
+      "claimed_by": "hermes-agent",
       "depends_on": [
         "HAD-146"
       ],
@@ -8043,7 +8068,7 @@
       "priority": 57,
       "ready_at": "2026-08-04T12:23:15Z",
       "risk": "low",
-      "status": "ready",
+      "status": "in_progress",
       "title": "Migrate dev tooling to Rust: replay_model_selection"
     },
     {
@@ -8433,8 +8458,9 @@
       ],
       "owner_role": "implementer",
       "priority": 42,
+      "ready_at": "2026-08-04T12:34:46Z",
       "risk": "low",
-      "status": "queued",
+      "status": "ready",
       "title": "Migrate dev tooling to Rust: probe_hermes help family"
     },
     {
@@ -8593,5 +8619,5 @@
       "title": "Retire the Python harness and orchestrate verify in Rust"
     }
   ],
-  "updated_at": "2026-08-04T12:28:24Z"
+  "updated_at": "2026-08-04T12:34:46Z"
 }

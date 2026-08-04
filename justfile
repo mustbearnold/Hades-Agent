@@ -61,7 +61,9 @@ replay-configured-surfaces:
 
 replay-configured-help:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_configured_help.py --binary target/debug/hades --report .hades/runtime/configured-help-replay.json --timeout 60
+    cargo build --offline --package hades-dev --bin replay_configured_help
+    python3 scripts/check_replay_parity.py replay_configured_help replay_configured_help --timeout 20
+    ./target/debug/replay_configured_help --binary target/debug/hades --report .hades/runtime/configured-help-replay.json --timeout 60
 
 replay-configured-help-lifecycle:
     cargo build --locked --package hades-cli

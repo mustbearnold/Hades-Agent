@@ -266,7 +266,11 @@ cargo build --offline --package hades-dev --bin replay_vertical_slice
 python3 scripts/check_replay_parity.py replay_vertical_slice replay_vertical_slice
 ./target/debug/replay_vertical_slice --binary target/debug/hades --report .hades/runtime/vertical-slice-replay.json --timeout 8
 python3 scripts/replay_configured_surfaces.py --binary target/debug/hades --report .hades/runtime/configured-surfaces-replay.json --timeout 8
-python3 scripts/replay_configured_help.py --binary target/debug/hades --report .hades/runtime/configured-help-replay.json --timeout 60
+# HAD-148: replay-configured-help is ported to Rust; the differential
+# check proves identical reports, then the Rust binary is the gate replay.
+cargo build --offline --package hades-dev --bin replay_configured_help
+python3 scripts/check_replay_parity.py replay_configured_help replay_configured_help --timeout 20
+./target/debug/replay_configured_help --binary target/debug/hades --report .hades/runtime/configured-help-replay.json --timeout 60
 python3 scripts/replay_configured_help_lifecycle.py --binary target/debug/hades --report .hades/runtime/configured-help-lifecycle-replay.json --timeout 60
 python3 scripts/replay_configured_help_resize.py --binary target/debug/hades --report .hades/runtime/configured-help-resize-replay.json --timeout 60
 python3 scripts/replay_provider_recovery.py --binary target/debug/hades --report .hades/runtime/provider-recovery-replay.json --timeout 8
