@@ -8294,11 +8294,19 @@
         "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
         "Run the targeted tests and the complete no-skip just verify gate before completion."
       ],
-      "attempts": 0,
+      "attempts": 1,
+      "claimed_at": "2026-08-04T13:10:25Z",
+      "claimed_by": "hermes-agent",
       "depends_on": [
         "HAD-136"
       ],
-      "evidence": [],
+      "evidence": [
+        "crates/hades-dev/src/bin/replay_osc52_timing_limits.rs",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile",
+        "CONTEXT.md"
+      ],
       "id": "HAD-159",
       "lane": "tooling",
       "oracle": [
@@ -8309,8 +8317,19 @@
       "owner_role": "implementer",
       "priority": 55,
       "ready_at": "2026-08-04T12:23:15Z",
+      "result": {
+        "completed_at": "2026-08-04T13:22:27Z",
+        "evidence": [
+          "crates/hades-dev/src/bin/replay_osc52_timing_limits.rs",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile",
+          "CONTEXT.md"
+        ],
+        "summary": "Ported replay_osc52_timing_limits to Rust as hades-dev replay-osc52-timing-limits: OBS-0033 timing and bounded-payload controls (500ms race before/after, 256KiB/512KiB bounded payloads) in a direct PTY with offset-tracking non-blocking writes. Parity checker extended to normalize the OSC52 timing diagnostics. Differential parity check proves identical reports (4 cases); verify.sh and justfile run the Rust binary as the gate replay."
+      },
       "risk": "low",
-      "status": "ready",
+      "status": "complete",
       "title": "Migrate dev tooling to Rust: replay_osc52_timing_limits"
     },
     {
@@ -8391,7 +8410,9 @@
         "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
         "Run the targeted tests and the complete no-skip just verify gate before completion."
       ],
-      "attempts": 0,
+      "attempts": 1,
+      "claimed_at": "2026-08-04T13:10:49Z",
+      "claimed_by": "hermes-agent",
       "depends_on": [
         "HAD-143"
       ],
@@ -8407,7 +8428,7 @@
       "priority": 52,
       "ready_at": "2026-08-04T12:23:15Z",
       "risk": "low",
-      "status": "ready",
+      "status": "in_progress",
       "title": "Migrate dev tooling to Rust: replay_standalone_empty_platform_confirmation"
     },
     {
@@ -8417,7 +8438,9 @@
         "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
         "Run the targeted tests and the complete no-skip just verify gate before completion."
       ],
-      "attempts": 0,
+      "attempts": 1,
+      "claimed_at": "2026-08-04T13:10:49Z",
+      "claimed_by": "hermes-agent",
       "depends_on": [
         "HAD-143"
       ],
@@ -8433,7 +8456,7 @@
       "priority": 51,
       "ready_at": "2026-08-04T12:23:15Z",
       "risk": "low",
-      "status": "ready",
+      "status": "in_progress",
       "title": "Migrate dev tooling to Rust: replay_standalone_full_setup"
     },
     {
@@ -8443,7 +8466,9 @@
         "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
         "Run the targeted tests and the complete no-skip just verify gate before completion."
       ],
-      "attempts": 0,
+      "attempts": 1,
+      "claimed_at": "2026-08-04T13:10:49Z",
+      "claimed_by": "hermes-agent",
       "depends_on": [
         "HAD-143"
       ],
@@ -8459,7 +8484,7 @@
       "priority": 50,
       "ready_at": "2026-08-04T12:23:15Z",
       "risk": "low",
-      "status": "ready",
+      "status": "in_progress",
       "title": "Migrate dev tooling to Rust: replay_standalone_setup"
     },
     {
@@ -8852,5 +8877,5 @@
       "title": "Retire the Python harness and orchestrate verify in Rust"
     }
   ],
-  "updated_at": "2026-08-04T13:10:17Z"
+  "updated_at": "2026-08-04T13:22:27Z"
 }

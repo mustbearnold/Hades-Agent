@@ -978,6 +978,15 @@ progress from August 1, 2026 through 2027.
   replay-local-provider` reproduces the OBS-0051 local-provider stream
   contract (3 cases) through the hold-provider loopback; the differential
   check proves identical reports; the Rust binary is now the gate replay.
+- HAD-159 ports replay_osc52_timing_limits to Rust: `hades-dev
+  replay-osc52-timing-limits` reproduces the OBS-0033 timing and
+  bounded-payload controls (response before/after the 500 ms timeout
+  race, and 256 KiB/512 KiB bounded payloads delivered before the
+  deadline) in a direct PTY. The differential check proves identical
+  reports (4 cases); the Rust binary is now the gate replay. The parity
+  checker normalizes the timing diagnostics (`response_elapsed_ms`,
+  `response_write_ms`, `query_offset`, `da1_query_offset`) like the
+  pre-existing `pre_delay_ms`/`observed_transition_ms` fields.
 - HAD-158 ports replay_osc52_clipboard to Rust: `hades-dev
   replay-osc52-clipboard` reproduces the bare-SSH OSC52-first clipboard
   contract (OBS-0025 legacy pair and the OBS-0027 response-boundary

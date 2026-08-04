@@ -68,6 +68,12 @@ def normalize_report(data):
     # pre_delay_ms and observed_transition_ms vary by run; both replays
     # assert the same bounds, so compare their presence, not exact values.
     text = re.sub(r'"(pre_delay_ms|observed_transition_ms)": \d+', r'"\1": <timing>', text)
+    # OSC52 timing controls: elapsed/write ms and raw-buffer offsets depend
+    # on scheduling and accumulated-buffer growth, so normalize them too.
+    text = re.sub(
+        r'"(response_elapsed_ms|response_write_ms)": [\d.e-]+', r'"\1": <timing>', text
+    )
+    text = re.sub(r'"(query_offset|da1_query_offset)": \d+', r'"\1": <offset>', text)
     return text
 
 

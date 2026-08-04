@@ -489,7 +489,11 @@ run_probe .hades/runtime/hermes-tool-provider-inventory-selection-probe.json pyt
 cargo build --offline --package hades-dev --bin replay_terminal_palette
 python3 scripts/check_replay_parity.py replay_terminal_palette replay_terminal_palette
 ./target/debug/replay_terminal_palette --binary target/debug/hades --report .hades/runtime/hades-terminal-palette-replay.json
-python3 scripts/replay_osc52_timing_limits.py --binary target/debug/hades --report .hades/runtime/hades-osc52-timing-limits-replay.json
+# HAD-159: replay-osc52-timing-limits is ported to Rust; the differential
+# check proves identical reports, then the Rust binary is the gate replay.
+cargo build --offline --package hades-dev --bin replay_osc52_timing_limits
+python3 scripts/check_replay_parity.py replay_osc52_timing_limits replay_osc52_timing_limits --timeout 10
+./target/debug/replay_osc52_timing_limits --binary target/debug/hades --report .hades/runtime/hades-osc52-timing-limits-replay.json --timeout 10
 python3 scripts/replay_osc52_clipboard.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0029-hades-osc52-st-termination.json --report .hades/runtime/hades-osc52-st-termination-replay.json
 python3 scripts/replay_osc52_clipboard.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0031-hades-osc52-multiplexer-passthrough.json --report .hades/runtime/hades-osc52-multiplexer-replay.json
 # HAD-134: replay-history is ported to Rust; the differential check proves
