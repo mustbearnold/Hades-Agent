@@ -7941,7 +7941,13 @@
       "depends_on": [
         "HAD-131"
       ],
-      "evidence": [],
+      "evidence": [
+        "crates/hades-dev/src/bin/replay_conversation_context.rs",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile",
+        "CONTEXT.md"
+      ],
       "id": "HAD-152",
       "lane": "tooling",
       "oracle": [
@@ -7952,8 +7958,19 @@
       "owner_role": "implementer",
       "priority": 62,
       "ready_at": "2026-08-04T12:23:15Z",
+      "result": {
+        "completed_at": "2026-08-04T12:38:43Z",
+        "evidence": [
+          "crates/hades-dev/src/bin/replay_conversation_context.rs",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile",
+          "CONTEXT.md"
+        ],
+        "summary": "Ported replay_conversation_context to Rust as hades-dev replay-conversation-context: OBS-0092 conversation lifecycle via hold-provider loopback. Differential parity check proves identical reports (2 cases); verify.sh and justfile run the Rust binary as the gate replay."
+      },
       "risk": "low",
-      "status": "in_progress",
+      "status": "complete",
       "title": "Migrate dev tooling to Rust: replay_conversation_context"
     },
     {
@@ -8021,7 +8038,13 @@
       "depends_on": [
         "HAD-131"
       ],
-      "evidence": [],
+      "evidence": [
+        "crates/hades-dev/src/bin/replay_local_provider.rs",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile",
+        "CONTEXT.md"
+      ],
       "id": "HAD-155",
       "lane": "tooling",
       "oracle": [
@@ -8032,8 +8055,19 @@
       "owner_role": "implementer",
       "priority": 59,
       "ready_at": "2026-08-04T12:23:15Z",
+      "result": {
+        "completed_at": "2026-08-04T12:38:43Z",
+        "evidence": [
+          "crates/hades-dev/src/bin/replay_local_provider.rs",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile",
+          "CONTEXT.md"
+        ],
+        "summary": "Ported replay_local_provider to Rust as hades-dev replay-local-provider: OBS-0051 local-provider stream contract (3 cases) via hold-provider loopback. Differential parity check proves identical reports; verify.sh and justfile run the Rust binary as the gate replay."
+      },
       "risk": "low",
-      "status": "in_progress",
+      "status": "complete",
       "title": "Migrate dev tooling to Rust: replay_local_provider"
     },
     {
@@ -8075,7 +8109,13 @@
       "depends_on": [
         "HAD-146"
       ],
-      "evidence": [],
+      "evidence": [
+        "crates/hades-dev/src/bin/replay_model_selection.rs",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile",
+        "CONTEXT.md"
+      ],
       "id": "HAD-157",
       "lane": "tooling",
       "oracle": [
@@ -8086,8 +8126,19 @@
       "owner_role": "implementer",
       "priority": 57,
       "ready_at": "2026-08-04T12:23:15Z",
+      "result": {
+        "completed_at": "2026-08-04T12:38:43Z",
+        "evidence": [
+          "crates/hades-dev/src/bin/replay_model_selection.rs",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile",
+          "CONTEXT.md"
+        ],
+        "summary": "Ported replay_model_selection to Rust as hades-dev replay-model-selection: live loopback session-scoped model selection replay (picker request boundary, fresh-process nonpersistence). Differential parity check proves identical reports (3 cases); verify.sh and justfile run the Rust binary as the gate replay."
+      },
       "risk": "low",
-      "status": "in_progress",
+      "status": "complete",
       "title": "Migrate dev tooling to Rust: replay_model_selection"
     },
     {
@@ -8504,8 +8555,9 @@
       ],
       "owner_role": "implementer",
       "priority": 41,
+      "ready_at": "2026-08-04T12:38:43Z",
       "risk": "low",
-      "status": "queued",
+      "status": "ready",
       "title": "Migrate dev tooling to Rust: probe_hermes osc52 family"
     },
     {
@@ -8530,8 +8582,9 @@
       ],
       "owner_role": "implementer",
       "priority": 40,
+      "ready_at": "2026-08-04T12:38:43Z",
       "risk": "low",
-      "status": "queued",
+      "status": "ready",
       "title": "Migrate dev tooling to Rust: probe_hermes provider family"
     },
     {
@@ -8556,8 +8609,9 @@
       ],
       "owner_role": "implementer",
       "priority": 39,
+      "ready_at": "2026-08-04T12:38:43Z",
       "risk": "low",
-      "status": "queued",
+      "status": "ready",
       "title": "Migrate dev tooling to Rust: probe_hermes tool family"
     },
     {
@@ -8582,8 +8636,9 @@
       ],
       "owner_role": "implementer",
       "priority": 38,
+      "ready_at": "2026-08-04T12:38:43Z",
       "risk": "low",
-      "status": "queued",
+      "status": "ready",
       "title": "Migrate dev tooling to Rust: probe_hermes model family"
     },
     {
@@ -8638,5 +8693,5 @@
       "title": "Retire the Python harness and orchestrate verify in Rust"
     }
   ],
-  "updated_at": "2026-08-04T12:36:11Z"
+  "updated_at": "2026-08-04T12:38:43Z"
 }

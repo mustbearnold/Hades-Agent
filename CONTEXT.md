@@ -923,6 +923,21 @@ progress from August 1, 2026 through 2027.
   reproduces the OBS-0039 model-stage contract through `hades_dev::setup`
   (the setup-family key set already covers Escape). The differential check
   proves identical reports; the Rust binary is now the gate replay.
+- HAD-152 ports replay_conversation_context to Rust: `hades-dev
+  replay-conversation-context` reproduces the OBS-0092 conversation
+  lifecycle contract (multi-turn request shape, failed-turn isolation)
+  through the hold-provider loopback; the differential check proves
+  identical reports (2 cases); the Rust binary is now the gate replay.
+- HAD-155 ports replay_local_provider to Rust: `hades-dev
+  replay-local-provider` reproduces the OBS-0051 local-provider stream
+  contract (3 cases) through the hold-provider loopback; the differential
+  check proves identical reports; the Rust binary is now the gate replay.
+- HAD-157 ports replay_model_selection to Rust: `hades-dev
+  replay-model-selection` reproduces the Python live loopback replay of
+  session-scoped model selection (picker request boundary, fresh-process
+  nonpersistence, no fixture contract — a direct behavioral replay); the
+  differential check proves identical reports (3 cases); the Rust binary
+  is now the gate replay.
 - HAD-149 ports replay_configured_help_lifecycle to Rust:
   `hades-dev replay-configured-help-lifecycle` reproduces the OBS-0100
   configured /help Escape lifecycle: /help opening the stable bordered

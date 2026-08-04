@@ -279,9 +279,17 @@ python3 scripts/check_replay_parity.py replay_configured_help_lifecycle replay_c
 ./target/debug/replay_configured_help_lifecycle --binary target/debug/hades --report .hades/runtime/configured-help-lifecycle-replay.json --timeout 60
 python3 scripts/replay_configured_help_resize.py --binary target/debug/hades --report .hades/runtime/configured-help-resize-replay.json --timeout 60
 python3 scripts/replay_provider_recovery.py --binary target/debug/hades --report .hades/runtime/provider-recovery-replay.json --timeout 8
-python3 scripts/replay_conversation_context.py --binary target/debug/hades --report .hades/runtime/conversation-context-replay.json --timeout 8
+# HAD-152: replay-conversation-context is ported to Rust; the differential
+# check proves identical reports, then the Rust binary is the gate replay.
+cargo build --offline --package hades-dev --bin replay_conversation_context
+python3 scripts/check_replay_parity.py replay_conversation_context replay_conversation_context --timeout 8
+./target/debug/replay_conversation_context --binary target/debug/hades --report .hades/runtime/conversation-context-replay.json --timeout 8
 python3 scripts/replay_tool_call_deltas.py --binary target/debug/hades --report .hades/runtime/tool-call-deltas-replay.json --timeout 8
-python3 scripts/replay_model_selection.py --binary target/debug/hades --report .hades/runtime/model-selection-replay.json --timeout 10
+# HAD-157: replay-model-selection is ported to Rust; the differential
+# check proves identical reports, then the Rust binary is the gate replay.
+cargo build --offline --package hades-dev --bin replay_model_selection
+python3 scripts/check_replay_parity.py replay_model_selection replay_model_selection --timeout 10
+./target/debug/replay_model_selection --binary target/debug/hades --report .hades/runtime/model-selection-replay.json --timeout 10
 cargo build --locked --release --package hades-cli
 bash scripts/install_user_launcher.sh
 python3 scripts/replay_fresh_shell_launch.py --report .hades/runtime/fresh-shell-launch-replay.json
@@ -457,7 +465,11 @@ python3 scripts/replay_osc52_clipboard.py --binary target/debug/hades --contract
 cargo build --offline --package hades-dev --bin replay_history
 python3 scripts/check_replay_parity.py replay_history replay_history
 ./target/debug/replay_history --binary target/debug/hades --report .hades/runtime/history-replay.json
-python3 scripts/replay_local_provider.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0051-hades-local-provider-stream.json --report .hades/runtime/local-provider-replay.json
+# HAD-155: replay-local-provider is ported to Rust; the differential
+# check proves identical reports, then the Rust binary is the gate replay.
+cargo build --offline --package hades-dev --bin replay_local_provider
+python3 scripts/check_replay_parity.py replay_local_provider replay_local_provider --contract tests/fixtures/parity/OBS-0051-hades-local-provider-stream.json --timeout 8
+./target/debug/replay_local_provider --binary target/debug/hades --contract tests/fixtures/parity/OBS-0051-hades-local-provider-stream.json --report .hades/runtime/local-provider-replay.json --timeout 8
 python3 scripts/replay_local_provider_timing.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0053-hades-stream-timing.json --report .hades/runtime/local-provider-timing-replay.json
 git diff --check
 

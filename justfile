@@ -84,11 +84,15 @@ replay-provider-recovery:
 
 replay-conversation-context:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_conversation_context.py --binary target/debug/hades --report .hades/runtime/conversation-context-replay.json
+    cargo build --offline --package hades-dev --bin replay_conversation_context
+    python3 scripts/check_replay_parity.py replay_conversation_context replay_conversation_context --timeout 8
+    ./target/debug/replay_conversation_context --binary target/debug/hades --report .hades/runtime/conversation-context-replay.json --timeout 8
 
 replay-model-selection:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_model_selection.py --binary target/debug/hades --report .hades/runtime/model-selection-replay.json
+    cargo build --offline --package hades-dev --bin replay_model_selection
+    python3 scripts/check_replay_parity.py replay_model_selection replay_model_selection --timeout 10
+    ./target/debug/replay_model_selection --binary target/debug/hades --report .hades/runtime/model-selection-replay.json --timeout 10
 
 replay-installed-model-selection:
     cargo build --locked --release --package hades-cli
@@ -414,7 +418,9 @@ probe-hermes-tool-provider-inventory-selection:
 
 replay-local-provider:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_local_provider.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0051-hades-local-provider-stream.json --report .hades/runtime/local-provider-replay.json
+    cargo build --offline --package hades-dev --bin replay_local_provider
+    python3 scripts/check_replay_parity.py replay_local_provider replay_local_provider --contract tests/fixtures/parity/OBS-0051-hades-local-provider-stream.json --timeout 8
+    ./target/debug/replay_local_provider --binary target/debug/hades --contract tests/fixtures/parity/OBS-0051-hades-local-provider-stream.json --report .hades/runtime/local-provider-replay.json --timeout 8
 
 replay-tool-call-deltas:
     cargo build --locked --package hades-cli
