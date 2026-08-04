@@ -73,7 +73,7 @@ pub fn resize_pty(
     let result = tcsetwinsize(&slave, size);
     drop(slave);
     result?;
-    let pid = rustix::process::Pid::from_child(&child);
+    let pid = rustix::process::Pid::from_child(child);
     let _ = rustix::process::kill_process(pid, rustix::process::Signal::WINCH);
     Ok(())
 }
