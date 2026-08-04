@@ -103,7 +103,9 @@ replay-composer:
 
 replay-completion:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_completion.py --binary target/debug/hades --report .hades/runtime/completion-replay.json
+    cargo build --offline --package hades-dev --bin replay_completion
+    python3 scripts/check_replay_parity.py replay_completion replay_completion
+    ./target/debug/replay_completion --binary target/debug/hades --report .hades/runtime/completion-replay.json
 
 replay-unknown-command:
     cargo build --locked --package hades-cli
@@ -136,11 +138,15 @@ replay-setup-platform-picker:
 
 replay-paste:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_paste.py --binary target/debug/hades --report .hades/runtime/paste-replay.json
+    cargo build --offline --package hades-dev --bin replay_paste
+    python3 scripts/check_replay_parity.py replay_paste replay_paste
+    ./target/debug/replay_paste --binary target/debug/hades --report .hades/runtime/paste-replay.json
 
 replay-editor:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_editor.py --binary target/debug/hades --report .hades/runtime/editor-replay.json
+    cargo build --offline --package hades-dev --bin replay_editor
+    python3 scripts/check_replay_parity.py replay_editor replay_editor
+    ./target/debug/replay_editor --binary target/debug/hades --report .hades/runtime/editor-replay.json
 
 replay-editor-outcomes:
     cargo build --locked --package hades-cli
@@ -152,7 +158,9 @@ replay-modified-enter:
 
 replay-clipboard:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_clipboard.py --binary target/debug/hades --report .hades/runtime/clipboard-replay.json
+    cargo build --offline --package hades-dev --bin replay_clipboard
+    python3 scripts/check_replay_parity.py replay_clipboard replay_clipboard
+    ./target/debug/replay_clipboard --binary target/debug/hades --report .hades/runtime/clipboard-replay.json
 
 replay-clipboard-text:
     cargo build --locked --package hades-cli

@@ -5,6 +5,7 @@
 //! emulation, PTY control) and, in later phases, the fixture validator,
 //! control plane, replays, reference probes, and verify orchestration.
 
+pub mod composer;
 pub mod hold_provider;
 pub mod pty;
 pub mod replay;

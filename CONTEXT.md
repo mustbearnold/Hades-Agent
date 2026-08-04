@@ -865,6 +865,16 @@ progress from August 1, 2026 through 2027.
   wait loop uses poll-based reads (like Python's select) so the raw-delta
   boundary matches exactly. The differential check proves identical
   reports; the Rust binary is now the gate replay.
+- HAD-136..HAD-139 port the composer-family wrapper replays to Rust:
+  `hades-dev replay-completion` (OBS-0012 slash completion),
+  `replay-clipboard` (OBS-0015 empty clipboard), `replay-paste`
+  (OBS-0013 bracketed paste), and `replay-editor` (OBS-0014 editor
+  handoff, with the deterministic `EDITOR=/bin/true` the Python replay
+  injects). The shared composer machinery moved into
+  `hades_dev::composer` (load_contract / run_case with an environment
+  override / emit_report / arg parsing), so each wrapper is a thin main.
+  Differential checks prove identical reports on the same binary; the
+  Rust binaries are now the gate replays.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes

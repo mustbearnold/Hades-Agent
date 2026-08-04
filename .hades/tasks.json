@@ -7227,7 +7227,195 @@
       "risk": "high",
       "status": "complete",
       "title": "Migrate dev tooling to Rust: replay_terminal_palette"
+    },
+    {
+      "acceptance": [
+        "hades-dev had 136 reproduces scripts/replay_*.py semantics for the OBS-0012-hades-slash-completion.json contract: composer-family tmux replay with the same report JSON shape.",
+        "A differential parity check proves the Rust replay and the Python replay produce identical reports on the same binary.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 1,
+      "claimed_at": "2026-08-04T00:46:46Z",
+      "claimed_by": "hermes-agent",
+      "depends_on": [
+        "HAD-133"
+      ],
+      "evidence": [
+        "crates/hades-dev/src/composer.rs",
+        "crates/hades-dev/src/bin/replay_completion.rs",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile",
+        "CONTEXT.md"
+      ],
+      "id": "HAD-136",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 55,
+      "ready_at": "2026-08-04T00:00:00Z",
+      "result": {
+        "completed_at": "2026-08-04T01:07:46Z",
+        "evidence": [
+          "crates/hades-dev/src/composer.rs",
+          "crates/hades-dev/src/bin/replay_completion.rs",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile",
+          "CONTEXT.md"
+        ],
+        "summary": "Ported the composer-family wrapper replay to Rust via the shared hades_dev::composer machinery; differential parity check proves identical reports on the same binary; verify.sh and justfile run the Rust binary as the gate replay."
+      },
+      "risk": "medium",
+      "status": "complete",
+      "title": "Migrate dev tooling to Rust: replay_completion"
+    },
+    {
+      "acceptance": [
+        "hades-dev had 137 reproduces scripts/replay_*.py semantics for the OBS-0015-hades-empty-clipboard.json contract: composer-family tmux replay with the same report JSON shape.",
+        "A differential parity check proves the Rust replay and the Python replay produce identical reports on the same binary.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 1,
+      "claimed_at": "2026-08-04T01:07:58Z",
+      "claimed_by": "hermes-agent",
+      "depends_on": [
+        "HAD-133"
+      ],
+      "evidence": [
+        "crates/hades-dev/src/composer.rs",
+        "crates/hades-dev/src/bin/replay_clipboard.rs",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile",
+        "CONTEXT.md"
+      ],
+      "id": "HAD-137",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 54,
+      "ready_at": "2026-08-04T00:00:00Z",
+      "result": {
+        "completed_at": "2026-08-04T01:07:59Z",
+        "evidence": [
+          "crates/hades-dev/src/composer.rs",
+          "crates/hades-dev/src/bin/replay_clipboard.rs",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile",
+          "CONTEXT.md"
+        ],
+        "summary": "Ported the composer-family wrapper replay to Rust via the shared hades_dev::composer machinery; differential parity check proves identical reports on the same binary; verify.sh and justfile run the Rust binary as the gate replay."
+      },
+      "risk": "medium",
+      "status": "complete",
+      "title": "Migrate dev tooling to Rust: replay_clipboard"
+    },
+    {
+      "acceptance": [
+        "hades-dev had 138 reproduces scripts/replay_*.py semantics for the OBS-0013-hades-bracketed-paste.json contract: composer-family tmux replay with the same report JSON shape.",
+        "A differential parity check proves the Rust replay and the Python replay produce identical reports on the same binary.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 1,
+      "claimed_at": "2026-08-04T01:07:59Z",
+      "claimed_by": "hermes-agent",
+      "depends_on": [
+        "HAD-133"
+      ],
+      "evidence": [
+        "crates/hades-dev/src/composer.rs",
+        "crates/hades-dev/src/bin/replay_paste.rs",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile",
+        "CONTEXT.md"
+      ],
+      "id": "HAD-138",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 53,
+      "ready_at": "2026-08-04T00:00:00Z",
+      "result": {
+        "completed_at": "2026-08-04T01:07:59Z",
+        "evidence": [
+          "crates/hades-dev/src/composer.rs",
+          "crates/hades-dev/src/bin/replay_paste.rs",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile",
+          "CONTEXT.md"
+        ],
+        "summary": "Ported the composer-family wrapper replay to Rust via the shared hades_dev::composer machinery; differential parity check proves identical reports on the same binary; verify.sh and justfile run the Rust binary as the gate replay."
+      },
+      "risk": "medium",
+      "status": "complete",
+      "title": "Migrate dev tooling to Rust: replay_paste"
+    },
+    {
+      "acceptance": [
+        "hades-dev had 139 reproduces scripts/replay_*.py semantics for the OBS-0014-hades-editor-handoff.json contract: composer-family tmux replay with the same report JSON shape.",
+        "A differential parity check proves the Rust replay and the Python replay produce identical reports on the same binary.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 1,
+      "claimed_at": "2026-08-04T01:07:59Z",
+      "claimed_by": "hermes-agent",
+      "depends_on": [
+        "HAD-133"
+      ],
+      "evidence": [
+        "crates/hades-dev/src/composer.rs",
+        "crates/hades-dev/src/bin/replay_editor.rs",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile",
+        "CONTEXT.md"
+      ],
+      "id": "HAD-139",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 52,
+      "ready_at": "2026-08-04T00:00:00Z",
+      "result": {
+        "completed_at": "2026-08-04T01:07:59Z",
+        "evidence": [
+          "crates/hades-dev/src/composer.rs",
+          "crates/hades-dev/src/bin/replay_editor.rs",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile",
+          "CONTEXT.md"
+        ],
+        "summary": "Ported the composer-family wrapper replay to Rust via the shared hades_dev::composer machinery; differential parity check proves identical reports on the same binary; verify.sh and justfile run the Rust binary as the gate replay."
+      },
+      "risk": "medium",
+      "status": "complete",
+      "title": "Migrate dev tooling to Rust: replay_editor"
     }
   ],
-  "updated_at": "2026-08-04T00:44:17Z"
+  "updated_at": "2026-08-04T01:07:59Z"
 }

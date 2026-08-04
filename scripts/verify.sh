@@ -290,7 +290,11 @@ python3 scripts/differential_replay.py --binary target/debug/hades --report .had
 cargo build --offline --package hades-dev --bin replay_composer
 python3 scripts/check_replay_parity.py replay_composer replay_composer
 ./target/debug/replay_composer --binary target/debug/hades --report .hades/runtime/composer-replay.json
-python3 scripts/replay_completion.py --binary target/debug/hades --report .hades/runtime/completion-replay.json
+# HAD-136: replay-completion is ported to Rust; the differential check
+# proves identical reports, then the Rust binary is the gate replay.
+cargo build --offline --package hades-dev --bin replay_completion
+python3 scripts/check_replay_parity.py replay_completion replay_completion
+./target/debug/replay_completion --binary target/debug/hades --report .hades/runtime/completion-replay.json
 ./target/debug/replay_composer --binary target/debug/hades --contract tests/fixtures/parity/OBS-0037-hades-unknown-slash-command.json --report .hades/runtime/unknown-command-replay.json
 python3 scripts/replay_model_picker.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0039-hades-model-picker-model-stage.json --report .hades/runtime/model-picker-replay.json
 python3 scripts/replay_setup_wizard.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0041-hades-setup-wizard-cancel.json --report .hades/runtime/setup-wizard-replay.json
@@ -298,11 +302,23 @@ python3 scripts/replay_setup_provider_menu.py --binary target/debug/hades --cont
 python3 scripts/replay_setup_provider_model_prompt.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0047-hades-provider-selection-model-prompt.json --report .hades/runtime/setup-provider-model-prompt-replay.json
 python3 scripts/replay_setup_terminal_backend.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0049-hades-model-default-terminal-backend.json --report .hades/runtime/setup-terminal-backend-replay.json
 python3 scripts/replay_setup_terminal_backend.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0057-hades-setup-platform-picker.json --report .hades/runtime/setup-platform-picker-replay.json
-python3 scripts/replay_paste.py --binary target/debug/hades --report .hades/runtime/paste-replay.json
-python3 scripts/replay_editor.py --binary target/debug/hades --report .hades/runtime/editor-replay.json
+# HAD-138: replay-paste is ported to Rust; the differential check proves
+# identical reports, then the Rust binary is the gate replay.
+cargo build --offline --package hades-dev --bin replay_paste
+python3 scripts/check_replay_parity.py replay_paste replay_paste
+./target/debug/replay_paste --binary target/debug/hades --report .hades/runtime/paste-replay.json
+# HAD-139: replay-editor is ported to Rust; the differential check proves
+# identical reports, then the Rust binary is the gate replay.
+cargo build --offline --package hades-dev --bin replay_editor
+python3 scripts/check_replay_parity.py replay_editor replay_editor
+./target/debug/replay_editor --binary target/debug/hades --report .hades/runtime/editor-replay.json
 python3 scripts/replay_editor_outcomes.py --binary target/debug/hades --report .hades/runtime/editor-outcomes-replay.json
 python3 scripts/replay_modified_enter.py --binary target/debug/hades --report .hades/runtime/modified-enter-replay.json
-python3 scripts/replay_clipboard.py --binary target/debug/hades --report .hades/runtime/clipboard-replay.json
+# HAD-137: replay-clipboard is ported to Rust; the differential check
+# proves identical reports, then the Rust binary is the gate replay.
+cargo build --offline --package hades-dev --bin replay_clipboard
+python3 scripts/check_replay_parity.py replay_clipboard replay_clipboard
+./target/debug/replay_clipboard --binary target/debug/hades --report .hades/runtime/clipboard-replay.json
 python3 scripts/replay_clipboard_text.py --binary target/debug/hades --report .hades/runtime/clipboard-text-replay.json
 python3 scripts/replay_osc52_clipboard.py --binary target/debug/hades --report .hades/runtime/osc52-clipboard-replay.json
 python3 scripts/replay_osc52_clipboard.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0027-hades-osc52-response-boundaries.json --report .hades/runtime/osc52-response-boundaries-replay.json
