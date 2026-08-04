@@ -23,8 +23,8 @@ allow_credential_access = false
 [paths]
 mutable = [
     "AGENTS.md",
-    "CONTEXT.md",
     "README.md",
+    "specs/**",
     "Cargo.toml",
     "Cargo.lock",
     "crates/**",

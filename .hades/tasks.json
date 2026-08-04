@@ -18,9 +18,9 @@
       "evidence": [
         "scripts/probe_hermes_tool_provider_inventory_edges.py",
         "tests/fixtures/parity/OBS-0083-hermes-tool-provider-inventory-edges.json",
-        "docs/parity/observations/OBS-0083-hermes-tool-provider-inventory-edges-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0083-hermes-tool-provider-inventory-edges-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -43,9 +43,9 @@
         "evidence": [
           "scripts/probe_hermes_tool_provider_inventory_edges.py",
           "tests/fixtures/parity/OBS-0083-hermes-tool-provider-inventory-edges.json",
-          "docs/parity/observations/OBS-0083-hermes-tool-provider-inventory-edges-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0083-hermes-tool-provider-inventory-edges-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -79,9 +79,9 @@
         "crates/hades-tui/src/lib.rs",
         "scripts/replay_standalone_tool_provider_inventory_navigation.py",
         "tests/fixtures/parity/OBS-0084-hades-tool-provider-inventory-navigation-edges.json",
-        "docs/parity/observations/OBS-0084-hades-tool-provider-inventory-navigation-edges-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0084-hades-tool-provider-inventory-navigation-edges-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -105,9 +105,9 @@
           "crates/hades-tui/src/lib.rs",
           "scripts/replay_standalone_tool_provider_inventory_navigation.py",
           "tests/fixtures/parity/OBS-0084-hades-tool-provider-inventory-navigation-edges.json",
-          "docs/parity/observations/OBS-0084-hades-tool-provider-inventory-navigation-edges-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0084-hades-tool-provider-inventory-navigation-edges-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -130,7 +130,7 @@
       "claimed_by": "hermes-research",
       "depends_on": [],
       "evidence": [
-        "docs/parity/observations/OBS-0001-hermes-main-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0001-hermes-main-2026-08-01.md",
         "tests/fixtures/parity/OBS-0001-lifecycle.json",
         "tests/fixtures/parity/OBS-0001-startup-120x40.txt"
       ],
@@ -145,7 +145,7 @@
       "result": {
         "completed_at": "2026-08-01T01:03:16Z",
         "evidence": [
-          "docs/parity/observations/OBS-0001-hermes-main-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0001-hermes-main-2026-08-01.md",
           "tests/fixtures/parity/OBS-0001-lifecycle.json",
           "tests/fixtures/parity/OBS-0001-startup-120x40.txt"
         ],
@@ -170,7 +170,7 @@
       "evidence": [
         "tests/fixtures/parity/OBS-0001-lifecycle.json",
         "tests/fixtures/parity/OBS-0001-startup-120x40.txt",
-        "docs/parity/observations/OBS-0001-hermes-main-2026-08-01.md"
+        "_attic/docs/parity-observations/OBS-0001-hermes-main-2026-08-01.md"
       ],
       "id": "HAD-002",
       "lane": "parity",
@@ -186,7 +186,7 @@
         "evidence": [
           "tests/fixtures/parity/OBS-0001-lifecycle.json",
           "tests/fixtures/parity/OBS-0001-startup-120x40.txt",
-          "docs/parity/observations/OBS-0001-hermes-main-2026-08-01.md"
+          "_attic/docs/parity-observations/OBS-0001-hermes-main-2026-08-01.md"
         ],
         "summary": "Added the sanitized ordered lifecycle trace, normalized 120x40 startup frame, and explicit normalization contract."
       },
@@ -207,7 +207,7 @@
         "HAD-001"
       ],
       "evidence": [
-        "docs/parity/observations/OBS-0002-hades-lifecycle-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0002-hades-lifecycle-2026-08-01.md",
         "scripts/probe_tui_lifecycle.py",
         "scripts/verify.sh",
         "justfile"
@@ -224,7 +224,7 @@
       "result": {
         "completed_at": "2026-08-01T01:16:12Z",
         "evidence": [
-          "docs/parity/observations/OBS-0002-hades-lifecycle-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0002-hades-lifecycle-2026-08-01.md",
           "scripts/probe_tui_lifecycle.py",
           "scripts/verify.sh",
           "justfile"
@@ -252,7 +252,7 @@
         "crates/hades-core/src/lib.rs",
         "crates/hades-app/src/lib.rs",
         "tests/fixtures/parity/OBS-0003-submit-interrupt.json",
-        "docs/parity/observations/OBS-0003-hades-submit-interrupt-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0003-hades-submit-interrupt-2026-08-01.md",
         "scripts/probe_tui_lifecycle.py"
       ],
       "id": "HAD-004",
@@ -270,7 +270,7 @@
           "crates/hades-core/src/lib.rs",
           "crates/hades-app/src/lib.rs",
           "tests/fixtures/parity/OBS-0003-submit-interrupt.json",
-          "docs/parity/observations/OBS-0003-hades-submit-interrupt-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0003-hades-submit-interrupt-2026-08-01.md",
           "scripts/probe_tui_lifecycle.py"
         ],
         "summary": "Implemented the first trace-backed submit -> busy -> Ctrl+C interrupt transition with typed core state, focused reducer tests, a sanitized replay fixture, and a passing PTY integration oracle."
@@ -295,7 +295,7 @@
         "crates/hades-tui/src/lib.rs",
         "tests/fixtures/parity/OBS-0001-startup-120x40.txt",
         "tests/fixtures/parity/OBS-0001-startup-120x40.txt",
-        "docs/parity/observations/OBS-0004-hades-startup-surface-2026-08-01.md"
+        "_attic/docs/parity-observations/OBS-0004-hades-startup-surface-2026-08-01.md"
       ],
       "id": "HAD-005",
       "lane": "visual",
@@ -310,9 +310,9 @@
         "completed_at": "2026-08-01T01:56:03Z",
         "evidence": [
           "crates/hades-tui/src/lib.rs",
-          "crates/hades-tui/assets/hermes-startup-120x40.txt",
           "tests/fixtures/parity/OBS-0001-startup-120x40.txt",
-          "docs/parity/observations/OBS-0004-hades-startup-surface-2026-08-01.md"
+          "tests/fixtures/parity/OBS-0001-startup-120x40.txt",
+          "_attic/docs/parity-observations/OBS-0004-hades-startup-surface-2026-08-01.md"
         ],
         "summary": "Implemented the normalized Hermes startup surface at 120x40 with a product-owned Ratatui asset, cell-level golden comparison, dynamic input/busy assertions, and documented terminal-dependent differences."
       },
@@ -338,7 +338,7 @@
         "scripts/verify.sh",
         "tests/fixtures/parity/OBS-0003-submit-interrupt.json",
         "tests/fixtures/parity/OBS-0001-startup-120x40.txt",
-        "docs/parity/observations/OBS-0005-differential-replay-2026-08-01.md"
+        "_attic/docs/parity-observations/OBS-0005-differential-replay-2026-08-01.md"
       ],
       "id": "HAD-006",
       "lane": "verification",
@@ -357,7 +357,7 @@
           "scripts/verify.sh",
           "tests/fixtures/parity/OBS-0003-submit-interrupt.json",
           "tests/fixtures/parity/OBS-0001-startup-120x40.txt",
-          "docs/parity/observations/OBS-0005-differential-replay-2026-08-01.md"
+          "_attic/docs/parity-observations/OBS-0005-differential-replay-2026-08-01.md"
         ],
         "summary": "Added a machine-readable differential replay command that compares the normalized 120x40 Hermes golden frame, replays the sanitized submit/interrupt trace in a PTY, reports first-cell visual diffs, and verifies terminal cleanup; wired it into just replay-differential and the full verification gate."
       },
@@ -381,9 +381,9 @@
       "evidence": [
         "crates/hades-tui/src/lib.rs",
         "tests/fixtures/parity/OBS-0006-busy-interrupt-visual.json",
-        "docs/parity/observations/OBS-0006-hades-busy-interrupt-visual-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0006-hades-busy-interrupt-visual-2026-08-01.md",
         "scripts/differential_replay.py",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-007",
       "lane": "visual",
@@ -399,9 +399,9 @@
         "evidence": [
           "crates/hades-tui/src/lib.rs",
           "tests/fixtures/parity/OBS-0006-busy-interrupt-visual.json",
-          "docs/parity/observations/OBS-0006-hades-busy-interrupt-visual-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0006-hades-busy-interrupt-visual-2026-08-01.md",
           "scripts/differential_replay.py",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "Aligned the 120x40 busy and interrupted projection with the observed Hermes markers, added the OBS-0006 normalized visual contract, and made differential replay consume the contract while preserving the typed core transition."
       },
@@ -426,9 +426,9 @@
         "crates/hades-app/src/lib.rs",
         "crates/hades-tui/src/lib.rs",
         "tests/fixtures/parity/OBS-0007-session-switcher.json",
-        "docs/parity/observations/OBS-0007-hades-session-switcher-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0007-hades-session-switcher-2026-08-01.md",
         "scripts/differential_replay.py",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-008",
       "lane": "interaction",
@@ -447,9 +447,9 @@
           "crates/hades-app/src/lib.rs",
           "crates/hades-tui/src/lib.rs",
           "tests/fixtures/parity/OBS-0007-session-switcher.json",
-          "docs/parity/observations/OBS-0007-hades-session-switcher-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0007-hades-session-switcher-2026-08-01.md",
           "scripts/differential_replay.py",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "Implemented typed Sessions overlay state with Ctrl+X open and Esc close behavior, added the normalized 120x40 overlay projection and contract fixture, and extended differential replay to prove modal landmarks, post-close composer input, and terminal cleanup."
       },
@@ -474,9 +474,9 @@
         "crates/hades-app/src/lib.rs",
         "crates/hades-tui/src/lib.rs",
         "tests/fixtures/parity/OBS-0008-setup-required.json",
-        "docs/parity/observations/OBS-0008-hades-setup-required-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0008-hades-setup-required-2026-08-01.md",
         "scripts/differential_replay.py",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-009",
       "lane": "interaction",
@@ -495,9 +495,9 @@
           "crates/hades-app/src/lib.rs",
           "crates/hades-tui/src/lib.rs",
           "tests/fixtures/parity/OBS-0008-setup-required.json",
-          "docs/parity/observations/OBS-0008-hades-setup-required-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0008-hades-setup-required-2026-08-01.md",
           "scripts/differential_replay.py",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "Implemented the observed provider-missing /help path with retained input, a Setup Required overlay, first-Ctrl+C input clearing, second-Ctrl+C clean exit, and contract-driven PTY replay coverage while leaving provider setup unimplemented."
       },
@@ -519,11 +519,11 @@
       ],
       "evidence": [
         "tests/fixtures/parity/OBS-0010-input-editing-keymap.json",
-        "docs/parity/observations/OBS-0010-hermes-input-editing-keymap-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0010-hermes-input-editing-keymap-2026-08-01.md",
         "scripts/validate_reference_fixture.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-010",
       "lane": "parity",
@@ -539,11 +539,11 @@
         "completed_at": "2026-08-01T03:05:19Z",
         "evidence": [
           "tests/fixtures/parity/OBS-0010-input-editing-keymap.json",
-          "docs/parity/observations/OBS-0010-hermes-input-editing-keymap-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0010-hermes-input-editing-keymap-2026-08-01.md",
           "scripts/validate_reference_fixture.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "Captured the pinned Hermes input-editing and keymap contract with fresh synthetic PTY probes: history recall, cursor editing, multiline fallback, slash completion, Ctrl+G editor return, bracketed paste, and the empty-clipboard miss path. Added exact input-byte provenance, explicit environment-sensitive unknowns, a sanitized fixture validator, and wired it into the required verification gate."
       },
@@ -569,11 +569,11 @@
         "crates/hades-cli/src/main.rs",
         "crates/hades-tui/src/lib.rs",
         "tests/fixtures/parity/OBS-0011-hades-composer-editing.json",
-        "docs/parity/observations/OBS-0011-hades-composer-editing-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0011-hades-composer-editing-2026-08-01.md",
         "scripts/replay_composer.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-011",
       "lane": "interaction",
@@ -593,11 +593,11 @@
           "crates/hades-cli/src/main.rs",
           "crates/hades-tui/src/lib.rs",
           "tests/fixtures/parity/OBS-0011-hades-composer-editing.json",
-          "docs/parity/observations/OBS-0011-hades-composer-editing-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0011-hades-composer-editing-2026-08-01.md",
           "scripts/replay_composer.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "Implemented the reference-backed Unicode-safe composer editing core with cursor movement, history recall, multiline fallback, terminal key translation, TUI rendering, and isolated tmux screen replay evidence."
       },
@@ -623,12 +623,12 @@
         "crates/hades-cli/src/main.rs",
         "crates/hades-tui/src/lib.rs",
         "tests/fixtures/parity/OBS-0012-hades-slash-completion.json",
-        "docs/parity/observations/OBS-0012-hades-slash-completion-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0012-hades-slash-completion-2026-08-01.md",
         "scripts/replay_completion.py",
         "scripts/replay_composer.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-012",
       "lane": "interaction",
@@ -648,12 +648,12 @@
           "crates/hades-cli/src/main.rs",
           "crates/hades-tui/src/lib.rs",
           "tests/fixtures/parity/OBS-0012-hades-slash-completion.json",
-          "docs/parity/observations/OBS-0012-hades-slash-completion-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0012-hades-slash-completion-2026-08-01.md",
           "scripts/replay_completion.py",
           "scripts/replay_composer.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "Implemented the narrow reference-backed /he slash-completion slice with typed completion state, deterministic panel rendering, Tab application of /help before surface navigation, focused tests, and isolated tmux screen replay integrated into verification."
       },
@@ -679,12 +679,12 @@
         "crates/hades-cli/src/main.rs",
         "crates/hades-tui/src/lib.rs",
         "tests/fixtures/parity/OBS-0013-hades-bracketed-paste.json",
-        "docs/parity/observations/OBS-0013-hades-bracketed-paste-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0013-hades-bracketed-paste-2026-08-01.md",
         "scripts/replay_paste.py",
         "scripts/replay_composer.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-013",
       "lane": "interaction",
@@ -704,12 +704,12 @@
           "crates/hades-cli/src/main.rs",
           "crates/hades-tui/src/lib.rs",
           "tests/fixtures/parity/OBS-0013-hades-bracketed-paste.json",
-          "docs/parity/observations/OBS-0013-hades-bracketed-paste-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0013-hades-bracketed-paste-2026-08-01.md",
           "scripts/replay_paste.py",
           "scripts/replay_composer.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "Implemented the observed bracketed-paste path with typed crossterm paste events, cursor insertion preserving embedded newlines without submission, TUI rendering, focused tests, and isolated tmux replay integrated into verification."
       },
@@ -733,12 +733,12 @@
         "crates/hades-app/src/lib.rs",
         "crates/hades-cli/src/main.rs",
         "tests/fixtures/parity/OBS-0014-hades-editor-handoff.json",
-        "docs/parity/observations/OBS-0014-hades-editor-handoff-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0014-hades-editor-handoff-2026-08-01.md",
         "scripts/replay_editor.py",
         "scripts/replay_composer.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-014",
       "lane": "interaction",
@@ -756,12 +756,12 @@
           "crates/hades-app/src/lib.rs",
           "crates/hades-cli/src/main.rs",
           "tests/fixtures/parity/OBS-0014-hades-editor-handoff.json",
-          "docs/parity/observations/OBS-0014-hades-editor-handoff-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0014-hades-editor-handoff-2026-08-01.md",
           "scripts/replay_editor.py",
           "scripts/replay_composer.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "Implemented the observed unchanged-draft Ctrl+G editor handoff with a typed editor request, temporary draft file, raw/alternate-screen suspension and restoration, configured EDITOR invocation, busy submission, focused reducer coverage, and isolated tmux replay."
       },
@@ -786,12 +786,12 @@
         "crates/hades-tui/src/lib.rs",
         "crates/hades-cli/src/main.rs",
         "tests/fixtures/parity/OBS-0015-hades-empty-clipboard.json",
-        "docs/parity/observations/OBS-0015-hades-empty-clipboard-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0015-hades-empty-clipboard-2026-08-01.md",
         "scripts/replay_clipboard.py",
         "scripts/replay_composer.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-015",
       "lane": "interaction",
@@ -810,12 +810,12 @@
           "crates/hades-tui/src/lib.rs",
           "crates/hades-cli/src/main.rs",
           "tests/fixtures/parity/OBS-0015-hades-empty-clipboard.json",
-          "docs/parity/observations/OBS-0015-hades-empty-clipboard-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0015-hades-empty-clipboard-2026-08-01.md",
           "scripts/replay_clipboard.py",
           "scripts/replay_composer.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "Implemented the observed empty-clipboard Ctrl+V fallback with the exact miss message, unchanged draft semantics, 120x40 rendering, focused tests, and isolated tmux replay integrated into verification."
       },
@@ -837,11 +837,11 @@
       ],
       "evidence": [
         "tests/fixtures/parity/OBS-0016-hermes-input-history-persistence.json",
-        "docs/parity/observations/OBS-0016-hermes-input-history-persistence-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0016-hermes-input-history-persistence-2026-08-01.md",
         "scripts/validate_reference_fixture.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-016",
       "lane": "parity",
@@ -856,11 +856,11 @@
         "completed_at": "2026-08-01T04:09:15Z",
         "evidence": [
           "tests/fixtures/parity/OBS-0016-hermes-input-history-persistence.json",
-          "docs/parity/observations/OBS-0016-hermes-input-history-persistence-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0016-hermes-input-history-persistence-2026-08-01.md",
           "scripts/validate_reference_fixture.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "Captured pinned Hermes persistent input-history parity across process restart, consecutive duplicates, multiline + encoding, and the 1,000-entry load cap; added a sanitized fixture, provenance record, matrix/docs updates, validator integration, and a green full verification gate."
       },
@@ -886,11 +886,11 @@
         "crates/hades-app/src/lib.rs",
         "crates/hades-cli/src/main.rs",
         "tests/fixtures/parity/OBS-0017-hades-input-history-persistence.json",
-        "docs/parity/observations/OBS-0017-hades-input-history-persistence-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0017-hades-input-history-persistence-2026-08-01.md",
         "scripts/replay_history.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-017",
       "lane": "storage",
@@ -908,11 +908,11 @@
           "crates/hades-app/src/lib.rs",
           "crates/hades-cli/src/main.rs",
           "tests/fixtures/parity/OBS-0017-hades-input-history-persistence.json",
-          "docs/parity/observations/OBS-0017-hades-input-history-persistence-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0017-hades-input-history-persistence-2026-08-01.md",
           "scripts/replay_history.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "Implemented Hermes-compatible persistent input history with deterministic core injection, fail-open disk storage, restart recall, duplicate suppression, multiline records, newest-1000 cap, isolated PTY replay, and verification-gate integration."
       },
@@ -935,11 +935,11 @@
       ],
       "evidence": [
         "tests/fixtures/parity/OBS-0018-hermes-editor-outcomes.json",
-        "docs/parity/observations/OBS-0018-hermes-editor-outcomes-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0018-hermes-editor-outcomes-2026-08-01.md",
         "scripts/validate_reference_fixture.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-018",
       "lane": "parity",
@@ -955,11 +955,11 @@
         "completed_at": "2026-08-01T04:31:30Z",
         "evidence": [
           "tests/fixtures/parity/OBS-0018-hermes-editor-outcomes.json",
-          "docs/parity/observations/OBS-0018-hermes-editor-outcomes-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0018-hermes-editor-outcomes-2026-08-01.md",
           "scripts/validate_reference_fixture.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "Captured deterministic Hermes editor outcomes on the pinned 0.19.1 reference: modified and multiline clean exits submit trimmed text, trailing-newline trimming preserves meaningful spaces, empty output preserves the draft, and nonzero exit cancels without submission; added provenance, validated fixture, and gate/docs links."
       },
@@ -985,11 +985,11 @@
         "crates/hades-app/src/lib.rs",
         "crates/hades-cli/src/main.rs",
         "tests/fixtures/parity/OBS-0019-hades-editor-outcomes.json",
-        "docs/parity/observations/OBS-0019-hades-editor-outcomes-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0019-hades-editor-outcomes-2026-08-01.md",
         "scripts/replay_editor_outcomes.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-019",
       "lane": "interaction",
@@ -1008,11 +1008,11 @@
           "crates/hades-app/src/lib.rs",
           "crates/hades-cli/src/main.rs",
           "tests/fixtures/parity/OBS-0019-hades-editor-outcomes.json",
-          "docs/parity/observations/OBS-0019-hades-editor-outcomes-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0019-hades-editor-outcomes-2026-08-01.md",
           "scripts/replay_editor_outcomes.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "Implemented deterministic Hermes editor outcome parity: tokenized VISUAL/EDITOR execution, trimEnd-based non-empty editor submission with multiline preservation, empty-output draft retention, nonzero cancellation, history-compatible normalization, focused tests, and a five-case isolated PTY replay."
       },
@@ -1035,11 +1035,11 @@
       ],
       "evidence": [
         "tests/fixtures/parity/OBS-0020-hermes-modified-enter.json",
-        "docs/parity/observations/OBS-0020-hermes-modified-enter-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0020-hermes-modified-enter-2026-08-01.md",
         "scripts/validate_reference_fixture.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-020",
       "lane": "parity",
@@ -1055,11 +1055,11 @@
         "completed_at": "2026-08-01T04:53:00Z",
         "evidence": [
           "tests/fixtures/parity/OBS-0020-hermes-modified-enter.json",
-          "docs/parity/observations/OBS-0020-hermes-modified-enter-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0020-hermes-modified-enter-2026-08-01.md",
           "scripts/validate_reference_fixture.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "Captured the pinned Hermes native modified-Enter contract through a direct 120x40 PTY: CSI-u Shift+Enter and Alt+Enter insert a newline without submission, while plain Enter submits; alternate terminal encodings and universal terminal support remain unknown."
       },
@@ -1085,11 +1085,11 @@
         "crates/hades-app/src/lib.rs",
         "crates/hades-cli/src/main.rs",
         "tests/fixtures/parity/OBS-0021-hades-modified-enter.json",
-        "docs/parity/observations/OBS-0021-hades-modified-enter-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0021-hades-modified-enter-2026-08-01.md",
         "scripts/replay_modified_enter.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-021",
       "lane": "interaction",
@@ -1108,11 +1108,11 @@
           "crates/hades-app/src/lib.rs",
           "crates/hades-cli/src/main.rs",
           "tests/fixtures/parity/OBS-0021-hades-modified-enter.json",
-          "docs/parity/observations/OBS-0021-hades-modified-enter-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0021-hades-modified-enter-2026-08-01.md",
           "scripts/replay_modified_enter.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "Implemented the stable modified-Enter slice: crossterm CSI-u Enter events with Shift or Alt map to a typed newline insertion, ordinary Enter still submits, focused core/app/CLI tests cover both paths, and a direct 120x40 PTY replay passes Shift+Enter, Alt+Enter, and plain Enter controls without claiming alternate encodings."
       },
@@ -1135,12 +1135,12 @@
       ],
       "evidence": [
         "tests/fixtures/parity/OBS-0022-hermes-text-clipboard.json",
-        "docs/parity/observations/OBS-0022-hermes-text-clipboard-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0022-hermes-text-clipboard-2026-08-01.md",
         "scripts/probe_hermes_text_clipboard.py",
         "scripts/validate_reference_fixture.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-022",
       "lane": "parity",
@@ -1156,12 +1156,12 @@
         "completed_at": "2026-08-01T05:11:15Z",
         "evidence": [
           "tests/fixtures/parity/OBS-0022-hermes-text-clipboard.json",
-          "docs/parity/observations/OBS-0022-hermes-text-clipboard-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0022-hermes-text-clipboard-2026-08-01.md",
           "scripts/probe_hermes_text_clipboard.py",
           "scripts/validate_reference_fixture.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "Captured Hermes successful text clipboard parity with a synthetic xclip provider in a direct 120x40 PTY: raw Ctrl+V invokes xclip with -selection clipboard -out, inserts text at the cursor, preserves internal newlines and meaningful spaces, strips trailing newlines, and remains ready without submission. An empty-provider control leaves the draft unchanged; the later image-gateway fallback is explicitly environment-sensitive because no gateway response was attached."
       },
@@ -1188,11 +1188,11 @@
         "crates/hades-cli/src/main.rs",
         "crates/hades-app/src/lib.rs",
         "tests/fixtures/parity/OBS-0023-hades-text-clipboard.json",
-        "docs/parity/observations/OBS-0023-hades-text-clipboard-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0023-hades-text-clipboard-2026-08-01.md",
         "scripts/replay_clipboard_text.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-023",
       "lane": "interaction",
@@ -1211,11 +1211,11 @@
           "crates/hades-cli/src/main.rs",
           "crates/hades-app/src/lib.rs",
           "tests/fixtures/parity/OBS-0023-hades-text-clipboard.json",
-          "docs/parity/observations/OBS-0023-hades-text-clipboard-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0023-hades-text-clipboard-2026-08-01.md",
           "scripts/replay_clipboard_text.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "Implemented Hermes-compatible native text clipboard parity at the Hades CLI boundary. The provider module follows WSL powershell.exe, Wayland wl-paste --type text, then xclip -selection clipboard -out; command failures fall through, successful empty/unusable output retains the existing image-miss fallback, and usable text preserves internal newlines/meaningful spaces while removing trailing newline runs. Ready non-overlay Ctrl+V becomes a non-submitting paste event; busy and overlay paths do not read the provider. Focused provider/event tests and an isolated 120x40 direct-PTY replay pass synthetic xclip success and empty controls without host clipboard access."
       },
@@ -1239,12 +1239,12 @@
       ],
       "evidence": [
         "tests/fixtures/parity/OBS-0024-hermes-osc52-clipboard.json",
-        "docs/parity/observations/OBS-0024-hermes-osc52-clipboard-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0024-hermes-osc52-clipboard-2026-08-01.md",
         "scripts/probe_hermes_osc52_clipboard.py",
         "scripts/validate_reference_fixture.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-024",
       "lane": "parity",
@@ -1260,12 +1260,12 @@
         "completed_at": "2026-08-01T05:31:23Z",
         "evidence": [
           "tests/fixtures/parity/OBS-0024-hermes-osc52-clipboard.json",
-          "docs/parity/observations/OBS-0024-hermes-osc52-clipboard-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0024-hermes-osc52-clipboard-2026-08-01.md",
           "scripts/probe_hermes_osc52_clipboard.py",
           "scripts/validate_reference_fixture.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "Captured Hermes remote-shell OSC52 clipboard precedence in a direct 120x40 PTY with SSH_TTY set and TMUX/STY absent. Raw Ctrl+V emits ESC]52;c;?BEL; a controlled base64 OSC52 response is decoded with trailing newlines removed, inserted into the ready composer, and suppresses native xclip. A no-response control observes Hermes flushing the OSC52 request with DA1 barriers, then invoking xclip -selection clipboard -out and inserting the native fallback without submission. This remains research-only; tmux/STY wrapping, invalid/empty OSC52 responses, Hades OSC52 behavior, and image/path gateway behavior remain unknown."
       },
@@ -1291,11 +1291,11 @@
         "crates/hades-cli/src/osc52.rs",
         "crates/hades-cli/src/main.rs",
         "tests/fixtures/parity/OBS-0025-hades-osc52-clipboard.json",
-        "docs/parity/observations/OBS-0025-hades-osc52-clipboard-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0025-hades-osc52-clipboard-2026-08-01.md",
         "scripts/replay_osc52_clipboard.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-025",
       "lane": "interaction",
@@ -1313,11 +1313,11 @@
           "crates/hades-cli/src/osc52.rs",
           "crates/hades-cli/src/main.rs",
           "tests/fixtures/parity/OBS-0025-hades-osc52-clipboard.json",
-          "docs/parity/observations/OBS-0025-hades-osc52-clipboard-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0025-hades-osc52-clipboard-2026-08-01.md",
           "scripts/replay_osc52_clipboard.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "implemented-bare-ssh-osc52-with-direct-pty-evidence-and-full-verify"
       },
@@ -1341,12 +1341,12 @@
       ],
       "evidence": [
         "tests/fixtures/parity/OBS-0026-hermes-osc52-response-boundaries.json",
-        "docs/parity/observations/OBS-0026-hermes-osc52-response-boundaries-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0026-hermes-osc52-response-boundaries-2026-08-01.md",
         "scripts/probe_hermes_osc52_response_boundaries.py",
         "scripts/validate_reference_fixture.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-026",
       "lane": "parity",
@@ -1363,12 +1363,12 @@
         "completed_at": "2026-08-01T06:54:59Z",
         "evidence": [
           "tests/fixtures/parity/OBS-0026-hermes-osc52-response-boundaries.json",
-          "docs/parity/observations/OBS-0026-hermes-osc52-response-boundaries-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0026-hermes-osc52-response-boundaries-2026-08-01.md",
           "scripts/probe_hermes_osc52_response_boundaries.py",
           "scripts/validate_reference_fixture.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "captured-hermes-empty-and-malformed-osc52-fallback-boundaries-with-direct-pty-evidence-and-full-verify"
       },
@@ -1394,11 +1394,11 @@
         "crates/hades-cli/src/osc52.rs",
         "crates/hades-cli/src/main.rs",
         "tests/fixtures/parity/OBS-0027-hades-osc52-response-boundaries.json",
-        "docs/parity/observations/OBS-0027-hades-osc52-response-boundaries-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0027-hades-osc52-response-boundaries-2026-08-01.md",
         "scripts/replay_osc52_clipboard.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-027",
       "lane": "interaction",
@@ -1416,11 +1416,11 @@
           "crates/hades-cli/src/osc52.rs",
           "crates/hades-cli/src/main.rs",
           "tests/fixtures/parity/OBS-0027-hades-osc52-response-boundaries.json",
-          "docs/parity/observations/OBS-0027-hades-osc52-response-boundaries-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0027-hades-osc52-response-boundaries-2026-08-01.md",
           "scripts/replay_osc52_clipboard.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "implemented-hades-osc52-response-boundary-fallback-parity-with-direct-pty-replay-and-full-verify"
       },
@@ -1444,12 +1444,12 @@
       ],
       "evidence": [
         "tests/fixtures/parity/OBS-0028-hermes-osc52-st-termination.json",
-        "docs/parity/observations/OBS-0028-hermes-osc52-st-termination-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0028-hermes-osc52-st-termination-2026-08-01.md",
         "scripts/probe_hermes_osc52_st_termination.py",
         "scripts/validate_reference_fixture.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-028",
       "lane": "parity",
@@ -1466,12 +1466,12 @@
         "completed_at": "2026-08-01T07:09:27Z",
         "evidence": [
           "tests/fixtures/parity/OBS-0028-hermes-osc52-st-termination.json",
-          "docs/parity/observations/OBS-0028-hermes-osc52-st-termination-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0028-hermes-osc52-st-termination-2026-08-01.md",
           "scripts/probe_hermes_osc52_st_termination.py",
           "scripts/validate_reference_fixture.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "captured-hermes-st-terminated-osc52-acceptance-and-fallback-boundaries-with-direct-pty-evidence-and-full-verify"
       },
@@ -1497,11 +1497,11 @@
         "crates/hades-cli/src/osc52.rs",
         "crates/hades-cli/src/main.rs",
         "tests/fixtures/parity/OBS-0029-hades-osc52-st-termination.json",
-        "docs/parity/observations/OBS-0029-hades-osc52-st-termination-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0029-hades-osc52-st-termination-2026-08-01.md",
         "scripts/replay_osc52_clipboard.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-029",
       "lane": "interaction",
@@ -1519,11 +1519,11 @@
           "crates/hades-cli/src/osc52.rs",
           "crates/hades-cli/src/main.rs",
           "tests/fixtures/parity/OBS-0029-hades-osc52-st-termination.json",
-          "docs/parity/observations/OBS-0029-hades-osc52-st-termination-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0029-hades-osc52-st-termination-2026-08-01.md",
           "scripts/replay_osc52_clipboard.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "verified-hades-st-terminated-osc52-precedence-and-fallback-parity-with-direct-pty-replay-and-full-verify"
       },
@@ -1547,12 +1547,12 @@
       ],
       "evidence": [
         "tests/fixtures/parity/OBS-0030-hermes-osc52-multiplexer-passthrough.json",
-        "docs/parity/observations/OBS-0030-hermes-osc52-multiplexer-passthrough-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0030-hermes-osc52-multiplexer-passthrough-2026-08-01.md",
         "scripts/probe_hermes_osc52_multiplexer.py",
         "scripts/validate_reference_fixture.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-030",
       "lane": "parity",
@@ -1569,12 +1569,12 @@
         "completed_at": "2026-08-01T07:25:58Z",
         "evidence": [
           "tests/fixtures/parity/OBS-0030-hermes-osc52-multiplexer-passthrough.json",
-          "docs/parity/observations/OBS-0030-hermes-osc52-multiplexer-passthrough-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0030-hermes-osc52-multiplexer-passthrough-2026-08-01.md",
           "scripts/probe_hermes_osc52_multiplexer.py",
           "scripts/validate_reference_fixture.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "captured-hermes-tmux-sty-osc52-wrapper-and-fallback-boundaries-with-direct-pty-evidence-and-full-verify"
       },
@@ -1600,11 +1600,11 @@
         "crates/hades-cli/src/osc52.rs",
         "crates/hades-cli/src/main.rs",
         "tests/fixtures/parity/OBS-0031-hades-osc52-multiplexer-passthrough.json",
-        "docs/parity/observations/OBS-0031-hades-osc52-multiplexer-passthrough-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0031-hades-osc52-multiplexer-passthrough-2026-08-01.md",
         "scripts/replay_osc52_clipboard.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-031",
       "lane": "interaction",
@@ -1622,11 +1622,11 @@
           "crates/hades-cli/src/osc52.rs",
           "crates/hades-cli/src/main.rs",
           "tests/fixtures/parity/OBS-0031-hades-osc52-multiplexer-passthrough.json",
-          "docs/parity/observations/OBS-0031-hades-osc52-multiplexer-passthrough-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0031-hades-osc52-multiplexer-passthrough-2026-08-01.md",
           "scripts/replay_osc52_clipboard.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "implemented-and-replayed-hades-tmux-sty-osc52-wrapper-and-fallback-parity-with-full-verify"
       },
@@ -1650,12 +1650,12 @@
       ],
       "evidence": [
         "tests/fixtures/parity/OBS-0032-hermes-osc52-timing-limits.json",
-        "docs/parity/observations/OBS-0032-hermes-osc52-timing-limits-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0032-hermes-osc52-timing-limits-2026-08-01.md",
         "scripts/probe_hermes_osc52_timing_limits.py",
         "scripts/validate_reference_fixture.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-032",
       "lane": "parity",
@@ -1672,12 +1672,12 @@
         "completed_at": "2026-08-01T07:51:33Z",
         "evidence": [
           "tests/fixtures/parity/OBS-0032-hermes-osc52-timing-limits.json",
-          "docs/parity/observations/OBS-0032-hermes-osc52-timing-limits-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0032-hermes-osc52-timing-limits-2026-08-01.md",
           "scripts/probe_hermes_osc52_timing_limits.py",
           "scripts/validate_reference_fixture.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "Captured Hermes OSC52 timing and bounded payload behavior in a sanitized direct-PTY observation. The probe proves a usable 100 ms response wins, a response supplied after the timeout DA1 flush falls back to native xclip, and deterministic 256 KiB and 512 KiB decoded payloads are consumed; exact control bytes, hashes, provider order, readiness, non-submission, cleanup, and explicit unknowns are recorded."
       },
@@ -1705,10 +1705,10 @@
         "crates/hades-tui/src/lib.rs",
         "scripts/replay_osc52_timing_limits.py",
         "tests/fixtures/parity/OBS-0033-hades-osc52-timing-limits.json",
-        "docs/parity/observations/OBS-0033-hades-osc52-timing-limits-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0033-hades-osc52-timing-limits-2026-08-01.md",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-033",
       "lane": "parity",
@@ -1729,10 +1729,10 @@
           "crates/hades-tui/src/lib.rs",
           "scripts/replay_osc52_timing_limits.py",
           "tests/fixtures/parity/OBS-0033-hades-osc52-timing-limits.json",
-          "docs/parity/observations/OBS-0033-hades-osc52-timing-limits-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0033-hades-osc52-timing-limits-2026-08-01.md",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "Implemented the observed 500 ms OSC52 race, incremental response parsing, efficient large-paste insertion, bounded Hermes-surface rendering, and a complete four-control direct-PTY parity replay with no universal size claim."
       },
@@ -1755,12 +1755,12 @@
       ],
       "evidence": [
         "tests/fixtures/parity/OBS-0034-hermes-terminal-palette.json",
-        "docs/parity/observations/OBS-0034-hermes-terminal-palette-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0034-hermes-terminal-palette-2026-08-01.md",
         "scripts/probe_hermes_terminal_palette.py",
         "scripts/validate_reference_fixture.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-034",
       "lane": "parity",
@@ -1776,12 +1776,12 @@
         "completed_at": "2026-08-01T08:29:54Z",
         "evidence": [
           "tests/fixtures/parity/OBS-0034-hermes-terminal-palette.json",
-          "docs/parity/observations/OBS-0034-hermes-terminal-palette-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0034-hermes-terminal-palette-2026-08-01.md",
           "scripts/probe_hermes_terminal_palette.py",
           "scripts/validate_reference_fixture.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "Captured the pinned Hermes terminal palette subset in fresh 120x40 direct PTYs, recording exact SGR forms and sanitized landmark cell styles for startup, ready, busy, interrupted, and setup-required surfaces with explicit animation and coverage unknowns."
       },
@@ -1807,11 +1807,11 @@
         "crates/hades-cli/src/main.rs",
         "scripts/replay_terminal_palette.py",
         "tests/fixtures/parity/OBS-0035-hades-terminal-palette.json",
-        "docs/parity/observations/OBS-0035-hades-terminal-palette-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0035-hades-terminal-palette-2026-08-01.md",
         "scripts/validate_reference_fixture.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-035",
       "lane": "parity",
@@ -1830,11 +1830,11 @@
           "crates/hades-cli/src/main.rs",
           "scripts/replay_terminal_palette.py",
           "tests/fixtures/parity/OBS-0035-hades-terminal-palette.json",
-          "docs/parity/observations/OBS-0035-hades-terminal-palette-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0035-hades-terminal-palette-2026-08-01.md",
           "scripts/validate_reference_fixture.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "Implemented the OBS-0034 Hermes palette subset in a typed Hades renderer seam, forced live Crossterm color output to match Hermes under inherited NO_COLOR, added the sanitized OBS-0035 fixture and direct-PTY replay, and passed the complete just verify gate."
       },
@@ -1860,7 +1860,7 @@
         "scripts/install_user_launcher.sh",
         "justfile",
         "README.md",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-036",
       "lane": "packaging",
@@ -1879,7 +1879,7 @@
           "scripts/install_user_launcher.sh",
           "justfile",
           "README.md",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Added a locked release install-user workflow that creates collision-safe, idempotent hades and Hades launchers in the user-local bin directory; temporary install, collision, Fish, Bash, and version checks passed, and just verify passed."
       },
@@ -1903,12 +1903,12 @@
       ],
       "evidence": [
         "tests/fixtures/parity/OBS-0036-hermes-slash-command-surfaces.json",
-        "docs/parity/observations/OBS-0036-hermes-slash-command-surfaces-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0036-hermes-slash-command-surfaces-2026-08-01.md",
         "scripts/probe_hermes_slash_commands.py",
         "scripts/validate_reference_fixture.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-037",
       "lane": "parity",
@@ -1925,12 +1925,12 @@
         "completed_at": "2026-08-01T09:26:23Z",
         "evidence": [
           "tests/fixtures/parity/OBS-0036-hermes-slash-command-surfaces.json",
-          "docs/parity/observations/OBS-0036-hermes-slash-command-surfaces-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0036-hermes-slash-command-surfaces-2026-08-01.md",
           "scripts/probe_hermes_slash_commands.py",
           "scripts/validate_reference_fixture.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "Captured the configured Hermes slash-command subset in fresh sanitized direct PTYs: /help help surface, /model provider picker, /setup external wizard handoff, and unknown-command error with clean cleanup; wired the OBS-0036 validator and probe into just verify, and the full gate passed."
       },
@@ -1959,8 +1959,8 @@
         "tests/fixtures/parity/OBS-0037-hades-unknown-slash-command.json",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/observations/OBS-0037-hades-unknown-slash-command-2026-08-01.md",
-        "CONTEXT.md"
+        "_attic/docs/parity-observations/OBS-0037-hades-unknown-slash-command-2026-08-01.md",
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-038",
       "lane": "behavior",
@@ -1982,8 +1982,8 @@
           "tests/fixtures/parity/OBS-0037-hades-unknown-slash-command.json",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/observations/OBS-0037-hades-unknown-slash-command-2026-08-01.md",
-          "CONTEXT.md"
+          "_attic/docs/parity-observations/OBS-0037-hades-unknown-slash-command-2026-08-01.md",
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Implemented the typed unknown slash-command boundary: unrecognized slash input remains ready, records the exact two-line error, clears the composer, avoids Busy, and passes focused core/TUI tests plus an isolated 120x40 replay wired into just verify."
       },
@@ -2007,12 +2007,12 @@
       ],
       "evidence": [
         "tests/fixtures/parity/OBS-0038-hermes-model-picker-model-stage.json",
-        "docs/parity/observations/OBS-0038-hermes-model-picker-model-stage-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0038-hermes-model-picker-model-stage-2026-08-01.md",
         "scripts/probe_hermes_model_picker.py",
         "scripts/validate_reference_fixture.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-039",
       "lane": "parity",
@@ -2029,12 +2029,12 @@
         "completed_at": "2026-08-01T09:54:36Z",
         "evidence": [
           "tests/fixtures/parity/OBS-0038-hermes-model-picker-model-stage.json",
-          "docs/parity/observations/OBS-0038-hermes-model-picker-model-stage-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0038-hermes-model-picker-model-stage-2026-08-01.md",
           "scripts/probe_hermes_model_picker.py",
           "scripts/validate_reference_fixture.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "Captured Hermes model-picker model-stage behavior and Escape back semantics in a fresh sanitized 120x40 direct PTY, with incremental redraws asserted through a terminal screen model; the complete just verify gate passes."
       },
@@ -2065,9 +2065,9 @@
         "scripts/replay_model_picker.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/observations/OBS-0039-hades-model-picker-model-stage-2026-08-01.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md"
+        "_attic/docs/parity-observations/OBS-0039-hades-model-picker-model-stage-2026-08-01.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-040",
       "lane": "behavior",
@@ -2090,9 +2090,9 @@
           "scripts/replay_model_picker.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/observations/OBS-0039-hades-model-picker-model-stage-2026-08-01.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md"
+          "_attic/docs/parity-observations/OBS-0039-hades-model-picker-model-stage-2026-08-01.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Implemented the bounded Hermes model picker with typed provider/model stages, deterministic palette-loopback/palette-model filtering, the observed two-step /model entry, both Escape meanings, q close, focused tests, and a fresh 120x40 replay; the complete just verify gate passes."
       },
@@ -2117,7 +2117,7 @@
       ],
       "evidence": [
         "tests/fixtures/parity/OBS-0040-hermes-setup-wizard-cancel.json",
-        "docs/parity/observations/OBS-0040-hermes-setup-wizard-cancel-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0040-hermes-setup-wizard-cancel-2026-08-01.md",
         "scripts/probe_hermes_setup_wizard.py",
         "justfile",
         "scripts/verify.sh"
@@ -2137,7 +2137,7 @@
         "completed_at": "2026-08-01T10:34:14Z",
         "evidence": [
           "tests/fixtures/parity/OBS-0040-hermes-setup-wizard-cancel.json",
-          "docs/parity/observations/OBS-0040-hermes-setup-wizard-cancel-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0040-hermes-setup-wizard-cancel-2026-08-01.md",
           "scripts/probe_hermes_setup_wizard.py",
           "justfile",
           "scripts/verify.sh"
@@ -2169,7 +2169,7 @@
         "crates/hades-tui/src/lib.rs",
         "tests/fixtures/parity/OBS-0041-hades-setup-wizard-cancel.json",
         "scripts/replay_setup_wizard.py",
-        "docs/parity/observations/OBS-0041-hades-setup-wizard-cancel-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0041-hades-setup-wizard-cancel-2026-08-01.md",
         "justfile",
         "scripts/verify.sh"
       ],
@@ -2192,7 +2192,7 @@
           "crates/hades-tui/src/lib.rs",
           "tests/fixtures/parity/OBS-0041-hades-setup-wizard-cancel.json",
           "scripts/replay_setup_wizard.py",
-          "docs/parity/observations/OBS-0041-hades-setup-wizard-cancel-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0041-hades-setup-wizard-cancel-2026-08-01.md",
           "justfile",
           "scripts/verify.sh"
         ],
@@ -2219,11 +2219,11 @@
       ],
       "evidence": [
         "tests/fixtures/parity/OBS-0042-hermes-full-setup-continuation.json",
-        "docs/parity/observations/OBS-0042-hermes-full-setup-continuation-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0042-hermes-full-setup-continuation-2026-08-01.md",
         "scripts/probe_hermes_full_setup.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md"
+        "specs/001-parity-contract/matrix.md"
       ],
       "id": "HAD-043",
       "lane": "parity",
@@ -2240,11 +2240,11 @@
         "completed_at": "2026-08-01T11:25:47Z",
         "evidence": [
           "tests/fixtures/parity/OBS-0042-hermes-full-setup-continuation.json",
-          "docs/parity/observations/OBS-0042-hermes-full-setup-continuation-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0042-hermes-full-setup-continuation-2026-08-01.md",
           "scripts/probe_hermes_full_setup.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md"
+          "specs/001-parity-contract/matrix.md"
         ],
         "summary": "Captured the reversible Hermes Full setup continuation through the first Inference Provider boundary; normalized the unchanged config, absent secrets file, observed backup artifact, and clean Ctrl+C exit in OBS-0042."
       },
@@ -2275,11 +2275,11 @@
       "evidence": [
         "crates/hades-cli/src/main.rs",
         "scripts/replay_cli_launch.py",
-        "docs/parity/observations/OBS-0043-hades-cli-launch-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0043-hades-cli-launch-2026-08-01.md",
         "justfile",
         "scripts/verify.sh",
         "README.md",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-044",
       "lane": "packaging",
@@ -2297,11 +2297,11 @@
         "evidence": [
           "crates/hades-cli/src/main.rs",
           "scripts/replay_cli_launch.py",
-          "docs/parity/observations/OBS-0043-hades-cli-launch-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0043-hades-cli-launch-2026-08-01.md",
           "justfile",
           "scripts/verify.sh",
           "README.md",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Added explicit tui CLI dispatch while preserving the default launch path and existing non-TUI modes; documented both launcher forms, refreshed the user-local release artifact, and verified lowercase/capitalized launchers plus no-argument and explicit-tui direct-PTY cleanup."
       },
@@ -2325,12 +2325,12 @@
       ],
       "evidence": [
         "tests/fixtures/parity/OBS-0044-hermes-full-setup-provider-menu.json",
-        "docs/parity/observations/OBS-0044-hermes-full-setup-provider-menu-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0044-hermes-full-setup-provider-menu-2026-08-01.md",
         "scripts/probe_hermes_full_setup_provider.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md"
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-045",
       "lane": "parity",
@@ -2347,12 +2347,12 @@
         "completed_at": "2026-08-01T12:11:15Z",
         "evidence": [
           "tests/fixtures/parity/OBS-0044-hermes-full-setup-provider-menu.json",
-          "docs/parity/observations/OBS-0044-hermes-full-setup-provider-menu-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0044-hermes-full-setup-provider-menu-2026-08-01.md",
           "scripts/probe_hermes_full_setup_provider.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md"
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Captured the bounded Hermes Full setup provider menu before selection: stable current-model/active-provider and visible custom-provider landmarks, guarded reversible navigation, clean Ctrl+C, unchanged config bytes, and normalized backup/history/update-check artifact classes."
       },
@@ -2380,12 +2380,12 @@
         "crates/hades-app/src/lib.rs",
         "crates/hades-tui/src/lib.rs",
         "tests/fixtures/parity/OBS-0045-hades-full-setup-provider-menu.json",
-        "docs/parity/observations/OBS-0045-hades-full-setup-provider-menu-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0045-hades-full-setup-provider-menu-2026-08-01.md",
         "scripts/replay_setup_provider_menu.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md"
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-046",
       "lane": "behavior",
@@ -2405,12 +2405,12 @@
           "crates/hades-app/src/lib.rs",
           "crates/hades-tui/src/lib.rs",
           "tests/fixtures/parity/OBS-0045-hades-full-setup-provider-menu.json",
-          "docs/parity/observations/OBS-0045-hades-full-setup-provider-menu-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0045-hades-full-setup-provider-menu-2026-08-01.md",
           "scripts/replay_setup_provider_menu.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md"
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Implemented the bounded Full setup provider menu with typed reversible navigation, sanitized Configuration Location and Inference Provider rendering, focused core/app/TUI tests, and a 120x40 tmux replay derived from OBS-0044; provider submission, credentials, OAuth, persistence, model discovery, and network behavior remain outside the claim."
       },
@@ -2434,12 +2434,12 @@
       ],
       "evidence": [
         "tests/fixtures/parity/OBS-0046-hermes-provider-selection.json",
-        "docs/parity/observations/OBS-0046-hermes-provider-selection-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0046-hermes-provider-selection-2026-08-01.md",
         "scripts/probe_hermes_full_setup_provider_selection.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md"
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-047",
       "lane": "parity",
@@ -2456,12 +2456,12 @@
         "completed_at": "2026-08-01T12:43:25Z",
         "evidence": [
           "tests/fixtures/parity/OBS-0046-hermes-provider-selection.json",
-          "docs/parity/observations/OBS-0046-hermes-provider-selection-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0046-hermes-provider-selection-2026-08-01.md",
           "scripts/probe_hermes_full_setup_provider_selection.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md"
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Captured the bounded Hermes active-provider selection boundary: one Enter on the active palette-loopback row opens Model name [palette-model] while retaining the provider viewport, changes config bytes, creates a normalized backup artifact, and exits cleanly on Ctrl+C before model, credential, OAuth, save, model-request, or network behavior."
       },
@@ -2488,12 +2488,12 @@
         "crates/hades-app/src/lib.rs",
         "crates/hades-tui/src/lib.rs",
         "tests/fixtures/parity/OBS-0047-hades-provider-selection-model-prompt.json",
-        "docs/parity/observations/OBS-0047-hades-provider-selection-model-prompt-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0047-hades-provider-selection-model-prompt-2026-08-01.md",
         "scripts/replay_setup_provider_model_prompt.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md"
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-048",
       "lane": "behavior",
@@ -2513,12 +2513,12 @@
           "crates/hades-app/src/lib.rs",
           "crates/hades-tui/src/lib.rs",
           "tests/fixtures/parity/OBS-0047-hades-provider-selection-model-prompt.json",
-          "docs/parity/observations/OBS-0047-hades-provider-selection-model-prompt-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0047-hades-provider-selection-model-prompt-2026-08-01.md",
           "scripts/replay_setup_provider_model_prompt.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md"
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Implemented the bounded display-only Hades model-name prompt after active provider selection, preserving sanitized provider/model context and clean Ctrl+C cleanup; focused core/app/TUI tests and OBS-0047 tmux replay pass while model editing, validation, persistence, credentials, OAuth, save, model requests, and network behavior remain outside the claim."
       },
@@ -2542,13 +2542,13 @@
       ],
       "evidence": [
         "tests/fixtures/parity/OBS-0048-hermes-model-default-terminal-backend.json",
-        "docs/parity/observations/OBS-0048-hermes-model-default-terminal-backend-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0048-hermes-model-default-terminal-backend-2026-08-01.md",
         "scripts/probe_hermes_full_setup_model_default.py",
         "scripts/probe_hermes_full_setup_provider_selection.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md"
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-049",
       "lane": "parity",
@@ -2565,13 +2565,13 @@
         "completed_at": "2026-08-01T13:22:16Z",
         "evidence": [
           "tests/fixtures/parity/OBS-0048-hermes-model-default-terminal-backend.json",
-          "docs/parity/observations/OBS-0048-hermes-model-default-terminal-backend-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0048-hermes-model-default-terminal-backend-2026-08-01.md",
           "scripts/probe_hermes_full_setup_model_default.py",
           "scripts/probe_hermes_full_setup_provider_selection.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md"
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Captured Hermes default model acceptance: Enter on Model name [palette-model] reaches the terminal-backend picker with Local, Docker, Modal, SSH, Daytona, Vercel Sandbox, Singularity/Apptainer, and Keep current rows; config bytes and a normalized backup change, and Ctrl+C exits before backend selection. Hardened the preceding provider-selection probe with a guarded redraw retry."
       },
@@ -2594,9 +2594,9 @@
       ],
       "evidence": [
         "scripts/probe_hermes_full_setup.py",
-        "CONTEXT.md",
+        "specs/001-parity-contract/spec.md",
         "tests/fixtures/parity/OBS-0042-hermes-full-setup-continuation.json",
-        "docs/parity/observations/OBS-0042-hermes-full-setup-continuation-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0042-hermes-full-setup-continuation-2026-08-01.md",
         ".hades/runtime/had050-pre-completion-verify-retry-20260801T134135Z.log"
       ],
       "id": "HAD-050",
@@ -2612,9 +2612,9 @@
         "completed_at": "2026-08-01T13:44:20Z",
         "evidence": [
           "scripts/probe_hermes_full_setup.py",
-          "CONTEXT.md",
+          "specs/001-parity-contract/spec.md",
           "tests/fixtures/parity/OBS-0042-hermes-full-setup-continuation.json",
-          "docs/parity/observations/OBS-0042-hermes-full-setup-continuation-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0042-hermes-full-setup-continuation-2026-08-01.md",
           ".hades/runtime/had050-pre-completion-verify-retry-20260801T134135Z.log"
         ],
         "summary": "Added a state-aware Hermes Full setup continuation retry that resubmits Enter at most once and only while the Full setup cursor remains visible; targeted probe and complete no-skip verification passed, with fixture semantics unchanged."
@@ -2641,12 +2641,12 @@
         "crates/hades-app/src/lib.rs",
         "crates/hades-tui/src/lib.rs",
         "tests/fixtures/parity/OBS-0049-hades-model-default-terminal-backend.json",
-        "docs/parity/observations/OBS-0049-hades-model-default-terminal-backend-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0049-hades-model-default-terminal-backend-2026-08-01.md",
         "scripts/replay_setup_terminal_backend.py",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         ".hades/runtime/had051-pre-completion-verify-20260801T135609Z.log"
       ],
       "id": "HAD-051",
@@ -2667,12 +2667,12 @@
           "crates/hades-app/src/lib.rs",
           "crates/hades-tui/src/lib.rs",
           "tests/fixtures/parity/OBS-0049-hades-model-default-terminal-backend.json",
-          "docs/parity/observations/OBS-0049-hades-model-default-terminal-backend-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0049-hades-model-default-terminal-backend-2026-08-01.md",
           "scripts/replay_setup_terminal_backend.py",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           ".hades/runtime/had051-pre-completion-verify-20260801T135609Z.log"
         ],
         "summary": "Implemented the bounded terminal-backend picker after accepting the displayed model default, preserving provider/model context and clean Ctrl+C while leaving backend selection and later setup behavior unknown; OBS-0049 replay, focused tests, and complete no-skip verification passed."
@@ -2698,11 +2698,11 @@
       "evidence": [
         "scripts/probe_hermes_local_provider_stream.py",
         "tests/fixtures/parity/OBS-0050-hermes-local-provider-stream.json",
-        "docs/parity/observations/OBS-0050-hermes-local-provider-stream-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0050-hermes-local-provider-stream-2026-08-01.md",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         ".hades/runtime/had052-pre-completion-verify-retry2-20260801T143500Z.log"
       ],
       "id": "HAD-052",
@@ -2722,11 +2722,11 @@
         "evidence": [
           "scripts/probe_hermes_local_provider_stream.py",
           "tests/fixtures/parity/OBS-0050-hermes-local-provider-stream.json",
-          "docs/parity/observations/OBS-0050-hermes-local-provider-stream-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0050-hermes-local-provider-stream-2026-08-01.md",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           ".hades/runtime/had052-pre-completion-verify-retry2-20260801T143500Z.log"
         ],
         "summary": "Captured Hermes' first local-provider request and SSE stream boundary through a fresh 120x40 PTY and deterministic loopback HTTP fixture; normalized the OpenAI-compatible streaming request, response landmarks, visible ready/interrupt state, and cleanup while preserving subsequent-request and provider-behavior unknowns. Targeted replay and complete no-skip verification passed."
@@ -2755,8 +2755,8 @@
         "Cargo.lock",
         "docs/decisions/ADR-0004-local-provider-transport-seam.md",
         "README.md",
-        "CONTEXT.md",
-        "docs/parity/MATRIX.md",
+        "specs/001-parity-contract/spec.md",
+        "specs/001-parity-contract/matrix.md",
         ".hades/runtime/had053-pre-completion-verify-20260801T145000Z.log"
       ],
       "id": "HAD-053",
@@ -2779,8 +2779,8 @@
           "Cargo.lock",
           "docs/decisions/ADR-0004-local-provider-transport-seam.md",
           "README.md",
-          "CONTEXT.md",
-          "docs/parity/MATRIX.md",
+          "specs/001-parity-contract/spec.md",
+          "specs/001-parity-contract/matrix.md",
           ".hades/runtime/had053-pre-completion-verify-20260801T145000Z.log"
         ],
         "summary": "Added the isolated hades-provider loopback transport seam: it serializes the OBS-0050 OpenAI-compatible streaming request, enforces http://127.0.0.1 URL policy, parses text deltas and [DONE], and reports malformed, incomplete, HTTP, and unsupported-boundary errors. In-process TCP tests assert the normalized request and three-chunk SSE response; the reducer/TUI remains intentionally unwired. Focused tests and complete no-skip verification passed."
@@ -2808,8 +2808,8 @@
         "crates/hades-tui/src/lib.rs",
         "docs/decisions/ADR-0005-provider-event-reducer-seam.md",
         "README.md",
-        "CONTEXT.md",
-        "docs/parity/MATRIX.md",
+        "specs/001-parity-contract/spec.md",
+        "specs/001-parity-contract/matrix.md",
         ".hades/runtime/had054-pre-completion-verify-20260801T152000Z.log"
       ],
       "id": "HAD-054",
@@ -2831,8 +2831,8 @@
           "crates/hades-tui/src/lib.rs",
           "docs/decisions/ADR-0005-provider-event-reducer-seam.md",
           "README.md",
-          "CONTEXT.md",
-          "docs/parity/MATRIX.md",
+          "specs/001-parity-contract/spec.md",
+          "specs/001-parity-contract/matrix.md",
           ".hades/runtime/had054-pre-completion-verify-20260801T152000Z.log"
         ],
         "summary": "Added the serializable provider lifecycle seam: core events now cross InputEvent, the reducer accumulates assistant deltas and handles completion, failure, and cancellation only during a busy turn, and the 120x40 Hermes renderer shows streamed responses and bounded provider notices. Focused core/app/TUI tests, strict Clippy, formatting, and complete no-skip verification passed; the live CLI worker remains a separate task."
@@ -2864,11 +2864,11 @@
         "scripts/replay_editor_outcomes.py",
         "scripts/replay_terminal_palette.py",
         "tests/fixtures/parity/OBS-0051-hades-local-provider-stream.json",
-        "docs/parity/observations/OBS-0051-hades-local-provider-stream-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0051-hades-local-provider-stream-2026-08-01.md",
         "docs/decisions/ADR-0006-live-loopback-provider-worker.md",
         "README.md",
-        "CONTEXT.md",
-        "docs/parity/MATRIX.md",
+        "specs/001-parity-contract/spec.md",
+        "specs/001-parity-contract/matrix.md",
         "justfile",
         "scripts/verify.sh",
         ".hades/runtime/had055-pre-completion-verify-retry4-20260801T164500Z.log"
@@ -2896,11 +2896,11 @@
           "scripts/replay_editor_outcomes.py",
           "scripts/replay_terminal_palette.py",
           "tests/fixtures/parity/OBS-0051-hades-local-provider-stream.json",
-          "docs/parity/observations/OBS-0051-hades-local-provider-stream-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0051-hades-local-provider-stream-2026-08-01.md",
           "docs/decisions/ADR-0006-live-loopback-provider-worker.md",
           "README.md",
-          "CONTEXT.md",
-          "docs/parity/MATRIX.md",
+          "specs/001-parity-contract/spec.md",
+          "specs/001-parity-contract/matrix.md",
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/had055-pre-completion-verify-retry4-20260801T164500Z.log"
@@ -2927,9 +2927,9 @@
       "evidence": [
         "scripts/probe_hermes_stream_timing.py",
         "tests/fixtures/parity/OBS-0052-hermes-stream-timing.json",
-        "docs/parity/observations/OBS-0052-hermes-stream-timing-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0052-hermes-stream-timing-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "justfile",
         "scripts/verify.sh",
         ".hades/runtime/had056-reference-probe.log",
@@ -2952,9 +2952,9 @@
         "evidence": [
           "scripts/probe_hermes_stream_timing.py",
           "tests/fixtures/parity/OBS-0052-hermes-stream-timing.json",
-          "docs/parity/observations/OBS-0052-hermes-stream-timing-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0052-hermes-stream-timing-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/had056-reference-probe.log",
@@ -2986,11 +2986,11 @@
         "crates/hades-cli/src/main.rs",
         "scripts/replay_local_provider_timing.py",
         "tests/fixtures/parity/OBS-0053-hades-stream-timing.json",
-        "docs/parity/observations/OBS-0053-hades-stream-timing-2026-08-02.md",
+        "_attic/docs/parity-observations/OBS-0053-hades-stream-timing-2026-08-02.md",
         "docs/decisions/ADR-0007-incremental-provider-cancellation.md",
         "docs/decisions/ADR-0006-live-loopback-provider-worker.md",
-        "CONTEXT.md",
-        "docs/parity/MATRIX.md",
+        "specs/001-parity-contract/spec.md",
+        "specs/001-parity-contract/matrix.md",
         "justfile",
         "scripts/verify.sh",
         ".hades/runtime/local-provider-timing-replay.json",
@@ -3014,11 +3014,11 @@
           "crates/hades-cli/src/main.rs",
           "scripts/replay_local_provider_timing.py",
           "tests/fixtures/parity/OBS-0053-hades-stream-timing.json",
-          "docs/parity/observations/OBS-0053-hades-stream-timing-2026-08-02.md",
+          "_attic/docs/parity-observations/OBS-0053-hades-stream-timing-2026-08-02.md",
           "docs/decisions/ADR-0007-incremental-provider-cancellation.md",
           "docs/decisions/ADR-0006-live-loopback-provider-worker.md",
-          "CONTEXT.md",
-          "docs/parity/MATRIX.md",
+          "specs/001-parity-contract/spec.md",
+          "specs/001-parity-contract/matrix.md",
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/local-provider-timing-replay.json",
@@ -3046,9 +3046,9 @@
       "evidence": [
         "scripts/probe_hermes_provider_errors.py",
         "tests/fixtures/parity/OBS-0054-hermes-provider-errors.json",
-        "docs/parity/observations/OBS-0054-hermes-provider-errors-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0054-hermes-provider-errors-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "justfile",
         "scripts/verify.sh",
         ".hades/runtime/had058-reference-probe.log",
@@ -3071,9 +3071,9 @@
         "evidence": [
           "scripts/probe_hermes_provider_errors.py",
           "tests/fixtures/parity/OBS-0054-hermes-provider-errors.json",
-          "docs/parity/observations/OBS-0054-hermes-provider-errors-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0054-hermes-provider-errors-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/had058-reference-probe.log",
@@ -3102,9 +3102,9 @@
       "evidence": [
         "scripts/probe_hermes_provider_setup_persistence.py",
         "tests/fixtures/parity/OBS-0055-hermes-provider-setup-persistence.json",
-        "docs/parity/observations/OBS-0055-hermes-provider-setup-persistence-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0055-hermes-provider-setup-persistence-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "justfile",
         "scripts/verify.sh",
         ".hades/runtime/hermes-provider-setup-persistence-probe.json",
@@ -3127,9 +3127,9 @@
         "evidence": [
           "scripts/probe_hermes_provider_setup_persistence.py",
           "tests/fixtures/parity/OBS-0055-hermes-provider-setup-persistence.json",
-          "docs/parity/observations/OBS-0055-hermes-provider-setup-persistence-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0055-hermes-provider-setup-persistence-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/hermes-provider-setup-persistence-probe.json",
@@ -3158,9 +3158,9 @@
       "evidence": [
         "scripts/probe_hermes_setup_config_shape.py",
         "tests/fixtures/parity/OBS-0056-hermes-setup-config-shape.json",
-        "docs/parity/observations/OBS-0056-hermes-setup-config-shape-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0056-hermes-setup-config-shape-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "justfile",
         "scripts/verify.sh",
         ".hades/runtime/hermes-setup-config-shape-probe.json",
@@ -3183,9 +3183,9 @@
         "evidence": [
           "scripts/probe_hermes_setup_config_shape.py",
           "tests/fixtures/parity/OBS-0056-hermes-setup-config-shape.json",
-          "docs/parity/observations/OBS-0056-hermes-setup-config-shape-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0056-hermes-setup-config-shape-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/hermes-setup-config-shape-probe.json",
@@ -3217,9 +3217,9 @@
         "crates/hades-tui/src/lib.rs",
         "scripts/replay_setup_terminal_backend.py",
         "tests/fixtures/parity/OBS-0057-hades-setup-platform-picker.json",
-        "docs/parity/observations/OBS-0057-hades-setup-platform-picker-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0057-hades-setup-platform-picker-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "justfile",
         "scripts/verify.sh",
         ".hades/runtime/setup-platform-picker-replay.json",
@@ -3245,9 +3245,9 @@
           "crates/hades-tui/src/lib.rs",
           "scripts/replay_setup_terminal_backend.py",
           "tests/fixtures/parity/OBS-0057-hades-setup-platform-picker.json",
-          "docs/parity/observations/OBS-0057-hades-setup-platform-picker-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0057-hades-setup-platform-picker-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "justfile",
           "scripts/verify.sh",
           ".hades/runtime/setup-platform-picker-replay.json",
@@ -3276,7 +3276,7 @@
       "evidence": [
         "scripts/probe_hermes_empty_platform_confirmation.py",
         "tests/fixtures/parity/OBS-0058-hermes-empty-platform-confirmation.json",
-        "docs/parity/observations/OBS-0058-hermes-empty-platform-confirmation-2026-08-02.md",
+        "_attic/docs/parity-observations/OBS-0058-hermes-empty-platform-confirmation-2026-08-02.md",
         ".hades/runtime/hermes-empty-platform-confirmation-probe.json",
         ".hades/runtime/had062-pre-completion-verify-final.log"
       ],
@@ -3296,7 +3296,7 @@
         "evidence": [
           "scripts/probe_hermes_empty_platform_confirmation.py",
           "tests/fixtures/parity/OBS-0058-hermes-empty-platform-confirmation.json",
-          "docs/parity/observations/OBS-0058-hermes-empty-platform-confirmation-2026-08-02.md",
+          "_attic/docs/parity-observations/OBS-0058-hermes-empty-platform-confirmation-2026-08-02.md",
           ".hades/runtime/hermes-empty-platform-confirmation-probe.json",
           ".hades/runtime/had062-pre-completion-verify-final.log"
         ],
@@ -3322,9 +3322,9 @@
       "evidence": [
         "scripts/probe_hermes_unconfigured_startup.py",
         "tests/fixtures/parity/OBS-0059-hermes-unconfigured-startup.json",
-        "docs/parity/observations/OBS-0059-hermes-unconfigured-startup-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0059-hermes-unconfigured-startup-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "justfile",
         "scripts/verify.sh",
         "scripts/probe_hermes_setup_wizard.py",
@@ -3350,9 +3350,9 @@
         "evidence": [
           "scripts/probe_hermes_unconfigured_startup.py",
           "tests/fixtures/parity/OBS-0059-hermes-unconfigured-startup.json",
-          "docs/parity/observations/OBS-0059-hermes-unconfigured-startup-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0059-hermes-unconfigured-startup-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "justfile",
           "scripts/verify.sh",
           "scripts/probe_hermes_setup_wizard.py",
@@ -3389,9 +3389,9 @@
         "crates/hades-tui/src/lib.rs",
         "scripts/replay_unconfigured_startup.py",
         "tests/fixtures/parity/OBS-0060-hades-unconfigured-startup.json",
-        "docs/parity/observations/OBS-0060-hades-unconfigured-startup-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0060-hades-unconfigured-startup-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "justfile",
         "scripts/verify.sh",
         "scripts/probe_tui_lifecycle.py",
@@ -3429,9 +3429,9 @@
           "crates/hades-tui/src/lib.rs",
           "scripts/replay_unconfigured_startup.py",
           "tests/fixtures/parity/OBS-0060-hades-unconfigured-startup.json",
-          "docs/parity/observations/OBS-0060-hades-unconfigured-startup-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0060-hades-unconfigured-startup-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "justfile",
           "scripts/verify.sh",
           "scripts/probe_tui_lifecycle.py",
@@ -3472,10 +3472,10 @@
       "evidence": [
         "scripts/probe_hermes_unconfigured_input_queue.py",
         "tests/fixtures/parity/OBS-0061-hermes-unconfigured-input-queue.json",
-        "docs/parity/observations/OBS-0061-hermes-unconfigured-input-queue-2026-08-02.md",
-        "docs/parity/observations/OBS-0059-hermes-unconfigured-startup-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0061-hermes-unconfigured-input-queue-2026-08-02.md",
+        "_attic/docs/parity-observations/OBS-0059-hermes-unconfigured-startup-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "docs/decisions/ADR-0006-live-loopback-provider-worker.md",
         "justfile",
@@ -3501,10 +3501,10 @@
         "evidence": [
           "scripts/probe_hermes_unconfigured_input_queue.py",
           "tests/fixtures/parity/OBS-0061-hermes-unconfigured-input-queue.json",
-          "docs/parity/observations/OBS-0061-hermes-unconfigured-input-queue-2026-08-02.md",
-          "docs/parity/observations/OBS-0059-hermes-unconfigured-startup-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0061-hermes-unconfigured-input-queue-2026-08-02.md",
+          "_attic/docs/parity-observations/OBS-0059-hermes-unconfigured-startup-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "docs/decisions/ADR-0006-live-loopback-provider-worker.md",
           "justfile",
@@ -3540,12 +3540,12 @@
         "crates/hades-tui/src/lib.rs",
         "scripts/replay_unconfigured_input.py",
         "tests/fixtures/parity/OBS-0062-hades-unconfigured-input.json",
-        "docs/parity/observations/OBS-0062-hades-unconfigured-input-2026-08-02.md",
+        "_attic/docs/parity-observations/OBS-0062-hades-unconfigured-input-2026-08-02.md",
         "scripts/probe_tui_lifecycle.py",
         "scripts/differential_replay.py",
         "scripts/replay_local_provider.py",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "docs/decisions/ADR-0006-live-loopback-provider-worker.md",
         "justfile",
@@ -3573,12 +3573,12 @@
           "crates/hades-tui/src/lib.rs",
           "scripts/replay_unconfigured_input.py",
           "tests/fixtures/parity/OBS-0062-hades-unconfigured-input.json",
-          "docs/parity/observations/OBS-0062-hades-unconfigured-input-2026-08-02.md",
+          "_attic/docs/parity-observations/OBS-0062-hades-unconfigured-input-2026-08-02.md",
           "scripts/probe_tui_lifecycle.py",
           "scripts/differential_replay.py",
           "scripts/replay_local_provider.py",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "docs/decisions/ADR-0006-live-loopback-provider-worker.md",
           "justfile",
@@ -3609,9 +3609,9 @@
       "evidence": [
         "scripts/probe_hermes_unconfigured_setup_escape.py",
         "tests/fixtures/parity/OBS-0063-hermes-unconfigured-setup-escape.json",
-        "docs/parity/observations/OBS-0063-hermes-unconfigured-setup-escape-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0063-hermes-unconfigured-setup-escape-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -3632,9 +3632,9 @@
         "evidence": [
           "scripts/probe_hermes_unconfigured_setup_escape.py",
           "tests/fixtures/parity/OBS-0063-hermes-unconfigured-setup-escape.json",
-          "docs/parity/observations/OBS-0063-hermes-unconfigured-setup-escape-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0063-hermes-unconfigured-setup-escape-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -3663,9 +3663,9 @@
       "evidence": [
         "scripts/probe_hermes_unconfigured_resolution.py",
         "tests/fixtures/parity/OBS-0064-hermes-unconfigured-resolution.json",
-        "docs/parity/observations/OBS-0064-hermes-unconfigured-resolution-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0064-hermes-unconfigured-resolution-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -3686,9 +3686,9 @@
         "evidence": [
           "scripts/probe_hermes_unconfigured_resolution.py",
           "tests/fixtures/parity/OBS-0064-hermes-unconfigured-resolution.json",
-          "docs/parity/observations/OBS-0064-hermes-unconfigured-resolution-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0064-hermes-unconfigured-resolution-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -3764,9 +3764,9 @@
       "evidence": [
         "scripts/probe_hermes_setup_required_reconciliation.py",
         "tests/fixtures/parity/OBS-0065-hermes-setup-required-reconciliation.json",
-        "docs/parity/observations/OBS-0065-hermes-setup-required-reconciliation-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0065-hermes-setup-required-reconciliation-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -3788,9 +3788,9 @@
         "evidence": [
           "scripts/probe_hermes_setup_required_reconciliation.py",
           "tests/fixtures/parity/OBS-0065-hermes-setup-required-reconciliation.json",
-          "docs/parity/observations/OBS-0065-hermes-setup-required-reconciliation-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0065-hermes-setup-required-reconciliation-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -3819,9 +3819,9 @@
       "evidence": [
         "scripts/probe_hermes_help_setup_timing.py",
         "tests/fixtures/parity/OBS-0066-hermes-help-setup-timing.json",
-        "docs/parity/observations/OBS-0066-hermes-help-setup-timing-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0066-hermes-help-setup-timing-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -3843,9 +3843,9 @@
         "evidence": [
           "scripts/probe_hermes_help_setup_timing.py",
           "tests/fixtures/parity/OBS-0066-hermes-help-setup-timing.json",
-          "docs/parity/observations/OBS-0066-hermes-help-setup-timing-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0066-hermes-help-setup-timing-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -3878,9 +3878,9 @@
         "crates/hades-cli/src/main.rs",
         "scripts/replay_unconfigured_help.py",
         "tests/fixtures/parity/OBS-0067-hades-help-setup-required.json",
-        "docs/parity/observations/OBS-0067-hades-help-setup-required-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0067-hades-help-setup-required-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -3909,9 +3909,9 @@
           "crates/hades-cli/src/main.rs",
           "scripts/replay_unconfigured_help.py",
           "tests/fixtures/parity/OBS-0067-hades-help-setup-required.json",
-          "docs/parity/observations/OBS-0067-hades-help-setup-required-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0067-hades-help-setup-required-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -3942,9 +3942,9 @@
       "evidence": [
         "scripts/probe_hermes_setup_required_actions.py",
         "tests/fixtures/parity/OBS-0068-hermes-setup-required-actions.json",
-        "docs/parity/observations/OBS-0068-hermes-setup-required-actions-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0068-hermes-setup-required-actions-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -3966,9 +3966,9 @@
         "evidence": [
           "scripts/probe_hermes_setup_required_actions.py",
           "tests/fixtures/parity/OBS-0068-hermes-setup-required-actions.json",
-          "docs/parity/observations/OBS-0068-hermes-setup-required-actions-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0068-hermes-setup-required-actions-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -3997,9 +3997,9 @@
       "evidence": [
         "scripts/probe_hermes_standalone_setup.py",
         "tests/fixtures/parity/OBS-0069-hermes-standalone-setup.json",
-        "docs/parity/observations/OBS-0069-hermes-standalone-setup-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0069-hermes-standalone-setup-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -4021,9 +4021,9 @@
         "evidence": [
           "scripts/probe_hermes_standalone_setup.py",
           "tests/fixtures/parity/OBS-0069-hermes-standalone-setup.json",
-          "docs/parity/observations/OBS-0069-hermes-standalone-setup-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0069-hermes-standalone-setup-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -4055,9 +4055,9 @@
         "crates/hades-tui/src/lib.rs",
         "scripts/replay_standalone_setup.py",
         "tests/fixtures/parity/OBS-0070-hades-standalone-setup.json",
-        "docs/parity/observations/OBS-0070-hades-standalone-setup-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0070-hades-standalone-setup-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -4083,9 +4083,9 @@
           "crates/hades-tui/src/lib.rs",
           "scripts/replay_standalone_setup.py",
           "tests/fixtures/parity/OBS-0070-hades-standalone-setup.json",
-          "docs/parity/observations/OBS-0070-hades-standalone-setup-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0070-hades-standalone-setup-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -4114,9 +4114,9 @@
       "evidence": [
         "scripts/probe_hermes_standalone_full_setup.py",
         "tests/fixtures/parity/OBS-0071-hermes-standalone-full-setup.json",
-        "docs/parity/observations/OBS-0071-hermes-standalone-full-setup-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0071-hermes-standalone-full-setup-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -4138,9 +4138,9 @@
         "evidence": [
           "scripts/probe_hermes_standalone_full_setup.py",
           "tests/fixtures/parity/OBS-0071-hermes-standalone-full-setup.json",
-          "docs/parity/observations/OBS-0071-hermes-standalone-full-setup-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0071-hermes-standalone-full-setup-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -4172,9 +4172,9 @@
         "crates/hades-tui/src/lib.rs",
         "scripts/replay_standalone_full_setup.py",
         "tests/fixtures/parity/OBS-0072-hades-standalone-full-setup.json",
-        "docs/parity/observations/OBS-0072-hades-standalone-full-setup-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0072-hades-standalone-full-setup-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -4200,9 +4200,9 @@
           "crates/hades-tui/src/lib.rs",
           "scripts/replay_standalone_full_setup.py",
           "tests/fixtures/parity/OBS-0072-hades-standalone-full-setup.json",
-          "docs/parity/observations/OBS-0072-hades-standalone-full-setup-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0072-hades-standalone-full-setup-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -4231,9 +4231,9 @@
       "evidence": [
         "scripts/probe_hermes_standalone_terminal_platform.py",
         "tests/fixtures/parity/OBS-0073-hermes-standalone-terminal-platform.json",
-        "docs/parity/observations/OBS-0073-hermes-standalone-terminal-platform-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0073-hermes-standalone-terminal-platform-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -4255,9 +4255,9 @@
         "evidence": [
           "scripts/probe_hermes_standalone_terminal_platform.py",
           "tests/fixtures/parity/OBS-0073-hermes-standalone-terminal-platform.json",
-          "docs/parity/observations/OBS-0073-hermes-standalone-terminal-platform-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0073-hermes-standalone-terminal-platform-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -4289,9 +4289,9 @@
         "crates/hades-tui/src/lib.rs",
         "scripts/replay_standalone_terminal_platform.py",
         "tests/fixtures/parity/OBS-0074-hades-standalone-terminal-platform.json",
-        "docs/parity/observations/OBS-0074-hades-standalone-terminal-platform-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0074-hades-standalone-terminal-platform-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -4317,9 +4317,9 @@
           "crates/hades-tui/src/lib.rs",
           "scripts/replay_standalone_terminal_platform.py",
           "tests/fixtures/parity/OBS-0074-hades-standalone-terminal-platform.json",
-          "docs/parity/observations/OBS-0074-hades-standalone-terminal-platform-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0074-hades-standalone-terminal-platform-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -4348,9 +4348,9 @@
       "evidence": [
         "scripts/probe_hermes_standalone_tool_configuration.py",
         "tests/fixtures/parity/OBS-0075-hermes-standalone-tool-configuration.json",
-        "docs/parity/observations/OBS-0075-hermes-standalone-tool-configuration-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0075-hermes-standalone-tool-configuration-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -4372,9 +4372,9 @@
         "evidence": [
           "scripts/probe_hermes_standalone_tool_configuration.py",
           "tests/fixtures/parity/OBS-0075-hermes-standalone-tool-configuration.json",
-          "docs/parity/observations/OBS-0075-hermes-standalone-tool-configuration-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0075-hermes-standalone-tool-configuration-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -4403,9 +4403,9 @@
       "evidence": [
         "scripts/probe_hermes_tool_configuration_navigation.py",
         "tests/fixtures/parity/OBS-0076-hermes-tool-configuration-navigation.json",
-        "docs/parity/observations/OBS-0076-hermes-tool-configuration-navigation-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0076-hermes-tool-configuration-navigation-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -4427,9 +4427,9 @@
         "evidence": [
           "scripts/probe_hermes_tool_configuration_navigation.py",
           "tests/fixtures/parity/OBS-0076-hermes-tool-configuration-navigation.json",
-          "docs/parity/observations/OBS-0076-hermes-tool-configuration-navigation-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0076-hermes-tool-configuration-navigation-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -4458,9 +4458,9 @@
       "evidence": [
         "scripts/probe_hermes_tool_provider_boundary.py",
         "tests/fixtures/parity/OBS-0077-hermes-tool-provider-boundary.json",
-        "docs/parity/observations/OBS-0077-hermes-tool-provider-boundary-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0077-hermes-tool-provider-boundary-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -4482,9 +4482,9 @@
         "evidence": [
           "scripts/probe_hermes_tool_provider_boundary.py",
           "tests/fixtures/parity/OBS-0077-hermes-tool-provider-boundary.json",
-          "docs/parity/observations/OBS-0077-hermes-tool-provider-boundary-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0077-hermes-tool-provider-boundary-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -4516,9 +4516,9 @@
         "crates/hades-tui/src/lib.rs",
         "scripts/replay_standalone_tool_provider_boundary.py",
         "tests/fixtures/parity/OBS-0078-hades-tool-provider-boundary.json",
-        "docs/parity/observations/OBS-0078-hades-tool-provider-boundary-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0078-hades-tool-provider-boundary-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -4544,9 +4544,9 @@
           "crates/hades-tui/src/lib.rs",
           "scripts/replay_standalone_tool_provider_boundary.py",
           "tests/fixtures/parity/OBS-0078-hades-tool-provider-boundary.json",
-          "docs/parity/observations/OBS-0078-hades-tool-provider-boundary-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0078-hades-tool-provider-boundary-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -4577,9 +4577,9 @@
         "scripts/probe_tui_lifecycle.py",
         "scripts/probe_hermes_tool_provider_inventory.py",
         "tests/fixtures/parity/OBS-0079-hermes-tool-provider-inventory.json",
-        "docs/parity/observations/OBS-0079-hermes-tool-provider-inventory-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0079-hermes-tool-provider-inventory-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -4603,9 +4603,9 @@
           "scripts/probe_tui_lifecycle.py",
           "scripts/probe_hermes_tool_provider_inventory.py",
           "tests/fixtures/parity/OBS-0079-hermes-tool-provider-inventory.json",
-          "docs/parity/observations/OBS-0079-hermes-tool-provider-inventory-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0079-hermes-tool-provider-inventory-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -4637,9 +4637,9 @@
         "crates/hades-tui/src/lib.rs",
         "scripts/replay_standalone_tool_provider_inventory.py",
         "tests/fixtures/parity/OBS-0080-hades-tool-provider-inventory.json",
-        "docs/parity/observations/OBS-0080-hades-tool-provider-inventory-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0080-hades-tool-provider-inventory-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -4665,9 +4665,9 @@
           "crates/hades-tui/src/lib.rs",
           "scripts/replay_standalone_tool_provider_inventory.py",
           "tests/fixtures/parity/OBS-0080-hades-tool-provider-inventory.json",
-          "docs/parity/observations/OBS-0080-hades-tool-provider-inventory-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0080-hades-tool-provider-inventory-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -4698,9 +4698,9 @@
         "scripts/probe_hermes_tool_provider_inventory_interaction.py",
         "scripts/probe_tui_lifecycle.py",
         "tests/fixtures/parity/OBS-0081-hermes-tool-provider-inventory-interaction.json",
-        "docs/parity/observations/OBS-0081-hermes-tool-provider-inventory-interaction-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0081-hermes-tool-provider-inventory-interaction-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -4723,9 +4723,9 @@
           "scripts/probe_hermes_tool_provider_inventory_interaction.py",
           "scripts/probe_tui_lifecycle.py",
           "tests/fixtures/parity/OBS-0081-hermes-tool-provider-inventory-interaction.json",
-          "docs/parity/observations/OBS-0081-hermes-tool-provider-inventory-interaction-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0081-hermes-tool-provider-inventory-interaction-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -4768,10 +4768,10 @@
         "scripts/replay_standalone_tool_provider_inventory_navigation.py",
         "tests/fixtures/parity/OBS-0080-hades-tool-provider-inventory.json",
         "tests/fixtures/parity/OBS-0082-hades-tool-provider-inventory-navigation.json",
-        "docs/parity/observations/OBS-0080-hades-tool-provider-inventory-2026-08-02.md",
-        "docs/parity/observations/OBS-0082-hades-tool-provider-inventory-navigation-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0080-hades-tool-provider-inventory-2026-08-02.md",
+        "_attic/docs/parity-observations/OBS-0082-hades-tool-provider-inventory-navigation-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -4805,10 +4805,10 @@
           "scripts/replay_standalone_tool_provider_inventory_navigation.py",
           "tests/fixtures/parity/OBS-0080-hades-tool-provider-inventory.json",
           "tests/fixtures/parity/OBS-0082-hades-tool-provider-inventory-navigation.json",
-          "docs/parity/observations/OBS-0080-hades-tool-provider-inventory-2026-08-02.md",
-          "docs/parity/observations/OBS-0082-hades-tool-provider-inventory-navigation-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0080-hades-tool-provider-inventory-2026-08-02.md",
+          "_attic/docs/parity-observations/OBS-0082-hades-tool-provider-inventory-navigation-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -4837,9 +4837,9 @@
       "evidence": [
         "scripts/probe_hermes_tool_provider_inventory_selection.py",
         "tests/fixtures/parity/OBS-0085-hermes-tool-provider-inventory-selection.json",
-        "docs/parity/observations/OBS-0085-hermes-tool-provider-inventory-selection-2026-08-02.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0085-hermes-tool-provider-inventory-selection-2026-08-02.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -4860,9 +4860,9 @@
         "evidence": [
           "scripts/probe_hermes_tool_provider_inventory_selection.py",
           "tests/fixtures/parity/OBS-0085-hermes-tool-provider-inventory-selection.json",
-          "docs/parity/observations/OBS-0085-hermes-tool-provider-inventory-selection-2026-08-02.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0085-hermes-tool-provider-inventory-selection-2026-08-02.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -4894,7 +4894,7 @@
         "crates/hades-cli/src/main.rs",
         "scripts/replay_standalone_tool_provider_inventory_selection.py",
         "tests/fixtures/parity/OBS-0086-hades-tool-provider-inventory-selection.json",
-        "docs/parity/observations/OBS-0086-hades-tool-provider-inventory-selection-2026-08-02.md",
+        "_attic/docs/parity-observations/OBS-0086-hades-tool-provider-inventory-selection-2026-08-02.md",
         "scripts/probe_hermes_setup_wizard.py",
         "scripts/verify.sh"
       ],
@@ -4917,7 +4917,7 @@
           "crates/hades-cli/src/main.rs",
           "scripts/replay_standalone_tool_provider_inventory_selection.py",
           "tests/fixtures/parity/OBS-0086-hades-tool-provider-inventory-selection.json",
-          "docs/parity/observations/OBS-0086-hades-tool-provider-inventory-selection-2026-08-02.md",
+          "_attic/docs/parity-observations/OBS-0086-hades-tool-provider-inventory-selection-2026-08-02.md",
           "scripts/probe_hermes_setup_wizard.py",
           "scripts/verify.sh"
         ],
@@ -4982,7 +4982,7 @@
         "scripts/replay_fresh_shell_launch.py",
         "scripts/install_user_launcher.sh",
         "tests/fixtures/parity/OBS-0088-hades-fresh-shell-launch.json",
-        "docs/parity/observations/OBS-0088-hades-fresh-shell-launch-2026-08-02.md",
+        "_attic/docs/parity-observations/OBS-0088-hades-fresh-shell-launch-2026-08-02.md",
         "justfile",
         "scripts/verify.sh",
         "scripts/probe_hermes_osc52_st_termination.py"
@@ -5005,7 +5005,7 @@
           "scripts/replay_fresh_shell_launch.py",
           "scripts/install_user_launcher.sh",
           "tests/fixtures/parity/OBS-0088-hades-fresh-shell-launch.json",
-          "docs/parity/observations/OBS-0088-hades-fresh-shell-launch-2026-08-02.md",
+          "_attic/docs/parity-observations/OBS-0088-hades-fresh-shell-launch-2026-08-02.md",
           "justfile",
           "scripts/verify.sh",
           "scripts/probe_hermes_osc52_st_termination.py"
@@ -5037,7 +5037,7 @@
         "crates/hades-cli/src/main.rs",
         "scripts/replay_vertical_slice.py",
         "tests/fixtures/parity/OBS-0089-hades-local-provider-vertical-slice.json",
-        "docs/parity/observations/OBS-0089-hades-local-provider-vertical-slice-2026-08-02.md",
+        "_attic/docs/parity-observations/OBS-0089-hades-local-provider-vertical-slice-2026-08-02.md",
         "justfile",
         "scripts/verify.sh"
       ],
@@ -5060,7 +5060,7 @@
           "crates/hades-cli/src/main.rs",
           "scripts/replay_vertical_slice.py",
           "tests/fixtures/parity/OBS-0089-hades-local-provider-vertical-slice.json",
-          "docs/parity/observations/OBS-0089-hades-local-provider-vertical-slice-2026-08-02.md",
+          "_attic/docs/parity-observations/OBS-0089-hades-local-provider-vertical-slice-2026-08-02.md",
           "justfile",
           "scripts/verify.sh"
         ],
@@ -5088,14 +5088,14 @@
       "evidence": [
         "scripts/replay_configured_surfaces.py",
         "tests/fixtures/parity/OBS-0090-hades-configured-primary-surfaces.json",
-        "docs/parity/observations/OBS-0090-hades-configured-primary-surfaces-2026-08-02.md",
+        "_attic/docs/parity-observations/OBS-0090-hades-configured-primary-surfaces-2026-08-02.md",
         "scripts/probe_hermes_osc52_multiplexer.py",
         "tests/fixtures/parity/OBS-0030-hermes-osc52-multiplexer-passthrough.json",
-        "docs/parity/observations/OBS-0030-hermes-osc52-multiplexer-passthrough-2026-08-01.md",
+        "_attic/docs/parity-observations/OBS-0030-hermes-osc52-multiplexer-passthrough-2026-08-01.md",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md"
       ],
       "id": "HAD-095",
@@ -5116,14 +5116,14 @@
         "evidence": [
           "scripts/replay_configured_surfaces.py",
           "tests/fixtures/parity/OBS-0090-hades-configured-primary-surfaces.json",
-          "docs/parity/observations/OBS-0090-hades-configured-primary-surfaces-2026-08-02.md",
+          "_attic/docs/parity-observations/OBS-0090-hades-configured-primary-surfaces-2026-08-02.md",
           "scripts/probe_hermes_osc52_multiplexer.py",
           "tests/fixtures/parity/OBS-0030-hermes-osc52-multiplexer-passthrough.json",
-          "docs/parity/observations/OBS-0030-hermes-osc52-multiplexer-passthrough-2026-08-01.md",
+          "_attic/docs/parity-observations/OBS-0030-hermes-osc52-multiplexer-passthrough-2026-08-01.md",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md"
         ],
         "summary": "Proved the configured primary Hades journey across slash completion, model and sessions overlays, streamed prompts, persisted history, restart recall, and synthetic clipboard, with full verification."
@@ -5151,12 +5151,12 @@
         "crates/hades-app/src/lib.rs",
         "scripts/replay_provider_recovery.py",
         "tests/fixtures/parity/OBS-0091-hades-provider-failure-recovery.json",
-        "docs/parity/observations/OBS-0091-hades-provider-failure-recovery-2026-08-02.md",
-        "docs/parity/observations/OBS-0054-hermes-provider-errors-2026-08-02.md",
+        "_attic/docs/parity-observations/OBS-0091-hades-provider-failure-recovery-2026-08-02.md",
+        "_attic/docs/parity-observations/OBS-0054-hermes-provider-errors-2026-08-02.md",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md"
       ],
       "id": "HAD-096",
@@ -5178,12 +5178,12 @@
           "crates/hades-app/src/lib.rs",
           "scripts/replay_provider_recovery.py",
           "tests/fixtures/parity/OBS-0091-hades-provider-failure-recovery.json",
-          "docs/parity/observations/OBS-0091-hades-provider-failure-recovery-2026-08-02.md",
-          "docs/parity/observations/OBS-0054-hermes-provider-errors-2026-08-02.md",
+          "_attic/docs/parity-observations/OBS-0091-hades-provider-failure-recovery-2026-08-02.md",
+          "_attic/docs/parity-observations/OBS-0054-hermes-provider-errors-2026-08-02.md",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md"
         ],
         "summary": "Implemented and proved safe local-provider failure recovery: HTTP 500, malformed SSE, and incomplete streams return to Ready with visible errors, preserve partial diagnostics, avoid automatic retries, and accept exactly one explicit recovered follow-up."
@@ -5213,12 +5213,12 @@
         "crates/hades-cli/src/main.rs",
         "scripts/replay_conversation_context.py",
         "tests/fixtures/parity/OBS-0092-hades-conversation-context.json",
-        "docs/parity/observations/OBS-0092-hades-conversation-context-2026-08-02.md",
+        "_attic/docs/parity-observations/OBS-0092-hades-conversation-context-2026-08-02.md",
         ".hades/runtime/conversation-context-replay.json",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md"
       ],
       "id": "HAD-097",
@@ -5239,12 +5239,12 @@
           "crates/hades-cli/src/main.rs",
           "scripts/replay_conversation_context.py",
           "tests/fixtures/parity/OBS-0092-hades-conversation-context.json",
-          "docs/parity/observations/OBS-0092-hades-conversation-context-2026-08-02.md",
+          "_attic/docs/parity-observations/OBS-0092-hades-conversation-context-2026-08-02.md",
           ".hades/runtime/conversation-context-replay.json",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md"
         ],
         "summary": "Implemented typed successful conversation context: completed turns are carried into later local-provider requests, while failed, cancelled, and incomplete turns remain diagnostic-only and are excluded from explicit recovery follow-ups. OBS-0092 and the complete no-skip gate prove exact request order, no automatic context refresh, credential-free loopback boundaries, and clean terminal restoration."
@@ -5271,10 +5271,10 @@
       "evidence": [
         "scripts/probe_hermes_model_picker_selection.py",
         "tests/fixtures/parity/OBS-0093-hermes-model-picker-selection.json",
-        "docs/parity/observations/OBS-0093-hermes-model-picker-selection-2026-08-02.md",
+        "_attic/docs/parity-observations/OBS-0093-hermes-model-picker-selection-2026-08-02.md",
         ".hades/runtime/hermes-model-picker-selection-probe.json",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh"
@@ -5296,10 +5296,10 @@
         "evidence": [
           "scripts/probe_hermes_model_picker_selection.py",
           "tests/fixtures/parity/OBS-0093-hermes-model-picker-selection.json",
-          "docs/parity/observations/OBS-0093-hermes-model-picker-selection-2026-08-02.md",
+          "_attic/docs/parity-observations/OBS-0093-hermes-model-picker-selection-2026-08-02.md",
           ".hades/runtime/hermes-model-picker-selection-probe.json",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh"
@@ -5334,12 +5334,12 @@
         "crates/hades-tui/src/lib.rs",
         "scripts/replay_model_selection.py",
         "tests/fixtures/parity/OBS-0094-hades-model-picker-selection.json",
-        "docs/parity/observations/OBS-0094-hades-model-picker-selection-2026-08-02.md",
+        "_attic/docs/parity-observations/OBS-0094-hades-model-picker-selection-2026-08-02.md",
         ".hades/runtime/model-selection-replay.json",
         "justfile",
         "scripts/verify.sh",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md"
       ],
       "id": "HAD-099",
@@ -5363,12 +5363,12 @@
           "crates/hades-tui/src/lib.rs",
           "scripts/replay_model_selection.py",
           "tests/fixtures/parity/OBS-0094-hades-model-picker-selection.json",
-          "docs/parity/observations/OBS-0094-hades-model-picker-selection-2026-08-02.md",
+          "_attic/docs/parity-observations/OBS-0094-hades-model-picker-selection-2026-08-02.md",
           ".hades/runtime/model-selection-replay.json",
           "justfile",
           "scripts/verify.sh",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md"
         ],
         "summary": "Implemented typed session-scoped model-picker selection. The direct-PTY OBS-0094 replay proves the visible model \u2192 palette-model transition, no request during selection, effective palette-model use for the next streamed request, byte-identical sidecar and no Hermes config mutation, clean terminal restoration, and fresh-process return to vertical-model. Focused Rust tests and the complete no-skip just verify gate pass."
@@ -5399,13 +5399,13 @@
         "scripts/replay_fresh_shell_launch.py",
         "scripts/install_user_launcher.sh",
         "tests/fixtures/parity/OBS-0095-hades-installed-model-selection.json",
-        "docs/parity/observations/OBS-0095-hades-installed-model-selection-2026-08-02.md",
+        "_attic/docs/parity-observations/OBS-0095-hades-installed-model-selection-2026-08-02.md",
         ".hades/runtime/installed-model-selection-replay.json",
         "justfile",
         "scripts/verify.sh",
         "README.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md"
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-100",
       "lane": "release",
@@ -5426,13 +5426,13 @@
           "scripts/replay_fresh_shell_launch.py",
           "scripts/install_user_launcher.sh",
           "tests/fixtures/parity/OBS-0095-hades-installed-model-selection.json",
-          "docs/parity/observations/OBS-0095-hades-installed-model-selection-2026-08-02.md",
+          "_attic/docs/parity-observations/OBS-0095-hades-installed-model-selection-2026-08-02.md",
           ".hades/runtime/installed-model-selection-replay.json",
           "justfile",
           "scripts/verify.sh",
           "README.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md"
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Proved the installed release path end to end. Clean Bash and Fish shells resolve hades and Hades to target/release/hades, and both aliases pass the OBS-0094 setup, session model selection, streamed answer, fresh-process reset, sidecar, and terminal-cleanup oracle. OBS-0095 and the complete no-skip just verify gate pass without credentials, external network, or Hermes config mutation."
       },
@@ -5459,13 +5459,13 @@
       "evidence": [
         "scripts/probe_hermes_distinct_model_selection.py",
         "tests/fixtures/parity/OBS-0096-hermes-distinct-model-selection.json",
-        "docs/parity/observations/OBS-0096-hermes-distinct-model-selection-2026-08-03.md",
+        "_attic/docs/parity-observations/OBS-0096-hermes-distinct-model-selection-2026-08-03.md",
         ".hades/runtime/hermes-distinct-model-selection-probe.json",
         "justfile",
         "scripts/verify.sh",
         "README.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md"
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-101",
       "lane": "parity",
@@ -5485,13 +5485,13 @@
         "evidence": [
           "scripts/probe_hermes_distinct_model_selection.py",
           "tests/fixtures/parity/OBS-0096-hermes-distinct-model-selection.json",
-          "docs/parity/observations/OBS-0096-hermes-distinct-model-selection-2026-08-03.md",
+          "_attic/docs/parity-observations/OBS-0096-hermes-distinct-model-selection-2026-08-03.md",
           ".hades/runtime/hermes-distinct-model-selection-probe.json",
           "justfile",
           "scripts/verify.sh",
           "README.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md"
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Captured Hermes distinct-model selection with a fresh loopback-backed model switch, verified the effective alternate-model request and non-persistence, and wired the sanitized probe and fixture into the complete gate."
       },
@@ -5518,15 +5518,15 @@
         "scripts/probe_hermes_empty_platform_confirmation.py",
         "tests/fixtures/parity/OBS-0058-hermes-empty-platform-confirmation.json",
         "tests/fixtures/parity/OBS-0097-hermes-empty-platform-reconciliation.json",
-        "docs/parity/observations/OBS-0058-hermes-empty-platform-confirmation-2026-08-02.md",
-        "docs/parity/observations/OBS-0097-hermes-empty-platform-reconciliation-2026-08-03.md",
+        "_attic/docs/parity-observations/OBS-0058-hermes-empty-platform-confirmation-2026-08-02.md",
+        "_attic/docs/parity-observations/OBS-0097-hermes-empty-platform-reconciliation-2026-08-03.md",
         ".hades/runtime/hermes-empty-platform-confirmation-probe.json",
         ".hades/runtime/hermes-empty-platform-reconciliation-probe.json",
         "justfile",
         "scripts/verify.sh",
         "README.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md"
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-102",
       "lane": "parity",
@@ -5547,15 +5547,15 @@
           "scripts/probe_hermes_empty_platform_confirmation.py",
           "tests/fixtures/parity/OBS-0058-hermes-empty-platform-confirmation.json",
           "tests/fixtures/parity/OBS-0097-hermes-empty-platform-reconciliation.json",
-          "docs/parity/observations/OBS-0058-hermes-empty-platform-confirmation-2026-08-02.md",
-          "docs/parity/observations/OBS-0097-hermes-empty-platform-reconciliation-2026-08-03.md",
+          "_attic/docs/parity-observations/OBS-0058-hermes-empty-platform-confirmation-2026-08-02.md",
+          "_attic/docs/parity-observations/OBS-0097-hermes-empty-platform-reconciliation-2026-08-03.md",
           ".hades/runtime/hermes-empty-platform-confirmation-probe.json",
           ".hades/runtime/hermes-empty-platform-reconciliation-probe.json",
           "justfile",
           "scripts/verify.sh",
           "README.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md"
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Re-observed Hermes empty-platform confirmation in a pinned fresh environment, preserved the historical OBS-0058 same-picker no-op, and recorded the current bounded later-setup divergence without importing it into Hades behavior."
       },
@@ -5579,13 +5579,13 @@
       "evidence": [
         "scripts/probe_hermes_help_catalog.py",
         "tests/fixtures/parity/OBS-0098-hermes-help-catalog.json",
-        "docs/parity/observations/OBS-0098-hermes-help-catalog-2026-08-03.md",
+        "_attic/docs/parity-observations/OBS-0098-hermes-help-catalog-2026-08-03.md",
         ".hades/runtime/hermes-help-catalog-probe.json",
         "justfile",
         "scripts/verify.sh",
         "README.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md"
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-103",
       "lane": "parity",
@@ -5603,13 +5603,13 @@
         "evidence": [
           "scripts/probe_hermes_help_catalog.py",
           "tests/fixtures/parity/OBS-0098-hermes-help-catalog.json",
-          "docs/parity/observations/OBS-0098-hermes-help-catalog-2026-08-03.md",
+          "_attic/docs/parity-observations/OBS-0098-hermes-help-catalog-2026-08-03.md",
           ".hades/runtime/hermes-help-catalog-probe.json",
           "justfile",
           "scripts/verify.sh",
           "README.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md"
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Captured the stable configured Hermes /help panel with exact bordered command/composer landmarks, ready-state cleanup, and explicit dynamic-catalog unknowns; wired OBS-0098 into the complete gate without executing side-effecting commands."
       },
@@ -5636,7 +5636,7 @@
         "crates/hades-tui/src/lib.rs",
         "scripts/replay_configured_help.py",
         "tests/fixtures/parity/OBS-0099-hades-configured-help.json",
-        "docs/parity/observations/OBS-0099-hades-configured-help-2026-08-03.md",
+        "_attic/docs/parity-observations/OBS-0099-hades-configured-help-2026-08-03.md",
         ".hades/runtime/configured-help-replay.json",
         "scripts/differential_replay.py",
         "scripts/replay_terminal_palette.py",
@@ -5645,8 +5645,8 @@
         "justfile",
         "scripts/verify.sh",
         "README.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md"
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-104",
       "lane": "implementation",
@@ -5668,7 +5668,7 @@
           "crates/hades-tui/src/lib.rs",
           "scripts/replay_configured_help.py",
           "tests/fixtures/parity/OBS-0099-hades-configured-help.json",
-          "docs/parity/observations/OBS-0099-hades-configured-help-2026-08-03.md",
+          "_attic/docs/parity-observations/OBS-0099-hades-configured-help-2026-08-03.md",
           ".hades/runtime/configured-help-replay.json",
           "scripts/differential_replay.py",
           "scripts/replay_terminal_palette.py",
@@ -5677,8 +5677,8 @@
           "justfile",
           "scripts/verify.sh",
           "README.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md"
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Implemented configured /help as a typed Help overlay with the OBS-0098 double-border command row, ready-state preservation, retained /help composer, safe Ctrl+C cleanup, and Escape convenience; preserved the unconfigured delayed Setup Required route and corrected stale differential/palette oracles to launch that route explicitly. Full just verify passes."
       },
@@ -5702,13 +5702,13 @@
       "evidence": [
         "scripts/probe_hermes_help_lifecycle.py",
         "tests/fixtures/parity/OBS-0100-hermes-help-lifecycle.json",
-        "docs/parity/observations/OBS-0100-hermes-help-lifecycle-2026-08-03.md",
+        "_attic/docs/parity-observations/OBS-0100-hermes-help-lifecycle-2026-08-03.md",
         ".hades/runtime/hermes-help-lifecycle-probe.json",
         "justfile",
         "scripts/verify.sh",
         "README.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md"
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-105",
       "lane": "parity",
@@ -5727,13 +5727,13 @@
         "evidence": [
           "scripts/probe_hermes_help_lifecycle.py",
           "tests/fixtures/parity/OBS-0100-hermes-help-lifecycle.json",
-          "docs/parity/observations/OBS-0100-hermes-help-lifecycle-2026-08-03.md",
+          "_attic/docs/parity-observations/OBS-0100-hermes-help-lifecycle-2026-08-03.md",
           ".hades/runtime/hermes-help-lifecycle-probe.json",
           "justfile",
           "scripts/verify.sh",
           "README.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md"
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Captured Hermes configured /help Escape lifecycle in OBS-0100: one Escape preserves the stable double-bordered help panel and /help composer while the process remains alive; bounded Ctrl+C exits cleanly. The normalized ready-footer marker is absent after Escape and remains an unresolved redraw/state detail. No side-effecting command or provider behavior was exercised; full just verify passes."
       },
@@ -5759,13 +5759,13 @@
         "crates/hades-tui/src/lib.rs",
         "scripts/replay_configured_help_lifecycle.py",
         "tests/fixtures/parity/OBS-0101-hades-configured-help-lifecycle.json",
-        "docs/parity/observations/OBS-0101-hades-help-lifecycle-2026-08-03.md",
+        "_attic/docs/parity-observations/OBS-0101-hades-help-lifecycle-2026-08-03.md",
         ".hades/runtime/configured-help-lifecycle-replay.json",
         "justfile",
         "scripts/verify.sh",
         "README.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md"
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-106",
       "lane": "implementation",
@@ -5787,13 +5787,13 @@
           "crates/hades-tui/src/lib.rs",
           "scripts/replay_configured_help_lifecycle.py",
           "tests/fixtures/parity/OBS-0101-hades-configured-help-lifecycle.json",
-          "docs/parity/observations/OBS-0101-hades-help-lifecycle-2026-08-03.md",
+          "_attic/docs/parity-observations/OBS-0101-hades-help-lifecycle-2026-08-03.md",
           ".hades/runtime/configured-help-lifecycle-replay.json",
           "justfile",
           "scripts/verify.sh",
           "README.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md"
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Implemented configured Hades /help Escape preservation, added the Hermes lifecycle replay boundary, and passed the complete verification gate."
       },
@@ -5818,18 +5818,18 @@
         "crates/hades-tui/src/lib.rs",
         "scripts/probe_hermes_help_resize.py",
         "tests/fixtures/parity/OBS-0102-hermes-help-resize.json",
-        "docs/parity/observations/OBS-0102-hermes-help-resize-2026-08-03.md",
+        "_attic/docs/parity-observations/OBS-0102-hermes-help-resize-2026-08-03.md",
         "scripts/replay_configured_help_resize.py",
         "tests/fixtures/parity/OBS-0103-hades-configured-help-resize.json",
-        "docs/parity/observations/OBS-0103-hades-help-resize-2026-08-03.md",
+        "_attic/docs/parity-observations/OBS-0103-hades-help-resize-2026-08-03.md",
         ".hades/runtime/hermes-help-resize-probe.json",
         ".hades/runtime/configured-help-resize-replay.json",
         "scripts/probe_tui_lifecycle.py",
         "justfile",
         "scripts/verify.sh",
         "README.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md"
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-107",
       "lane": "parity",
@@ -5850,18 +5850,18 @@
           "crates/hades-tui/src/lib.rs",
           "scripts/probe_hermes_help_resize.py",
           "tests/fixtures/parity/OBS-0102-hermes-help-resize.json",
-          "docs/parity/observations/OBS-0102-hermes-help-resize-2026-08-03.md",
+          "_attic/docs/parity-observations/OBS-0102-hermes-help-resize-2026-08-03.md",
           "scripts/replay_configured_help_resize.py",
           "tests/fixtures/parity/OBS-0103-hades-configured-help-resize.json",
-          "docs/parity/observations/OBS-0103-hades-help-resize-2026-08-03.md",
+          "_attic/docs/parity-observations/OBS-0103-hades-help-resize-2026-08-03.md",
           ".hades/runtime/hermes-help-resize-probe.json",
           ".hades/runtime/configured-help-resize-replay.json",
           "scripts/probe_tui_lifecycle.py",
           "justfile",
           "scripts/verify.sh",
           "README.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md"
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Captured Hermes configured Help resize geometry and matched it in Hades responsive rendering; focused tests, replays, probes, and full just verify pass."
       },
@@ -5886,14 +5886,14 @@
         "scripts/probe_hermes_setup_required_actions.py",
         "tests/fixtures/parity/OBS-0068-hermes-setup-required-actions.json",
         "tests/fixtures/parity/OBS-0104-hermes-setup-required-actions-revalidation.json",
-        "docs/parity/observations/OBS-0068-hermes-setup-required-actions-2026-08-02.md",
-        "docs/parity/observations/OBS-0104-hermes-setup-required-actions-revalidation-2026-08-03.md",
+        "_attic/docs/parity-observations/OBS-0068-hermes-setup-required-actions-2026-08-02.md",
+        "_attic/docs/parity-observations/OBS-0104-hermes-setup-required-actions-revalidation-2026-08-03.md",
         ".hades/runtime/hermes-setup-required-actions-probe.json",
         "justfile",
         "scripts/verify.sh",
         "README.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md"
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-108",
       "lane": "parity",
@@ -5913,14 +5913,14 @@
           "scripts/probe_hermes_setup_required_actions.py",
           "tests/fixtures/parity/OBS-0068-hermes-setup-required-actions.json",
           "tests/fixtures/parity/OBS-0104-hermes-setup-required-actions-revalidation.json",
-          "docs/parity/observations/OBS-0068-hermes-setup-required-actions-2026-08-02.md",
-          "docs/parity/observations/OBS-0104-hermes-setup-required-actions-revalidation-2026-08-03.md",
+          "_attic/docs/parity-observations/OBS-0068-hermes-setup-required-actions-2026-08-02.md",
+          "_attic/docs/parity-observations/OBS-0104-hermes-setup-required-actions-revalidation-2026-08-03.md",
           ".hades/runtime/hermes-setup-required-actions-probe.json",
           "justfile",
           "scripts/verify.sh",
           "README.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md"
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Revalidated Hermes post-delay Setup Required actions: /model and /setup remain on the explanatory overlay without provider/config activity; bounded Ctrl+C cleanup remains stable. Full just verify passed on retry after one isolated transient OSC52 timing failure."
       },
@@ -5945,14 +5945,14 @@
         "crates/hades-app/src/lib.rs",
         "scripts/replay_setup_required_actions.py",
         "tests/fixtures/parity/OBS-0105-hades-setup-required-actions.json",
-        "docs/parity/observations/OBS-0105-hades-setup-required-actions-2026-08-03.md",
+        "_attic/docs/parity-observations/OBS-0105-hades-setup-required-actions-2026-08-03.md",
         ".hades/runtime/setup-required-actions-replay.json",
         "tests/fixtures/parity/OBS-0104-hermes-setup-required-actions-revalidation.json",
         "justfile",
         "scripts/verify.sh",
         "README.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md"
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-109",
       "lane": "implementation",
@@ -5972,14 +5972,14 @@
           "crates/hades-app/src/lib.rs",
           "scripts/replay_setup_required_actions.py",
           "tests/fixtures/parity/OBS-0105-hades-setup-required-actions.json",
-          "docs/parity/observations/OBS-0105-hades-setup-required-actions-2026-08-03.md",
+          "_attic/docs/parity-observations/OBS-0105-hades-setup-required-actions-2026-08-03.md",
           ".hades/runtime/setup-required-actions-replay.json",
           "tests/fixtures/parity/OBS-0104-hermes-setup-required-actions-revalidation.json",
           "justfile",
           "scripts/verify.sh",
           "README.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md"
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Matched OBS-0104 in Hades: post-delay /model and /setup remain safely on Setup Required with no picker, wizard, provider request, or config activity; focused app coverage, latest-frame PTY replay, and full just verify pass."
       },
@@ -6006,16 +6006,16 @@
         "tests/fixtures/parity/OBS-0055-hermes-provider-setup-persistence.json",
         "tests/fixtures/parity/OBS-0056-hermes-setup-config-shape.json",
         "tests/fixtures/parity/OBS-0106-hermes-setup-persistence-revalidation.json",
-        "docs/parity/observations/OBS-0055-hermes-provider-setup-persistence-2026-08-02.md",
-        "docs/parity/observations/OBS-0056-hermes-setup-config-shape-2026-08-02.md",
-        "docs/parity/observations/OBS-0106-hermes-setup-persistence-revalidation-2026-08-03.md",
+        "_attic/docs/parity-observations/OBS-0055-hermes-provider-setup-persistence-2026-08-02.md",
+        "_attic/docs/parity-observations/OBS-0056-hermes-setup-config-shape-2026-08-02.md",
+        "_attic/docs/parity-observations/OBS-0106-hermes-setup-persistence-revalidation-2026-08-03.md",
         ".hades/runtime/hermes-provider-setup-persistence-probe.json",
         ".hades/runtime/hermes-setup-config-shape-probe.json",
         "justfile",
         "scripts/verify.sh",
         "README.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md"
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-110",
       "lane": "parity",
@@ -6037,16 +6037,16 @@
           "tests/fixtures/parity/OBS-0055-hermes-provider-setup-persistence.json",
           "tests/fixtures/parity/OBS-0056-hermes-setup-config-shape.json",
           "tests/fixtures/parity/OBS-0106-hermes-setup-persistence-revalidation.json",
-          "docs/parity/observations/OBS-0055-hermes-provider-setup-persistence-2026-08-02.md",
-          "docs/parity/observations/OBS-0056-hermes-setup-config-shape-2026-08-02.md",
-          "docs/parity/observations/OBS-0106-hermes-setup-persistence-revalidation-2026-08-03.md",
+          "_attic/docs/parity-observations/OBS-0055-hermes-provider-setup-persistence-2026-08-02.md",
+          "_attic/docs/parity-observations/OBS-0056-hermes-setup-config-shape-2026-08-02.md",
+          "_attic/docs/parity-observations/OBS-0106-hermes-setup-persistence-revalidation-2026-08-03.md",
           ".hades/runtime/hermes-provider-setup-persistence-probe.json",
           ".hades/runtime/hermes-setup-config-shape-probe.json",
           "justfile",
           "scripts/verify.sh",
           "README.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md"
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Revalidated Hermes bounded Full setup persistence and config shape: model defaults mutate config, backend cancellation does not, accepting Keep current mutates again, and a fresh process returns ready; values and secrets remain excluded. Full just verify passes."
       },
@@ -6072,12 +6072,12 @@
         "scripts/replay_standalone_terminal_platform.py",
         ".hades/runtime/hades-standalone-terminal-platform-replay.json",
         "tests/fixtures/parity/OBS-0107-hades-setup-persistence.json",
-        "docs/parity/observations/OBS-0107-hades-setup-persistence-2026-08-03.md",
+        "_attic/docs/parity-observations/OBS-0107-hades-setup-persistence-2026-08-03.md",
         "scripts/verify.sh",
         "justfile",
         "README.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md"
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-111",
       "lane": "implementation",
@@ -6099,12 +6099,12 @@
           "scripts/replay_standalone_terminal_platform.py",
           ".hades/runtime/hades-standalone-terminal-platform-replay.json",
           "tests/fixtures/parity/OBS-0107-hades-setup-persistence.json",
-          "docs/parity/observations/OBS-0107-hades-setup-persistence-2026-08-03.md",
+          "_attic/docs/parity-observations/OBS-0107-hades-setup-persistence-2026-08-03.md",
           "scripts/verify.sh",
           "justfile",
           "README.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md"
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Implemented Hades-owned bounded setup persistence: standalone Full setup writes only hades-setup-boundary.conf after accepting the observed local backend boundary, using a unique temporary file, sync_all, and same-directory replacement; backend cancellation remains write-free, platform cancellation preserves the sidecar, and provider readiness remains opt-in. Added focused atomic/duplicate/no-secret tests, two-case direct PTY replay, OBS-0107 fixture and observation document, project wiring, and a passing just verify gate."
       },
@@ -6132,12 +6132,12 @@
         "scripts/probe_hermes_multi_turn_provider.py",
         ".hades/runtime/hermes-multi-turn-provider-probe.json",
         "tests/fixtures/parity/OBS-0108-hermes-multi-turn-provider.json",
-        "docs/parity/observations/OBS-0108-hermes-multi-turn-provider-2026-08-03.md",
+        "_attic/docs/parity-observations/OBS-0108-hermes-multi-turn-provider-2026-08-03.md",
         "justfile",
         "scripts/verify.sh",
         "README.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md"
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-112",
       "lane": "research",
@@ -6156,12 +6156,12 @@
           "scripts/probe_hermes_multi_turn_provider.py",
           ".hades/runtime/hermes-multi-turn-provider-probe.json",
           "tests/fixtures/parity/OBS-0108-hermes-multi-turn-provider.json",
-          "docs/parity/observations/OBS-0108-hermes-multi-turn-provider-2026-08-03.md",
+          "_attic/docs/parity-observations/OBS-0108-hermes-multi-turn-provider-2026-08-03.md",
           "justfile",
           "scripts/verify.sh",
           "README.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md"
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Captured Hermes OBS-0108 with two ordinary prompts against a fresh synthetic loopback: the second streamed request includes the completed first user/assistant turn, both streamed requests carry a normalized 31-tool structural schema, and one protocol-correct auxiliary non-stream JSON request was recorded without classifying its purpose. No tool action, credential, OAuth, external network, Hermes defect, or failure case was reproduced; just verify passed."
       },
@@ -6187,12 +6187,12 @@
         "scripts/probe_hermes_tool_schema_semantics.py",
         ".hades/runtime/hermes-tool-schema-semantics-probe.json",
         "tests/fixtures/parity/OBS-0109-hermes-tool-schema-semantics.json",
-        "docs/parity/observations/OBS-0109-hermes-tool-schema-semantics-2026-08-03.md",
+        "_attic/docs/parity-observations/OBS-0109-hermes-tool-schema-semantics-2026-08-03.md",
         "justfile",
         "scripts/verify.sh",
         "README.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md"
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-113",
       "lane": "research",
@@ -6211,12 +6211,12 @@
           "scripts/probe_hermes_tool_schema_semantics.py",
           ".hades/runtime/hermes-tool-schema-semantics-probe.json",
           "tests/fixtures/parity/OBS-0109-hermes-tool-schema-semantics.json",
-          "docs/parity/observations/OBS-0109-hermes-tool-schema-semantics-2026-08-03.md",
+          "_attic/docs/parity-observations/OBS-0109-hermes-tool-schema-semantics-2026-08-03.md",
           "justfile",
           "scripts/verify.sh",
           "README.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md"
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Captured Hermes OBS-0109 with two ordinary streamed turns against a fresh synthetic loopback: both carry the same stable 31-tool inventory, including names, parameter properties/types, required fields, nested shape markers, and safe description digests; one auxiliary non-stream JSON request carried no tools. No tool-call response, tool action, credential, OAuth, external network, defect, or failure case was exercised; just verify passed."
       },
@@ -6241,9 +6241,9 @@
       "evidence": [
         "scripts/probe_hermes_tool_call_handoff.py",
         "tests/fixtures/parity/OBS-0110-hermes-tool-call-handoff.json",
-        "docs/parity/observations/OBS-0110-hermes-tool-call-handoff-2026-08-03.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0110-hermes-tool-call-handoff-2026-08-03.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -6268,9 +6268,9 @@
         "evidence": [
           "scripts/probe_hermes_tool_call_handoff.py",
           "tests/fixtures/parity/OBS-0110-hermes-tool-call-handoff.json",
-          "docs/parity/observations/OBS-0110-hermes-tool-call-handoff-2026-08-03.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0110-hermes-tool-call-handoff-2026-08-03.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -6306,9 +6306,9 @@
         "crates/hades-cli/src/main.rs",
         "scripts/replay_tool_call_deltas.py",
         "tests/fixtures/parity/OBS-0111-hades-tool-call-deltas.json",
-        "docs/parity/observations/OBS-0111-hades-tool-call-deltas-2026-08-03.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0111-hades-tool-call-deltas-2026-08-03.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -6334,9 +6334,9 @@
           "crates/hades-cli/src/main.rs",
           "scripts/replay_tool_call_deltas.py",
           "tests/fixtures/parity/OBS-0111-hades-tool-call-deltas.json",
-          "docs/parity/observations/OBS-0111-hades-tool-call-deltas-2026-08-03.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0111-hades-tool-call-deltas-2026-08-03.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -6365,10 +6365,10 @@
       "evidence": [
         "scripts/probe_hermes_tool_inventory.py",
         "tests/fixtures/parity/OBS-0112-hermes-tool-inventory.json",
-        "docs/parity/observations/OBS-0112-hermes-tool-inventory-2026-08-03.md",
+        "_attic/docs/parity-observations/OBS-0112-hermes-tool-inventory-2026-08-03.md",
         "scripts/validate_reference_fixture.py",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -6390,10 +6390,10 @@
         "evidence": [
           "scripts/probe_hermes_tool_inventory.py",
           "tests/fixtures/parity/OBS-0112-hermes-tool-inventory.json",
-          "docs/parity/observations/OBS-0112-hermes-tool-inventory-2026-08-03.md",
+          "_attic/docs/parity-observations/OBS-0112-hermes-tool-inventory-2026-08-03.md",
           "scripts/validate_reference_fixture.py",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -6426,9 +6426,9 @@
         "crates/hades-cli/src/main.rs",
         "scripts/replay_tool_call_deltas.py",
         "tests/fixtures/parity/OBS-0113-hades-tool-inventory-advertisement.json",
-        "docs/parity/observations/OBS-0113-hades-tool-inventory-advertisement-2026-08-03.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0113-hades-tool-inventory-advertisement-2026-08-03.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -6454,9 +6454,9 @@
           "crates/hades-cli/src/main.rs",
           "scripts/replay_tool_call_deltas.py",
           "tests/fixtures/parity/OBS-0113-hades-tool-inventory-advertisement.json",
-          "docs/parity/observations/OBS-0113-hades-tool-inventory-advertisement-2026-08-03.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0113-hades-tool-inventory-advertisement-2026-08-03.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -6485,9 +6485,9 @@
       "evidence": [
         "scripts/probe_hermes_tool_completion_handoff.py",
         "tests/fixtures/parity/OBS-0114-hermes-tool-completion-handoff.json",
-        "docs/parity/observations/OBS-0114-hermes-tool-completion-handoff-2026-08-03.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0114-hermes-tool-completion-handoff-2026-08-03.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -6510,9 +6510,9 @@
         "evidence": [
           "scripts/probe_hermes_tool_completion_handoff.py",
           "tests/fixtures/parity/OBS-0114-hermes-tool-completion-handoff.json",
-          "docs/parity/observations/OBS-0114-hermes-tool-completion-handoff-2026-08-03.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0114-hermes-tool-completion-handoff-2026-08-03.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -6545,9 +6545,9 @@
         "crates/hades-app/src/lib.rs",
         "scripts/replay_tool_call_deltas.py",
         "tests/fixtures/parity/OBS-0115-hades-tool-result-follow-up.json",
-        "docs/parity/observations/OBS-0115-hades-tool-result-follow-up-2026-08-03.md",
-        "docs/parity/MATRIX.md",
-        "CONTEXT.md",
+        "_attic/docs/parity-observations/OBS-0115-hades-tool-result-follow-up-2026-08-03.md",
+        "specs/001-parity-contract/matrix.md",
+        "specs/001-parity-contract/spec.md",
         "README.md",
         "justfile",
         "scripts/verify.sh",
@@ -6573,9 +6573,9 @@
           "crates/hades-app/src/lib.rs",
           "scripts/replay_tool_call_deltas.py",
           "tests/fixtures/parity/OBS-0115-hades-tool-result-follow-up.json",
-          "docs/parity/observations/OBS-0115-hades-tool-result-follow-up-2026-08-03.md",
-          "docs/parity/MATRIX.md",
-          "CONTEXT.md",
+          "_attic/docs/parity-observations/OBS-0115-hades-tool-result-follow-up-2026-08-03.md",
+          "specs/001-parity-contract/matrix.md",
+          "specs/001-parity-contract/spec.md",
           "README.md",
           "justfile",
           "scripts/verify.sh",
@@ -7061,7 +7061,7 @@
         "crates/hades-dev/src/bin/tmux_hold_diff.rs",
         "scripts/check_tmux_hold_parity.py",
         "scripts/verify.sh",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-132",
       "lane": "tooling",
@@ -7081,7 +7081,7 @@
           "crates/hades-dev/src/bin/tmux_hold_diff.rs",
           "scripts/check_tmux_hold_parity.py",
           "scripts/verify.sh",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported the configured-family runtime extensions to Rust: hades_dev::hold_provider (loopback server holding an accepted provider request until release, with the provider environment helper) and hades_dev::tmux (session lifecycle, send-keys text/key/paste, wait_for_screen, lowercase contains_marker). Differential parity check (scripts/check_tmux_hold_parity.py + tmux_hold_diff) proves the Rust helpers agree with replay_composer.py; wired into just verify."
       },
@@ -7107,7 +7107,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-133",
       "lane": "tooling",
@@ -7126,7 +7126,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported replay_composer to Rust as hades-dev replay-composer: contract loading and validation (OBS-0011 + OBS-0037), hold-provider-backed tmux sessions per case, text/key/paste input, pty_markers/pty_absent_markers screen assertions, and the same report JSON shape. Differential parity check proves identical reports on the default contract; OBS-0037 reports match byte-for-byte. verify.sh and justfile targets run the Rust binary as the gate replay."
       },
@@ -7152,7 +7152,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-134",
       "lane": "tooling",
@@ -7171,7 +7171,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported replay_history to Rust as hades-dev replay-history: restart recall, duplicate suppression, multiline readback, and the newest-1,000 load cap against a seeded history file, with the same report JSON shape. Differential parity check proves identical reports on the same binary; verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -7199,7 +7199,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-135",
       "lane": "tooling",
@@ -7220,7 +7220,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported replay_terminal_palette to Rust as hades-dev replay-terminal-palette: OBS-0035 step contract against a direct-PTY Hades process behind the hold provider, landmark marker styles and required SGR sequences per surface, raw-delta sha256/byte-length/SGR inventory, and the same report JSON shape. Poll-based wait reads (like Python select) match the raw-delta boundary exactly; the differential check proves identical reports. verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -7247,7 +7247,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-136",
       "lane": "tooling",
@@ -7267,7 +7267,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported the composer-family wrapper replay to Rust via the shared hades_dev::composer machinery; differential parity check proves identical reports on the same binary; verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -7294,7 +7294,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-137",
       "lane": "tooling",
@@ -7314,7 +7314,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported the composer-family wrapper replay to Rust via the shared hades_dev::composer machinery; differential parity check proves identical reports on the same binary; verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -7341,7 +7341,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-138",
       "lane": "tooling",
@@ -7361,7 +7361,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported the composer-family wrapper replay to Rust via the shared hades_dev::composer machinery; differential parity check proves identical reports on the same binary; verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -7388,7 +7388,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-139",
       "lane": "tooling",
@@ -7408,7 +7408,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported the composer-family wrapper replay to Rust via the shared hades_dev::composer machinery; differential parity check proves identical reports on the same binary; verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -7435,7 +7435,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-140",
       "lane": "tooling",
@@ -7455,7 +7455,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported the setup-family replay to Rust via the shared hades_dev::setup machinery; differential parity checks prove identical reports on the same contracts; verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -7482,7 +7482,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-141",
       "lane": "tooling",
@@ -7502,7 +7502,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported the setup-family replay to Rust via the shared hades_dev::setup machinery; differential parity checks prove identical reports on the same contracts; verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -7529,7 +7529,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-142",
       "lane": "tooling",
@@ -7549,7 +7549,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported the setup-family replay to Rust via the shared hades_dev::setup machinery; differential parity checks prove identical reports on the same contracts; verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -7576,7 +7576,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-143",
       "lane": "tooling",
@@ -7596,7 +7596,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported the setup-family replay to Rust via the shared hades_dev::setup machinery; differential parity checks prove identical reports on the same contracts; verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -7622,7 +7622,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-144",
       "lane": "tooling",
@@ -7641,7 +7641,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported replay_editor_outcomes to Rust as hades-dev replay-editor-outcomes: OBS-0019 contract in tmux with per-case deterministic EDITOR, screen-marker assertions, .hermes_history readback, interrupt/exit. Differential parity check proves identical reports (5 cases); verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -7667,7 +7667,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-145",
       "lane": "tooling",
@@ -7686,7 +7686,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported replay_modified_enter to Rust as hades-dev replay-modified-enter: OBS-0021 contract in a direct 120x40 PTY with the hold-provider loopback, hex byte input sequences with whitespace-tolerant parsing, shift/alt-Enter submit vs plain-Enter control, child-status waits. Differential parity check proves identical reports (3 cases); verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -7713,7 +7713,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-146",
       "lane": "tooling",
@@ -7733,7 +7733,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported replay_model_picker to Rust as hades-dev replay-model-picker: OBS-0039 model-stage contract via the shared hades_dev::setup machinery (setup-family key set covers Escape). Differential parity check proves identical reports; verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -7759,7 +7759,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-147",
       "lane": "tooling",
@@ -7778,7 +7778,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported replay_clipboard_text to Rust as hades-dev replay-clipboard-text: OBS-0023 successful-text + empty-provider-control cases in a direct 120x40 PTY with a synthetic xclip provider, rendered-screen marker waits, provider-argument log match, clean Ctrl+C exit. Differential parity check proves identical reports (2 cases); verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -7804,7 +7804,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-148",
       "lane": "tooling",
@@ -7823,7 +7823,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported replay_configured_help to Rust as hades-dev replay-configured-help: OBS-0098 stable bordered /help panel (3 consecutive identical samples), main-surface landmarks, no setup-required state, clean Ctrl+C exit with terminal restoration. Differential parity check proves identical reports (1 case); verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -7849,7 +7849,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-149",
       "lane": "tooling",
@@ -7868,7 +7868,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported replay_configured_help_lifecycle to Rust as hades-dev replay-configured-help-lifecycle: OBS-0100 configured /help Escape lifecycle (stable panel, Escape preserves panel + composer with process alive, clean Ctrl+C exit + terminal restoration). Differential parity check proves identical reports (1 case); verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -7895,7 +7895,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-150",
       "lane": "tooling",
@@ -7915,7 +7915,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported replay_configured_help_resize to Rust as hades-dev replay-configured-help-resize: OBS-0102 geometry contract at 120x40/100x30/160x50 via pty::resize_pty (master+slave resize + SIGWINCH), panel floats above composer, clean Ctrl+C exit. Differential parity check proves identical reports (1 case); verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -7941,7 +7941,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-151",
       "lane": "tooling",
@@ -7960,7 +7960,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported replay_configured_surfaces to Rust as hades-dev replay-configured-surfaces: OBS-0090 configured primary surfaces (4 steps via hold-provider loopback: setup, overlay surfaces without provider requests, history up/down + persistence + restart recall verified by request, Ctrl+V clipboard via synthetic xclip, config.yaml boundary). Differential parity check proves identical reports (4 cases); verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -7986,7 +7986,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-152",
       "lane": "tooling",
@@ -8005,7 +8005,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported replay_conversation_context to Rust as hades-dev replay-conversation-context: OBS-0092 conversation lifecycle via hold-provider loopback. Differential parity check proves identical reports (2 cases); verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -8032,7 +8032,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-153",
       "lane": "tooling",
@@ -8052,7 +8052,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported replay_fresh_shell_launch to Rust as hades-dev replay-fresh-shell-launch: Bash/Fish command resolution through installed launcher symlinks + installed TUI lifecycle (raw-mode startup, Ctrl+C clean exit, alternate-screen/terminal restoration); accepts ignored --binary for parity compatibility. Differential parity check proves identical reports; verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -8079,7 +8079,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-154",
       "lane": "tooling",
@@ -8099,7 +8099,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported replay_installed_model_selection to Rust as hades-dev replay-installed-model-selection: both launcher spellings resolve to target/release/hades, each runs the model-selection replay inside the persisted sidecar boundary (palette-model/vertical-model, 2 requests, sidecar unchanged, no config.yaml); accepts ignored --binary. Differential parity check proves identical reports (6 cases); verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -8125,7 +8125,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-155",
       "lane": "tooling",
@@ -8144,7 +8144,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported replay_local_provider to Rust as hades-dev replay-local-provider: OBS-0051 local-provider stream contract (3 cases) via hold-provider loopback. Differential parity check proves identical reports; verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -8170,7 +8170,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-156",
       "lane": "tooling",
@@ -8189,7 +8189,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported replay_local_provider_timing to Rust as hades-dev replay-local-provider-timing: OBS-0053 delayed-delta and cancellation contract via a release-gated loopback server (delayed-delta-order renders both deltas; interrupt-before-completion cancels the socket, second delta never renders, second Ctrl+C exits). Differential parity check proves identical reports (2 cases); verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -8215,7 +8215,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-157",
       "lane": "tooling",
@@ -8234,7 +8234,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported replay_model_selection to Rust as hades-dev replay-model-selection: live loopback session-scoped model selection replay (picker request boundary, fresh-process nonpersistence). Differential parity check proves identical reports (3 cases); verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -8260,7 +8260,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-158",
       "lane": "tooling",
@@ -8279,7 +8279,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported replay_osc52_clipboard to Rust as hades-dev replay-osc52-clipboard: bare-SSH OSC52-first clipboard contract (OBS-0025 legacy pair + OBS-0027 response-boundary family) in a direct PTY with OSC52 query + DA1 barrier, usable OSC52 response wins before native xclip, malformed/empty/timeout falls back. Differential parity checks prove identical reports on both contracts (2 and 5 cases); verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -8305,7 +8305,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-159",
       "lane": "tooling",
@@ -8324,7 +8324,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported replay_osc52_timing_limits to Rust as hades-dev replay-osc52-timing-limits: OBS-0033 timing and bounded-payload controls (500ms race before/after, 256KiB/512KiB bounded payloads) in a direct PTY with offset-tracking non-blocking writes. Parity checker extended to normalize the OSC52 timing diagnostics. Differential parity check proves identical reports (4 cases); verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -8350,7 +8350,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-160",
       "lane": "tooling",
@@ -8369,7 +8369,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported replay_provider_recovery to Rust as hades-dev replay-provider-recovery: OBS-0091 provider failure recovery contract (HTTP error, malformed SSE, incomplete stream, follow-up request) via loopback failure fixtures. Ported by a deepseek-v4-flash subagent and independently re-verified. Differential parity check proves identical reports (4 cases); verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -8395,7 +8395,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-161",
       "lane": "tooling",
@@ -8414,7 +8414,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported replay_setup_required_actions to Rust as hades-dev replay-setup-required-actions: OBS-0105 no-provider Setup Required action boundary (follow-up /model and /setup stay on the overlay, first Ctrl+C clears the retained draft without exiting, second exits cleanly, terminal restored). Differential parity check proves identical reports (3 cases); verify.sh and justfile run the Rust binary as the gate replay."
       },
@@ -8681,7 +8681,7 @@
         "scripts/check_replay_parity.py",
         "scripts/verify.sh",
         "justfile",
-        "CONTEXT.md"
+        "specs/001-parity-contract/spec.md"
       ],
       "id": "HAD-170",
       "lane": "tooling",
@@ -8700,7 +8700,7 @@
           "scripts/check_replay_parity.py",
           "scripts/verify.sh",
           "justfile",
-          "CONTEXT.md"
+          "specs/001-parity-contract/spec.md"
         ],
         "summary": "Ported replay_tool_call_deltas to Rust as hades-dev replay-tool-call-deltas: synthetic tool-call stream contract (role delta, JSON-encoded argument fragments, finish_reason tool_calls, DONE, bounded follow-up, no tool execution) via the loopback provider. Subagent draft completed by the orchestrator (fixed the SSE chunk construction). Differential parity check proves identical reports (1 case); verify.sh and justfile run the Rust binary as the gate replay."
       },

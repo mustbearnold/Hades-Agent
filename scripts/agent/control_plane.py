@@ -19,15 +19,13 @@ LOCK_PATH = ROOT / ".hades" / "locks" / "tasks.lock"
 
 REQUIRED_FILES = (
     "AGENTS.md",
-    "CONTEXT.md",
     "README.md",
     "SECURITY.md",
     "Cargo.toml",
     "rust-toolchain.toml",
-    "docs/PRODUCT_SPEC.md",
-    "docs/parity/MATRIX.md",
-    "docs/parity/TRACE_FORMAT.md",
-    ".agents/README.md",
+    "specs/001-parity-contract/spec.md",
+    "specs/001-parity-contract/matrix.md",
+    "docs/runbooks/agent-contracts.md",
     ".agents/protocol/task.schema.json",
 )
 

@@ -20,17 +20,15 @@ use serde_json::{Value, json};
 
 const STATUSES: [&str; 6] = ["queued", "ready", "in_progress", "blocked", "complete", "cancelled"];
 const RISKS: [&str; 3] = ["low", "medium", "high"];
-const REQUIRED_FILES: [&str; 11] = [
+const REQUIRED_FILES: [&str; 9] = [
     "AGENTS.md",
-    "CONTEXT.md",
     "README.md",
     "SECURITY.md",
     "Cargo.toml",
     "rust-toolchain.toml",
-    "docs/PRODUCT_SPEC.md",
-    "docs/parity/MATRIX.md",
-    "docs/parity/TRACE_FORMAT.md",
-    ".agents/README.md",
+    "specs/001-parity-contract/spec.md",
+    "specs/001-parity-contract/matrix.md",
+    "docs/runbooks/agent-contracts.md",
     ".agents/protocol/task.schema.json",
 ];
 
@@ -769,7 +767,7 @@ mod tests {
     #[test]
     fn complete_task_requires_matching_evidence() {
         let mut data = sample_ledger();
-        data["tasks"][0]["evidence"] = json!(["README.md", "CONTEXT.md"]);
+        data["tasks"][0]["evidence"] = json!(["README.md", "specs/001-parity-contract/spec.md"]);
         let errors = validate(&data);
         assert!(
             errors.iter().any(|error| error.contains("result evidence must match")),
