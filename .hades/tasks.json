@@ -7141,10 +7141,19 @@
         "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
         "Run the targeted tests and the complete no-skip just verify gate before completion."
       ],
+      "attempts": 1,
+      "claimed_at": "2026-08-04T00:26:09Z",
+      "claimed_by": "hermes-agent",
       "depends_on": [
         "HAD-132"
       ],
-      "evidence": [],
+      "evidence": [
+        "crates/hades-dev/src/bin/replay_history.rs",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile",
+        "CONTEXT.md"
+      ],
       "id": "HAD-134",
       "lane": "tooling",
       "oracle": [
@@ -7155,8 +7164,19 @@
       "owner_role": "implementer",
       "priority": 57,
       "ready_at": "2026-08-04T00:00:00Z",
+      "result": {
+        "completed_at": "2026-08-04T00:33:09Z",
+        "evidence": [
+          "crates/hades-dev/src/bin/replay_history.rs",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile",
+          "CONTEXT.md"
+        ],
+        "summary": "Ported replay_history to Rust as hades-dev replay-history: restart recall, duplicate suppression, multiline readback, and the newest-1,000 load cap against a seeded history file, with the same report JSON shape. Differential parity check proves identical reports on the same binary; verify.sh and justfile run the Rust binary as the gate replay."
+      },
       "risk": "high",
-      "status": "ready",
+      "status": "complete",
       "title": "Migrate dev tooling to Rust: replay_history"
     },
     {
@@ -7185,5 +7205,5 @@
       "title": "Migrate dev tooling to Rust: replay_terminal_palette"
     }
   ],
-  "updated_at": "2026-08-04T00:26:04Z"
+  "updated_at": "2026-08-04T00:33:09Z"
 }

@@ -271,7 +271,9 @@ replay-osc52-multiplexer:
 
 replay-history:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_history.py --binary target/debug/hades --report .hades/runtime/history-replay.json
+    cargo build --offline --package hades-dev --bin replay_history
+    python3 scripts/check_replay_parity.py replay_history replay_history
+    ./target/debug/replay_history --binary target/debug/hades --report .hades/runtime/history-replay.json
 
 replay-unconfigured-startup:
     cargo build --locked --package hades-cli

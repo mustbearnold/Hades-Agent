@@ -389,7 +389,11 @@ python3 scripts/replay_terminal_palette.py --binary target/debug/hades --report 
 python3 scripts/replay_osc52_timing_limits.py --binary target/debug/hades --report .hades/runtime/hades-osc52-timing-limits-replay.json
 python3 scripts/replay_osc52_clipboard.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0029-hades-osc52-st-termination.json --report .hades/runtime/hades-osc52-st-termination-replay.json
 python3 scripts/replay_osc52_clipboard.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0031-hades-osc52-multiplexer-passthrough.json --report .hades/runtime/hades-osc52-multiplexer-replay.json
-python3 scripts/replay_history.py --binary target/debug/hades --report .hades/runtime/history-replay.json
+# HAD-134: replay-history is ported to Rust; the differential check proves
+# identical reports, then the Rust binary is the gate replay.
+cargo build --offline --package hades-dev --bin replay_history
+python3 scripts/check_replay_parity.py replay_history replay_history
+./target/debug/replay_history --binary target/debug/hades --report .hades/runtime/history-replay.json
 python3 scripts/replay_local_provider.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0051-hades-local-provider-stream.json --report .hades/runtime/local-provider-replay.json
 python3 scripts/replay_local_provider_timing.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0053-hades-stream-timing.json --report .hades/runtime/local-provider-timing-replay.json
 git diff --check

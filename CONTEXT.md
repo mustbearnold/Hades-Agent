@@ -844,6 +844,15 @@ progress from August 1, 2026 through 2027.
   The differential check proves identical reports on the default contract
   and the OBS-0037 reports match byte-for-byte; the Rust binary is now the
   gate replay for both verify.sh invocations.
+- HAD-134 ports the input-history replay to Rust:
+  `hades-dev replay-history` reproduces `replay_history.py` — restart
+  recall (history written by one process recalled by a fresh one),
+  duplicate suppression (consecutive duplicate drafts leave the file
+  unchanged), multiline readback (paste persists as one record per line),
+  and the newest-1,000 load cap against a seeded history file, with the
+  same report JSON shape (checks with per-step observed records). The
+  differential check proves identical reports on the same binary; the Rust
+  binary is now the gate replay.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes
