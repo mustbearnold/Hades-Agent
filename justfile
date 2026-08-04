@@ -434,7 +434,9 @@ replay-tool-call-deltas:
 
 replay-local-provider-timing:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_local_provider_timing.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0053-hades-stream-timing.json --report .hades/runtime/local-provider-timing-replay.json
+    cargo build --offline --package hades-dev --bin replay_local_provider_timing
+    python3 scripts/check_replay_parity.py replay_local_provider_timing replay_local_provider_timing --contract tests/fixtures/parity/OBS-0053-hades-stream-timing.json --timeout 8
+    ./target/debug/replay_local_provider_timing --binary target/debug/hades --contract tests/fixtures/parity/OBS-0053-hades-stream-timing.json --report .hades/runtime/local-provider-timing-replay.json --timeout 8
 
 validate-reference:
     cargo build --offline --package hades-dev --bin validate_fixture

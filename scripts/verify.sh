@@ -484,7 +484,12 @@ python3 scripts/check_replay_parity.py replay_history replay_history
 cargo build --offline --package hades-dev --bin replay_local_provider
 python3 scripts/check_replay_parity.py replay_local_provider replay_local_provider --contract tests/fixtures/parity/OBS-0051-hades-local-provider-stream.json --timeout 8
 ./target/debug/replay_local_provider --binary target/debug/hades --contract tests/fixtures/parity/OBS-0051-hades-local-provider-stream.json --report .hades/runtime/local-provider-replay.json --timeout 8
-python3 scripts/replay_local_provider_timing.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0053-hades-stream-timing.json --report .hades/runtime/local-provider-timing-replay.json
+# HAD-156: replay-local-provider-timing is ported to Rust; the
+# differential check proves identical reports, then the Rust binary is
+# the gate replay.
+cargo build --offline --package hades-dev --bin replay_local_provider_timing
+python3 scripts/check_replay_parity.py replay_local_provider_timing replay_local_provider_timing --contract tests/fixtures/parity/OBS-0053-hades-stream-timing.json --timeout 8
+./target/debug/replay_local_provider_timing --binary target/debug/hades --contract tests/fixtures/parity/OBS-0053-hades-stream-timing.json --report .hades/runtime/local-provider-timing-replay.json --timeout 8
 git diff --check
 
 _end_ms=$(date +%s%3N)

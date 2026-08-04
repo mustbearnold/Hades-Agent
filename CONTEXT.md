@@ -945,6 +945,14 @@ progress from August 1, 2026 through 2027.
   lifecycle contract (multi-turn request shape, failed-turn isolation)
   through the hold-provider loopback; the differential check proves
   identical reports (2 cases); the Rust binary is now the gate replay.
+- HAD-156 ports replay_local_provider_timing to Rust: `hades-dev
+  replay-local-provider-timing` reproduces the OBS-0053 delayed-delta and
+  cancellation contract with a release-gated loopback server (first delta
+  held until release): delayed-delta-order renders both deltas in order
+  with a clean exit; interrupt-before-completion cancels the socket
+  (server observes connection close, the second delta never renders, a
+  second Ctrl+C exits). The differential check proves identical reports
+  (2 cases); the Rust binary is now the gate replay.
 - HAD-155 ports replay_local_provider to Rust: `hades-dev
   replay-local-provider` reproduces the OBS-0051 local-provider stream
   contract (3 cases) through the hold-provider loopback; the differential

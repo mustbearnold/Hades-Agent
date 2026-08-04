@@ -8142,11 +8142,19 @@
         "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
         "Run the targeted tests and the complete no-skip just verify gate before completion."
       ],
-      "attempts": 0,
+      "attempts": 1,
+      "claimed_at": "2026-08-04T12:51:23Z",
+      "claimed_by": "hermes-agent",
       "depends_on": [
         "HAD-131"
       ],
-      "evidence": [],
+      "evidence": [
+        "crates/hades-dev/src/bin/replay_local_provider_timing.rs",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile",
+        "CONTEXT.md"
+      ],
       "id": "HAD-156",
       "lane": "tooling",
       "oracle": [
@@ -8157,8 +8165,19 @@
       "owner_role": "implementer",
       "priority": 58,
       "ready_at": "2026-08-04T12:23:15Z",
+      "result": {
+        "completed_at": "2026-08-04T12:54:29Z",
+        "evidence": [
+          "crates/hades-dev/src/bin/replay_local_provider_timing.rs",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile",
+          "CONTEXT.md"
+        ],
+        "summary": "Ported replay_local_provider_timing to Rust as hades-dev replay-local-provider-timing: OBS-0053 delayed-delta and cancellation contract via a release-gated loopback server (delayed-delta-order renders both deltas; interrupt-before-completion cancels the socket, second delta never renders, second Ctrl+C exits). Differential parity check proves identical reports (2 cases); verify.sh and justfile run the Rust binary as the gate replay."
+      },
       "risk": "low",
-      "status": "ready",
+      "status": "complete",
       "title": "Migrate dev tooling to Rust: replay_local_provider_timing"
     },
     {
@@ -8762,5 +8781,5 @@
       "title": "Retire the Python harness and orchestrate verify in Rust"
     }
   ],
-  "updated_at": "2026-08-04T12:50:58Z"
+  "updated_at": "2026-08-04T12:54:29Z"
 }
