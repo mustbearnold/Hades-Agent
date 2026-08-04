@@ -97,7 +97,9 @@ replay-differential:
 
 replay-composer:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_composer.py --binary target/debug/hades --report .hades/runtime/composer-replay.json
+    cargo build --offline --package hades-dev --bin replay_composer
+    python3 scripts/check_replay_parity.py replay_composer replay_composer
+    ./target/debug/replay_composer --binary target/debug/hades --report .hades/runtime/composer-replay.json
 
 replay-completion:
     cargo build --locked --package hades-cli
@@ -105,7 +107,8 @@ replay-completion:
 
 replay-unknown-command:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_composer.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0037-hades-unknown-slash-command.json --report .hades/runtime/unknown-command-replay.json
+    cargo build --offline --package hades-dev --bin replay_composer
+    ./target/debug/replay_composer --binary target/debug/hades --contract tests/fixtures/parity/OBS-0037-hades-unknown-slash-command.json --report .hades/runtime/unknown-command-replay.json
 
 replay-model-picker:
     cargo build --locked --package hades-cli

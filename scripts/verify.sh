@@ -284,9 +284,14 @@ python3 scripts/replay_standalone_setup.py --binary "$HOME/.local/bin/hades" --r
 python3 scripts/replay_standalone_full_setup.py --binary "$HOME/.local/bin/hades" --report .hades/runtime/installed-standalone-full-setup-hades.json --timeout 5
 python3 scripts/replay_standalone_terminal_platform.py --binary "$HOME/.local/bin/hades" --report .hades/runtime/installed-standalone-terminal-platform-hades.json --timeout 5
 python3 scripts/differential_replay.py --binary target/debug/hades --report .hades/runtime/differential-replay.json
-python3 scripts/replay_composer.py --binary target/debug/hades --report .hades/runtime/composer-replay.json
+# HAD-133: replay-composer is ported to Rust; the differential check proves
+# identical reports on the default contract, then the Rust binary is the
+# gate replay for both the default and OBS-0037 invocations.
+cargo build --offline --package hades-dev --bin replay_composer
+python3 scripts/check_replay_parity.py replay_composer replay_composer
+./target/debug/replay_composer --binary target/debug/hades --report .hades/runtime/composer-replay.json
 python3 scripts/replay_completion.py --binary target/debug/hades --report .hades/runtime/completion-replay.json
-python3 scripts/replay_composer.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0037-hades-unknown-slash-command.json --report .hades/runtime/unknown-command-replay.json
+./target/debug/replay_composer --binary target/debug/hades --contract tests/fixtures/parity/OBS-0037-hades-unknown-slash-command.json --report .hades/runtime/unknown-command-replay.json
 python3 scripts/replay_model_picker.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0039-hades-model-picker-model-stage.json --report .hades/runtime/model-picker-replay.json
 python3 scripts/replay_setup_wizard.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0041-hades-setup-wizard-cancel.json --report .hades/runtime/setup-wizard-replay.json
 python3 scripts/replay_setup_provider_menu.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0045-hades-full-setup-provider-menu.json --report .hades/runtime/setup-provider-replay.json

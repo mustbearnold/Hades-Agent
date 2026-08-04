@@ -61,5 +61,5 @@ if normalize_report(py_data) != normalize_report(rs_data):
         print(line)
     sys.exit(1)
 
-count = len(py_data.get("cases", py_data.get("steps", [])))
+count = len(py_data.get("cases", py_data.get("steps", py_data.get("checks", []))))
 print(f"RESULT: PASS ({count} cases identical)")

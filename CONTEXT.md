@@ -835,6 +835,15 @@ progress from August 1, 2026 through 2027.
   the Rust helpers agree with `replay_composer.py` on marker matching, key
   payloads, real tmux session lifecycle, and hold-provider request gating;
   wired into `just verify`.
+- HAD-133 ports the composer replay to Rust:
+  `hades-dev replay-composer` reproduces `replay_composer.py` — contract
+  loading and validation (OBS-0011 editing/history/multiline, OBS-0037
+  unknown slash command), hold-provider-backed tmux sessions per case,
+  text/key/paste input, pty_markers/pty_absent_markers screen assertions,
+  and the same report JSON shape (checks with per-step observed/absent).
+  The differential check proves identical reports on the default contract
+  and the OBS-0037 reports match byte-for-byte; the Rust binary is now the
+  gate replay for both verify.sh invocations.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes
