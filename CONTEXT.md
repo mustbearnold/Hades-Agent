@@ -719,7 +719,26 @@ progress from August 1, 2026 through 2027.
   Hades frame). The bug fix stops the startup body copy before the template's
   own footer/composer rows, so terminals taller than 40 rows no longer show a
   duplicated footer and prompt mid-screen; the standalone setup wizard
-  surfaces keep their captured Hermes reference text and fixtures.
+  surfaces keep their captured Hermes reference text and fixtures. A
+  follow-up owner-directed visual pass (2026-08-04) replaced the in-box
+  skull braille glyph with a Baphomet-style goat-head-with-horns braille
+  logo and realigned every box row to exactly 117 characters so the right
+  border lands at column 116 on all rows (rows 11/26/27 were short, row 28
+  overflowed the box — the latter inherited from the Hermes template);
+  the unconfigured model line constant was realigned to match. A further
+  owner-directed pass replaced the ANSI Shadow text logo with the
+  heavy-metal dripping-gothic `sblood` figlet font for the HADES AGENT
+  wordmark (rows 1–5), keeping the layout and style-marker rows stable.
+  A further owner-directed pass (same day) made the in-box logo an
+  ANIMATED demon-skeleton-with-pitchfork: four braille frames cycle with
+  the TUI tick (frame 0 equals the static asset, so snapshots and the
+  golden test stay deterministic), and swapped the bottom rows so the
+  composer sits ABOVE the information line (composer at height-2, info
+  line at height-1) — a deliberate deviation from the Hermes reference
+  layout, documented in MATRIX.md. Because the animation interleaves
+  sparse-redraw cells into the raw PTY stream (fragmenting typed text),
+  the replay harnesses now wait on the RENDERED screen (Screen emulator)
+  instead of raw-byte markers.
 - ADR-0008 records the owner direction that Hades Agent is entirely Rust,
   including development tooling, and HAD-123 begins the migration: a new
   `hades-dev` workspace crate hosts the shared harness primitives that every
@@ -904,6 +923,12 @@ progress from August 1, 2026 through 2027.
   reproduces the OBS-0039 model-stage contract through `hades_dev::setup`
   (the setup-family key set already covers Escape). The differential check
   proves identical reports; the Rust binary is now the gate replay.
+- The provider transport now decodes HTTP `Transfer-Encoding: chunked`
+  streams (local providers like Ollama frame SSE bodies in chunks; the
+  parser previously surfaced chunk-size lines as `malformed provider SSE`)
+  and waits up to 120s for response headers (cold local model loads take
+  tens of seconds before the first byte). Regression oracle:
+  `local_transport_parses_chunked_transfer_encoding_streams`.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes
