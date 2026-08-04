@@ -923,6 +923,15 @@ progress from August 1, 2026 through 2027.
   reproduces the OBS-0039 model-stage contract through `hades_dev::setup`
   (the setup-family key set already covers Escape). The differential check
   proves identical reports; the Rust binary is now the gate replay.
+- HAD-147 ports replay_clipboard_text to Rust: `hades-dev replay-clipboard-text`
+  reproduces the OBS-0023 successful-text clipboard contract in a direct
+  120x40 PTY with a synthetic xclip provider (records argv to a log, echoes
+  the fixture payload): seed text typed into the composer, Ctrl+V (raw 0x16)
+  pasting the payload, rendered-screen marker waits (clip-one/clip-two and
+  the empty-provider control's `No image found in clipboard`), the provider
+  argument log matching `-selection clipboard -out`, and a clean Ctrl+C exit
+  from ready. The differential check proves identical reports (2 cases); the
+  Rust binary is now the gate replay in verify.sh and the justfile.
 - The provider transport now decodes HTTP `Transfer-Encoding: chunked`
   streams (local providers like Ollama frame SSE bodies in chunks; the
   parser previously surfaced chunk-size lines as `malformed provider SSE`)

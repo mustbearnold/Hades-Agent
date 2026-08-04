@@ -178,7 +178,9 @@ replay-clipboard:
 
 replay-clipboard-text:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_clipboard_text.py --binary target/debug/hades --report .hades/runtime/clipboard-text-replay.json
+    cargo build --offline --package hades-dev --bin replay_clipboard_text
+    python3 scripts/check_replay_parity.py replay_clipboard_text replay_clipboard_text --timeout 8
+    ./target/debug/replay_clipboard_text --binary target/debug/hades --report .hades/runtime/clipboard-text-replay.json --timeout 8
 
 replay-osc52-clipboard:
     cargo build --locked --package hades-cli

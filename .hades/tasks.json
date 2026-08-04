@@ -7740,7 +7740,858 @@
       "risk": "low",
       "status": "complete",
       "title": "Migrate dev tooling to Rust: replay_model_picker"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-clipboard-text reproduces the Python replay semantics for the same contract with the same report JSON shape.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 1,
+      "claimed_at": "2026-08-04T12:23:20Z",
+      "claimed_by": "hermes-agent",
+      "depends_on": [
+        "HAD-137"
+      ],
+      "evidence": [
+        "crates/hades-dev/src/bin/replay_clipboard_text.rs",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile",
+        "CONTEXT.md"
+      ],
+      "id": "HAD-147",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 67,
+      "ready_at": "2026-08-04T12:23:15Z",
+      "result": {
+        "completed_at": "2026-08-04T12:28:24Z",
+        "evidence": [
+          "crates/hades-dev/src/bin/replay_clipboard_text.rs",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile",
+          "CONTEXT.md"
+        ],
+        "summary": "Ported replay_clipboard_text to Rust as hades-dev replay-clipboard-text: OBS-0023 successful-text + empty-provider-control cases in a direct 120x40 PTY with a synthetic xclip provider, rendered-screen marker waits, provider-argument log match, clean Ctrl+C exit. Differential parity check proves identical reports (2 cases); verify.sh and justfile run the Rust binary as the gate replay."
+      },
+      "risk": "low",
+      "status": "complete",
+      "title": "Migrate dev tooling to Rust: replay_clipboard_text"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-configured-help reproduces the Python replay semantics for the same contract with the same report JSON shape.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-133"
+      ],
+      "evidence": [],
+      "id": "HAD-148",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 66,
+      "ready_at": "2026-08-04T12:23:15Z",
+      "risk": "low",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: replay_configured_help"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-configured-help-lifecycle reproduces the Python replay semantics for the same contract with the same report JSON shape.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-133"
+      ],
+      "evidence": [],
+      "id": "HAD-149",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 65,
+      "ready_at": "2026-08-04T12:23:15Z",
+      "risk": "low",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: replay_configured_help_lifecycle"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-configured-help-resize reproduces the Python replay semantics for the same contract with the same report JSON shape.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-133"
+      ],
+      "evidence": [],
+      "id": "HAD-150",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 64,
+      "ready_at": "2026-08-04T12:23:15Z",
+      "risk": "low",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: replay_configured_help_resize"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-configured-surfaces reproduces the Python replay semantics for the same contract with the same report JSON shape.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-131"
+      ],
+      "evidence": [],
+      "id": "HAD-151",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 63,
+      "ready_at": "2026-08-04T12:23:15Z",
+      "risk": "low",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: replay_configured_surfaces"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-conversation-context reproduces the Python replay semantics for the same contract with the same report JSON shape.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-131"
+      ],
+      "evidence": [],
+      "id": "HAD-152",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 62,
+      "ready_at": "2026-08-04T12:23:15Z",
+      "risk": "low",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: replay_conversation_context"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-fresh-shell-launch reproduces the Python replay semantics for the same contract with the same report JSON shape.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-131"
+      ],
+      "evidence": [],
+      "id": "HAD-153",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 61,
+      "ready_at": "2026-08-04T12:23:15Z",
+      "risk": "low",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: replay_fresh_shell_launch"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-installed-model-selection reproduces the Python replay semantics for the same contract with the same report JSON shape.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-146"
+      ],
+      "evidence": [],
+      "id": "HAD-154",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 60,
+      "ready_at": "2026-08-04T12:23:15Z",
+      "risk": "low",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: replay_installed_model_selection"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-local-provider reproduces the Python replay semantics for the same contract with the same report JSON shape.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-131"
+      ],
+      "evidence": [],
+      "id": "HAD-155",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 59,
+      "ready_at": "2026-08-04T12:23:15Z",
+      "risk": "low",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: replay_local_provider"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-local-provider-timing reproduces the Python replay semantics for the same contract with the same report JSON shape.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-131"
+      ],
+      "evidence": [],
+      "id": "HAD-156",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 58,
+      "ready_at": "2026-08-04T12:23:15Z",
+      "risk": "low",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: replay_local_provider_timing"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-model-selection reproduces the Python replay semantics for the same contract with the same report JSON shape.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-146"
+      ],
+      "evidence": [],
+      "id": "HAD-157",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 57,
+      "ready_at": "2026-08-04T12:23:15Z",
+      "risk": "low",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: replay_model_selection"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-osc52-clipboard reproduces the Python replay semantics for the same contract with the same report JSON shape.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-136"
+      ],
+      "evidence": [],
+      "id": "HAD-158",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 56,
+      "ready_at": "2026-08-04T12:23:15Z",
+      "risk": "low",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: replay_osc52_clipboard"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-osc52-timing-limits reproduces the Python replay semantics for the same contract with the same report JSON shape.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-136"
+      ],
+      "evidence": [],
+      "id": "HAD-159",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 55,
+      "ready_at": "2026-08-04T12:23:15Z",
+      "risk": "low",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: replay_osc52_timing_limits"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-provider-recovery reproduces the Python replay semantics for the same contract with the same report JSON shape.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-131"
+      ],
+      "evidence": [],
+      "id": "HAD-160",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 54,
+      "ready_at": "2026-08-04T12:23:15Z",
+      "risk": "low",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: replay_provider_recovery"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-setup-required-actions reproduces the Python replay semantics for the same contract with the same report JSON shape.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-143"
+      ],
+      "evidence": [],
+      "id": "HAD-161",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 53,
+      "ready_at": "2026-08-04T12:23:15Z",
+      "risk": "low",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: replay_setup_required_actions"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-standalone-empty-platform-confirmation reproduces the Python replay semantics for the same contract with the same report JSON shape.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-143"
+      ],
+      "evidence": [],
+      "id": "HAD-162",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 52,
+      "ready_at": "2026-08-04T12:23:15Z",
+      "risk": "low",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: replay_standalone_empty_platform_confirmation"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-standalone-full-setup reproduces the Python replay semantics for the same contract with the same report JSON shape.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-143"
+      ],
+      "evidence": [],
+      "id": "HAD-163",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 51,
+      "ready_at": "2026-08-04T12:23:15Z",
+      "risk": "low",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: replay_standalone_full_setup"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-standalone-setup reproduces the Python replay semantics for the same contract with the same report JSON shape.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-143"
+      ],
+      "evidence": [],
+      "id": "HAD-164",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 50,
+      "ready_at": "2026-08-04T12:23:15Z",
+      "risk": "low",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: replay_standalone_setup"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-standalone-terminal-platform reproduces the Python replay semantics for the same contract with the same report JSON shape.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-143"
+      ],
+      "evidence": [],
+      "id": "HAD-165",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 49,
+      "ready_at": "2026-08-04T12:23:15Z",
+      "risk": "low",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: replay_standalone_terminal_platform"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-standalone-tool-provider-boundary reproduces the Python replay semantics for the same contract with the same report JSON shape.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-143"
+      ],
+      "evidence": [],
+      "id": "HAD-166",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 48,
+      "ready_at": "2026-08-04T12:23:15Z",
+      "risk": "low",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: replay_standalone_tool_provider_boundary"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-standalone-tool-provider-inventory reproduces the Python replay semantics for the same contract with the same report JSON shape.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-143"
+      ],
+      "evidence": [],
+      "id": "HAD-167",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 47,
+      "ready_at": "2026-08-04T12:23:15Z",
+      "risk": "low",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: replay_standalone_tool_provider_inventory"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-standalone-tool-provider-inventory-navigation reproduces the Python replay semantics for the same contract with the same report JSON shape.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-143"
+      ],
+      "evidence": [],
+      "id": "HAD-168",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 46,
+      "ready_at": "2026-08-04T12:23:15Z",
+      "risk": "low",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: replay_standalone_tool_provider_inventory_navigation"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-standalone-tool-provider-inventory-selection reproduces the Python replay semantics for the same contract with the same report JSON shape.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-143"
+      ],
+      "evidence": [],
+      "id": "HAD-169",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 45,
+      "ready_at": "2026-08-04T12:23:15Z",
+      "risk": "low",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: replay_standalone_tool_provider_inventory_selection"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-tool-call-deltas reproduces the Python replay semantics for the same contract with the same report JSON shape.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-131"
+      ],
+      "evidence": [],
+      "id": "HAD-170",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 44,
+      "ready_at": "2026-08-04T12:23:15Z",
+      "risk": "low",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: replay_tool_call_deltas"
+    },
+    {
+      "acceptance": [
+        "Port 13 reference probes (probe_hermes_setup.py, probe_hermes_setup_wizard.py, probe_hermes_setup_required.py…) to Rust with the same sanitized report/fixture shapes.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-147"
+      ],
+      "evidence": [],
+      "id": "HAD-171",
+      "lane": "tooling",
+      "oracle": [
+        "reference_observation",
+        "provenance_record",
+        "fixture_validator",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 43,
+      "ready_at": "2026-08-04T12:28:24Z",
+      "risk": "low",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: probe_hermes setup family"
+    },
+    {
+      "acceptance": [
+        "Port 4 reference probes (probe_hermes_help_catalog.py, probe_hermes_help_lifecycle.py, probe_hermes_help_resize.py…) to Rust with the same sanitized report/fixture shapes.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-148"
+      ],
+      "evidence": [],
+      "id": "HAD-172",
+      "lane": "tooling",
+      "oracle": [
+        "reference_observation",
+        "provenance_record",
+        "fixture_validator",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 42,
+      "risk": "low",
+      "status": "queued",
+      "title": "Migrate dev tooling to Rust: probe_hermes help family"
+    },
+    {
+      "acceptance": [
+        "Port 5 reference probes (probe_hermes_osc52_clipboard.py, probe_hermes_osc52_multiplexer.py, probe_hermes_osc52_response_boundaries.py…) to Rust with the same sanitized report/fixture shapes.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-152"
+      ],
+      "evidence": [],
+      "id": "HAD-173",
+      "lane": "tooling",
+      "oracle": [
+        "reference_observation",
+        "provenance_record",
+        "fixture_validator",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 41,
+      "risk": "low",
+      "status": "queued",
+      "title": "Migrate dev tooling to Rust: probe_hermes osc52 family"
+    },
+    {
+      "acceptance": [
+        "Port 5 reference probes (probe_hermes_local_provider_stream.py, probe_hermes_multi_turn_provider.py, probe_hermes_provider_errors.py…) to Rust with the same sanitized report/fixture shapes.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-152"
+      ],
+      "evidence": [],
+      "id": "HAD-174",
+      "lane": "tooling",
+      "oracle": [
+        "reference_observation",
+        "provenance_record",
+        "fixture_validator",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 40,
+      "risk": "low",
+      "status": "queued",
+      "title": "Migrate dev tooling to Rust: probe_hermes provider family"
+    },
+    {
+      "acceptance": [
+        "Port 6 reference probes (probe_hermes_tool_schema_semantics.py, probe_hermes_tool_provider_inventory.py, probe_hermes_tool_provider_inventory_selection.py…) to Rust with the same sanitized report/fixture shapes.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-152"
+      ],
+      "evidence": [],
+      "id": "HAD-175",
+      "lane": "tooling",
+      "oracle": [
+        "reference_observation",
+        "provenance_record",
+        "fixture_validator",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 39,
+      "risk": "low",
+      "status": "queued",
+      "title": "Migrate dev tooling to Rust: probe_hermes tool family"
+    },
+    {
+      "acceptance": [
+        "Port 3 reference probes (probe_hermes_model_picker.py, probe_hermes_model_picker_selection.py, probe_hermes_distinct_model_selection.py) to Rust with the same sanitized report/fixture shapes.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-157"
+      ],
+      "evidence": [],
+      "id": "HAD-176",
+      "lane": "tooling",
+      "oracle": [
+        "reference_observation",
+        "provenance_record",
+        "fixture_validator",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 38,
+      "risk": "low",
+      "status": "queued",
+      "title": "Migrate dev tooling to Rust: probe_hermes model family"
+    },
+    {
+      "acceptance": [
+        "Port the remaining probe_hermes_* reference probes not covered by earlier family tasks to Rust with the same sanitized report/fixture shapes.",
+        "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-158"
+      ],
+      "evidence": [],
+      "id": "HAD-177",
+      "lane": "tooling",
+      "oracle": [
+        "reference_observation",
+        "provenance_record",
+        "fixture_validator",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 37,
+      "risk": "low",
+      "status": "queued",
+      "title": "Migrate dev tooling to Rust: probe_hermes remaining probes"
+    },
+    {
+      "acceptance": [
+        "Every gate replay and reference probe has a Rust twin with differential parity proven.",
+        "verify.sh is replaced by a Rust verify orchestration (or equivalent justfile wiring) with no Python gate steps.",
+        "All Python probe/replay/parity scripts are removed from the gate and the repository migration is documented as complete in CONTEXT.md and ADR-0008.",
+        "Run the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-177"
+      ],
+      "evidence": [],
+      "id": "HAD-178",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 43,
+      "risk": "medium",
+      "status": "queued",
+      "title": "Retire the Python harness and orchestrate verify in Rust"
     }
   ],
-  "updated_at": "2026-08-04T01:40:13Z"
+  "updated_at": "2026-08-04T12:28:24Z"
 }
