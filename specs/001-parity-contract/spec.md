@@ -103,6 +103,17 @@ line. The capture contract must state whether trailing spaces, ANSI escapes,
 cursor position, and timing are retained or normalized. A normalizer is part
 of the oracle, not an undocumented cleanup step.
 
+## Appendix — Fixture policy
+
+`tests/fixtures/parity/` holds only sanitized, provenance-bearing reference
+fixtures. Never add credentials, private transcripts, model payloads, or
+unreviewed screenshots. Each fixture links back to an observation under
+`_attic/docs/parity-observations/`, names its normalization rules, and is
+consumed by an executable test, replay command, or the fixture validator
+(`scripts/validate_reference_fixture.py`). The fixture provenance index
+(which OBS pair anchors which replay oracle) lives in the parity matrix
+(`matrix.md` in this directory).
+
 ## Links
 
 Code: `crates/hades-dev/src/bin/validate_fixture.rs` · Tests: `tests/fixtures/parity/` ·

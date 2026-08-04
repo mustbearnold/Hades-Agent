@@ -10,3 +10,5 @@
 | docs/parity/TRACE_FORMAT.md | docs/parity/ | Content merged into specs/001 (appendix) | Delete |
 | CONTEXT.md | repo root | Capability history merged into specs/001-010; control plane now requires specs/ | Delete |
 | AGENTS.md (pre-SDD) | repo root | Superseded by the SDD entry-point (Phase 4); preserved from git history | Delete |
+| SDD_MIGRATION.md | repo root | Protocol executed; deleted per Phase 6 (git history retains it) | Deleted |
+| tests/fixtures/parity/README.md | tests/fixtures/parity/ | Fixture policy merged into specs/001 appendix (Phase 6 audit); husk deleted (committed since phase-1) | Deleted |
