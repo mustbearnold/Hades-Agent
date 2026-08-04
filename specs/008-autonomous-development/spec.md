@@ -12,8 +12,9 @@ that makes agent progress verifiable.
 
 ## Requirements
 
-- R1. The control plane lives in `.hades/` (tasks.json, runtime logs, locks)
-  and `.agents/` (role contracts); generated run logs and leases are
+- R1. The control plane lives in `.hades/` (tasks.json, protocol schemas,
+  runtime logs, locks) and the agent contracts in `docs/runbooks/`;
+  generated run logs and leases are
   local-only and never become product source.
 - R2. Every run has exactly one terminal outcome: `complete`, `blocked`, or
   `cancelled`; retries are attributable and never overwrite prior evidence.

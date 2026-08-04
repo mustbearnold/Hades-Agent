@@ -16,7 +16,7 @@ dependencies, required oracle kinds, explicit owners, and evidence paths. The
 control-plane script validates the graph, claims work with an agent lease, and
 refuses completion without existing evidence.
 
-Agent roles are narrow and documented under `.agents/roles/`. The project gate
+Agent roles are narrow and documented under `docs/runbooks/`. The project gate
 is a single deterministic command (`just verify`) that every role can invoke.
 No background daemon, network service, or credential is required for the local
 development loop.

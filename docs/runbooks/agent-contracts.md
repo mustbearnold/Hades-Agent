@@ -18,7 +18,7 @@ authority boundary or declare another role's work complete.
 ## Result envelope
 
 Every autonomous run should be representable by the result shape in
-`protocol/result.schema.json`:
+`../../.hades/protocol/result.schema.json`:
 
 - `complete` names changed paths, tests, and evidence;
 - `blocked` names the exact missing dependency or authority;
