@@ -893,6 +893,13 @@ progress from August 1, 2026 through 2027.
   alt-Enter submit from ready while plain Enter does not, Ctrl+C
   interrupt/exit waits on the child. The differential check proves
   identical reports; the Rust binary is now the gate replay.
+- HAD-144 ports replay_editor_outcomes to Rust: `hades-dev
+  replay-editor-outcomes` reproduces the OBS-0019 contract in tmux with a
+  per-case deterministic `EDITOR` (perl edits submit the modified draft,
+  empty/cancelled editor results keep the original), asserts screen
+  markers, reads `.hermes_history` back, and interrupts/exits. The
+  differential check proves identical reports (5 cases); the Rust binary
+  is now the gate replay.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes

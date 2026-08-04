@@ -7611,10 +7611,19 @@
         "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
         "Run the targeted tests and the complete no-skip just verify gate before completion."
       ],
+      "attempts": 1,
+      "claimed_at": "2026-08-04T01:28:01Z",
+      "claimed_by": "hermes-agent",
       "depends_on": [
         "HAD-132"
       ],
-      "evidence": [],
+      "evidence": [
+        "crates/hades-dev/src/bin/replay_editor_outcomes.rs",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile",
+        "CONTEXT.md"
+      ],
       "id": "HAD-144",
       "lane": "tooling",
       "oracle": [
@@ -7625,8 +7634,19 @@
       "owner_role": "implementer",
       "priority": 47,
       "ready_at": "2026-08-04T00:00:00Z",
+      "result": {
+        "completed_at": "2026-08-04T01:34:12Z",
+        "evidence": [
+          "crates/hades-dev/src/bin/replay_editor_outcomes.rs",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile",
+          "CONTEXT.md"
+        ],
+        "summary": "Ported replay_editor_outcomes to Rust as hades-dev replay-editor-outcomes: OBS-0019 contract in tmux with per-case deterministic EDITOR, screen-marker assertions, .hermes_history readback, interrupt/exit. Differential parity check proves identical reports (5 cases); verify.sh and justfile run the Rust binary as the gate replay."
+      },
       "risk": "medium",
-      "status": "ready",
+      "status": "complete",
       "title": "Migrate dev tooling to Rust: replay_editor_outcomes"
     },
     {
@@ -7675,5 +7695,5 @@
       "title": "Migrate dev tooling to Rust: replay_modified_enter"
     }
   ],
-  "updated_at": "2026-08-04T01:27:49Z"
+  "updated_at": "2026-08-04T01:34:12Z"
 }

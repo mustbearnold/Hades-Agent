@@ -158,7 +158,9 @@ replay-editor:
 
 replay-editor-outcomes:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_editor_outcomes.py --binary target/debug/hades --report .hades/runtime/editor-outcomes-replay.json
+    cargo build --offline --package hades-dev --bin replay_editor_outcomes
+    python3 scripts/check_replay_parity.py replay_editor_outcomes replay_editor_outcomes
+    ./target/debug/replay_editor_outcomes --binary target/debug/hades --report .hades/runtime/editor-outcomes-replay.json
 
 replay-modified-enter:
     cargo build --locked --package hades-cli
