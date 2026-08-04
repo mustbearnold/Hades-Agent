@@ -86,7 +86,9 @@ replay-configured-help-resize:
 
 replay-provider-recovery:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_provider_recovery.py --binary target/debug/hades --report .hades/runtime/provider-recovery-replay.json
+    cargo build --offline --package hades-dev --bin replay_provider_recovery
+    python3 scripts/check_replay_parity.py replay_provider_recovery replay_provider_recovery --timeout 8
+    ./target/debug/replay_provider_recovery --binary target/debug/hades --report .hades/runtime/provider-recovery-replay.json --timeout 8
 
 replay-conversation-context:
     cargo build --locked --package hades-cli

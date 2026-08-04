@@ -508,7 +508,7 @@ fn run_case(
         if tool_message.get("role").and_then(Value::as_str) != Some("tool") {
             return Err("follow-up: tool result message missing role".to_string());
         }
-        if tool_message.get("tool_call_id").map_or(true, Value::is_null) {
+        if tool_message.get("tool_call_id").is_none_or(Value::is_null) {
             return Err("follow-up: tool result message missing tool_call_id".to_string());
         }
         let tool_result_sha256 = sha256_hex(

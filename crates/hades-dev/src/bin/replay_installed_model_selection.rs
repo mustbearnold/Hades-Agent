@@ -32,8 +32,8 @@ fn run_shell_command(
     launcher_dir: &Path,
     home: &Path,
 ) -> Result<Value, String> {
-    let path = vec![launcher_dir.display().to_string(), "/usr/bin".to_owned(), "/bin".to_owned()]
-        .join(":");
+    let path =
+        [launcher_dir.display().to_string(), "/usr/bin".to_owned(), "/bin".to_owned()].join(":");
     let shell_executable = path
         .split(':')
         .map(|directory| Path::new(directory).join(shell))

@@ -11,7 +11,6 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, ExitCode, Stdio};
 use std::time::Duration;
 
-use hades_dev::pty::spawn_pty;
 use hades_dev::replay::{
     ExitStatus, RetainedSlave, marker_present, terminal_flags, wait_for, wait_for_exit,
 };
@@ -38,12 +37,8 @@ impl RuntimeEnvironment {
             ("HERMES_HOME", self.home.join("hermes").display().to_string()),
             (
                 "PATH",
-                vec![
-                    self.launcher_dir.display().to_string(),
-                    "/usr/bin".to_owned(),
-                    "/bin".to_owned(),
-                ]
-                .join(":"),
+                [self.launcher_dir.display().to_string(), "/usr/bin".to_owned(), "/bin".to_owned()]
+                    .join(":"),
             ),
             ("TERM", "xterm-256color".to_owned()),
             ("COLUMNS", "120".to_owned()),
@@ -53,7 +48,7 @@ impl RuntimeEnvironment {
 
     fn shell_path(&self, name: &str) -> Result<PathBuf, String> {
         let path =
-            vec![self.launcher_dir.display().to_string(), "/usr/bin".to_owned(), "/bin".to_owned()]
+            [self.launcher_dir.display().to_string(), "/usr/bin".to_owned(), "/bin".to_owned()]
                 .join(":");
         for directory in path.split(':') {
             let candidate = Path::new(directory).join(name);

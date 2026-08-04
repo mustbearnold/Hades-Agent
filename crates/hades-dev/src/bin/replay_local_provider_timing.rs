@@ -15,12 +15,10 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::mpsc;
 use std::time::{Duration, Instant};
 
-use hades_dev::pty::read_available;
 use hades_dev::replay::{
-    ExitStatus, ReplayChild, marker_present, spawn_with_env, try_wait, wait_for, wait_for_exit,
+    ExitStatus, ReplayChild, marker_present, spawn_with_env, wait_for, wait_for_exit,
     wait_for_rendered,
 };
 use serde_json::{Value, json};
@@ -72,14 +70,6 @@ impl DelayedProvider {
         let thread_state = Arc::clone(&state);
         let handle = std::thread::spawn(move || serve(listener, thread_state));
         Ok(Self { port, state, handle: Some(handle) })
-    }
-
-    fn environment(&self) -> Vec<(&'static str, String)> {
-        vec![
-            ("HADES_PROVIDER_BASE_URL", format!("http://127.0.0.1:{}/v1", self.port)),
-            ("HADES_MODEL", "palette-model".to_string()),
-            ("HADES_PROVIDER_API_KEY", String::new()),
-        ]
     }
 
     fn finish(&mut self) {
@@ -479,7 +469,7 @@ fn run_case(binary: &Path, interrupt: bool, timeout: Duration) -> Result<Value, 
     }
     server.finish();
     let _ = fs::remove_dir_all(
-        &std::env::temp_dir().join(format!("hades-timing-{}", std::process::id())),
+        std::env::temp_dir().join(format!("hades-timing-{}", std::process::id())),
     );
     result
 }

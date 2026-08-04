@@ -953,6 +953,12 @@ progress from August 1, 2026 through 2027.
   lifecycle contract (multi-turn request shape, failed-turn isolation)
   through the hold-provider loopback; the differential check proves
   identical reports (2 cases); the Rust binary is now the gate replay.
+- HAD-160 ports replay_provider_recovery to Rust: `hades-dev
+  replay-provider-recovery` reproduces the OBS-0091 provider failure
+  recovery contract (HTTP error, malformed SSE, incomplete stream, and
+  follow-up request through the loopback failure fixtures; 4 cases). The
+  differential check proves identical reports; the Rust binary is now
+  the gate replay.
 - HAD-170 ports replay_tool_call_deltas to Rust: `hades-dev
   replay-tool-call-deltas` reproduces the synthetic tool-call stream
   contract (assistant role delta, tool-call fragments with JSON-encoded
