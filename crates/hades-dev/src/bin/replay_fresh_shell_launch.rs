@@ -11,11 +11,10 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, ExitCode, Stdio};
 use std::time::Duration;
 
-use hades_dev::pty::read_available;
+use hades_dev::pty::spawn_pty;
 use hades_dev::replay::{
-    ExitStatus, RetainedSlave, marker_present, terminal_flags, try_wait, wait_for, wait_for_exit,
+    ExitStatus, RetainedSlave, marker_present, terminal_flags, wait_for, wait_for_exit,
 };
-use hades_dev::screen::Screen;
 use serde_json::{Value, json};
 
 const STARTUP_MARKERS: [&str; 4] =
