@@ -8430,8 +8430,6 @@
         "Run the targeted tests and the complete no-skip just verify gate before completion."
       ],
       "attempts": 1,
-      "claimed_at": "2026-08-04T13:10:49Z",
-      "claimed_by": "hermes-agent",
       "depends_on": [
         "HAD-143"
       ],
@@ -8445,9 +8443,9 @@
       ],
       "owner_role": "implementer",
       "priority": 52,
-      "ready_at": "2026-08-04T12:23:15Z",
+      "ready_at": "2026-08-04T13:33:15Z",
       "risk": "low",
-      "status": "in_progress",
+      "status": "ready",
       "title": "Migrate dev tooling to Rust: replay_standalone_empty_platform_confirmation"
     },
     {
@@ -8463,7 +8461,9 @@
       "depends_on": [
         "HAD-143"
       ],
-      "evidence": [],
+      "evidence": [
+        "crates/hades-dev/src/bin/replay_standalone_full_setup.rs"
+      ],
       "id": "HAD-163",
       "lane": "tooling",
       "oracle": [
@@ -8474,8 +8474,15 @@
       "owner_role": "implementer",
       "priority": 51,
       "ready_at": "2026-08-04T12:23:15Z",
+      "result": {
+        "completed_at": "2026-08-04T13:33:10Z",
+        "evidence": [
+          "crates/hades-dev/src/bin/replay_standalone_full_setup.rs"
+        ],
+        "summary": "Ported replay_standalone_full_setup to Rust"
+      },
       "risk": "low",
-      "status": "in_progress",
+      "status": "complete",
       "title": "Migrate dev tooling to Rust: replay_standalone_full_setup"
     },
     {
@@ -8491,7 +8498,9 @@
       "depends_on": [
         "HAD-143"
       ],
-      "evidence": [],
+      "evidence": [
+        "crates/hades-dev/src/bin/replay_standalone_setup.rs"
+      ],
       "id": "HAD-164",
       "lane": "tooling",
       "oracle": [
@@ -8502,8 +8511,15 @@
       "owner_role": "implementer",
       "priority": 50,
       "ready_at": "2026-08-04T12:23:15Z",
+      "result": {
+        "completed_at": "2026-08-04T13:33:10Z",
+        "evidence": [
+          "crates/hades-dev/src/bin/replay_standalone_setup.rs"
+        ],
+        "summary": "Ported replay_standalone_setup to Rust"
+      },
       "risk": "low",
-      "status": "in_progress",
+      "status": "complete",
       "title": "Migrate dev tooling to Rust: replay_standalone_setup"
     },
     {
@@ -8513,11 +8529,15 @@
         "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
         "Run the targeted tests and the complete no-skip just verify gate before completion."
       ],
-      "attempts": 0,
+      "attempts": 1,
+      "claimed_at": "2026-08-04T13:33:06Z",
+      "claimed_by": "hermes-agent",
       "depends_on": [
         "HAD-143"
       ],
-      "evidence": [],
+      "evidence": [
+        "crates/hades-dev/src/bin/replay_standalone_terminal_platform.rs"
+      ],
       "id": "HAD-165",
       "lane": "tooling",
       "oracle": [
@@ -8528,8 +8548,15 @@
       "owner_role": "implementer",
       "priority": 49,
       "ready_at": "2026-08-04T12:23:15Z",
+      "result": {
+        "completed_at": "2026-08-04T13:33:15Z",
+        "evidence": [
+          "crates/hades-dev/src/bin/replay_standalone_terminal_platform.rs"
+        ],
+        "summary": "Ported replay_standalone_terminal_platform to Rust"
+      },
       "risk": "low",
-      "status": "ready",
+      "status": "complete",
       "title": "Migrate dev tooling to Rust: replay_standalone_terminal_platform"
     },
     {
@@ -8896,5 +8923,5 @@
       "title": "Retire the Python harness and orchestrate verify in Rust"
     }
   ],
-  "updated_at": "2026-08-04T13:26:59Z"
+  "updated_at": "2026-08-04T13:33:15Z"
 }

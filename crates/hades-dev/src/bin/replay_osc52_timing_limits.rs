@@ -154,17 +154,6 @@ fn hex_bytes(bytes: &[u8]) -> String {
     bytes.iter().map(|byte| format!("{byte:02x}")).collect::<Vec<_>>().join(" ")
 }
 
-fn hex_from_string(value: &str) -> Result<Vec<u8>, String> {
-    let compact: String = value.split_whitespace().collect();
-    (0..compact.len())
-        .step_by(2)
-        .map(|index| {
-            u8::from_str_radix(&compact[index..index + 2], 16)
-                .map_err(|error| format!("invalid hex: {error}"))
-        })
-        .collect()
-}
-
 fn response_bytes(case_id: &str, payload: &[u8], case: &Value) -> Result<Vec<u8>, String> {
     let mut response = format!("\x1b]52;c;{}", base64_encode(payload)).into_bytes();
     response.push(0x07);
@@ -395,7 +384,6 @@ fn run_case(
                 (response_sent_at.elapsed().as_secs_f64() * 1000.0, "response-before-500ms-timeout")
             }
             _ => {
-                let response_sent_at = Instant::now();
                 let write_ms = write_bounded(
                     &child,
                     &response,

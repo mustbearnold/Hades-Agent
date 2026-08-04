@@ -11,7 +11,7 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 use hades_dev::replay::{
     ExitStatus, RetainedSlave, TerminalFlags, marker_present, spawn_with_env, terminal_flags,
@@ -142,7 +142,7 @@ fn run_case(binary: &Path, command: Option<&str>, timeout: Duration) -> Result<V
             }
         }
 
-        let action_text = if let Some(command) = command {
+        if let Some(command) = command {
             let payload = format!("{command}\r\r");
             hades_dev::replay::send(&child.child.master, payload.as_bytes())
                 .map_err(|error| error.to_string())?;
@@ -157,10 +157,7 @@ fn run_case(binary: &Path, command: Option<&str>, timeout: Duration) -> Result<V
             if marker_present(&text, &format!("❯ {command}")) {
                 return Err(format!("{case}: follow-up command became an active composer draft"));
             }
-            text
-        } else {
-            transition_text
-        };
+        }
 
         hades_dev::replay::send(&child.child.master, b"\x03").map_err(|error| error.to_string())?;
         std::thread::sleep(Duration::from_millis(150));

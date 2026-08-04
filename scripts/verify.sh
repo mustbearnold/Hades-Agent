@@ -257,9 +257,18 @@ python3 scripts/check_replay_parity.py replay_unconfigured_help replay_unconfigu
 cargo build --offline --package hades-dev --bin replay_setup_required_actions
 python3 scripts/check_replay_parity.py replay_setup_required_actions replay_setup_required_actions --timeout 20
 ./target/debug/replay_setup_required_actions --binary target/debug/hades --report .hades/runtime/setup-required-actions-replay.json --timeout 20
-python3 scripts/replay_standalone_setup.py --binary target/debug/hades --report .hades/runtime/hades-standalone-setup-replay.json --timeout 5
-python3 scripts/replay_standalone_full_setup.py --binary target/debug/hades --report .hades/runtime/hades-standalone-full-setup-replay.json --timeout 5
-python3 scripts/replay_standalone_terminal_platform.py --binary target/debug/hades --report .hades/runtime/hades-standalone-terminal-platform-replay.json --timeout 5
+# HAD-162/163/164: replay-standalone-{setup,full-setup,terminal-platform}
+# are ported to Rust; the differential checks prove identical reports,
+# then the Rust binaries are the gate replays.
+cargo build --offline --package hades-dev --bin replay_standalone_setup
+cargo build --offline --package hades-dev --bin replay_standalone_full_setup
+cargo build --offline --package hades-dev --bin replay_standalone_terminal_platform
+python3 scripts/check_replay_parity.py replay_standalone_setup replay_standalone_setup --timeout 5
+python3 scripts/check_replay_parity.py replay_standalone_full_setup replay_standalone_full_setup --timeout 5
+python3 scripts/check_replay_parity.py replay_standalone_terminal_platform replay_standalone_terminal_platform --timeout 5
+./target/debug/replay_standalone_setup --binary target/debug/hades --report .hades/runtime/hades-standalone-setup-replay.json --timeout 5
+./target/debug/replay_standalone_full_setup --binary target/debug/hades --report .hades/runtime/hades-standalone-full-setup-replay.json --timeout 5
+./target/debug/replay_standalone_terminal_platform --binary target/debug/hades --report .hades/runtime/hades-standalone-terminal-platform-replay.json --timeout 5
 python3 scripts/replay_standalone_empty_platform_confirmation.py --binary target/debug/hades --report .hades/runtime/hades-empty-platform-confirmation-replay.json --timeout 5
 python3 scripts/replay_standalone_tool_provider_boundary.py --binary target/debug/hades --report .hades/runtime/hades-tool-provider-boundary-replay.json --timeout 5
 python3 scripts/replay_standalone_tool_provider_inventory.py --binary target/debug/hades --report .hades/runtime/hades-tool-provider-inventory-replay.json --timeout 5

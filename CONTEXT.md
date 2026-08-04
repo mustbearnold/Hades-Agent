@@ -978,6 +978,15 @@ progress from August 1, 2026 through 2027.
   replay-local-provider` reproduces the OBS-0051 local-provider stream
   contract (3 cases) through the hold-provider loopback; the differential
   check proves identical reports; the Rust binary is now the gate replay.
+- HAD-162/163/164/165 map the standalone-setup replay family to Rust:
+  `hades-dev replay-standalone-setup` (HAD-164, standalone setup
+  contract), `replay-standalone-full-setup` (HAD-163), and
+  `replay-standalone-terminal-platform` (HAD-165, 2 cases) reproduce
+  the Python standalone replay semantics through `hades_dev::setup`;
+  the differential checks prove identical reports and the Rust binaries
+  are the gate replays. (The ledger ids were reconciled: the encode
+  script had mislabeled HAD-162; the empty-platform-confirmation port
+  remains as the next frontier task.)
 - HAD-161 ports replay_setup_required_actions to Rust: `hades-dev
   replay-setup-required-actions` reproduces the OBS-0105 no-provider
   Setup Required action boundary: after the delayed Setup Required

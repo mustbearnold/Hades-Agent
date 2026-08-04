@@ -353,15 +353,21 @@ replay-setup-required-actions:
 
 replay-standalone-setup:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_standalone_setup.py --binary target/debug/hades --report .hades/runtime/hades-standalone-setup-replay.json --timeout 5
+    cargo build --offline --package hades-dev --bin replay_standalone_setup
+    python3 scripts/check_replay_parity.py replay_standalone_setup replay_standalone_setup --timeout 5
+    ./target/debug/replay_standalone_setup --binary target/debug/hades --report .hades/runtime/hades-standalone-setup-replay.json --timeout 5
 
 replay-standalone-full-setup:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_standalone_full_setup.py --binary target/debug/hades --report .hades/runtime/hades-standalone-full-setup-replay.json --timeout 5
+    cargo build --offline --package hades-dev --bin replay_standalone_full_setup
+    python3 scripts/check_replay_parity.py replay_standalone_full_setup replay_standalone_full_setup --timeout 5
+    ./target/debug/replay_standalone_full_setup --binary target/debug/hades --report .hades/runtime/hades-standalone-full-setup-replay.json --timeout 5
 
 replay-standalone-terminal-platform:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_standalone_terminal_platform.py --binary target/debug/hades --report .hades/runtime/hades-standalone-terminal-platform-replay.json --timeout 5
+    cargo build --offline --package hades-dev --bin replay_standalone_terminal_platform
+    python3 scripts/check_replay_parity.py replay_standalone_terminal_platform replay_standalone_terminal_platform --timeout 5
+    ./target/debug/replay_standalone_terminal_platform --binary target/debug/hades --report .hades/runtime/hades-standalone-terminal-platform-replay.json --timeout 5
 
 replay-standalone-empty-platform:
     cargo build --locked --package hades-cli
