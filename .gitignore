@@ -10,3 +10,17 @@ __pycache__/
 !.env.example
 
 .directory
+
+# OS/editor cruft (SDD Phase 2D standard set)
+.DS_Store
+Thumbs.db
+*~
+.idea/
+.vscode/
+*.tmp
+*.cache
+*.pyc
+coverage/
+.venv/
+.pytest_cache/
+.ruff_cache/
