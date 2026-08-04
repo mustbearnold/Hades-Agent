@@ -198,6 +198,7 @@ def write_report(report: dict[str, object], path: Path | None, status: int) -> i
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--binary", help="accepted for parity-checker compatibility; ignored (this replay runs the installed release launcher)")
     parser.add_argument("--launcher-dir", default="~/.local/bin")
     parser.add_argument("--release-binary", default="target/release/hades")
     parser.add_argument("--report")

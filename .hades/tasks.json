@@ -7930,7 +7930,9 @@
         "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
         "Run the targeted tests and the complete no-skip just verify gate before completion."
       ],
-      "attempts": 0,
+      "attempts": 1,
+      "claimed_at": "2026-08-04T12:44:15Z",
+      "claimed_by": "hermes-agent",
       "depends_on": [
         "HAD-131"
       ],
@@ -7946,7 +7948,7 @@
       "priority": 63,
       "ready_at": "2026-08-04T12:23:15Z",
       "risk": "low",
-      "status": "ready",
+      "status": "in_progress",
       "title": "Migrate dev tooling to Rust: replay_configured_surfaces"
     },
     {
@@ -8001,11 +8003,20 @@
         "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
         "Run the targeted tests and the complete no-skip just verify gate before completion."
       ],
-      "attempts": 0,
+      "attempts": 1,
+      "claimed_at": "2026-08-04T12:45:02Z",
+      "claimed_by": "hermes-agent",
       "depends_on": [
         "HAD-131"
       ],
-      "evidence": [],
+      "evidence": [
+        "crates/hades-dev/src/bin/replay_fresh_shell_launch.rs",
+        "scripts/replay_fresh_shell_launch.py",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile",
+        "CONTEXT.md"
+      ],
       "id": "HAD-153",
       "lane": "tooling",
       "oracle": [
@@ -8016,8 +8027,20 @@
       "owner_role": "implementer",
       "priority": 61,
       "ready_at": "2026-08-04T12:23:15Z",
+      "result": {
+        "completed_at": "2026-08-04T12:47:38Z",
+        "evidence": [
+          "crates/hades-dev/src/bin/replay_fresh_shell_launch.rs",
+          "scripts/replay_fresh_shell_launch.py",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile",
+          "CONTEXT.md"
+        ],
+        "summary": "Ported replay_fresh_shell_launch to Rust as hades-dev replay-fresh-shell-launch: Bash/Fish command resolution through installed launcher symlinks + installed TUI lifecycle (raw-mode startup, Ctrl+C clean exit, alternate-screen/terminal restoration); accepts ignored --binary for parity compatibility. Differential parity check proves identical reports; verify.sh and justfile run the Rust binary as the gate replay."
+      },
       "risk": "low",
-      "status": "ready",
+      "status": "complete",
       "title": "Migrate dev tooling to Rust: replay_fresh_shell_launch"
     },
     {
@@ -8221,7 +8244,9 @@
         "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
         "Run the targeted tests and the complete no-skip just verify gate before completion."
       ],
-      "attempts": 0,
+      "attempts": 1,
+      "claimed_at": "2026-08-04T12:44:47Z",
+      "claimed_by": "hermes-agent",
       "depends_on": [
         "HAD-131"
       ],
@@ -8237,7 +8262,7 @@
       "priority": 54,
       "ready_at": "2026-08-04T12:23:15Z",
       "risk": "low",
-      "status": "ready",
+      "status": "in_progress",
       "title": "Migrate dev tooling to Rust: replay_provider_recovery"
     },
     {
@@ -8481,7 +8506,9 @@
         "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
         "Run the targeted tests and the complete no-skip just verify gate before completion."
       ],
-      "attempts": 0,
+      "attempts": 1,
+      "claimed_at": "2026-08-04T12:44:47Z",
+      "claimed_by": "hermes-agent",
       "depends_on": [
         "HAD-131"
       ],
@@ -8497,7 +8524,7 @@
       "priority": 44,
       "ready_at": "2026-08-04T12:23:15Z",
       "risk": "low",
-      "status": "ready",
+      "status": "in_progress",
       "title": "Migrate dev tooling to Rust: replay_tool_call_deltas"
     },
     {
@@ -8714,5 +8741,5 @@
       "title": "Retire the Python harness and orchestrate verify in Rust"
     }
   ],
-  "updated_at": "2026-08-04T12:43:42Z"
+  "updated_at": "2026-08-04T12:47:38Z"
 }

@@ -923,6 +923,14 @@ progress from August 1, 2026 through 2027.
   reproduces the OBS-0039 model-stage contract through `hades_dev::setup`
   (the setup-family key set already covers Escape). The differential check
   proves identical reports; the Rust binary is now the gate replay.
+- HAD-153 ports replay_fresh_shell_launch to Rust: `hades-dev
+  replay-fresh-shell-launch` reproduces the fresh Bash/Fish resolution
+  and installed-TUI lifecycle replay (command -v/--version/--help
+  through the installed launcher symlinks, raw-mode startup, Ctrl+C
+  clean exit, alternate-screen and terminal restoration; accepts an
+  ignored `--binary` so the parity checker can compare both sides). The
+  differential check proves identical reports; the Rust binary is now
+  the gate replay.
 - HAD-152 ports replay_conversation_context to Rust: `hades-dev
   replay-conversation-context` reproduces the OBS-0092 conversation
   lifecycle contract (multi-turn request shape, failed-turn isolation)

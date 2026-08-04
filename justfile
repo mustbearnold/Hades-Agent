@@ -47,7 +47,9 @@ replay-cli-launch:
 replay-fresh-shell-launch:
     cargo build --locked --release --package hades-cli
     bash scripts/install_user_launcher.sh
-    python3 scripts/replay_fresh_shell_launch.py --report .hades/runtime/fresh-shell-launch-replay.json
+    cargo build --offline --package hades-dev --bin replay_fresh_shell_launch
+    python3 scripts/check_replay_parity.py replay_fresh_shell_launch replay_fresh_shell_launch --timeout 10
+    ./target/debug/replay_fresh_shell_launch --report .hades/runtime/fresh-shell-launch-replay.json --timeout 10
 
 replay-vertical-slice:
     cargo build --locked --package hades-cli
