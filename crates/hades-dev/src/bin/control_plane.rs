@@ -31,7 +31,7 @@ const REQUIRED_FILES: [&str; 11] = [
     "specs/001-parity-contract/spec.md",
     "specs/001-parity-contract/matrix.md",
     "docs/runbooks/agent-contracts.md",
-    ".agents/protocol/task.schema.json",
+    ".hades/protocol/task.schema.json",
 ];
 
 fn root() -> PathBuf {

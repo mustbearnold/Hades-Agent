@@ -28,7 +28,7 @@ REQUIRED_FILES = (
     "specs/001-parity-contract/spec.md",
     "specs/001-parity-contract/matrix.md",
     "docs/runbooks/agent-contracts.md",
-    ".agents/protocol/task.schema.json",
+    ".hades/protocol/task.schema.json",
 )
 
 STATUSES = {"queued", "ready", "in_progress", "blocked", "complete", "cancelled"}

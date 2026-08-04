@@ -29,7 +29,7 @@ mutable = [
     "Cargo.lock",
     "crates/**",
     "docs/**",
-    ".agents/**",
+    ".hades/protocol/**",
     ".hades/tasks.json",
     "scripts/**",
     "tests/**",
