@@ -389,8 +389,14 @@ python3 scripts/check_replay_parity.py replay_clipboard replay_clipboard
 cargo build --offline --package hades-dev --bin replay_clipboard_text
 python3 scripts/check_replay_parity.py replay_clipboard_text replay_clipboard_text --timeout 8
 ./target/debug/replay_clipboard_text --binary target/debug/hades --report .hades/runtime/clipboard-text-replay.json --timeout 8
-python3 scripts/replay_osc52_clipboard.py --binary target/debug/hades --report .hades/runtime/osc52-clipboard-replay.json
-python3 scripts/replay_osc52_clipboard.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0027-hades-osc52-response-boundaries.json --report .hades/runtime/osc52-response-boundaries-replay.json
+# HAD-158: replay-osc52-clipboard is ported to Rust; the differential
+# checks prove identical reports on the OBS-0025 and OBS-0027 contracts,
+# then the Rust binary is the gate replay.
+cargo build --offline --package hades-dev --bin replay_osc52_clipboard
+python3 scripts/check_replay_parity.py replay_osc52_clipboard replay_osc52_clipboard --timeout 8
+python3 scripts/check_replay_parity.py replay_osc52_clipboard replay_osc52_clipboard --contract tests/fixtures/parity/OBS-0027-hades-osc52-response-boundaries.json --timeout 8
+./target/debug/replay_osc52_clipboard --binary target/debug/hades --report .hades/runtime/osc52-clipboard-replay.json --timeout 8
+./target/debug/replay_osc52_clipboard --binary target/debug/hades --contract tests/fixtures/parity/OBS-0027-hades-osc52-response-boundaries.json --report .hades/runtime/osc52-response-boundaries-replay.json --timeout 8
 run_probe .hades/runtime/hermes-osc52-st-termination-probe.json python3 scripts/probe_hermes_osc52_st_termination.py --report .hades/runtime/hermes-osc52-st-termination-probe.json --timeout 60
 run_probe .hades/runtime/hermes-osc52-multiplexer-probe.json python3 scripts/probe_hermes_osc52_multiplexer.py --report .hades/runtime/hermes-osc52-multiplexer-probe.json --timeout 30
 run_probe .hades/runtime/hermes-osc52-timing-limits-probe.json python3 scripts/probe_hermes_osc52_timing_limits.py --report .hades/runtime/hermes-osc52-timing-limits-probe.json --timeout 60

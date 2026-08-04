@@ -965,6 +965,14 @@ progress from August 1, 2026 through 2027.
   replay-local-provider` reproduces the OBS-0051 local-provider stream
   contract (3 cases) through the hold-provider loopback; the differential
   check proves identical reports; the Rust binary is now the gate replay.
+- HAD-158 ports replay_osc52_clipboard to Rust: `hades-dev
+  replay-osc52-clipboard` reproduces the bare-SSH OSC52-first clipboard
+  contract (OBS-0025 legacy pair and the OBS-0027 response-boundary
+  family) in a direct PTY: Ctrl+V emits the OSC52 query then a DA1
+  barrier; a usable OSC52 response wins before the native xclip provider
+  while malformed/empty responses and DA1-acknowledged timeouts fall
+  back to it. The differential checks prove identical reports on both
+  contracts (2 and 5 cases); the Rust binary is now the gate replay.
 - HAD-157 ports replay_model_selection to Rust: `hades-dev
   replay-model-selection` reproduces the Python live loopback replay of
   session-scoped model selection (picker request boundary, fresh-process

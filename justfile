@@ -200,11 +200,17 @@ replay-clipboard-text:
 
 replay-osc52-clipboard:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_osc52_clipboard.py --binary target/debug/hades --report .hades/runtime/osc52-clipboard-replay.json
+    cargo build --offline --package hades-dev --bin replay_osc52_clipboard
+    python3 scripts/check_replay_parity.py replay_osc52_clipboard replay_osc52_clipboard --timeout 8
+    python3 scripts/check_replay_parity.py replay_osc52_clipboard replay_osc52_clipboard --contract tests/fixtures/parity/OBS-0027-hades-osc52-response-boundaries.json --timeout 8
+    ./target/debug/replay_osc52_clipboard --binary target/debug/hades --report .hades/runtime/osc52-clipboard-replay.json --timeout 8
+    ./target/debug/replay_osc52_clipboard --binary target/debug/hades --contract tests/fixtures/parity/OBS-0027-hades-osc52-response-boundaries.json --report .hades/runtime/osc52-response-boundaries-replay.json --timeout 8
 
 replay-osc52-response-boundaries:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_osc52_clipboard.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0027-hades-osc52-response-boundaries.json --report .hades/runtime/osc52-response-boundaries-replay.json
+    cargo build --offline --package hades-dev --bin replay_osc52_clipboard
+    python3 scripts/check_replay_parity.py replay_osc52_clipboard replay_osc52_clipboard --contract tests/fixtures/parity/OBS-0027-hades-osc52-response-boundaries.json --timeout 8
+    ./target/debug/replay_osc52_clipboard --binary target/debug/hades --contract tests/fixtures/parity/OBS-0027-hades-osc52-response-boundaries.json --report .hades/runtime/osc52-response-boundaries-replay.json --timeout 8
 
 probe-osc52-st-termination:
     python3 scripts/probe_hermes_osc52_st_termination.py --report .hades/runtime/hermes-osc52-st-termination-probe.json --timeout 60

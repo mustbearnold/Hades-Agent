@@ -8249,11 +8249,19 @@
         "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
         "Run the targeted tests and the complete no-skip just verify gate before completion."
       ],
-      "attempts": 0,
+      "attempts": 1,
+      "claimed_at": "2026-08-04T12:55:45Z",
+      "claimed_by": "hermes-agent",
       "depends_on": [
         "HAD-136"
       ],
-      "evidence": [],
+      "evidence": [
+        "crates/hades-dev/src/bin/replay_osc52_clipboard.rs",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile",
+        "CONTEXT.md"
+      ],
       "id": "HAD-158",
       "lane": "tooling",
       "oracle": [
@@ -8264,8 +8272,19 @@
       "owner_role": "implementer",
       "priority": 56,
       "ready_at": "2026-08-04T12:23:15Z",
+      "result": {
+        "completed_at": "2026-08-04T12:58:04Z",
+        "evidence": [
+          "crates/hades-dev/src/bin/replay_osc52_clipboard.rs",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile",
+          "CONTEXT.md"
+        ],
+        "summary": "Ported replay_osc52_clipboard to Rust as hades-dev replay-osc52-clipboard: bare-SSH OSC52-first clipboard contract (OBS-0025 legacy pair + OBS-0027 response-boundary family) in a direct PTY with OSC52 query + DA1 barrier, usable OSC52 response wins before native xclip, malformed/empty/timeout falls back. Differential parity checks prove identical reports on both contracts (2 and 5 cases); verify.sh and justfile run the Rust binary as the gate replay."
+      },
       "risk": "low",
-      "status": "ready",
+      "status": "complete",
       "title": "Migrate dev tooling to Rust: replay_osc52_clipboard"
     },
     {
@@ -8768,8 +8787,9 @@
       ],
       "owner_role": "implementer",
       "priority": 37,
+      "ready_at": "2026-08-04T12:58:04Z",
       "risk": "low",
-      "status": "queued",
+      "status": "ready",
       "title": "Migrate dev tooling to Rust: probe_hermes remaining probes"
     },
     {
@@ -8798,5 +8818,5 @@
       "title": "Retire the Python harness and orchestrate verify in Rust"
     }
   ],
-  "updated_at": "2026-08-04T12:55:40Z"
+  "updated_at": "2026-08-04T12:58:04Z"
 }
