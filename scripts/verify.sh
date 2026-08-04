@@ -303,7 +303,12 @@ cargo build --offline --package hades-dev --bin replay_fresh_shell_launch
 python3 scripts/check_replay_parity.py replay_fresh_shell_launch replay_fresh_shell_launch --timeout 10
 ./target/debug/replay_fresh_shell_launch --report .hades/runtime/fresh-shell-launch-replay.json --timeout 10
 python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0095-hades-installed-model-selection.json
-python3 scripts/replay_installed_model_selection.py --report .hades/runtime/installed-model-selection-replay.json --timeout 10
+# HAD-154: replay-installed-model-selection is ported to Rust; the
+# differential check proves identical reports, then the Rust binary is
+# the gate replay.
+cargo build --offline --package hades-dev --bin replay_installed_model_selection
+python3 scripts/check_replay_parity.py replay_installed_model_selection replay_installed_model_selection --timeout 10
+./target/debug/replay_installed_model_selection --report .hades/runtime/installed-model-selection-replay.json --timeout 10
 ./target/debug/replay_unconfigured_help --binary "$HOME/.local/bin/hades" --report .hades/runtime/installed-help-setup-required-hades.json --timeout 12
 ./target/debug/replay_unconfigured_help --binary "$HOME/.local/bin/Hades" --report .hades/runtime/installed-help-setup-required-Hades.json --timeout 12
 python3 scripts/replay_standalone_setup.py --binary "$HOME/.local/bin/hades" --report .hades/runtime/installed-standalone-setup-hades.json --timeout 5

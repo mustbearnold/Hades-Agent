@@ -101,7 +101,9 @@ replay-model-selection:
 replay-installed-model-selection:
     cargo build --locked --release --package hades-cli
     bash scripts/install_user_launcher.sh
-    python3 scripts/replay_installed_model_selection.py --report .hades/runtime/installed-model-selection-replay.json
+    cargo build --offline --package hades-dev --bin replay_installed_model_selection
+    python3 scripts/check_replay_parity.py replay_installed_model_selection replay_installed_model_selection --timeout 10
+    ./target/debug/replay_installed_model_selection --report .hades/runtime/installed-model-selection-replay.json --timeout 10
 
 replay-differential:
     cargo build --locked --package hades-cli

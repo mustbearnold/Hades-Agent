@@ -923,6 +923,15 @@ progress from August 1, 2026 through 2027.
   reproduces the OBS-0039 model-stage contract through `hades_dev::setup`
   (the setup-family key set already covers Escape). The differential check
   proves identical reports; the Rust binary is now the gate replay.
+- HAD-154 ports replay_installed_model_selection to Rust: `hades-dev
+  replay-installed-model-selection` reproduces the installed-launcher
+  model-selection wrapper (both ~/.local/bin spellings resolve to
+  target/release/hades; each alias runs the model-selection replay and
+  must stay inside the persisted sidecar boundary — palette-model
+  selected, vertical-model on a fresh process, 2 requests, sidecar
+  unchanged, no Hermes config.yaml; accepts an ignored `--binary` for
+  parity compatibility). The differential check proves identical reports
+  (6 cases); the Rust binary is now the gate replay.
 - HAD-153 ports replay_fresh_shell_launch to Rust: `hades-dev
   replay-fresh-shell-launch` reproduces the fresh Bash/Fish resolution
   and installed-TUI lifecycle replay (command -v/--version/--help

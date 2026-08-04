@@ -98,6 +98,7 @@ def run_alias(
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--binary", help="accepted for parity-checker compatibility; ignored (this replay runs the installed launcher aliases)")
     parser.add_argument("--launcher-dir", type=Path, default=DEFAULT_INSTALL_DIR)
     parser.add_argument(
         "--report",
