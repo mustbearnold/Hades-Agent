@@ -114,7 +114,9 @@ replay-unknown-command:
 
 replay-model-picker:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_model_picker.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0039-hades-model-picker-model-stage.json --report .hades/runtime/model-picker-replay.json
+    cargo build --offline --package hades-dev --bin replay_model_picker
+    python3 scripts/check_replay_parity.py replay_model_picker replay_model_picker --contract tests/fixtures/parity/OBS-0039-hades-model-picker-model-stage.json
+    ./target/debug/replay_model_picker --binary target/debug/hades --contract tests/fixtures/parity/OBS-0039-hades-model-picker-model-stage.json --report .hades/runtime/model-picker-replay.json
 replay-setup-wizard:
     cargo build --locked --package hades-cli
     cargo build --offline --package hades-dev --bin replay_setup_wizard

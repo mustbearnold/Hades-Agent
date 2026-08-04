@@ -296,7 +296,11 @@ cargo build --offline --package hades-dev --bin replay_completion
 python3 scripts/check_replay_parity.py replay_completion replay_completion
 ./target/debug/replay_completion --binary target/debug/hades --report .hades/runtime/completion-replay.json
 ./target/debug/replay_composer --binary target/debug/hades --contract tests/fixtures/parity/OBS-0037-hades-unknown-slash-command.json --report .hades/runtime/unknown-command-replay.json
-python3 scripts/replay_model_picker.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0039-hades-model-picker-model-stage.json --report .hades/runtime/model-picker-replay.json
+# HAD-146: replay-model-picker is ported to Rust; the differential check
+# proves identical reports, then the Rust binary is the gate replay.
+cargo build --offline --package hades-dev --bin replay_model_picker
+python3 scripts/check_replay_parity.py replay_model_picker replay_model_picker --contract tests/fixtures/parity/OBS-0039-hades-model-picker-model-stage.json
+./target/debug/replay_model_picker --binary target/debug/hades --contract tests/fixtures/parity/OBS-0039-hades-model-picker-model-stage.json --report .hades/runtime/model-picker-replay.json
 # HAD-140: replay-setup-wizard is ported to Rust; the differential check
 # proves identical reports, then the Rust binary is the gate replay.
 cargo build --offline --package hades-dev --bin replay_setup_wizard

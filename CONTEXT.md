@@ -900,6 +900,10 @@ progress from August 1, 2026 through 2027.
   markers, reads `.hermes_history` back, and interrupts/exits. The
   differential check proves identical reports (5 cases); the Rust binary
   is now the gate replay.
+- HAD-146 ports replay_model_picker to Rust: `hades-dev replay-model-picker`
+  reproduces the OBS-0039 model-stage contract through `hades_dev::setup`
+  (the setup-family key set already covers Escape). The differential check
+  proves identical reports; the Rust binary is now the gate replay.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes
