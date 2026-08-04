@@ -12,9 +12,10 @@ use std::time::Duration;
 
 use hades_dev::pty::read_available;
 use hades_dev::replay::{
-    ExitStatus, RetainedSlave, clean_output, marker_present, spawn_with_env, terminal_flags,
-    try_wait, wait_for, wait_for_exit,
+    ExitStatus, RetainedSlave, marker_present, spawn_with_env, terminal_flags, try_wait, wait_for,
+    wait_for_exit, wait_for_rendered,
 };
+use hades_dev::screen::Screen;
 use serde_json::{Value, json};
 
 const STARTUP_MARKERS: [&str; 6] = [
@@ -25,6 +26,16 @@ const STARTUP_MARKERS: [&str; 6] = [
     "glm-5.2 · Hades",
     "starting agent",
 ];
+
+/// Reconstruct the on-screen text (what a real terminal shows). The
+/// animated startup logo emits interleaved sparse-redraw cell writes that
+/// fragment typed text in the raw stream; the Screen emulator rebuilds the
+/// grid so draft markers are contiguous again.
+fn rendered_text(output: &[u8]) -> String {
+    let mut screen = Screen::new(120, 40);
+    screen.feed(output);
+    screen.lines().join("\n")
+}
 const STRIP_ENV: [&str; 5] = [
     "HADES_PROVIDER_BASE_URL",
     "HADES_PROVIDER_API_KEY",
@@ -59,36 +70,34 @@ fn run_input_case(binary: &Path, timeout: Duration) -> Result<Value, String> {
 
         hades_dev::replay::send(&child.child.master, format!("{INPUT_TEXT}\r").as_bytes())
             .map_err(|error| error.to_string())?;
-        wait_for(
+        wait_for_rendered(
             &child.child,
             &mut output,
             &format!("{case}: draft"),
-            |text| text.contains(INPUT_TEXT),
+            |rendered| marker_present(rendered, INPUT_TEXT),
             timeout,
         )?;
 
         std::thread::sleep(Duration::from_millis(150));
         output.extend_from_slice(&read_available(&child.child.master));
-        let raw_with_draft = clean_output(&output);
-        let draft_tail = tail_chars(&raw_with_draft, 1200);
-        if !marker_present(&draft_tail, "❯ queued hello") {
+        let rendered_with_draft = rendered_text(&output);
+        if !marker_present(&rendered_with_draft, "❯ queued hello") {
             return Err("unconfigured input did not render the Hermes composer marker".to_owned());
         }
-        if !marker_present(&raw_with_draft, "starting agent")
-            || marker_present(&draft_tail, "─ ready │")
+        if !marker_present(&rendered_with_draft, "starting agent")
+            || marker_present(&rendered_with_draft, "─ ready │")
         {
             return Err("unconfigured input changed the startup boundary".to_owned());
         }
-        if marker_present(&draft_tail, "Provider error") {
+        if marker_present(&rendered_with_draft, "Provider error") {
             return Err("unconfigured input rendered a provider error".to_owned());
         }
 
         hades_dev::replay::send(&child.child.master, b"\x03").map_err(|error| error.to_string())?;
         std::thread::sleep(Duration::from_millis(150));
         output.extend_from_slice(&read_available(&child.child.master));
-        let raw_after_clear = clean_output(&output);
-        let after_clear_tail = tail_chars(&raw_after_clear, 1200);
-        if !marker_present(&after_clear_tail, "starting agent") {
+        let rendered_after_clear = rendered_text(&output);
+        if !marker_present(&rendered_after_clear, "starting agent") {
             return Err("first Ctrl+C left the unconfigured startup surface".to_owned());
         }
         if try_wait(&child.child)?.is_some() {
@@ -215,12 +224,6 @@ fn run_empty_case(binary: &Path, timeout: Duration) -> Result<Value, String> {
     }
     let _ = std::fs::remove_dir_all(&child.history_home);
     result
-}
-
-fn tail_chars(text: &str, count: usize) -> String {
-    let chars: Vec<char> = text.chars().collect();
-    let start = chars.len().saturating_sub(count);
-    chars[start..].iter().collect()
 }
 
 fn find_sequence(haystack: &[u8], needle: &[u8]) -> bool {

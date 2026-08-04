@@ -42,8 +42,28 @@ if py.returncode != 0 or rs.returncode != 0:
     print("rs stderr:", rs.stderr[-300:])
     sys.exit(1)
 
+def _drop_raw_delta(node):
+    """Recursively replace raw_delta/screen_tail (timing-dependent byte
+    diagnostics) with a placeholder so reports from two runs compare on the
+    asserted contract (marker styles, structure, cleanup) only."""
+    if isinstance(node, dict):
+        result = {}
+        for key, value in node.items():
+            if key == "raw_delta":
+                result[key] = "<delta>"
+            elif key == "screen_tail":
+                result[key] = "<tail>"
+            else:
+                result[key] = _drop_raw_delta(value)
+        return result
+    if isinstance(node, list):
+        return [_drop_raw_delta(item) for item in node]
+    return node
+
+
 def normalize_report(data):
     """Normalize run-to-run timing fields before comparison."""
+    data = _drop_raw_delta(data)
     text = json.dumps(data, sort_keys=True)
     # pre_delay_ms and observed_transition_ms vary by run; both replays
     # assert the same bounds, so compare their presence, not exact values.

@@ -58,7 +58,14 @@ def normalize(raw: bytes) -> str:
 
 
 def contains_marker(raw: bytes, marker: str) -> bool:
-    text = normalize(raw)
+    # Render through the Screen emulator: the animated startup logo emits
+    # interleaved sparse-redraw cell writes that fragment typed text in the
+    # raw stream; the reconstructed screen keeps markers contiguous.
+    from probe_hermes_terminal_palette import Screen
+
+    screen = Screen()
+    screen.feed(raw)
+    text = "\n".join(screen.lines())
     compact_text = "".join(text.split()).lower()
     compact_marker = "".join(marker.split()).lower()
     return marker in text or compact_marker in compact_text

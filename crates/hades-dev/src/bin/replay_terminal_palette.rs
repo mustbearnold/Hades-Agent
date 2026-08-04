@@ -103,6 +103,18 @@ fn contains_marker(text: &str, marker: &str) -> bool {
     compact_text.contains(&compact_marker)
 }
 
+/// Search the RENDERED screen (via the Screen emulator) for a marker.
+/// The raw PTY stream carries sparse-redraw cell writes interleaved with
+/// the animated logo redraws, so a typed string is fragmented in the raw
+/// bytes but contiguous on the reconstructed screen — the same view a real
+/// terminal shows.
+fn rendered_contains(output: &[u8], marker: &str) -> bool {
+    let mut screen = Screen::new(COLUMNS as usize, ROWS as usize);
+    screen.feed(output);
+    let rendered = screen.lines().join("\n");
+    contains_marker(&rendered, marker)
+}
+
 /// SGR summary of a raw delta, like `sgr_summary` (sha256, byte length,
 /// and ordered `\x1b[...m` sequence counts).
 fn sgr_summary(raw: &[u8]) -> Value {
@@ -429,7 +441,7 @@ fn run_ready_sequence(
             &mut output,
             case,
             "composer",
-            |current| contains_marker(&normalized(current), "palette-ready"),
+            |current| rendered_contains(current, "palette-ready"),
             timeout,
         )?;
         output.extend_from_slice(&drain(&child.child.master, Duration::from_millis(120)));
@@ -445,7 +457,7 @@ fn run_ready_sequence(
             &mut output,
             case,
             "busy",
-            |current| contains_marker(&normalized(current), "Ctrl+C to interrupt"),
+            |current| rendered_contains(current, "Ctrl+C to interrupt"),
             timeout,
         )?;
         output.extend_from_slice(&drain(&child.child.master, Duration::from_millis(50)));
@@ -461,7 +473,7 @@ fn run_ready_sequence(
             &mut output,
             case,
             "interrupted",
-            |current| contains_marker(&normalized(current), "interrupted"),
+            |current| rendered_contains(current, "interrupted"),
             timeout,
         )?;
         output.extend_from_slice(&drain(&child.child.master, Duration::from_millis(120)));

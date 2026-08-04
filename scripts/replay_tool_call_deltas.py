@@ -276,6 +276,40 @@ def wait_for(
     raise ReplayFailure(case, step, f"timed out after {timeout:.1f}s", bytes(output))
 
 
+def wait_for_rendered(
+    pid: int,
+    fd: int,
+    output: bytearray,
+    case: str,
+    step: str,
+    predicate: Predicate,
+    timeout: float,
+) -> None:
+    """Like wait_for, but the predicate sees the RENDERED screen text.
+
+    The animated startup logo emits interleaved sparse-redraw cell writes
+    that fragment typed/streamed text in the raw stream; the Screen
+    emulator rebuilds the grid so markers are contiguous again.
+    """
+    from probe_hermes_terminal_palette import Screen  # lazy: avoids cycles
+
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        read_available(fd, output)
+        screen = Screen()
+        screen.feed(bytes(output))
+        if predicate("\n".join(screen.lines())):
+            return
+        done, _ = child_done(pid)
+        if done:
+            read_available(fd, output)
+            raise ReplayFailure(case, step, "Hades exited before the PTY assertion", bytes(output))
+        remaining = deadline - time.monotonic()
+        select.select([fd], [], [], min(0.05, max(0.0, remaining)))
+    read_available(fd, output)
+    raise ReplayFailure(case, step, f"timed out after {timeout:.1f}s", bytes(output))
+
+
 def wait_for_exit(pid: int, fd: int, output: bytearray, timeout: float) -> int:
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
@@ -377,7 +411,7 @@ def run_tool_call_case(binary: Path, timeout: float) -> dict[str, Any]:
             lambda _text: server.request_seen.is_set(),
             timeout,
         )
-        wait_for(
+        wait_for_rendered(
             pid,
             fd,
             output,
@@ -388,7 +422,7 @@ def run_tool_call_case(binary: Path, timeout: float) -> dict[str, Any]:
         )
         # Wait for the bounded tool-result follow-up and its answer, then prove
         # no third request arrives.
-        wait_for(
+        wait_for_rendered(
             pid,
             fd,
             output,

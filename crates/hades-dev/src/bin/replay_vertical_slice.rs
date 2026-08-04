@@ -21,7 +21,7 @@ use std::time::{Duration, Instant};
 
 use hades_dev::replay::{
     ExitStatus, RetainedSlave, TerminalFlags, clean_output, marker_present, spawn_with_env,
-    terminal_flags, wait_for, wait_for_exit,
+    terminal_flags, wait_for, wait_for_exit, wait_for_rendered,
 };
 use serde_json::{Value, json};
 
@@ -308,7 +308,7 @@ fn run_chat(
             |_text| state.request_seen.load(Ordering::SeqCst),
             timeout,
         )?;
-        wait_for(
+        wait_for_rendered(
             &child.child,
             &mut output,
             "first-delta",
@@ -319,7 +319,7 @@ fn run_chat(
             return Err("first-delta: completion arrived before first-delta readback".to_string());
         }
         state.release_response.store(true, Ordering::SeqCst);
-        wait_for(
+        wait_for_rendered(
             &child.child,
             &mut output,
             "completion",

@@ -24,6 +24,7 @@ from probe_tui_lifecycle import (
     terminal_flags,
     wait_for,
     wait_for_exit,
+    wait_for_rendered,
 )
 
 
@@ -357,7 +358,7 @@ def run_behavior(
             if kind == "text":
                 payload = value.encode("utf-8")
                 send(master, payload)
-                wait_for(
+                wait_for_rendered(
                     pid,
                     master,
                     output,
@@ -573,7 +574,7 @@ def run_session_overlay(
                         "composer input was accepted while the overlay was open",
                     )
                 send(master, value.encode("utf-8"))
-                wait_for(
+                wait_for_rendered(
                     pid,
                     master,
                     output,
@@ -753,7 +754,7 @@ def run_setup_required(
                         "composer input was accepted while Setup Required was open",
                     )
                 send(master, value.encode("utf-8"))
-                wait_for(
+                wait_for_rendered(
                     pid,
                     master,
                     output,

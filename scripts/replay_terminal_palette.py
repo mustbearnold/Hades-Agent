@@ -36,6 +36,19 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_BINARY = ROOT / "target/debug/hades"
 DEFAULT_CONTRACT = ROOT / "tests/fixtures/parity/OBS-0035-hades-terminal-palette.json"
 SOURCE_COMMIT = "e444d165807f489b5c1ab8e4a612c8d09c2e67a2"
+
+
+def rendered_contains(raw: bytes, marker: str) -> bool:
+    """Search the RENDERED screen (via the Screen emulator) for a marker.
+
+    The raw PTY stream carries sparse-redraw cell writes interleaved with
+    the animated logo redraws, so a typed string is fragmented in the raw
+    bytes but contiguous on the reconstructed screen — the same view a real
+    terminal shows.
+    """
+    screen = Screen()
+    screen.feed(raw)
+    return contains_marker("\n".join(screen.lines()).encode(), marker)
 Predicate = Callable[[bytes], bool]
 
 
@@ -235,21 +248,21 @@ def run_ready_sequence(binary: Path, steps: dict[str, dict[str, Any]], timeout: 
 
         composer_start = len(buffer)
         write_bytes(fd, b"palette-ready")
-        buffer = wait_for(pid, fd, buffer, case, "composer", lambda current: contains_marker(current, "palette-ready"), timeout)
+        buffer = wait_for(pid, fd, buffer, case, "composer", lambda current: rendered_contains(current, "palette-ready"), timeout)
         buffer = drain(pid, fd, buffer)
         composer = surface_record(buffer[composer_start:], buffer, ["palette-ready", "ready"])
         assert_surface(case, "composer", composer, steps["composer"]["output"])
 
         busy_start = len(buffer)
         write_bytes(fd, b"\r")
-        buffer = wait_for(pid, fd, buffer, case, "busy", lambda current: contains_marker(current, "Ctrl+C to interrupt"), timeout)
+        buffer = wait_for(pid, fd, buffer, case, "busy", lambda current: rendered_contains(current, "Ctrl+C to interrupt"), timeout)
         buffer = drain(pid, fd, buffer, 0.05)
         busy = surface_record(buffer[busy_start:], buffer, ["Ctrl+C to interrupt"])
         assert_surface(case, "busy", busy, steps["busy"]["output"])
 
         interrupted_start = len(buffer)
         write_bytes(fd, b"\x03")
-        buffer = wait_for(pid, fd, buffer, case, "interrupted", lambda current: contains_marker(current, "interrupted"), timeout)
+        buffer = wait_for(pid, fd, buffer, case, "interrupted", lambda current: rendered_contains(current, "interrupted"), timeout)
         buffer = drain(pid, fd, buffer)
         interrupted = surface_record(buffer[interrupted_start:], buffer, ["interrupted", "✓"])
         assert_surface(case, "interrupted", interrupted, steps["interrupted"]["output"])

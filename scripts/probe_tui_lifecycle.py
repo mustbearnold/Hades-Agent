@@ -119,6 +119,42 @@ def wait_for(
     raise ProbeError(f"{description}: timed out\n{output_tail(output)}")
 
 
+def wait_for_rendered(
+    pid: int,
+    master: int,
+    output: bytearray,
+    description: str,
+    predicate: Predicate,
+    timeout: float,
+) -> None:
+    """Like wait_for, but the predicate receives the RENDERED screen text.
+
+    The animated startup logo emits interleaved sparse-redraw cell writes
+    that fragment typed text in the raw stream; the reconstructed screen
+    (what a real terminal shows) keeps it contiguous.
+    """
+    from probe_hermes_terminal_palette import Screen  # lazy: avoids cycles
+
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        read_available(master, output)
+        screen = Screen()
+        screen.feed(bytes(output))
+        if predicate("\n".join(screen.lines())):
+            return
+        done, status = os.waitpid(pid, os.WNOHANG)
+        if done:
+            raise ProbeError(
+                f"{description}: process exited early with {describe_status(status)}\n"
+                f"{output_tail(output)}"
+            )
+        remaining = deadline - time.monotonic()
+        if remaining > 0:
+            select.select([master], [], [], min(0.05, remaining))
+    read_available(master, output)
+    raise ProbeError(f"{description}: timed out\n{output_tail(output)}")
+
+
 def wait_for_exit(pid: int, master: int, output: bytearray, timeout: float) -> int:
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:

@@ -25,6 +25,7 @@ from replay_vertical_slice import (
     terminal_flags,
     wait_for,
     wait_for_exit,
+    wait_for_rendered,
     write_report,
 )
 from probe_hermes_terminal_palette import Screen as AnsiScreen
@@ -104,7 +105,7 @@ def run_first_process(
         )
 
         send(fd, b"/he")
-        wait_for(
+        wait_for_rendered(
             pid,
             fd,
             output,
@@ -123,7 +124,7 @@ def run_first_process(
         send(fd, b"\r")
         time.sleep(0.15)
         send(fd, b"\r")
-        wait_for(
+        wait_for_rendered(
             pid,
             fd,
             output,

@@ -15,7 +15,6 @@ from typing import Any
 
 from probe_tui_lifecycle import (
     ProbeError,
-    clean_output,
     describe_status,
     read_available,
     set_window_size,
@@ -25,6 +24,7 @@ from probe_tui_lifecycle import (
     slave_path_for_pid,
     wait_for,
     wait_for_exit,
+    wait_for_rendered,
 )
 
 
@@ -45,6 +45,20 @@ def send(master: int, payload: bytes) -> None:
     offset = 0
     while offset < len(payload):
         offset += os.write(master, payload[offset:])
+
+
+def rendered_text(output: bytearray) -> str:
+    """Reconstruct the on-screen text (what a real terminal shows).
+
+    The animated startup logo emits interleaved sparse-redraw cell writes
+    that fragment typed text in the raw stream; the Screen emulator rebuilds
+    the grid so draft markers are contiguous again.
+    """
+    from probe_hermes_terminal_palette import Screen  # lazy: avoids cycles
+
+    screen = Screen()
+    screen.feed(bytes(output))
+    return "\n".join(screen.lines())
 
 
 def poll_exit(pid: int) -> tuple[bool, int | None]:
@@ -126,29 +140,29 @@ def run_input_case(binary: Path, arguments: list[str], timeout: float) -> dict[s
             raise ProbeError("unconfigured input startup did not enter raw mode")
 
         send(master, f"{INPUT_TEXT}\r".encode())
-        wait_for(
+        wait_for_rendered(
             pid,
             master,
             output,
             f"{case}: draft",
-            lambda text: INPUT_TEXT in text,
+            lambda rendered: marker_present(rendered, INPUT_TEXT),
             timeout,
         )
         time.sleep(0.15)
         read_available(master, output)
-        raw_with_draft = clean_output(output)
-        if not marker_present(raw_with_draft[-1200:], "❯ queued hello"):
+        rendered_with_draft = rendered_text(output)
+        if not marker_present(rendered_with_draft, "❯ queued hello"):
             raise ProbeError("unconfigured input did not render the Hermes composer marker")
-        if not marker_present(raw_with_draft, "starting agent") or marker_present(raw_with_draft[-1200:], "─ ready │"):
+        if not marker_present(rendered_with_draft, "starting agent") or marker_present(rendered_with_draft, "─ ready │"):
             raise ProbeError("unconfigured input changed the startup boundary")
-        if marker_present(raw_with_draft[-1200:], "Provider error"):
+        if marker_present(rendered_with_draft, "Provider error"):
             raise ProbeError("unconfigured input rendered a provider error")
 
         send(master, b"\x03")
         time.sleep(0.15)
         read_available(master, output)
-        raw_after_clear = clean_output(output)[-1200:]
-        if not marker_present(raw_after_clear, "starting agent"):
+        rendered_after_clear = rendered_text(output)
+        if not marker_present(rendered_after_clear, "starting agent"):
             raise ProbeError("first Ctrl+C left the unconfigured startup surface")
         first_ctrl_c_exited, _ = poll_exit(pid)
         if first_ctrl_c_exited:

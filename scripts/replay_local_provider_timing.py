@@ -25,6 +25,7 @@ from replay_local_provider import (
     stop_process,
     wait_for,
     wait_for_exit,
+    wait_for_rendered,
 )
 
 
@@ -119,7 +120,7 @@ def run_case(binary: Path, interrupt: bool, timeout: float) -> dict[str, Any]:
         send(fd, b"stream timing probe\r")
         wait_for(pid, fd, output, case, "request", lambda _text: server.request_seen.is_set(), timeout)
         wait_for(pid, fd, output, case, "first-write", lambda _text: server.first_sent.is_set(), timeout)
-        wait_for(
+        wait_for_rendered(
             pid,
             fd,
             output,
@@ -131,7 +132,7 @@ def run_case(binary: Path, interrupt: bool, timeout: float) -> dict[str, Any]:
 
         if interrupt:
             send(fd, b"\x03")
-            wait_for(pid, fd, output, case, "interrupt", lambda text: marker_present(text, "interrupted"), timeout)
+            wait_for_rendered(pid, fd, output, case, "interrupt", lambda text: marker_present(text, "interrupted"), timeout)
             time.sleep(0.1)
             server.release_second.set()
             wait_for(pid, fd, output, case, "connection-close", lambda _text: server.handler_done.is_set(), timeout)
@@ -142,7 +143,7 @@ def run_case(binary: Path, interrupt: bool, timeout: float) -> dict[str, Any]:
             send(fd, b"\x03")
         else:
             server.release_second.set()
-            wait_for(
+            wait_for_rendered(
                 pid,
                 fd,
                 output,
@@ -151,7 +152,7 @@ def run_case(binary: Path, interrupt: bool, timeout: float) -> dict[str, Any]:
                 lambda text: marker_present(text, SECOND_DELTA),
                 timeout,
             )
-            wait_for(pid, fd, output, case, "ready", lambda text: marker_present(text, "ready"), timeout)
+            wait_for_rendered(pid, fd, output, case, "ready", lambda text: marker_present(text, "ready"), timeout)
             send(fd, b"\x03")
 
         status = wait_for_exit(pid, fd, output, timeout)

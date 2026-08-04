@@ -151,6 +151,63 @@ where
     }
 }
 
+/// Like `wait_for`, but the predicate receives the RENDERED screen text
+/// (rebuilt via the Screen emulator) instead of the raw byte stream. The
+/// animated startup logo emits interleaved sparse-redraw cell writes that
+/// fragment typed text in the raw stream; the reconstructed screen — the
+/// view a real terminal shows — keeps markers contiguous.
+fn wait_for_rendered<F>(
+    child: &hades_dev::pty::PtyChild,
+    output: &mut Vec<u8>,
+    case: &str,
+    step: &str,
+    predicate: F,
+    timeout: Duration,
+) -> Result<(), ModifiedEnterError>
+where
+    F: Fn(&str) -> bool,
+{
+    let deadline = Instant::now() + timeout;
+    loop {
+        let mut screen = hades_dev::screen::Screen::new(120, 40);
+        screen.feed(output);
+        let rendered = screen.lines().join("\n");
+        if predicate(&rendered) {
+            return Ok(());
+        }
+        if let Some(_status) = try_wait(child).map_err(|error| {
+            ModifiedEnterError::new(case, step, format!("waitpid failed: {error}"))
+        })? {
+            return Err(ModifiedEnterError::with_screen(
+                case,
+                step,
+                "process exited during wait".to_string(),
+                &normalized(output),
+            ));
+        }
+        if Instant::now() >= deadline {
+            return Err(ModifiedEnterError::with_screen(
+                case,
+                step,
+                format!("timed out after {:.1}s", timeout.as_secs_f64()),
+                &normalized(output),
+            ));
+        }
+        let remaining = deadline.saturating_duration_since(Instant::now());
+        let millis = remaining.as_millis().min(250) as i64;
+        let timespec =
+            rustix::time::Timespec { tv_sec: millis / 1000, tv_nsec: (millis % 1000) * 1_000_000 };
+        let mut poll_fd = rustix::event::PollFd::new(&child.master, rustix::event::PollFlags::IN);
+        let ready = rustix::event::poll(std::slice::from_mut(&mut poll_fd), Some(&timespec))
+            .map_err(|error| {
+                ModifiedEnterError::new(case, step, format!("poll failed: {error}"))
+            })?;
+        if ready > 0 {
+            output.extend_from_slice(&read_available(&child.master));
+        }
+    }
+}
+
 fn write_bytes(master: &rustix::fd::OwnedFd, payload: &[u8]) -> Result<(), ModifiedEnterError> {
     let mut offset = 0;
     while offset < payload.len() {
@@ -313,15 +370,12 @@ fn run_case(
 
         let step_name =
             if case_id == "plain-enter-control" { "plain-enter" } else { "modified-enter" };
-        wait_for(
+        wait_for_rendered(
             &child.child,
             &mut buffer,
             &case_id,
             step_name,
-            |current| {
-                let text = normalized(current);
-                markers.iter().all(|marker| contains_marker(&text, marker))
-            },
+            |text| markers.iter().all(|marker| contains_marker(text, marker)),
             timeout,
         )?;
         let screen = normalized(&buffer);
@@ -356,14 +410,13 @@ fn run_case(
             vec!["Ctrl+C exits from ready without submission"]
         } else {
             write_bytes(&child.child.master, b"\x03")?;
-            wait_for(
+            wait_for_rendered(
                 &child.child,
                 &mut buffer,
                 &case_id,
                 "interrupt",
-                |current| {
-                    let text = normalized(current);
-                    contains_marker(&text, "Interrupted.") || contains_marker(&text, "interrupted")
+                |text| {
+                    contains_marker(text, "Interrupted.") || contains_marker(text, "interrupted")
                 },
                 timeout,
             )?;

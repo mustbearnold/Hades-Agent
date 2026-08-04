@@ -235,6 +235,45 @@ pub fn try_wait(child: &PtyChild) -> Result<Option<WaitStatus>, String> {
     Ok(result.map(|(_, status)| status))
 }
 
+/// Wait until `predicate(rendered_screen)` — the predicate receives the
+/// RENDERED screen text (rebuilt from raw bytes via the Screen emulator),
+/// not the raw byte stream. The animated startup logo emits interleaved
+/// sparse-redraw cell writes that fragment typed text in the raw stream;
+/// the reconstructed screen — the view a real terminal shows — keeps it
+/// contiguous.
+pub fn wait_for_rendered<F>(
+    child: &PtyChild,
+    output: &mut Vec<u8>,
+    description: &str,
+    predicate: F,
+    timeout: Duration,
+) -> Result<(), String>
+where
+    F: Fn(&str) -> bool,
+{
+    let deadline = Instant::now() + timeout;
+    loop {
+        output.extend_from_slice(&read_available(&child.master));
+        let mut screen = crate::screen::Screen::new(120, 40);
+        screen.feed(output);
+        let rendered = screen.lines().join("\n");
+        if predicate(&rendered) {
+            return Ok(());
+        }
+        if let Some(status) = try_wait(child)? {
+            return Err(format!(
+                "{description}: process exited early with {}\n{}",
+                serde_json::to_string(&ExitStatus::describe(status).as_json()).unwrap_or_default(),
+                output_tail(output)
+            ));
+        }
+        if Instant::now() >= deadline {
+            return Err(format!("{description}: timed out\n{}", output_tail(output)));
+        }
+        std::thread::sleep(Duration::from_millis(20));
+    }
+}
+
 /// Wait for the child to exit, draining output, like `wait_for_exit`.
 pub fn wait_for_exit(
     child: &PtyChild,

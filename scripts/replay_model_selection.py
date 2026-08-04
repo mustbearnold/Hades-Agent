@@ -24,6 +24,7 @@ from replay_vertical_slice import (
     stop_process,
     wait_for,
     wait_for_exit,
+    wait_for_rendered,
     write_report,
 )
 
@@ -44,7 +45,7 @@ def wait_for_stream(
         lambda _text: len(server.records) >= request_count,
         timeout,
     )
-    wait_for(
+    wait_for_rendered(
         pid,
         fd,
         output,
@@ -67,7 +68,7 @@ def wait_for_stream(
         lambda _text: server.response_complete.is_set(),
         timeout,
     )
-    wait_for(
+    wait_for_rendered(
         pid,
         fd,
         output,
