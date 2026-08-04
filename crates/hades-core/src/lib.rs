@@ -976,6 +976,9 @@ pub struct SessionState {
     pub messages: Vec<Message>,
     pub status: String,
     pub should_quit: bool,
+    /// Monotonic frame counter, incremented on every `InputEvent::Tick`.
+    /// Drives the animated startup logo (Hades-owned surface).
+    pub tick: u64,
 }
 
 impl Default for SessionState {
@@ -993,6 +996,7 @@ impl Default for SessionState {
             messages: Vec::new(),
             status: "Reference behavior pending capture.".to_owned(),
             should_quit: false,
+            tick: 0,
         }
     }
 }

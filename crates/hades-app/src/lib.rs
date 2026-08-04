@@ -274,6 +274,7 @@ impl App {
     }
 
     fn handle_tick(&mut self, now: Instant) -> DispatchOutcome {
+        self.state.tick = self.state.tick.wrapping_add(1);
         let help_is_pending = self.help_setup_deadline.is_some_and(|deadline| now >= deadline);
         if self.state.startup == StartupState::Unconfigured
             && self.state.overlay.is_none()

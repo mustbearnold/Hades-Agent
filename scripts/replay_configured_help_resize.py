@@ -160,10 +160,12 @@ def run_case(binary: Path, timeout: float) -> dict[str, Any]:
             state = wait_for_panel(pid, fd, output, columns, rows, timeout)
             expected = {
                 "x": 1,
-                "y": rows - 4,
+                # Composer sits ABOVE the information line (owner-directed
+                # deviation): panel floats above the composer.
+                "y": rows - 5,
                 "width": columns - 2,
                 "height": 3,
-                "composer_y": rows - 1,
+                "composer_y": rows - 2,
             }
             for key, value in expected.items():
                 if state[key] != value:

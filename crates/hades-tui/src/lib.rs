@@ -29,11 +29,19 @@ use ratatui::{
 
 const HADES_STARTUP_HEIGHT: u16 = 40;
 const HADES_STARTUP_FRAME: &str = include_str!("../assets/hades-startup-120x40.txt");
+/// 4-frame animated demon-skeleton-with-pitchfork logo. Each frame is 15
+/// braille rows; frames are separated by a blank line. Frame 0 matches the
+/// braille region baked into the startup asset, so static snapshots (golden
+/// tests, `--snapshot`) render frame 0 and live ticks animate.
+const HADES_DEMON_FRAMES: &str = include_str!("../assets/hades-demon-frames.txt");
+const HADES_DEMON_FRAME_ROWS: usize = 15;
+const HADES_DEMON_REGION_ROW: usize = 16;
+const HADES_DEMON_REGION_COL: usize = 4;
 const HERMES_BUSY_FOOTER: &str = " ─ musing… │ mulling… │ mock model │ <seconds>s │ voice off │ 1 session                                      ─ <reference-cwd> (main)";
 const HERMES_INTERRUPT_PROMPT: &str = " ❯ Ctrl+C to interrupt…";
 const HERMES_INTERRUPTED_MARKER: &str = " │ interrupted";
 const HERMES_INTERRUPTED_FOOTER: &str = " ─ ready │ mock model │ ✓ <seconds>s │ voice off │ 1 session                                      ─ <reference-cwd> (main)";
-const HADES_UNCONFIGURED_MODEL: &str = " │ glm-5.2 · Hades          31 tools · 66 skills · /help for commands                                   │";
+const HADES_UNCONFIGURED_MODEL: &str = " │ glm-5.2 · Hades          31 tools · 66 skills · /help for commands                                               │";
 const HERMES_UNCONFIGURED_FOOTER: &str = " ─ starting agent… │ glm5.2 │ 0s │ voice off │ 1 session                                      ─ <reference-cwd> (main)";
 const HERMES_CLIPBOARD_MISS: &str = "No image found in clipboard";
 const HERMES_COMPOSER_MAX_CHARS: usize = 117;
@@ -282,34 +290,71 @@ fn draw_standalone_terminal_backend_fallback(frame: &mut Frame<'_>) {
     frame.render_widget(Paragraph::new(Text::from(lines)), frame.area());
 }
 
+/// Overlay the animated demon-skeleton frame for `tick` onto the braille
+/// logo region of the startup rows. Frame 0 equals the asset's baked-in
+/// braille, so tick 0 (static snapshots) renders identically to the golden.
+fn overlay_demon_frame(rows: &mut [String], tick: u64) {
+    let frame_count = HADES_DEMON_FRAMES.lines().filter(|l| l.is_empty()).count() + 1;
+    let frame_index = (tick as usize) % frame_count;
+    let frame = HADES_DEMON_FRAMES
+        .split('\n')
+        .filter(|line| !line.is_empty())
+        .skip(frame_index * HADES_DEMON_FRAME_ROWS)
+        .take(HADES_DEMON_FRAME_ROWS)
+        .collect::<Vec<_>>();
+    if frame.len() != HADES_DEMON_FRAME_ROWS {
+        return;
+    }
+    for (i, braille_row) in frame.iter().enumerate() {
+        let row = HADES_DEMON_REGION_ROW + i;
+        let Some(destination) = rows.get_mut(row) else {
+            return;
+        };
+        let mut chars: Vec<char> = destination.chars().collect();
+        for (j, ch) in braille_row.chars().enumerate() {
+            let column = HADES_DEMON_REGION_COL + j;
+            if column < chars.len() {
+                chars[column] = ch;
+            }
+        }
+        *destination = chars.into_iter().collect();
+    }
+}
+
 fn draw_hermes_startup(frame: &mut Frame<'_>, app: &App) {
     let height = usize::from(frame.area().height);
-    let footer_row = height.saturating_sub(2);
-    let composer_row = height.saturating_sub(1);
+    // Owner-directed layout: the composer sits ABOVE the information line
+    // (deviation from the Hermes reference, documented in MATRIX.md).
+    let composer_row = height.saturating_sub(2);
+    let footer_row = height.saturating_sub(1);
     let template_rows = HADES_STARTUP_FRAME.lines().collect::<Vec<_>>();
     let mut rows = vec![String::new(); height];
     // Copy only the template body (rows 0..38), never the template's own
     // footer/composer rows: on terminals taller than the 40-row template,
     // copying them mid-screen duplicated the footer and prompt (HAD-122).
-    let body_rows = (HADES_STARTUP_HEIGHT as usize - 2).min(footer_row);
+    let body_rows = (HADES_STARTUP_HEIGHT as usize - 2).min(composer_row);
     for (row, destination) in rows.iter_mut().enumerate().take(body_rows) {
         if let Some(template) = template_rows.get(row) {
             *destination = (*template).to_owned();
         }
     }
-    if let Some(footer) = template_rows.get(HADES_STARTUP_HEIGHT as usize - 2)
-        && let Some(row) = rows.get_mut(footer_row)
-    {
-        *row = (*footer).to_owned();
-    }
-    if let Some(composer) = template_rows.last()
+    if let Some(composer) = template_rows.get(HADES_STARTUP_HEIGHT as usize - 2)
         && let Some(row) = rows.get_mut(composer_row)
     {
         *row = (*composer).to_owned();
     }
+    if let Some(footer) = template_rows.last()
+        && let Some(row) = rows.get_mut(footer_row)
+    {
+        *row = (*footer).to_owned();
+    }
+
+    // Animated demon-skeleton logo: overlay the frame for the current tick
+    // on the braille region. Tick 0 matches the asset (golden snapshots).
+    overlay_demon_frame(&mut rows, app.state().tick);
 
     if app.state().startup == StartupState::Unconfigured {
-        if let Some(row) = rows.get_mut(26) {
+        if let Some(row) = rows.get_mut(31) {
             *row = HADES_UNCONFIGURED_MODEL.to_owned();
         }
         if let Some(row) = rows.get_mut(footer_row) {
@@ -332,7 +377,7 @@ fn draw_hermes_startup(frame: &mut Frame<'_>, app: &App) {
     } else if !app.state().composer.text().is_empty() {
         draw_hermes_composer(&mut rows, app.state().composer.text(), composer_row);
     } else if app.state().status == "Interrupted." {
-        if let Some(row) = rows.get_mut(footer_row.saturating_sub(1)) {
+        if let Some(row) = rows.get_mut(composer_row.saturating_sub(1)) {
             *row = HERMES_INTERRUPTED_MARKER.to_owned();
         }
         if let Some(row) = rows.get_mut(footer_row) {
@@ -349,37 +394,37 @@ fn draw_hermes_startup(frame: &mut Frame<'_>, app: &App) {
         *row = format!(" {}", app.state().status);
     }
 
-    draw_hermes_response(&mut rows, app, footer_row);
+    draw_hermes_response(&mut rows, app, composer_row);
 
     if app.state().completion.is_visible() {
-        draw_hermes_completion(&mut rows, app.state().completion.items(), footer_row);
+        draw_hermes_completion(&mut rows, app.state().completion.items(), composer_row);
     }
     if app.state().status == HERMES_CLIPBOARD_MISS
-        && let Some(row) = rows.get_mut(footer_row.saturating_sub(1))
+        && let Some(row) = rows.get_mut(composer_row.saturating_sub(1))
     {
         *row = format!(" │ {HERMES_CLIPBOARD_MISS}");
     }
     if let Some(model_status) = app.state().status.strip_prefix("model → ")
-        && let Some(row) = rows.get_mut(footer_row.saturating_sub(1))
+        && let Some(row) = rows.get_mut(composer_row.saturating_sub(1))
     {
         *row = format!(" │ model → {model_status}");
     }
     if let Some(Notice::UnknownCommand { command }) = &app.state().notice {
-        if let Some(row) = rows.get_mut(footer_row.saturating_sub(2)) {
+        if let Some(row) = rows.get_mut(composer_row.saturating_sub(2)) {
             *row = format!(" Unknown command: {command}");
         }
-        if let Some(row) = rows.get_mut(footer_row.saturating_sub(1)) {
+        if let Some(row) = rows.get_mut(composer_row.saturating_sub(1)) {
             *row = " Type /help for available commands".to_owned();
         }
     }
     match &app.state().notice {
         Some(Notice::ProviderError { message }) => {
-            if let Some(row) = rows.get_mut(footer_row.saturating_sub(2)) {
+            if let Some(row) = rows.get_mut(composer_row.saturating_sub(2)) {
                 *row = format!(" Provider error: {}", bounded_composer_line(message));
             }
         }
         Some(Notice::ProviderCancelled) => {
-            if let Some(row) = rows.get_mut(footer_row.saturating_sub(2)) {
+            if let Some(row) = rows.get_mut(composer_row.saturating_sub(2)) {
                 *row = " Provider response cancelled".to_owned();
             }
         }
@@ -394,7 +439,7 @@ fn draw_hermes_startup(frame: &mut Frame<'_>, app: &App) {
     frame.render_widget(Paragraph::new(Text::from(styled_rows)), frame.area());
 }
 
-fn draw_hermes_response(rows: &mut [String], app: &App, footer_row: usize) {
+fn draw_hermes_response(rows: &mut [String], app: &App, composer_row: usize) {
     let Some(message) =
         app.state().messages.iter().rev().find(|message| message.role == Role::Assistant)
     else {
@@ -402,7 +447,7 @@ fn draw_hermes_response(rows: &mut [String], app: &App, footer_row: usize) {
     };
 
     let lines = message.content.split('\n').collect::<Vec<_>>();
-    let end = footer_row.saturating_sub(1).min(rows.len().saturating_sub(1));
+    let end = composer_row.saturating_sub(1).min(rows.len().saturating_sub(1));
     let start_row = end.saturating_sub(5);
     let available = end.saturating_sub(start_row) + 1;
     let start = lines.len().saturating_sub(available);
@@ -441,8 +486,8 @@ fn bounded_composer_line(line: &str) -> String {
     line.chars().rev().take(HERMES_COMPOSER_MAX_CHARS).collect::<String>().chars().rev().collect()
 }
 
-fn draw_hermes_completion(rows: &mut [String], items: &[String], footer_row: usize) {
-    let header_row = footer_row.saturating_sub(5);
+fn draw_hermes_completion(rows: &mut [String], items: &[String], composer_row: usize) {
+    let header_row = composer_row.saturating_sub(5);
     if header_row < rows.len() {
         rows[header_row] = "  completions".to_owned();
     }
@@ -466,10 +511,10 @@ fn style_hermes_line(
 ) -> Line<'static> {
     let mut markers = Vec::new();
     match row {
-        7 => markers.push(("Hades", HERMES_PALETTE.secondary())),
-        11 => markers.push(("Hades Agent", HERMES_PALETTE.brand())),
-        14 => markers.push(("Available Tools", HERMES_PALETTE.brand())),
-        25 => markers.push(("Available Skills", HERMES_PALETTE.brand())),
+        12 => markers.push(("Hades", HERMES_PALETTE.secondary())),
+        16 => markers.push(("Hades Agent", HERMES_PALETTE.brand())),
+        19 => markers.push(("Available Tools", HERMES_PALETTE.brand())),
+        30 => markers.push(("Available Skills", HERMES_PALETTE.brand())),
         _ if row == footer_row => {
             markers.push(("ready", HERMES_PALETTE.ready()));
             markers.push(("✓", HERMES_PALETTE.secondary()));
@@ -564,9 +609,11 @@ fn draw_help_overlay(frame: &mut Frame<'_>) {
     let frame_area = frame.area();
     let height = HERMES_HELP_PANEL_HEIGHT.min(frame_area.height);
     let width = frame_area.width.saturating_sub(2);
+    // The composer sits one row above the footer (owner-directed layout),
+    // so the panel floats above the composer: bottom edge at height-3.
     let area = Rect {
         x: frame_area.x + frame_area.width.saturating_sub(width) / 2,
-        y: frame_area.y + frame_area.height.saturating_sub(height + 1),
+        y: frame_area.y + frame_area.height.saturating_sub(height + 2),
         width,
         height,
     };
@@ -1378,9 +1425,10 @@ mod tests {
                 composer_lines, 1,
                 "height {height}: expected exactly one composer line, got {composer_lines}"
             );
-            // The single footer/composer live at the very bottom of the screen.
-            assert!(lines[usize::from(height) - 2].contains("─ ready │ mock model"));
-            assert!(lines[usize::from(height) - 1].trim_start().starts_with("❯ "));
+            // The composer sits ABOVE the information line at the bottom
+            // of the screen (owner-directed layout).
+            assert!(lines[usize::from(height) - 2].trim_start().starts_with("❯ "));
+            assert!(lines[usize::from(height) - 1].contains("─ ready │ mock model"));
         }
     }
 
@@ -1458,10 +1506,11 @@ mod tests {
                 .position(|line| line.contains(HERMES_HELP_COMMAND))
                 .expect("help command row");
 
-            assert_eq!(command_row, rows - 3);
+            assert_eq!(command_row, rows - 4);
             assert!(lines[command_row - 1].contains(&top_border));
             assert!(lines[command_row + 1].contains(&bottom_border));
-            assert_eq!(lines[rows - 1].trim(), "❯ /help");
+            // Composer sits ABOVE the information line (owner-directed).
+            assert_eq!(lines[rows - 2].trim(), "❯ /help");
         }
     }
 
@@ -1532,24 +1581,24 @@ mod tests {
     #[test]
     fn hermes_startup_surface_uses_the_observed_palette_landmarks() {
         let app = App::new();
-        let (brand_fg, brand_bg, brand_modifier) = hermes_cell_style(&app, 59, 11);
+        let (brand_fg, brand_bg, brand_modifier) = hermes_cell_style(&app, 59, 16);
         assert_eq!(brand_fg, Color::Indexed(220));
         assert_eq!(brand_bg, Color::Reset);
         assert!(brand_modifier.contains(Modifier::BOLD));
 
-        let (secondary_fg, _, _) = hermes_cell_style(&app, 3, 7);
+        let (secondary_fg, _, _) = hermes_cell_style(&app, 3, 12);
         assert_eq!(secondary_fg, Color::Indexed(178));
 
-        let (ready_fg, _, _) = hermes_cell_style(&app, 3, 38);
+        let (ready_fg, _, _) = hermes_cell_style(&app, 3, 39);
         assert_eq!(ready_fg, Color::Indexed(72));
 
         let mut composer = App::new();
         composer.handle(hades_core::InputEvent::Key(hades_core::Key::Char('x')));
-        let (composer_fg, _, _) = hermes_cell_style(&composer, 3, 39);
+        let (composer_fg, _, _) = hermes_cell_style(&composer, 3, 38);
         assert_eq!(composer_fg, Color::Indexed(230));
 
         composer.handle(hades_core::InputEvent::Key(hades_core::Key::Enter));
-        let (busy_fg, busy_bg, _) = hermes_cell_style(&composer, 3, 39);
+        let (busy_fg, busy_bg, _) = hermes_cell_style(&composer, 3, 38);
         assert_eq!(busy_fg, Color::Rgb(255, 255, 255));
         assert_eq!(busy_bg, Color::Rgb(184, 134, 11));
 
@@ -1559,7 +1608,7 @@ mod tests {
             .position(|character| character == '✓')
             .expect("interrupted footer has a completion marker")
             as u16;
-        let (completion_fg, _, _) = hermes_cell_style(&composer, completion_column, 38);
+        let (completion_fg, _, _) = hermes_cell_style(&composer, completion_column, 39);
         assert_eq!(completion_fg, Color::Indexed(178));
     }
 
@@ -1618,7 +1667,13 @@ mod tests {
         app.handle(hades_core::InputEvent::Key(hades_core::Key::Ctrl('c')));
         let cleared = snapshot(&app, HERMES_STARTUP_WIDTH, HADES_STARTUP_HEIGHT);
         assert!(cleared.contains("Setup Required"));
-        assert!(!cleared.contains("/help"));
+        // The composer draft is cleared; the model line's "/help for
+        // commands" hint (row 31) legitimately keeps the string. The
+        // composer sits ABOVE the information line (row 38 of 40).
+        let mut lines = cleared.lines();
+        let _footer = lines.next_back().unwrap_or_default();
+        let composer_line = lines.next_back().unwrap_or_default();
+        assert!(!composer_line.contains("/help"));
     }
 
     #[test]
