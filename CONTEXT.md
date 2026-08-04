@@ -824,6 +824,17 @@ progress from August 1, 2026 through 2027.
   differential check proves identical reports on the same binary. The Rust
   binary is now the gate replay (verify.sh + justfile); the Python replay
   stays until the final migration phase retires it.
+- HAD-132 ports the configured-family runtime extensions to Rust:
+  `hades_dev::hold_provider` (loopback server holding an accepted provider
+  request until release, with the `HADES_PROVIDER_BASE_URL`/`HADES_MODEL`/
+  `HADES_PROVIDER_API_KEY` environment helper) and `hades_dev::tmux`
+  (new-session/send-keys/capture-pane/has-session/kill-session lifecycle,
+  `wait_for_screen`, and the LOWERCASE `contains_marker` variant distinct
+  from `replay::marker_present`). A differential check
+  (`scripts/check_tmux_hold_parity.py` + `hades-dev tmux_hold_diff`) proves
+  the Rust helpers agree with `replay_composer.py` on marker matching, key
+  payloads, real tmux session lifecycle, and hold-provider request gating;
+  wired into `just verify`.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes

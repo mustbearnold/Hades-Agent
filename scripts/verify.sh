@@ -153,6 +153,12 @@ done
 # clean output, marker matching, and real-subprocess exit shapes.
 cargo build --offline --package hades-dev --bin replay_runtime_diff
 python3 scripts/check_replay_runtime_parity.py
+# HAD-132: the configured-family runtime extensions (hold-provider server +
+# tmux driver) are ported; the parity check proves they agree with
+# replay_composer.py on marker matching, key payloads, real tmux session
+# lifecycle, and hold-provider request gating.
+cargo build --offline --package hades-dev --bin tmux_hold_diff
+python3 scripts/check_tmux_hold_parity.py
 # HAD-123: Rust harness foundation. The screen-emulator parity check feeds
 # live Hades PTY output through both the Python and Rust Screen models and
 # requires identical lines, style inventory, and marker styles.

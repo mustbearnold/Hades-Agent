@@ -7041,7 +7041,129 @@
       "risk": "medium",
       "status": "complete",
       "title": "Migrate dev tooling to Rust: replay_vertical_slice"
+    },
+    {
+      "acceptance": [
+        "hades-dev gains a hold-provider loopback server (request_seen/release_response events, HADES_PROVIDER_BASE_URL/HADES_MODEL/HADES_PROVIDER_API_KEY environment helper) and a tmux driver (new-session, send-keys literal/key, capture-pane, has-session, kill-session, wait_for_screen) mirroring replay_composer.py semantics.",
+        "A differential parity check proves the Rust tmux/hold-provider helpers behave identically to the Python originals on the same inputs.",
+        "verify.sh and the justfile keep the full gate green; additive steps only, never weaken existing assertions.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 1,
+      "claimed_at": "2026-08-04T00:10:13Z",
+      "claimed_by": "hermes-agent",
+      "depends_on": [
+        "HAD-131"
+      ],
+      "evidence": [
+        "crates/hades-dev/src/hold_provider.rs",
+        "crates/hades-dev/src/tmux.rs",
+        "crates/hades-dev/src/bin/tmux_hold_diff.rs",
+        "scripts/check_tmux_hold_parity.py",
+        "scripts/verify.sh",
+        "CONTEXT.md"
+      ],
+      "id": "HAD-132",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 59,
+      "ready_at": "2026-08-04T00:00:00Z",
+      "result": {
+        "completed_at": "2026-08-04T00:19:13Z",
+        "evidence": [
+          "crates/hades-dev/src/hold_provider.rs",
+          "crates/hades-dev/src/tmux.rs",
+          "crates/hades-dev/src/bin/tmux_hold_diff.rs",
+          "scripts/check_tmux_hold_parity.py",
+          "scripts/verify.sh",
+          "CONTEXT.md"
+        ],
+        "summary": "Ported the configured-family runtime extensions to Rust: hades_dev::hold_provider (loopback server holding an accepted provider request until release, with the provider environment helper) and hades_dev::tmux (session lifecycle, send-keys text/key/paste, wait_for_screen, lowercase contains_marker). Differential parity check (scripts/check_tmux_hold_parity.py + tmux_hold_diff) proves the Rust helpers agree with replay_composer.py; wired into just verify."
+      },
+      "risk": "high",
+      "status": "complete",
+      "title": "Migrate dev tooling to Rust: configured-family runtime extensions (hold-provider server + tmux driver)"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-composer reproduces replay_composer.py semantics: contract loading and validation (OBS-0011 + OBS-0037), tmux session lifecycle per case, text/key/paste input, pty_markers/pty_absent_markers assertions, and the same report JSON shape.",
+        "A differential parity check proves the Rust replay and the Python replay produce identical reports on the same binary.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "depends_on": [
+        "HAD-132"
+      ],
+      "evidence": [],
+      "id": "HAD-133",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 58,
+      "ready_at": "2026-08-04T00:00:00Z",
+      "risk": "high",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: replay_composer"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-history reproduces replay_history.py semantics: restart-recall, duplicate-suppression, multiline-readback, and load-cap cases against OBS-0017 with the same report JSON shape.",
+        "A differential parity check proves the Rust replay and the Python replay produce identical reports on the same binary.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "depends_on": [
+        "HAD-132"
+      ],
+      "evidence": [],
+      "id": "HAD-134",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 57,
+      "ready_at": "2026-08-04T00:00:00Z",
+      "risk": "high",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: replay_history"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-terminal-palette reproduces replay_terminal_palette.py semantics: OBS-0035 step contract, hold-provider-backed ready/busy/interrupted/setup-required surfaces, marker styles and required SGR sequences, and the same report JSON shape.",
+        "A differential parity check proves the Rust replay and the Python replay produce identical reports on the same binary.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "depends_on": [
+        "HAD-132"
+      ],
+      "evidence": [],
+      "id": "HAD-135",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 56,
+      "ready_at": "2026-08-04T00:00:00Z",
+      "risk": "high",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: replay_terminal_palette"
     }
   ],
-  "updated_at": "2026-08-03T22:56:01Z"
+  "updated_at": "2026-08-04T00:19:13Z"
 }
