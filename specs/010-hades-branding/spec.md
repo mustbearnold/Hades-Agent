@@ -20,7 +20,8 @@ visual identity is Hades'.
   row = height−1); the help panel floats above the composer.
 - R3. Animation frame 0 equals the baked static asset; golden tests and
   `--snapshot` replays use tick 0.
-- R4. The deviation is recorded in the deviation matrix and CONTEXT.md;
+- R4. The deviation is recorded in the parity matrix
+  (specs/001-parity-contract/matrix.md).
   branding parity with Hermes is explicitly out of scope.
 
 ## Acceptance criteria
@@ -43,4 +44,5 @@ visual identity is Hades'.
 ## Links
 
 Code: `crates/hades-tui/assets/hades-*.txt` · Tests: golden tests in
-`crates/hades-tui/src/lib.rs` · ADRs: deviation matrix in `docs/parity/MATRIX.md`
+`crates/hades-tui/src/lib.rs` · ADRs: deviation matrix in
+`specs/001-parity-contract/matrix.md`

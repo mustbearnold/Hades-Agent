@@ -18,7 +18,8 @@ reference, within a documented normalization boundary. This spec defines what
   oracle, (d) a verification record naming the exact artifacts used.
 - R2. The reference is pinned: commit
   `e444d165807f489b5c1ab8e4a612c8d09c2e67a2`; provenance and sanitized
-  artifacts live in `docs/parity/observations/`.
+  artifacts live in `_attic/docs/parity-observations/` (frozen evidence,
+  owner-directed quarantine during the SDD migration).
 - R3. Raw captured data is never persisted; only normalized shape is stored.
   Credentials are normalized out (e.g. `authorization_present: true` only).
 - R4. If a reference behavior cannot be safely captured, the correct state is
@@ -49,9 +50,9 @@ reference, within a documented normalization boundary. This spec defines what
 
 ## Roadmap
 
-Behavior-led stages (from the former docs/ROADMAP.md): a stage is complete
-only when its evidence is recorded and its gates are green; elapsed time or
-code volume is not completion.
+Behavior-led stages (from the former docs/ROADMAP.md, now merged here): a
+stage is complete only when its evidence is recorded and its gates are
+green; elapsed time or code volume is not completion.
 
 - Stage 0 — Evidence substrate: reference build/capture environment,
   sanitized trace/frame formats, unknowns and normalization rules,

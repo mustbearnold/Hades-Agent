@@ -49,7 +49,8 @@ that makes agent progress verifiable.
 
 ## Open questions
 
-- None recorded beyond the control-plane behavior documented in CONTEXT.md.
+- None recorded beyond the control-plane behavior documented in
+  `.hades/tasks.json` and the parity matrix (specs/001-parity-contract/matrix.md).
 
 ## Links
 

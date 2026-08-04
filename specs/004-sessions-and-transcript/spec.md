@@ -43,7 +43,8 @@ cancellation.
 
 ## Open questions
 
-- None recorded beyond the observed-slice boundaries in CONTEXT.md.
+- None recorded beyond the observed-slice boundaries in the parity matrix
+  (specs/001-parity-contract/matrix.md).
 
 ## Links
 
