@@ -7415,7 +7415,195 @@
       "risk": "medium",
       "status": "complete",
       "title": "Migrate dev tooling to Rust: replay_editor"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-setup-wizard reproduces the Python replay semantics for OBS-0041-hades-setup-wizard-cancel.json: fixed-loopback setup contract in tmux with the same report JSON shape (sanitized <hades-binary>).",
+        "A differential parity check proves the Rust replay and the Python replay produce identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 1,
+      "claimed_at": "2026-08-04T01:12:13Z",
+      "claimed_by": "hermes-agent",
+      "depends_on": [
+        "HAD-133"
+      ],
+      "evidence": [
+        "crates/hades-dev/src/setup.rs",
+        "crates/hades-dev/src/bin/replay_setup_wizard.rs",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile",
+        "CONTEXT.md"
+      ],
+      "id": "HAD-140",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 51,
+      "ready_at": "2026-08-04T00:00:00Z",
+      "result": {
+        "completed_at": "2026-08-04T01:18:30Z",
+        "evidence": [
+          "crates/hades-dev/src/setup.rs",
+          "crates/hades-dev/src/bin/replay_setup_wizard.rs",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile",
+          "CONTEXT.md"
+        ],
+        "summary": "Ported the setup-family replay to Rust via the shared hades_dev::setup machinery; differential parity checks prove identical reports on the same contracts; verify.sh and justfile run the Rust binary as the gate replay."
+      },
+      "risk": "medium",
+      "status": "complete",
+      "title": "Migrate dev tooling to Rust: replay_setup_wizard"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-setup-provider-menu reproduces the Python replay semantics for OBS-0045-hades-full-setup-provider-menu.json: fixed-loopback setup contract in tmux with the same report JSON shape (sanitized <hades-binary>).",
+        "A differential parity check proves the Rust replay and the Python replay produce identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 1,
+      "claimed_at": "2026-08-04T01:18:30Z",
+      "claimed_by": "hermes-agent",
+      "depends_on": [
+        "HAD-133"
+      ],
+      "evidence": [
+        "crates/hades-dev/src/setup.rs",
+        "crates/hades-dev/src/bin/replay_setup_provider_menu.rs",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile",
+        "CONTEXT.md"
+      ],
+      "id": "HAD-141",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 50,
+      "ready_at": "2026-08-04T00:00:00Z",
+      "result": {
+        "completed_at": "2026-08-04T01:18:30Z",
+        "evidence": [
+          "crates/hades-dev/src/setup.rs",
+          "crates/hades-dev/src/bin/replay_setup_provider_menu.rs",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile",
+          "CONTEXT.md"
+        ],
+        "summary": "Ported the setup-family replay to Rust via the shared hades_dev::setup machinery; differential parity checks prove identical reports on the same contracts; verify.sh and justfile run the Rust binary as the gate replay."
+      },
+      "risk": "medium",
+      "status": "complete",
+      "title": "Migrate dev tooling to Rust: replay_setup_provider_menu"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-setup-provider-model-prompt reproduces the Python replay semantics for OBS-0047-hades-provider-selection-model-prompt.json: fixed-loopback setup contract in tmux with the same report JSON shape (sanitized <hades-binary>).",
+        "A differential parity check proves the Rust replay and the Python replay produce identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 1,
+      "claimed_at": "2026-08-04T01:18:30Z",
+      "claimed_by": "hermes-agent",
+      "depends_on": [
+        "HAD-133"
+      ],
+      "evidence": [
+        "crates/hades-dev/src/setup.rs",
+        "crates/hades-dev/src/bin/replay_setup_provider_model_prompt.rs",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile",
+        "CONTEXT.md"
+      ],
+      "id": "HAD-142",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 49,
+      "ready_at": "2026-08-04T00:00:00Z",
+      "result": {
+        "completed_at": "2026-08-04T01:18:30Z",
+        "evidence": [
+          "crates/hades-dev/src/setup.rs",
+          "crates/hades-dev/src/bin/replay_setup_provider_model_prompt.rs",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile",
+          "CONTEXT.md"
+        ],
+        "summary": "Ported the setup-family replay to Rust via the shared hades_dev::setup machinery; differential parity checks prove identical reports on the same contracts; verify.sh and justfile run the Rust binary as the gate replay."
+      },
+      "risk": "medium",
+      "status": "complete",
+      "title": "Migrate dev tooling to Rust: replay_setup_provider_model_prompt"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-setup-terminal-backend reproduces the Python replay semantics for OBS-0049-hades-model-default-terminal-backend.json: fixed-loopback setup contract in tmux with the same report JSON shape (sanitized <hades-binary>).",
+        "A differential parity check proves the Rust replay and the Python replay produce identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 1,
+      "claimed_at": "2026-08-04T01:18:30Z",
+      "claimed_by": "hermes-agent",
+      "depends_on": [
+        "HAD-133"
+      ],
+      "evidence": [
+        "crates/hades-dev/src/setup.rs",
+        "crates/hades-dev/src/bin/replay_setup_terminal_backend.rs",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile",
+        "CONTEXT.md"
+      ],
+      "id": "HAD-143",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 48,
+      "ready_at": "2026-08-04T00:00:00Z",
+      "result": {
+        "completed_at": "2026-08-04T01:18:31Z",
+        "evidence": [
+          "crates/hades-dev/src/setup.rs",
+          "crates/hades-dev/src/bin/replay_setup_terminal_backend.rs",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile",
+          "CONTEXT.md"
+        ],
+        "summary": "Ported the setup-family replay to Rust via the shared hades_dev::setup machinery; differential parity checks prove identical reports on the same contracts; verify.sh and justfile run the Rust binary as the gate replay."
+      },
+      "risk": "medium",
+      "status": "complete",
+      "title": "Migrate dev tooling to Rust: replay_setup_terminal_backend"
     }
   ],
-  "updated_at": "2026-08-04T01:07:59Z"
+  "updated_at": "2026-08-04T01:18:31Z"
 }

@@ -10,4 +10,5 @@ pub mod hold_provider;
 pub mod pty;
 pub mod replay;
 pub mod screen;
+pub mod setup;
 pub mod tmux;

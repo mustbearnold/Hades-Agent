@@ -875,6 +875,17 @@ progress from August 1, 2026 through 2027.
   override / emit_report / arg parsing), so each wrapper is a thin main.
   Differential checks prove identical reports on the same binary; the
   Rust binaries are now the gate replays.
+- HAD-140..HAD-143 port the setup-family replays to Rust:
+  `hades-dev replay-setup-wizard` (OBS-0041), `replay-setup-provider`
+  (OBS-0045, emitting the Python's exact `replay-setup-provider` command
+  name), `replay-setup-provider-model-prompt` (OBS-0047), and
+  `replay-setup-terminal-backend` (OBS-0049 + OBS-0057). The shared
+  machinery lives in `hades_dev::setup`: fixed loopback provider base
+  URL (no hold provider), the small setup key set, sanitized
+  `<hades-binary>` report field, and required `--contract`.
+  `check_replay_parity.py` now forwards extra args (e.g. `--contract`)
+  to both replays. Differential checks prove identical reports on the
+  same contracts; the Rust binaries are now the gate replays.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes

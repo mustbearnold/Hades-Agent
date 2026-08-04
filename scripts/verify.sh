@@ -297,11 +297,29 @@ python3 scripts/check_replay_parity.py replay_completion replay_completion
 ./target/debug/replay_completion --binary target/debug/hades --report .hades/runtime/completion-replay.json
 ./target/debug/replay_composer --binary target/debug/hades --contract tests/fixtures/parity/OBS-0037-hades-unknown-slash-command.json --report .hades/runtime/unknown-command-replay.json
 python3 scripts/replay_model_picker.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0039-hades-model-picker-model-stage.json --report .hades/runtime/model-picker-replay.json
-python3 scripts/replay_setup_wizard.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0041-hades-setup-wizard-cancel.json --report .hades/runtime/setup-wizard-replay.json
-python3 scripts/replay_setup_provider_menu.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0045-hades-full-setup-provider-menu.json --report .hades/runtime/setup-provider-replay.json
-python3 scripts/replay_setup_provider_model_prompt.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0047-hades-provider-selection-model-prompt.json --report .hades/runtime/setup-provider-model-prompt-replay.json
-python3 scripts/replay_setup_terminal_backend.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0049-hades-model-default-terminal-backend.json --report .hades/runtime/setup-terminal-backend-replay.json
-python3 scripts/replay_setup_terminal_backend.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0057-hades-setup-platform-picker.json --report .hades/runtime/setup-platform-picker-replay.json
+# HAD-140: replay-setup-wizard is ported to Rust; the differential check
+# proves identical reports, then the Rust binary is the gate replay.
+cargo build --offline --package hades-dev --bin replay_setup_wizard
+python3 scripts/check_replay_parity.py replay_setup_wizard replay_setup_wizard --contract tests/fixtures/parity/OBS-0041-hades-setup-wizard-cancel.json
+./target/debug/replay_setup_wizard --binary target/debug/hades --contract tests/fixtures/parity/OBS-0041-hades-setup-wizard-cancel.json --report .hades/runtime/setup-wizard-replay.json
+# HAD-141: replay-setup-provider-menu is ported to Rust; the differential
+# check proves identical reports, then the Rust binary is the gate replay.
+cargo build --offline --package hades-dev --bin replay_setup_provider_menu
+python3 scripts/check_replay_parity.py replay_setup_provider_menu replay_setup_provider_menu --contract tests/fixtures/parity/OBS-0045-hades-full-setup-provider-menu.json
+./target/debug/replay_setup_provider_menu --binary target/debug/hades --contract tests/fixtures/parity/OBS-0045-hades-full-setup-provider-menu.json --report .hades/runtime/setup-provider-replay.json
+# HAD-142: replay-setup-provider-model-prompt is ported to Rust; the
+# differential check proves identical reports, then the Rust binary is the
+# gate replay.
+cargo build --offline --package hades-dev --bin replay_setup_provider_model_prompt
+python3 scripts/check_replay_parity.py replay_setup_provider_model_prompt replay_setup_provider_model_prompt --contract tests/fixtures/parity/OBS-0047-hades-provider-selection-model-prompt.json
+./target/debug/replay_setup_provider_model_prompt --binary target/debug/hades --contract tests/fixtures/parity/OBS-0047-hades-provider-selection-model-prompt.json --report .hades/runtime/setup-provider-model-prompt-replay.json
+# HAD-143: replay-setup-terminal-backend is ported to Rust; the
+# differential check proves identical reports on both contracts, then the
+# Rust binary is the gate replay for both invocations.
+cargo build --offline --package hades-dev --bin replay_setup_terminal_backend
+python3 scripts/check_replay_parity.py replay_setup_terminal_backend replay_setup_terminal_backend --contract tests/fixtures/parity/OBS-0049-hades-model-default-terminal-backend.json
+./target/debug/replay_setup_terminal_backend --binary target/debug/hades --contract tests/fixtures/parity/OBS-0049-hades-model-default-terminal-backend.json --report .hades/runtime/setup-terminal-backend-replay.json
+./target/debug/replay_setup_terminal_backend --binary target/debug/hades --contract tests/fixtures/parity/OBS-0057-hades-setup-platform-picker.json --report .hades/runtime/setup-platform-picker-replay.json
 # HAD-138: replay-paste is ported to Rust; the differential check proves
 # identical reports, then the Rust binary is the gate replay.
 cargo build --offline --package hades-dev --bin replay_paste

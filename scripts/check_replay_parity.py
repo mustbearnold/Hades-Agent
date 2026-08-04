@@ -15,19 +15,21 @@ ROOT = Path(__file__).resolve().parents[1]
 BINARY = ROOT / "target/debug/hades"
 SCRIPT = sys.argv[1] if len(sys.argv) > 1 else "replay_unconfigured_startup"
 BIN_NAME = sys.argv[2] if len(sys.argv) > 2 else "replay_unconfigured_startup"
+# Extra arguments (e.g. --contract <path>) are forwarded to both replays.
+EXTRA_ARGS = sys.argv[3:]
 
 py_report = ROOT / f".hades/runtime/{BIN_NAME}-py-parity.json"
 rs_report = ROOT / f".hades/runtime/{BIN_NAME}-rs-parity.json"
 
 py = subprocess.run(
-    [sys.executable, f"scripts/{SCRIPT}.py", "--binary", str(BINARY), "--report", str(py_report)],
+    [sys.executable, f"scripts/{SCRIPT}.py", "--binary", str(BINARY), "--report", str(py_report), *EXTRA_ARGS],
     cwd=ROOT,
     capture_output=True,
     text=True,
     check=False,
 )
 rs = subprocess.run(
-    [str(ROOT / "target/debug" / BIN_NAME), "--binary", str(BINARY), "--report", str(rs_report)],
+    [str(ROOT / "target/debug" / BIN_NAME), "--binary", str(BINARY), "--report", str(rs_report), *EXTRA_ARGS],
     cwd=ROOT,
     capture_output=True,
     text=True,

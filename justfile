@@ -115,26 +115,34 @@ replay-unknown-command:
 replay-model-picker:
     cargo build --locked --package hades-cli
     python3 scripts/replay_model_picker.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0039-hades-model-picker-model-stage.json --report .hades/runtime/model-picker-replay.json
-
 replay-setup-wizard:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_setup_wizard.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0041-hades-setup-wizard-cancel.json --report .hades/runtime/setup-wizard-replay.json
+    cargo build --offline --package hades-dev --bin replay_setup_wizard
+    python3 scripts/check_replay_parity.py replay_setup_wizard replay_setup_wizard --contract tests/fixtures/parity/OBS-0041-hades-setup-wizard-cancel.json
+    ./target/debug/replay_setup_wizard --binary target/debug/hades --contract tests/fixtures/parity/OBS-0041-hades-setup-wizard-cancel.json --report .hades/runtime/setup-wizard-replay.json
 
 replay-setup-provider:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_setup_provider_menu.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0045-hades-full-setup-provider-menu.json --report .hades/runtime/setup-provider-replay.json
+    cargo build --offline --package hades-dev --bin replay_setup_provider_menu
+    python3 scripts/check_replay_parity.py replay_setup_provider_menu replay_setup_provider_menu --contract tests/fixtures/parity/OBS-0045-hades-full-setup-provider-menu.json
+    ./target/debug/replay_setup_provider_menu --binary target/debug/hades --contract tests/fixtures/parity/OBS-0045-hades-full-setup-provider-menu.json --report .hades/runtime/setup-provider-replay.json
 
 replay-setup-provider-model-prompt:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_setup_provider_model_prompt.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0047-hades-provider-selection-model-prompt.json --report .hades/runtime/setup-provider-model-prompt-replay.json
+    cargo build --offline --package hades-dev --bin replay_setup_provider_model_prompt
+    python3 scripts/check_replay_parity.py replay_setup_provider_model_prompt replay_setup_provider_model_prompt --contract tests/fixtures/parity/OBS-0047-hades-provider-selection-model-prompt.json
+    ./target/debug/replay_setup_provider_model_prompt --binary target/debug/hades --contract tests/fixtures/parity/OBS-0047-hades-provider-selection-model-prompt.json --report .hades/runtime/setup-provider-model-prompt-replay.json
 
 replay-setup-terminal-backend:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_setup_terminal_backend.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0049-hades-model-default-terminal-backend.json --report .hades/runtime/setup-terminal-backend-replay.json
+    cargo build --offline --package hades-dev --bin replay_setup_terminal_backend
+    python3 scripts/check_replay_parity.py replay_setup_terminal_backend replay_setup_terminal_backend --contract tests/fixtures/parity/OBS-0049-hades-model-default-terminal-backend.json
+    ./target/debug/replay_setup_terminal_backend --binary target/debug/hades --contract tests/fixtures/parity/OBS-0049-hades-model-default-terminal-backend.json --report .hades/runtime/setup-terminal-backend-replay.json
 
 replay-setup-platform-picker:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_setup_terminal_backend.py --binary target/debug/hades --contract tests/fixtures/parity/OBS-0057-hades-setup-platform-picker.json --report .hades/runtime/setup-platform-picker-replay.json
+    cargo build --offline --package hades-dev --bin replay_setup_terminal_backend
+    ./target/debug/replay_setup_terminal_backend --binary target/debug/hades --contract tests/fixtures/parity/OBS-0057-hades-setup-platform-picker.json --report .hades/runtime/setup-platform-picker-replay.json
 
 replay-paste:
     cargo build --locked --package hades-cli
