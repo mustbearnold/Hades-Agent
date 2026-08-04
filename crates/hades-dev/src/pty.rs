@@ -57,6 +57,27 @@ pub fn spawn_pty(command: &mut Command, columns: u16, rows: u16) -> std::io::Res
     Ok(PtyChild { child, master, slave_path, _slave: slave })
 }
 
+/// Resize the PTY window on both the master fd and the slave path, then
+/// signal SIGWINCH to the child — mirroring the Python harness's
+/// `set_window_size` + `set_slave_window_size` + `os.kill(pid, SIGWINCH)`.
+pub fn resize_pty(
+    master: &OwnedFd,
+    slave_path: &str,
+    child: &Child,
+    columns: u16,
+    rows: u16,
+) -> std::io::Result<()> {
+    let size = Winsize { ws_row: rows, ws_col: columns, ws_xpixel: 0, ws_ypixel: 0 };
+    tcsetwinsize(master, size)?;
+    let slave = open(slave_path, OFlags::RDWR | OFlags::NOCTTY, Mode::empty())?;
+    let result = tcsetwinsize(&slave, size);
+    drop(slave);
+    result?;
+    let pid = rustix::process::Pid::from_child(&child);
+    let _ = rustix::process::kill_process(pid, rustix::process::Signal::WINCH);
+    Ok(())
+}
+
 /// Read everything currently available on the master without blocking.
 pub fn read_available(master: &OwnedFd) -> Vec<u8> {
     let mut output = Vec::new();

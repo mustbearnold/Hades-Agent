@@ -76,7 +76,9 @@ probe-help-resize:
 
 replay-configured-help-resize:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_configured_help_resize.py --binary target/debug/hades --report .hades/runtime/configured-help-resize-replay.json --timeout 60
+    cargo build --offline --package hades-dev --bin replay_configured_help_resize
+    python3 scripts/check_replay_parity.py replay_configured_help_resize replay_configured_help_resize --timeout 20
+    ./target/debug/replay_configured_help_resize --binary target/debug/hades --report .hades/runtime/configured-help-resize-replay.json --timeout 60
 
 replay-provider-recovery:
     cargo build --locked --package hades-cli

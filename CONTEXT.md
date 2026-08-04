@@ -938,6 +938,15 @@ progress from August 1, 2026 through 2027.
   nonpersistence, no fixture contract — a direct behavioral replay); the
   differential check proves identical reports (3 cases); the Rust binary
   is now the gate replay.
+- HAD-150 ports replay_configured_help_resize to Rust:
+  `hades-dev replay-configured-help-resize` reproduces the OBS-0102
+  configured /help geometry contract at 120x40, 100x30, and 160x50
+  (PTY master+slave resize with SIGWINCH): the bordered panel floats
+  above the composer (composer at rows-2, panel top at rows-5 — the
+  owner-directed layout), the composer draft survives each resize, and a
+  clean Ctrl+C exit restores the terminal. A shared `pty::resize_pty`
+  helper was added. The differential check proves identical reports
+  (1 case); the Rust binary is now the gate replay.
 - HAD-149 ports replay_configured_help_lifecycle to Rust:
   `hades-dev replay-configured-help-lifecycle` reproduces the OBS-0100
   configured /help Escape lifecycle: /help opening the stable bordered

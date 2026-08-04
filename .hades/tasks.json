@@ -7883,11 +7883,20 @@
         "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
         "Run the targeted tests and the complete no-skip just verify gate before completion."
       ],
-      "attempts": 0,
+      "attempts": 1,
+      "claimed_at": "2026-08-04T12:39:04Z",
+      "claimed_by": "hermes-agent",
       "depends_on": [
         "HAD-133"
       ],
-      "evidence": [],
+      "evidence": [
+        "crates/hades-dev/src/bin/replay_configured_help_resize.rs",
+        "crates/hades-dev/src/pty.rs",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile",
+        "CONTEXT.md"
+      ],
       "id": "HAD-150",
       "lane": "tooling",
       "oracle": [
@@ -7898,8 +7907,20 @@
       "owner_role": "implementer",
       "priority": 64,
       "ready_at": "2026-08-04T12:23:15Z",
+      "result": {
+        "completed_at": "2026-08-04T12:43:42Z",
+        "evidence": [
+          "crates/hades-dev/src/bin/replay_configured_help_resize.rs",
+          "crates/hades-dev/src/pty.rs",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile",
+          "CONTEXT.md"
+        ],
+        "summary": "Ported replay_configured_help_resize to Rust as hades-dev replay-configured-help-resize: OBS-0102 geometry contract at 120x40/100x30/160x50 via pty::resize_pty (master+slave resize + SIGWINCH), panel floats above composer, clean Ctrl+C exit. Differential parity check proves identical reports (1 case); verify.sh and justfile run the Rust binary as the gate replay."
+      },
       "risk": "low",
-      "status": "ready",
+      "status": "complete",
       "title": "Migrate dev tooling to Rust: replay_configured_help_resize"
     },
     {
@@ -8693,5 +8714,5 @@
       "title": "Retire the Python harness and orchestrate verify in Rust"
     }
   ],
-  "updated_at": "2026-08-04T12:38:43Z"
+  "updated_at": "2026-08-04T12:43:42Z"
 }

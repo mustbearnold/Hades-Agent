@@ -277,7 +277,12 @@ python3 scripts/check_replay_parity.py replay_configured_help replay_configured_
 cargo build --offline --package hades-dev --bin replay_configured_help_lifecycle
 python3 scripts/check_replay_parity.py replay_configured_help_lifecycle replay_configured_help_lifecycle --timeout 20
 ./target/debug/replay_configured_help_lifecycle --binary target/debug/hades --report .hades/runtime/configured-help-lifecycle-replay.json --timeout 60
-python3 scripts/replay_configured_help_resize.py --binary target/debug/hades --report .hades/runtime/configured-help-resize-replay.json --timeout 60
+# HAD-150: replay-configured-help-resize is ported to Rust; the
+# differential check proves identical reports, then the Rust binary is
+# the gate replay.
+cargo build --offline --package hades-dev --bin replay_configured_help_resize
+python3 scripts/check_replay_parity.py replay_configured_help_resize replay_configured_help_resize --timeout 20
+./target/debug/replay_configured_help_resize --binary target/debug/hades --report .hades/runtime/configured-help-resize-replay.json --timeout 60
 python3 scripts/replay_provider_recovery.py --binary target/debug/hades --report .hades/runtime/provider-recovery-replay.json --timeout 8
 # HAD-152: replay-conversation-context is ported to Rust; the differential
 # check proves identical reports, then the Rust binary is the gate replay.
