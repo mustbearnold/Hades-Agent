@@ -978,6 +978,15 @@ progress from August 1, 2026 through 2027.
   replay-local-provider` reproduces the OBS-0051 local-provider stream
   contract (3 cases) through the hold-provider loopback; the differential
   check proves identical reports; the Rust binary is now the gate replay.
+- HAD-161 ports replay_setup_required_actions to Rust: `hades-dev
+  replay-setup-required-actions` reproduces the OBS-0105 no-provider
+  Setup Required action boundary: after the delayed Setup Required
+  overlay appears, follow-up /model and /setup commands stay on the
+  overlay (never composer drafts, no config.yaml); the first Ctrl+C
+  clears the retained /help draft without exiting; a second Ctrl+C
+  exits cleanly with the terminal restored. The differential check
+  proves identical reports (3 cases); the Rust binary is now the gate
+  replay.
 - HAD-159 ports replay_osc52_timing_limits to Rust: `hades-dev
   replay-osc52-timing-limits` reproduces the OBS-0033 timing and
   bounded-payload controls (response before/after the 500 ms timeout

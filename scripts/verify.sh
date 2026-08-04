@@ -251,7 +251,12 @@ python3 scripts/check_replay_parity.py replay_unconfigured_input replay_unconfig
 cargo build --offline --package hades-dev --bin replay_unconfigured_help
 python3 scripts/check_replay_parity.py replay_unconfigured_help replay_unconfigured_help
 ./target/debug/replay_unconfigured_help --binary target/debug/hades --report .hades/runtime/hades-help-setup-required-replay.json --timeout 12
-python3 scripts/replay_setup_required_actions.py --binary target/debug/hades --report .hades/runtime/setup-required-actions-replay.json --timeout 20
+# HAD-161: replay-setup-required-actions is ported to Rust; the
+# differential check proves identical reports, then the Rust binary is
+# the gate replay.
+cargo build --offline --package hades-dev --bin replay_setup_required_actions
+python3 scripts/check_replay_parity.py replay_setup_required_actions replay_setup_required_actions --timeout 20
+./target/debug/replay_setup_required_actions --binary target/debug/hades --report .hades/runtime/setup-required-actions-replay.json --timeout 20
 python3 scripts/replay_standalone_setup.py --binary target/debug/hades --report .hades/runtime/hades-standalone-setup-replay.json --timeout 5
 python3 scripts/replay_standalone_full_setup.py --binary target/debug/hades --report .hades/runtime/hades-standalone-full-setup-replay.json --timeout 5
 python3 scripts/replay_standalone_terminal_platform.py --binary target/debug/hades --report .hades/runtime/hades-standalone-terminal-platform-replay.json --timeout 5

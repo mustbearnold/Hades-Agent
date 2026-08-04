@@ -347,7 +347,9 @@ replay-unconfigured-help:
 
 replay-setup-required-actions:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_setup_required_actions.py --binary target/debug/hades --report .hades/runtime/setup-required-actions-replay.json --timeout 20
+    cargo build --offline --package hades-dev --bin replay_setup_required_actions
+    python3 scripts/check_replay_parity.py replay_setup_required_actions replay_setup_required_actions --timeout 20
+    ./target/debug/replay_setup_required_actions --binary target/debug/hades --report .hades/runtime/setup-required-actions-replay.json --timeout 20
 
 replay-standalone-setup:
     cargo build --locked --package hades-cli
