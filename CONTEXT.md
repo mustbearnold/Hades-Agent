@@ -886,6 +886,13 @@ progress from August 1, 2026 through 2027.
   `check_replay_parity.py` now forwards extra args (e.g. `--contract`)
   to both replays. Differential checks prove identical reports on the
   same contracts; the Rust binaries are now the gate replays.
+- HAD-145 ports replay_modified_enter to Rust: `hades-dev
+  replay-modified-enter` reproduces the OBS-0021 contract in a direct
+  120x40 PTY with the hold-provider loopback — hex byte input sequences
+  (whitespace-tolerant like Python's bytes.fromhex), shift-Enter /
+  alt-Enter submit from ready while plain Enter does not, Ctrl+C
+  interrupt/exit waits on the child. The differential check proves
+  identical reports; the Rust binary is now the gate replay.
 
 Parity policy: Hermes observations establish the intended compatibility
 contract, not bugs to preserve. Hades must not intentionally rebuild Hermes

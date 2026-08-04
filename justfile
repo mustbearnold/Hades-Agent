@@ -162,7 +162,9 @@ replay-editor-outcomes:
 
 replay-modified-enter:
     cargo build --locked --package hades-cli
-    python3 scripts/replay_modified_enter.py --binary target/debug/hades --report .hades/runtime/modified-enter-replay.json
+    cargo build --offline --package hades-dev --bin replay_modified_enter
+    python3 scripts/check_replay_parity.py replay_modified_enter replay_modified_enter
+    ./target/debug/replay_modified_enter --binary target/debug/hades --report .hades/runtime/modified-enter-replay.json
 
 replay-clipboard:
     cargo build --locked --package hades-cli

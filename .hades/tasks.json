@@ -7603,7 +7603,77 @@
       "risk": "medium",
       "status": "complete",
       "title": "Migrate dev tooling to Rust: replay_setup_terminal_backend"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-editor-outcomes reproduces the Python replay semantics for OBS-0019-hades-editor-outcomes.json with the same report JSON shape.",
+        "A differential parity check proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "depends_on": [
+        "HAD-132"
+      ],
+      "evidence": [],
+      "id": "HAD-144",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 47,
+      "ready_at": "2026-08-04T00:00:00Z",
+      "risk": "medium",
+      "status": "ready",
+      "title": "Migrate dev tooling to Rust: replay_editor_outcomes"
+    },
+    {
+      "acceptance": [
+        "hades-dev replay-modified-enter reproduces the Python replay semantics for OBS-0029-hades-modified-enter.json with the same report JSON shape.",
+        "A differential parity check proves identical reports on the same binary and contract.",
+        "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
+        "Run the targeted tests and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 1,
+      "claimed_at": "2026-08-04T01:21:40Z",
+      "claimed_by": "hermes-agent",
+      "depends_on": [
+        "HAD-132"
+      ],
+      "evidence": [
+        "crates/hades-dev/src/bin/replay_modified_enter.rs",
+        "scripts/check_replay_parity.py",
+        "scripts/verify.sh",
+        "justfile",
+        "CONTEXT.md"
+      ],
+      "id": "HAD-145",
+      "lane": "tooling",
+      "oracle": [
+        "unit_tests",
+        "differential_parity",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 46,
+      "ready_at": "2026-08-04T00:00:00Z",
+      "result": {
+        "completed_at": "2026-08-04T01:27:49Z",
+        "evidence": [
+          "crates/hades-dev/src/bin/replay_modified_enter.rs",
+          "scripts/check_replay_parity.py",
+          "scripts/verify.sh",
+          "justfile",
+          "CONTEXT.md"
+        ],
+        "summary": "Ported replay_modified_enter to Rust as hades-dev replay-modified-enter: OBS-0021 contract in a direct 120x40 PTY with the hold-provider loopback, hex byte input sequences with whitespace-tolerant parsing, shift/alt-Enter submit vs plain-Enter control, child-status waits. Differential parity check proves identical reports (3 cases); verify.sh and justfile run the Rust binary as the gate replay."
+      },
+      "risk": "medium",
+      "status": "complete",
+      "title": "Migrate dev tooling to Rust: replay_modified_enter"
     }
   ],
-  "updated_at": "2026-08-04T01:18:31Z"
+  "updated_at": "2026-08-04T01:27:49Z"
 }

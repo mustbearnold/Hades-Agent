@@ -331,7 +331,11 @@ cargo build --offline --package hades-dev --bin replay_editor
 python3 scripts/check_replay_parity.py replay_editor replay_editor
 ./target/debug/replay_editor --binary target/debug/hades --report .hades/runtime/editor-replay.json
 python3 scripts/replay_editor_outcomes.py --binary target/debug/hades --report .hades/runtime/editor-outcomes-replay.json
-python3 scripts/replay_modified_enter.py --binary target/debug/hades --report .hades/runtime/modified-enter-replay.json
+# HAD-145: replay-modified-enter is ported to Rust; the differential check
+# proves identical reports, then the Rust binary is the gate replay.
+cargo build --offline --package hades-dev --bin replay_modified_enter
+python3 scripts/check_replay_parity.py replay_modified_enter replay_modified_enter
+./target/debug/replay_modified_enter --binary target/debug/hades --report .hades/runtime/modified-enter-replay.json
 # HAD-137: replay-clipboard is ported to Rust; the differential check
 # proves identical reports, then the Rust binary is the gate replay.
 cargo build --offline --package hades-dev --bin replay_clipboard
