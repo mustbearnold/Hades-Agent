@@ -23,6 +23,8 @@ REQUIRED_FILES = (
     "SECURITY.md",
     "Cargo.toml",
     "rust-toolchain.toml",
+    "specs/constitution.md",
+    "specs/conventions.md",
     "specs/001-parity-contract/spec.md",
     "specs/001-parity-contract/matrix.md",
     "docs/runbooks/agent-contracts.md",

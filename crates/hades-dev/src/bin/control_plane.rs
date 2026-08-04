@@ -20,12 +20,14 @@ use serde_json::{Value, json};
 
 const STATUSES: [&str; 6] = ["queued", "ready", "in_progress", "blocked", "complete", "cancelled"];
 const RISKS: [&str; 3] = ["low", "medium", "high"];
-const REQUIRED_FILES: [&str; 9] = [
+const REQUIRED_FILES: [&str; 11] = [
     "AGENTS.md",
     "README.md",
     "SECURITY.md",
     "Cargo.toml",
     "rust-toolchain.toml",
+    "specs/constitution.md",
+    "specs/conventions.md",
     "specs/001-parity-contract/spec.md",
     "specs/001-parity-contract/matrix.md",
     "docs/runbooks/agent-contracts.md",

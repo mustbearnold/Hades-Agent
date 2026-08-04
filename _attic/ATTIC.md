@@ -9,5 +9,4 @@
 | docs/ROADMAP.md | docs/ | Content merged into specs/001 (roadmap section) | Delete |
 | docs/parity/TRACE_FORMAT.md | docs/parity/ | Content merged into specs/001 (appendix) | Delete |
 | CONTEXT.md | repo root | Capability history merged into specs/001-010; control plane now requires specs/ | Delete |
-| AGENTS.md | repo root | Replaced by Phase 4 entry point (atticked then) | Delete after Phase 4 |
-| docs/parity/observations/ (115 files) | docs/parity/observations/ | Frozen reference evidence; owner-directed attic per SDD verbatim execution (fits no doc category) | Review, keep as provenance |
+| AGENTS.md (pre-SDD) | repo root | Superseded by the SDD entry-point (Phase 4); preserved from git history | Delete |
