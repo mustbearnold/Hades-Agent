@@ -166,8 +166,30 @@ def safe_environment(reference: Path, home: Path) -> dict[str, str]:
             "UV_NO_CONFIG": "1",
         }
     )
-    for key in ("TMUX", "STY", "WAYLAND_DISPLAY", "WSL_INTEROP", "WSL_DISTRO_NAME"):
+    for key in (
+        "TMUX",
+        "STY",
+        "WAYLAND_DISPLAY",
+        "WSL_INTEROP",
+        "WSL_DISTRO_NAME",
+        # Reference-child environment leaks (same class as OBS-0116):
+        # desktop/kanban-worker/cron sessions export HERMES_* runtime markers
+        # (HERMES_DESKTOP, HERMES_SERVE_HEADLESS, HERMES_SESSION_ID,
+        # HERMES_WEB_DIST, HERMES_EXEC_ASK, HERMES_REAL_HOME, HERMES_KANBAN_*)
+        # and a desktop PYTHONPATH; stripping them keeps observations on the
+        # plain-CLI reference environment no matter how the gate was launched.
+        "HERMES_DESKTOP",
+        "PYTHONPATH",
+        "HERMES_SERVE_HEADLESS",
+        "HERMES_SESSION_ID",
+        "HERMES_WEB_DIST",
+        "HERMES_EXEC_ASK",
+        "HERMES_REAL_HOME",
+    ):
         environment.pop(key, None)
+    for key in list(environment):
+        if key.startswith("HERMES_KANBAN_"):
+            environment.pop(key)
     return environment
 
 

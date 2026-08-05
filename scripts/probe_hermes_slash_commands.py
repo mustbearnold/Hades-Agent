@@ -108,8 +108,23 @@ def safe_environment(reference: Path, home: Path) -> dict[str, str]:
         # checkout's modules (different tool descriptions/schemas) in the
         # reference child. Strip it so the reference resolves its own code.
         "PYTHONPATH",
+        # Hermes runtime markers leaked by desktop-app, kanban-worker, and
+        # cron sessions: the reference child would otherwise observe the
+        # caller's serve/session/web-dist/ask state instead of a plain CLI
+        # launch (same leak class as HERMES_DESKTOP above; OBS-0116 documents
+        # the drift). Strip every HERMES_* variable the harness did not set
+        # itself so observations match the plain-CLI reference environment
+        # regardless of how the gate was launched.
+        "HERMES_SERVE_HEADLESS",
+        "HERMES_SESSION_ID",
+        "HERMES_WEB_DIST",
+        "HERMES_EXEC_ASK",
+        "HERMES_REAL_HOME",
     ):
         environment.pop(key, None)
+    for key in list(environment):
+        if key.startswith("HERMES_KANBAN_"):
+            environment.pop(key)
     return environment
 
 

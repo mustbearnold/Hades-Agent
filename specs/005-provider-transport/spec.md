@@ -44,7 +44,7 @@ cooperative cancellation.
 ## Out of scope
 
 - Remote/gateway providers and OAuth (explicit unknowns).
-- Tool execution (deltas are rendered, not executed).
+- Tool execution (pending observation capture — see spec 011).
 
 ## Open questions
 

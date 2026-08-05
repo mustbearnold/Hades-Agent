@@ -4498,7 +4498,7 @@
     },
     {
       "acceptance": [
-        "Extend standalone `hades setup` from the observed Hermes Tool Configuration handoff so Escape enters a raw CLI checklist with the exact bounded title `Tools for \ud83d\udda5\ufe0f  CLI`, controls `SPACE toggle`, `ENTER confirm`, `ESC cancel`, and the observed Web Search & Scraping, Browser Automation, Terminal & Processes, and File Operations rows.",
+        "Extend standalone `hades setup` from the observed Hermes Tool Configuration handoff so Escape enters a raw CLI checklist with the exact bounded title `Tools for 🖥️  CLI`, controls `SPACE toggle`, `ENTER confirm`, `ESC cancel`, and the observed Web Search & Scraping, Browser Automation, Terminal & Processes, and File Operations rows.",
         "Add typed checklist and first-install provider-boundary state transitions. A bounded non-mutating navigation key must not toggle or confirm a tool; the first Ctrl+C from the checklist must restore canonical input and echo, keep setup alive, and render Configuring 6 tool(s) plus the observed Browser Automation provider boundary landmarks.",
         "Keep provider inventories, provider selection, API keys, OAuth, network behavior, tool persistence, later cancellation, and unobserved cursor redraw semantics outside the implementation claim. This evidence scope must not disable, slow, or otherwise nerf existing Hades capabilities outside the new bounded setup seam.",
         "Add focused core/TUI/CLI tests, a sanitized Hades OBS-0078 fixture, a direct-PTY replay asserting the exact safe sequence, raw-mode lifecycle, config/artifact invariants, process liveness, and no submission, then update parity/context/readme/gates.",
@@ -5304,7 +5304,7 @@
           "justfile",
           "scripts/verify.sh"
         ],
-        "summary": "Captured Hermes model-picker selection safely: Enter on the visible palette-model row produces the transient model \u2192 palette-model marker, while a no-selection control, unchanged selection config delta, and fresh-process readback do not prove persistence or distinct effective-model use. Metadata request paths, config hashes, artifact classes, cleanup, and reference unknowns are recorded without making Hermes retries or failures a Hades requirement."
+        "summary": "Captured Hermes model-picker selection safely: Enter on the visible palette-model row produces the transient model → palette-model marker, while a no-selection control, unchanged selection config delta, and fresh-process readback do not prove persistence or distinct effective-model use. Metadata request paths, config hashes, artifact classes, cleanup, and reference unknowns are recorded without making Hermes retries or failures a Hades requirement."
       },
       "risk": "high",
       "status": "complete",
@@ -5312,7 +5312,7 @@
     },
     {
       "acceptance": [
-        "In Hades /model provider-to-model flow, Enter on the visible palette-model row closes the picker to the ready surface and displays the observed model \u2192 palette-model status without opening a provider request during selection.",
+        "In Hades /model provider-to-model flow, Enter on the visible palette-model row closes the picker to the ready surface and displays the observed model → palette-model status without opening a provider request during selection.",
         "Represent the selection as typed session state and use it for the next local provider request; do not rewrite the Hades local-provider sidecar or any Hermes config, and preserve existing filter, Escape, q, streaming, and cleanup behavior.",
         "A deterministic direct-PTY replay configures vertical-model, selects palette-model, submits one prompt, and proves the loopback request uses palette-model with one request, a streamed answer, no credentials, no external network, no Hermes mutation, and restored terminal ownership.",
         "A fresh process using the unchanged sidecar sends vertical-model again without the prior selection, proving selection is session-scoped and not falsely advertised as persistence.",
@@ -5371,7 +5371,7 @@
           "specs/001-parity-contract/spec.md",
           "README.md"
         ],
-        "summary": "Implemented typed session-scoped model-picker selection. The direct-PTY OBS-0094 replay proves the visible model \u2192 palette-model transition, no request during selection, effective palette-model use for the next streamed request, byte-identical sidecar and no Hermes config mutation, clean terminal restoration, and fresh-process return to vertical-model. Focused Rust tests and the complete no-skip just verify gate pass."
+        "summary": "Implemented typed session-scoped model-picker selection. The direct-PTY OBS-0094 replay proves the visible model → palette-model transition, no request during selection, effective palette-model use for the next streamed request, byte-identical sidecar and no Hermes config mutation, clean terminal restoration, and fresh-process return to vertical-model. Focused Rust tests and the complete no-skip just verify gate pass."
       },
       "risk": "high",
       "status": "complete",
@@ -5380,7 +5380,7 @@
     {
       "acceptance": [
         "After the existing user-local release install, clean Bash and Fish command lookup resolves both hades and Hades to the intended release artifact without reading shell profiles or mutating shell configuration.",
-        "Run the complete OBS-0094 setup, model-selection, prompt, streamed-answer, fresh-process, sidecar, and terminal-cleanup oracle through each installed alias, proving the shipped command\u2014not only target/debug/hades\u2014works.",
+        "Run the complete OBS-0094 setup, model-selection, prompt, streamed-answer, fresh-process, sidecar, and terminal-cleanup oracle through each installed alias, proving the shipped command—not only target/debug/hades—works.",
         "Keep each alias run isolated with synthetic HERMES_HOME and a loopback-only HTTP/SSE fixture; record no credentials, no external network, no Hermes config mutation, exactly one selected-model request and one fresh-process configured-model request per run.",
         "Add a sanitized OBS-0095 fixture, deterministic installed-alias replay/report, observation and README/matrix/just/verify wiring; preserve the existing installer refusal and PATH boundaries.",
         "Run the targeted installed-alias replay and complete the no-skip just verify gate before completion."
@@ -6621,7 +6621,7 @@
     {
       "acceptance": [
         "Fix the startup-surface rendering bug on terminals taller than the 40-row template: the template body copy must stop before the template's own footer/composer rows so the footer and composer appear exactly once, at the bottom of the screen.",
-        "Give the startup surface a uniquely Hades identity as owner-directed: replace the Hermes branding (HERMES AGENT logo, Nous Research tagline, Hermes Agent title, mock-model \u00b7 Nous Research line) with the Hades-owned frame (HADES AGENT logo, `\u2620 Hades \u00b7 Lord of the Digital Underworld` tagline, `Hades Agent v0.1.0` title, `mock-model \u00b7 Hades` provider line, `glm-5.2 \u00b7 Hades` unconfigured line).",
+        "Give the startup surface a uniquely Hades identity as owner-directed: replace the Hermes branding (HERMES AGENT logo, Nous Research tagline, Hermes Agent title, mock-model · Nous Research line) with the Hades-owned frame (HADES AGENT logo, `☠ Hades · Lord of the Digital Underworld` tagline, `Hades Agent v0.1.0` title, `mock-model · Hades` provider line, `glm-5.2 · Hades` unconfigured line).",
         "Document the branding change as a deliberate deviation from the OBS-0001 reference frame (layout/geometry parity preserved); update Hades-facing replay markers, the differential golden, the parity matrix, context, and readme accordingly. Hermes-side probes and reference fixtures keep their Hermes markers.",
         "Add focused snapshot tests: the product frame matches the Hades-owned asset, the surface is Hades-branded (no Hermes/Nous text), and tall terminals render a single footer/composer at the bottom.",
         "Run the targeted tests and the complete no-skip just verify gate before completion."
@@ -6658,7 +6658,7 @@
           ".hades/runtime/terminal-palette-replay.json",
           "crates/hades-tui/assets/hades-startup-120x40.txt"
         ],
-        "summary": "Fixed the tall-terminal startup rendering bug (template body copy stops before the template's own footer/composer rows) and gave the startup surface its own owner-directed Hades identity (HADES AGENT logo, \u2620 Hades \u00b7 Lord of the Digital Underworld tagline, Hades Agent v0.1.0 title, mock-model \u00b7 Hades provider line, glm-5.2 \u00b7 Hades unconfigured line). Deliberate, documented deviation from OBS-0001 branding; layout/geometry parity preserved; Hades-facing replay markers, differential golden, and OBS-0035 palette fixture updated; Hermes-side probes keep Hermes markers."
+        "summary": "Fixed the tall-terminal startup rendering bug (template body copy stops before the template's own footer/composer rows) and gave the startup surface its own owner-directed Hades identity (HADES AGENT logo, ☠ Hades · Lord of the Digital Underworld tagline, Hades Agent v0.1.0 title, mock-model · Hades provider line, glm-5.2 · Hades unconfigured line). Deliberate, documented deviation from OBS-0001 branding; layout/geometry parity preserved; Hades-facing replay markers, differential golden, and OBS-0035 palette fixture updated; Hermes-side probes keep Hermes markers."
       },
       "risk": "medium",
       "status": "complete",
@@ -6826,7 +6826,7 @@
           "crates/hades-dev/src/bin/replay_runtime_diff.rs",
           "scripts/verify.sh"
         ],
-        "summary": "Ported the shared replay runtime to Rust as hades-dev::replay: the helpers every Python replay imports from probe_tui_lifecycle \u2014 spawn-with-arguments on a 120x40 PTY with the standard replay environment, slave_path_for_pid resolution via /proc, retained slave descriptors for termios inspection, terminal_flags (canonical/echo), ANSI-stripped clean_output, compact marker_present matching, wait_for with early-exit detection and output-tail diagnostics, wait_for_exit returning describe_status-shaped exit values, send, and write_ready_config. A differential parity check (scripts/check_replay_runtime_parity.py, wired into verify.sh) proves the Rust runtime agrees with the Python helpers on clean output, marker matching, and real-subprocess exit shapes; 8 focused unit tests cover the same behaviors against live subprocesses. The Python harness still passes just verify unchanged; the runtime is additive."
+        "summary": "Ported the shared replay runtime to Rust as hades-dev::replay: the helpers every Python replay imports from probe_tui_lifecycle — spawn-with-arguments on a 120x40 PTY with the standard replay environment, slave_path_for_pid resolution via /proc, retained slave descriptors for termios inspection, terminal_flags (canonical/echo), ANSI-stripped clean_output, compact marker_present matching, wait_for with early-exit detection and output-tail diagnostics, wait_for_exit returning describe_status-shaped exit values, send, and write_ready_config. A differential parity check (scripts/check_replay_runtime_parity.py, wired into verify.sh) proves the Rust runtime agrees with the Python helpers on clean output, marker matching, and real-subprocess exit shapes; 8 focused unit tests cover the same behaviors against live subprocesses. The Python harness still passes just verify unchanged; the runtime is additive."
       },
       "risk": "high",
       "status": "complete",
@@ -6910,7 +6910,7 @@
           "scripts/verify.sh",
           "justfile"
         ],
-        "summary": "Ported replay_unconfigured_startup to Rust as hades-dev replay-unconfigured-startup: provider-env stripping, unconfigured markers (glm-5.2 \u00b7 Hades, starting agent), absent ready footer and prompt placeholder, raw mode, alternate-screen sequences, and Ctrl+C exit, with the same report JSON shape (probe/binary/dimensions/cases/passed). A differential check (scripts/check_replay_parity.py) proves the Rust and Python replays produce identical reports on the same binary; verify.sh and just replay-unconfigured-startup now run the Rust binary as the gate replay."
+        "summary": "Ported replay_unconfigured_startup to Rust as hades-dev replay-unconfigured-startup: provider-env stripping, unconfigured markers (glm-5.2 · Hades, starting agent), absent ready footer and prompt placeholder, raw mode, alternate-screen sequences, and Ctrl+C exit, with the same report JSON shape (probe/binary/dimensions/cases/passed). A differential check (scripts/check_replay_parity.py) proves the Rust and Python replays produce identical reports on the same binary; verify.sh and just replay-unconfigured-startup now run the Rust binary as the gate replay."
       },
       "risk": "medium",
       "status": "complete",
@@ -6994,7 +6994,7 @@
           "scripts/verify.sh",
           "justfile"
         ],
-        "summary": "Ported replay_unconfigured_help to Rust as hades-dev replay-unconfigured-help: the delayed unconfigured /help setup-required route \u2014 /help retained during the 8000ms pre-delay window, delayed Setup Required overlay with /model//setup/Ctrl+C, bounded transition timing (7000-11000ms), first Ctrl+C clearing the overlay without exiting, second Ctrl+C exiting cleanly, and the stable-terminal-flags retry on the post-exec ioctl race (errno 25). The report matches the Python shape; the differential check normalizes the two run-to-run timing fields while both replays assert the same bounds. verify.sh and the justfile targets (replay-unconfigured-help, replay-installed-help) now run the Rust binary as the gate replay for the debug binary and both installed launchers."
+        "summary": "Ported replay_unconfigured_help to Rust as hades-dev replay-unconfigured-help: the delayed unconfigured /help setup-required route — /help retained during the 8000ms pre-delay window, delayed Setup Required overlay with /model//setup/Ctrl+C, bounded transition timing (7000-11000ms), first Ctrl+C clearing the overlay without exiting, second Ctrl+C exiting cleanly, and the stable-terminal-flags retry on the post-exec ioctl race (errno 25). The report matches the Python shape; the differential check normalizes the two run-to-run timing fields while both replays assert the same bounds. verify.sh and the justfile targets (replay-unconfigured-help, replay-installed-help) now run the Rust binary as the gate replay for the debug binary and both installed launchers."
       },
       "risk": "medium",
       "status": "complete",
@@ -8710,7 +8710,7 @@
     },
     {
       "acceptance": [
-        "Port 13 reference probes (probe_hermes_setup.py, probe_hermes_setup_wizard.py, probe_hermes_setup_required.py\u2026) to Rust with the same sanitized report/fixture shapes.",
+        "Port 13 reference probes (probe_hermes_setup.py, probe_hermes_setup_wizard.py, probe_hermes_setup_required.py…) to Rust with the same sanitized report/fixture shapes.",
         "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
         "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
         "Run the targeted tests and the complete no-skip just verify gate before completion."
@@ -8737,7 +8737,7 @@
     },
     {
       "acceptance": [
-        "Port 4 reference probes (probe_hermes_help_catalog.py, probe_hermes_help_lifecycle.py, probe_hermes_help_resize.py\u2026) to Rust with the same sanitized report/fixture shapes.",
+        "Port 4 reference probes (probe_hermes_help_catalog.py, probe_hermes_help_lifecycle.py, probe_hermes_help_resize.py…) to Rust with the same sanitized report/fixture shapes.",
         "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
         "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
         "Run the targeted tests and the complete no-skip just verify gate before completion."
@@ -8764,7 +8764,7 @@
     },
     {
       "acceptance": [
-        "Port 5 reference probes (probe_hermes_osc52_clipboard.py, probe_hermes_osc52_multiplexer.py, probe_hermes_osc52_response_boundaries.py\u2026) to Rust with the same sanitized report/fixture shapes.",
+        "Port 5 reference probes (probe_hermes_osc52_clipboard.py, probe_hermes_osc52_multiplexer.py, probe_hermes_osc52_response_boundaries.py…) to Rust with the same sanitized report/fixture shapes.",
         "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
         "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
         "Run the targeted tests and the complete no-skip just verify gate before completion."
@@ -8791,7 +8791,7 @@
     },
     {
       "acceptance": [
-        "Port 5 reference probes (probe_hermes_local_provider_stream.py, probe_hermes_multi_turn_provider.py, probe_hermes_provider_errors.py\u2026) to Rust with the same sanitized report/fixture shapes.",
+        "Port 5 reference probes (probe_hermes_local_provider_stream.py, probe_hermes_multi_turn_provider.py, probe_hermes_provider_errors.py…) to Rust with the same sanitized report/fixture shapes.",
         "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
         "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
         "Run the targeted tests and the complete no-skip just verify gate before completion."
@@ -8818,7 +8818,7 @@
     },
     {
       "acceptance": [
-        "Port 6 reference probes (probe_hermes_tool_schema_semantics.py, probe_hermes_tool_provider_inventory.py, probe_hermes_tool_provider_inventory_selection.py\u2026) to Rust with the same sanitized report/fixture shapes.",
+        "Port 6 reference probes (probe_hermes_tool_schema_semantics.py, probe_hermes_tool_provider_inventory.py, probe_hermes_tool_provider_inventory_selection.py…) to Rust with the same sanitized report/fixture shapes.",
         "A differential parity check (scripts/check_replay_parity.py) proves identical reports on the same binary and contract.",
         "verify.sh and the justfile target run the Rust replay; the Python replay is removed only after parity is demonstrated.",
         "Run the targeted tests and the complete no-skip just verify gate before completion."
@@ -8921,7 +8921,143 @@
       "risk": "medium",
       "status": "queued",
       "title": "Retire the Python harness and orchestrate verify in Rust"
+    },
+    {
+      "acceptance": [
+        "Promote specs/011-tool-execution/spec.md to active with a capture plan (plan.md) and checklist (tasks.md): observe the pinned reference executing tools against a synthetic sandbox (terminal writing to temp dirs, file tools, clarify) → new OBS fixtures → implement the hades-tools executor in Rust → parity-verify the multi-hop loop.",
+        "Reword spec 005's out-of-scope line to 'pending observation capture' so the record stops misstating the product; remove the promoted tool-execution line from specs/BACKLOG.md.",
+        "Add spec 011 to README.md and add the tool-execution row to the parity matrix (specs/001-parity-contract/matrix.md) with status 'Specified (pending observation capture, spec 011)'.",
+        "Register the capture stages as control-plane tasks HAD-180 (observe), HAD-181 (implement), HAD-182 (parity-verify) depending on this task.",
+        "Run the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 1,
+      "claimed_at": "2026-08-05T04:11:35Z",
+      "claimed_by": "spec-011-promoter",
+      "depends_on": [],
+      "evidence": [
+        "specs/011-tool-execution/spec.md",
+        "specs/011-tool-execution/plan.md",
+        "specs/011-tool-execution/tasks.md",
+        "specs/005-provider-transport/spec.md",
+        "specs/BACKLOG.md",
+        "README.md",
+        "specs/001-parity-contract/matrix.md",
+        ".hades/tasks.json",
+        "scripts/probe_hermes_slash_commands.py",
+        "scripts/probe_hermes_provider_errors.py",
+        "scripts/probe_hermes_stream_timing.py",
+        ".hades/runtime/hermes-tool-inventory-probe.json"
+      ],
+      "id": "HAD-179",
+      "lane": "product",
+      "oracle": [
+        "control_plane",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 80,
+      "result": {
+        "completed_at": "2026-08-05T04:29:35Z",
+        "evidence": [
+          "specs/011-tool-execution/spec.md",
+          "specs/011-tool-execution/plan.md",
+          "specs/011-tool-execution/tasks.md",
+          "specs/005-provider-transport/spec.md",
+          "specs/BACKLOG.md",
+          "README.md",
+          "specs/001-parity-contract/matrix.md",
+          ".hades/tasks.json",
+          "scripts/probe_hermes_slash_commands.py",
+          "scripts/probe_hermes_provider_errors.py",
+          "scripts/probe_hermes_stream_timing.py",
+          ".hades/runtime/hermes-tool-inventory-probe.json"
+        ],
+        "summary": "Promoted spec 011 (tool execution) to active with a capture plan (plan.md) and checklist (tasks.md): observe the pinned reference executing tools against a synthetic sandbox (terminal writing to temp dirs, file tools, clarify) -> new OBS fixtures -> implement the hades-tools executor in Rust -> parity-verify the multi-hop loop. Reworded spec 005's out-of-scope line to 'pending observation capture' so the record stops misstating the product; removed the promoted line from BACKLOG; added spec 011 to README and a 'Specified (pending observation capture)' row to the parity matrix. Registered capture stages HAD-180/181/182. Fixed a probe-harness environment leak: reference children inherited HERMES_SERVE_HEADLESS/SESSION_ID/WEB_DIST/EXEC_ASK/REAL_HOME and HERMES_KANBAN_* markers from desktop/kanban/cron sessions, drifting the observed tool inventory (41 vs anchored 31) and request counts; safe_environment now strips them (same class as the OBS-0116 HERMES_DESKTOP fix) so observations match the plain-CLI reference environment. Complete no-skip just verify gate PASS (751161 ms, zero probe retries)."
+      },
+      "risk": "low",
+      "status": "complete",
+      "title": "Promote spec 011 (tool execution) with capture plan"
+    },
+    {
+      "acceptance": [
+        "Write scripts/probe_hermes_tool_execution.py modeled on the tool-call handoff probes: fresh synthetic Hermes TUI, deterministic loopback provider, 120x40 PTY, bounded observation windows, loopback-only HTTP.",
+        "Capture S1 terminal tool writing to probe-owned temp dirs, S2 file read/write/list tools, S3 clarify interactive surface (OBS-0116 boundary), S4 multi-hop loop (tool call → tool result → second tool call → plain completion) with request counts and termination.",
+        "Produce sanitized OBS fixtures (tests/fixtures/parity/OBS-01xx-hermes-tool-execution-*.json) and observation documents (_attic/docs/parity-observations/) with provenance; never persist raw arguments, results, or transcripts.",
+        "Preserve unknowns (approval UI, retries, failure paths, timing) and record no credentials, no external network, no real filesystem side effects.",
+        "Run the targeted probe and the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-179"
+      ],
+      "evidence": [],
+      "id": "HAD-180",
+      "lane": "research",
+      "oracle": [
+        "pinned_hermes_reference",
+        "direct_pty_probe",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "owner_role": "observer",
+      "priority": 79,
+      "ready_at": "2026-08-05T04:29:35Z",
+      "risk": "medium",
+      "status": "ready",
+      "title": "Capture Hermes tool execution against a synthetic sandbox"
+    },
+    {
+      "acceptance": [
+        "New crate crates/hades-tools/ at the typed seam: ToolCallRecord in, typed tool result out, with an explicit Sandbox boundary (probe/temp-dir root) so tools never touch the real user environment.",
+        "Implement the observed slice: terminal (write into sandbox dirs only), file read/write/list, and clarify rendered as the observed question surface; nothing beyond the OBS fixtures.",
+        "Feed the tool result back through the follow-up request (existing one-hop path extended to the observed multi-hop loop with the observed termination).",
+        "Add unit tests at the typed seam and a direct-PTY replay proving the loop shape matches the reference observation.",
+        "Run the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-180"
+      ],
+      "evidence": [],
+      "id": "HAD-181",
+      "lane": "behavior",
+      "oracle": [
+        "typed_state_tests",
+        "direct_pty_replay",
+        "sanitized_fixture",
+        "full_verify"
+      ],
+      "owner_role": "implementer",
+      "priority": 78,
+      "risk": "medium",
+      "status": "queued",
+      "title": "Implement the hades-tools executor in Rust"
+    },
+    {
+      "acceptance": [
+        "Fresh 120x40 direct-PTY replay of each scenario against the Hades binary using the same loopback script as the reference probe.",
+        "Differential check proves normalized report parity with the reference observations: request sequence, roles (system, user, assistant, tool), tool-call names/arguments (digests), tool-result shape, and loop termination.",
+        "Update the parity matrix, README, and task evidence; document any preserved unknowns.",
+        "Run the complete no-skip just verify gate before completion."
+      ],
+      "attempts": 0,
+      "depends_on": [
+        "HAD-181"
+      ],
+      "evidence": [],
+      "id": "HAD-182",
+      "lane": "parity",
+      "oracle": [
+        "differential_parity",
+        "direct_pty_replay",
+        "full_verify"
+      ],
+      "owner_role": "verifier",
+      "priority": 77,
+      "risk": "medium",
+      "status": "queued",
+      "title": "Parity-verify the multi-hop tool loop"
     }
   ],
-  "updated_at": "2026-08-04T13:33:15Z"
+  "updated_at": "2026-08-05T04:29:35Z"
 }

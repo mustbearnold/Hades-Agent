@@ -34,6 +34,7 @@ capability specs:
 - [specs/008-autonomous-development/spec.md](specs/008-autonomous-development/spec.md)
 - [specs/009-rust-migration/spec.md](specs/009-rust-migration/spec.md)
 - [specs/010-hades-branding/spec.md](specs/010-hades-branding/spec.md)
+- [specs/011-tool-execution/spec.md](specs/011-tool-execution/spec.md)
 - [specs/BACKLOG.md](specs/BACKLOG.md) — known-but-unspecced capabilities
 
 For agents: read [AGENTS.md](AGENTS.md) and the constitution before any work.
