@@ -1,0 +1,313 @@
+{
+  "schema_version": 1,
+  "observation_id": "OBS-0120",
+  "reference_observation": "OBS-0114",
+  "surface": "hermes-tui-multi-hop-tool-execution",
+  "reference": {
+    "product": "Hermes Agent",
+    "version": "0.19.1",
+    "display_build": "2026.7.30",
+    "source_commit": "e444d165807f489b5c1ab8e4a612c8d09c2e67a2",
+    "terminal": {
+      "columns": 120,
+      "rows": 40,
+      "emulator": "direct PTY with deterministic loopback HTTP/SSE tool-call fixture"
+    },
+    "capture": "fresh synthetic-home Hermes TUI process with one ordinary prompt; the loopback provider requests a terminal tool call, answers the resulting tool message with a read_file tool call, then a plain completion — two hops then termination; bounded post-completion observation window"
+  },
+  "normalization": [
+    "The reference checkout, synthetic HOME/HERMES_HOME paths, prompt text, assistant text, tool arguments, credentials, authorization values, session identifiers, timestamps, and redraw bytes are omitted or represented by stable markers or digests.",
+    "The provider is a deterministic 127.0.0.1 fixture owned by the probe; all recorded HTTP traffic stayed on that loopback endpoint and no external network, OAuth flow, browser, or user credential was used.",
+    "The executed commands are synthetic probe-owned commands whose only side effects write into the probe sandbox; command structure is recorded as markers and arguments as length/digest, never the raw command text or sandbox path. Path-embedded argument digests vary per run.",
+    "The real Hermes tool-result contents (terminal output, read content) are recorded only as normalized shape (content kind, length, digest, JSON top-level keys, boolean anchors); the contents themselves are never persisted. The terminal result digest (708054e2...) and the read_file result digest (fb3accfc...) were identical across two fresh runs with different sandbox paths.",
+    "The [DONE] marker completes each tool-call stream so tool processing and execution proceed; the sandbox and HOME/HERMES_HOME are removed after the probe."
+  ],
+  "steps": [
+    {
+      "id": "multi-hop-tool-execution",
+      "precondition": "Fresh Hermes TUI at 120x40 with an isolated synthetic HERMES_HOME and a configured custom provider at the probe-owned loopback endpoint.",
+      "input_sequence": [
+        {
+          "kind": "text",
+          "value": "<synthetic prompt>",
+          "bytes_hex": "3c 73 79 6e 74 68 65 74 69 63 20 70 72 6f 6d 70 74 3e"
+        },
+        {
+          "kind": "key",
+          "value": "Enter",
+          "bytes_hex": "0d"
+        },
+        {
+          "kind": "wait",
+          "value": "scripted terminal tool-call stream served"
+        },
+        {
+          "kind": "wait",
+          "value": "terminal result followed up (streaming request 2)"
+        },
+        {
+          "kind": "wait",
+          "value": "read_file result followed up (streaming request 3)"
+        },
+        {
+          "kind": "wait",
+          "value": "plain completion rendered"
+        }
+      ],
+      "output": {
+        "status": "passed",
+        "provider_request": {
+          "path": "/v1/chat/completions",
+          "authorization_present": true,
+          "request_kind": "streaming-chat",
+          "model": "palette-model",
+          "body_keys": [
+            "max_tokens",
+            "messages",
+            "model",
+            "stream",
+            "stream_options",
+            "tools"
+          ],
+          "message_roles": [
+            "system",
+            "user"
+          ],
+          "tools": {
+            "present": true,
+            "count": 31,
+            "terminal_present": true,
+            "read_file_present": true
+          }
+        },
+        "tool_calls": [
+          {
+            "name": "terminal",
+            "sequence": 1,
+            "call_id_marker": "synthetic-call-id",
+            "finish_reason": "tool_calls",
+            "done_marker_sent": true,
+            "arguments": {
+              "length": 150,
+              "sha256": "04f430ffe340baad247d6880b7d3e2870bb33e9b515a456820814e9f206fde3a",
+              "path_embedded": true,
+              "valid_json": true,
+              "top_level_keys": [
+                "command"
+              ],
+              "value_kinds": {
+                "command": "string"
+              },
+              "markers": {
+                "command_present": true,
+                "contains_mkdir": true,
+                "contains_echo": true,
+                "contains_redirection": true,
+                "contains_chain": true,
+                "contains_expected_basename": true
+              }
+            }
+          },
+          {
+            "name": "read_file",
+            "sequence": 2,
+            "call_id_marker": "synthetic-call-id",
+            "finish_reason": "tool_calls",
+            "done_marker_sent": true,
+            "arguments": {
+              "length": 69,
+              "sha256": "76ec0a9b4d61890c96260533e2805f8eab892efc7c847e4a7b58bc1f846a8a29",
+              "path_embedded": true,
+              "valid_json": true,
+              "top_level_keys": [
+                "path"
+              ],
+              "value_kinds": {
+                "path": "string"
+              },
+              "markers": {
+                "path_ends_with_expected_basename": true
+              }
+            }
+          }
+        ],
+        "tool_results": [
+          {
+            "sequence": 1,
+            "recorded": true,
+            "content_kind": "string",
+            "length": 45,
+            "sha256": "708054e20f8345e96aa29aa3d3ae50e6245e6723619f1f57c1486f2c2ef9c451",
+            "stable_across_runs": true,
+            "empty": false,
+            "starts_with_brace": true,
+            "json_parseable": true,
+            "json_top_level_keys": [
+              "error",
+              "exit_code",
+              "output"
+            ],
+            "contains_anchors": []
+          },
+          {
+            "sequence": 2,
+            "recorded": true,
+            "content_kind": "string",
+            "length": 121,
+            "sha256": "fb3accfce3bc199b09eebb2e2e03ea41ff7467e0f76fc5e75ce6849fa6ff856f",
+            "stable_across_runs": true,
+            "empty": false,
+            "starts_with_brace": true,
+            "json_parseable": true,
+            "json_top_level_keys": [
+              "content",
+              "file_size",
+              "is_binary",
+              "is_image",
+              "total_lines",
+              "truncated"
+            ],
+            "contains_anchors": [
+              "hop-one"
+            ]
+          }
+        ],
+        "follow_up_requests": [
+          {
+            "sequence": 2,
+            "request_kind": "streaming-chat",
+            "model": "palette-model",
+            "message_count": 4,
+            "message_roles": [
+              "system",
+              "user",
+              "assistant",
+              "tool"
+            ],
+            "message_content_kinds": [
+              "string",
+              "string",
+              "string",
+              "string"
+            ],
+            "tool_calls_in_history": [
+              false,
+              false,
+              true,
+              false
+            ],
+            "tool_call_id_markers": [
+              "absent",
+              "absent",
+              "absent",
+              "synthetic-call-id"
+            ],
+            "tool_result_messages": 1
+          },
+          {
+            "sequence": 3,
+            "request_kind": "streaming-chat",
+            "model": "palette-model",
+            "message_count": 6,
+            "message_roles": [
+              "system",
+              "user",
+              "assistant",
+              "tool",
+              "assistant",
+              "tool"
+            ],
+            "message_content_kinds": [
+              "string",
+              "string",
+              "string",
+              "string",
+              "string",
+              "string"
+            ],
+            "tool_calls_in_history": [
+              false,
+              false,
+              true,
+              false,
+              true,
+              false
+            ],
+            "tool_call_id_markers": [
+              "absent",
+              "absent",
+              "absent",
+              "synthetic-call-id",
+              "absent",
+              "synthetic-call-id"
+            ],
+            "tool_result_messages": 2
+          },
+          {
+            "sequence": 4,
+            "request_kind": "auxiliary-nonstream",
+            "model": "palette-model",
+            "message_count": 2,
+            "message_roles": [
+              "system",
+              "user"
+            ],
+            "message_content_kinds": [
+              "string",
+              "string"
+            ],
+            "tool_calls_in_history": [
+              false,
+              false
+            ]
+          }
+        ],
+        "sandbox_side_effects": {
+          "files": [
+            {
+              "basename": "hop.txt",
+              "exists": true,
+              "content_matches_expected": true,
+              "content_length": 8,
+              "content_sha256": "8dafa0ec68b138aeb867e95010596f555ee72018ca35ae8ee8d4fdca3c55b030"
+            }
+          ],
+          "match": true
+        },
+        "visible_markers": {
+          "terminal_marker": true,
+          "read_file_marker": true,
+          "completion_marker": false,
+          "ready_marker": true
+        },
+        "request_counts": {
+          "chat_requests": 4,
+          "streaming_requests": 3,
+          "subsequent_chat_requests": 3,
+          "tool_result_requests": 2,
+          "loopback_http_requests": 14,
+          "auxiliary_responses": 1
+        },
+        "termination": {
+          "completion_text": "Synthetic completion.",
+          "completion_served": true,
+          "clean_exit": true
+        },
+        "side_effect_boundary": {
+          "provider_endpoint": "127.0.0.1 loopback owned by probe",
+          "external_network": "none observed; all recorded HTTP traffic stayed on the synthetic loopback",
+          "credentials": "none; only a synthetic key was placed in the throwaway config and auth values were reduced to presence booleans",
+          "oauth": "not entered",
+          "browser": "not started",
+          "filesystem": "tool side effects were confined to the probe-owned sandbox directory under a throwaway temp root; the sandbox was removed after the probe",
+          "tool_action": "two tool hops (terminal, then read_file) confined to the probe-owned sandbox directory"
+        }
+      }
+    }
+  ],
+  "unknowns": [
+    "Approval UI, retry, failure-path, and termination semantics beyond the observed plain-completion termination remain unknown; the loop terminated when the follow-up stream carried no tool calls.",
+    "Whether the multi-hop request sequence and tool-result contents are stable across reference restarts remains bounded by this single observation; both result digests were stable across two runs with different sandbox paths.",
+    "The purpose of the auxiliary non-stream system/user request seen in OBS-0108/0109/0114/0116/0119 remains unclassified and is not a Hades requirement."
+  ]
+}

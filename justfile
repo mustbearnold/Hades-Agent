@@ -280,6 +280,12 @@ probe-tool-completion-handoff:
 probe-clarify-question-surface:
     python3 scripts/probe_hermes_clarify_question_surface.py --report .hades/runtime/hermes-clarify-question-surface-probe.json --timeout 90 --observation-window 3
 
+probe-tool-execution:
+    python3 scripts/probe_hermes_tool_execution.py --scenario s1-terminal --report .hades/runtime/hermes-tool-execution-s1-terminal-probe.json --timeout 90 --observation-window 3
+    python3 scripts/probe_hermes_tool_execution.py --scenario s2-file-tools --report .hades/runtime/hermes-tool-execution-s2-file-tools-probe.json --timeout 90 --observation-window 3
+    python3 scripts/probe_hermes_tool_execution.py --scenario s3-clarify --report .hades/runtime/hermes-tool-execution-s3-clarify-probe.json --timeout 90 --observation-window 3
+    python3 scripts/probe_hermes_tool_execution.py --scenario s4-multi-hop --report .hades/runtime/hermes-tool-execution-s4-multi-hop-probe.json --timeout 90 --observation-window 3
+
 probe-stream-timing:
     python3 scripts/probe_hermes_stream_timing.py --report .hades/runtime/hermes-stream-timing-probe.json --timeout 30
 
@@ -502,6 +508,10 @@ validate-reference:
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0113-hades-tool-inventory-advertisement.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0114-hermes-tool-completion-handoff.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0115-hades-tool-result-follow-up.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0117-hermes-tool-execution-terminal.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0118-hermes-tool-execution-file-tools.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0119-hermes-tool-execution-clarify.json
+    python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0120-hermes-tool-execution-multi-hop.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0052-hermes-stream-timing.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0053-hades-stream-timing.json
     python3 scripts/validate_reference_fixture.py tests/fixtures/parity/OBS-0054-hermes-provider-errors.json

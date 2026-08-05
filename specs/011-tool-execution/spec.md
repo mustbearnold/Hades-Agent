@@ -52,10 +52,13 @@ hades-tools executor in Rust, and parity-verify the multi-hop loop.
       with a capture plan (plan.md), a checklist (tasks.md), and a registered
       control-plane task — and spec 005's out-of-scope line no longer
       misstates tool execution as permanently out of scope.
-- [ ] A2. Given the pinned reference, when the sandbox probe runs, then the
+- [x] A2. Given the pinned reference, when the sandbox probe runs, then the
       observation records the reference executing terminal/file/clarify tools
       against the synthetic sandbox, with provenance, sanitized OBS fixtures,
       and documented unknowns (approval, retries, failure, termination).
+      Evidence: `scripts/probe_hermes_tool_execution.py`;
+      `tests/fixtures/parity/OBS-0117…0120-hermes-tool-execution-*.json`;
+      `_attic/docs/parity-observations/OBS-0117…0120-hermes-tool-execution-*-2026-08-05.md`.
 - [ ] A3. Given a parsed tool-call record, when the executor runs, then the
       tool executes against the synthetic sandbox and the typed result feeds
       the follow-up request in the observed message shape.
@@ -75,12 +78,13 @@ hades-tools executor in Rust, and parity-verify the multi-hop loop.
 
 ## Open questions
 
-- Hermes' exact post-handoff execution transition (overlay presentation,
-  approval prompt, transcript persistence) — pending observation capture.
-- The multi-hop termination bound and per-hop tool-result rendering —
-  pending observation capture.
+- The multi-hop loop is observed (OBS-0120): two hops then plain-completion
+  termination, each follow-up a streaming `system, user, assistant, tool`
+  request with the tool message referencing the assistant's tool-call id.
+  Tool-result rendering per hop and any termination bound beyond the
+  observed plain-completion stop remain unobserved.
 - The purpose of the auxiliary non-stream `system, user` request seen in
-  OBS-0108/0109/0114/0116 — remains unknown.
+  OBS-0108/0109/0114/0116/0117/0118/0119/0120 — remains unknown.
 
 ## Links
 
