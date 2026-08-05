@@ -17,24 +17,26 @@ run_probe() {
     shift
     local attempt=0
     while :; do
-        # NOTE: capture the probe's exit status DIRECTLY. `if "$@"; then
-        # return 0; fi` would mask a failed probe: an if with no else
-        # clause exits 0 when the condition is false, so `local status=$?`
-        # would always read 0 and the gate could never fail on a probe.
-        "$@"
-        local status=$?
-        if [ "$status" -eq 0 ]; then
+        # Capture the probe's exit status in an if/else condition: a bare
+        # "$@" under `set -e` aborts the script on the first failure (the
+        # retry loop would never run), while `if "$@"; then ... fi` with no
+        # else clause masks the status as 0 (an if with no else exits 0 when
+        # its condition is false). The else branch preserves both: the real
+        # exit code AND the retry policy.
+        if "$@"; then
             return 0
-        fi
-        attempt=$((attempt + 1))
-        if [ "$attempt" -ge 3 ]; then
-            return "$status"
-        fi
-        if [ -f "$report_path" ]; then
-            cp "$report_path" "${report_path%.json}.attempt-${attempt}.json"
-            echo "[verify] probe attempt $attempt failed (status $status); report preserved at ${report_path%.json}.attempt-${attempt}.json; retrying: $*" >&2
         else
-            echo "[verify] probe attempt $attempt failed (status $status) with no report; retrying: $*" >&2
+            local status=$?
+            attempt=$((attempt + 1))
+            if [ "$attempt" -ge 3 ]; then
+                return "$status"
+            fi
+            if [ -f "$report_path" ]; then
+                cp "$report_path" "${report_path%.json}.attempt-${attempt}.json"
+                echo "[verify] probe attempt $attempt failed (status $status); report preserved at ${report_path%.json}.attempt-${attempt}.json; retrying: $*" >&2
+            else
+                echo "[verify] probe attempt $attempt failed (status $status) with no report; retrying: $*" >&2
+            fi
         fi
     done
 }
