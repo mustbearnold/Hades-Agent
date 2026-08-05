@@ -185,160 +185,59 @@ cargo build --offline --package hades-dev --bins
 cargo build --locked --release --package hades-cli
 bash scripts/install_user_launcher.sh
 
-# --- timing-asserting probes run serial with the timing-sensitive
-# replays; the remaining probes are parallel pool units. ---
-# --- timing-sensitive replays and probes (serial) ---
+# --- reference probes (serial; live Hermes, retried) ---
+run_probe .hades/runtime/hermes-tool-inventory-probe.json python3 scripts/probe_hermes_tool_inventory.py --report .hades/runtime/hermes-tool-inventory-probe.json --timeout 60
 python3 scripts/probe_tui_lifecycle.py --binary target/debug/hades
+run_probe .hades/runtime/hermes-osc52-st-termination-probe.json python3 scripts/probe_hermes_osc52_st_termination.py --report .hades/runtime/hermes-osc52-st-termination-probe.json --timeout 60
+run_probe .hades/runtime/hermes-osc52-multiplexer-probe.json python3 scripts/probe_hermes_osc52_multiplexer.py --report .hades/runtime/hermes-osc52-multiplexer-probe.json --timeout 30
 run_probe .hades/runtime/hermes-osc52-timing-limits-probe.json python3 scripts/probe_hermes_osc52_timing_limits.py --report .hades/runtime/hermes-osc52-timing-limits-probe.json --timeout 60
+run_probe .hades/runtime/hermes-terminal-palette-probe.json python3 scripts/probe_hermes_terminal_palette.py --report .hades/runtime/hermes-terminal-palette-probe.json --timeout 30
+run_probe .hades/runtime/hermes-slash-commands-probe.json python3 scripts/probe_hermes_slash_commands.py --report .hades/runtime/hermes-slash-commands-probe.json --timeout 30
+run_probe .hades/runtime/hermes-help-catalog-probe.json python3 scripts/probe_hermes_help_catalog.py --report .hades/runtime/hermes-help-catalog-probe.json --timeout 60
+run_probe .hades/runtime/hermes-help-lifecycle-probe.json python3 scripts/probe_hermes_help_lifecycle.py --report .hades/runtime/hermes-help-lifecycle-probe.json --timeout 60
+run_probe .hades/runtime/hermes-help-resize-probe.json python3 scripts/probe_hermes_help_resize.py --report .hades/runtime/hermes-help-resize-probe.json --timeout 60
+run_probe .hades/runtime/hermes-model-picker-probe.json python3 scripts/probe_hermes_model_picker.py --report .hades/runtime/hermes-model-picker-probe.json --timeout 30
+run_probe .hades/runtime/hermes-model-picker-selection-probe.json python3 scripts/probe_hermes_model_picker_selection.py --report .hades/runtime/hermes-model-picker-selection-probe.json --timeout 30
+run_probe .hades/runtime/hermes-distinct-model-selection-probe.json python3 scripts/probe_hermes_distinct_model_selection.py --report .hades/runtime/hermes-distinct-model-selection-probe.json --timeout 60
+run_probe .hades/runtime/hermes-setup-wizard-probe.json python3 scripts/probe_hermes_setup_wizard.py --report .hades/runtime/hermes-setup-wizard-probe.json --timeout 60
+run_probe .hades/runtime/hermes-full-setup-probe.json python3 scripts/probe_hermes_full_setup.py --report .hades/runtime/hermes-full-setup-probe.json --timeout 30
+run_probe .hades/runtime/hermes-full-setup-provider-probe.json python3 scripts/probe_hermes_full_setup_provider.py --report .hades/runtime/hermes-full-setup-provider-probe.json --timeout 30
+run_probe .hades/runtime/hermes-full-setup-provider-selection-probe.json python3 scripts/probe_hermes_full_setup_provider_selection.py --report .hades/runtime/hermes-full-setup-provider-selection-probe.json --timeout 30
+run_probe .hades/runtime/hermes-full-setup-model-default-probe.json python3 scripts/probe_hermes_full_setup_model_default.py --report .hades/runtime/hermes-full-setup-model-default-probe.json --timeout 30
+run_probe .hades/runtime/hermes-local-provider-stream-probe.json python3 scripts/probe_hermes_local_provider_stream.py --report .hades/runtime/hermes-local-provider-stream-probe.json --timeout 30
+run_probe .hades/runtime/hermes-multi-turn-provider-probe.json python3 scripts/probe_hermes_multi_turn_provider.py --report .hades/runtime/hermes-multi-turn-provider-probe.json --timeout 30
+run_probe .hades/runtime/hermes-tool-schema-semantics-probe.json python3 scripts/probe_hermes_tool_schema_semantics.py --report .hades/runtime/hermes-tool-schema-semantics-probe.json --timeout 30
+run_probe .hades/runtime/hermes-tool-call-handoff-probe.json python3 scripts/probe_hermes_tool_call_handoff.py --report .hades/runtime/hermes-tool-call-handoff-probe.json --timeout 30 --observation-window 0.2
+run_probe .hades/runtime/hermes-tool-completion-handoff-probe.json python3 scripts/probe_hermes_tool_completion_handoff.py --report .hades/runtime/hermes-tool-completion-handoff-probe.json --timeout 90 --observation-window 4
+run_probe .hades/runtime/hermes-clarify-question-surface-probe.json python3 scripts/probe_hermes_clarify_question_surface.py --report .hades/runtime/hermes-clarify-question-surface-probe.json --timeout 90 --observation-window 3
 run_probe .hades/runtime/hermes-stream-timing-probe.json python3 scripts/probe_hermes_stream_timing.py --report .hades/runtime/hermes-stream-timing-probe.json --timeout 30
+run_probe .hades/runtime/hermes-provider-errors-probe.json python3 scripts/probe_hermes_provider_errors.py --report .hades/runtime/hermes-provider-errors-probe.json --timeout 30
+run_probe .hades/runtime/hermes-provider-setup-persistence-probe.json python3 scripts/probe_hermes_provider_setup_persistence.py --report .hades/runtime/hermes-provider-setup-persistence-probe.json --timeout 30
+run_probe .hades/runtime/hermes-setup-config-shape-probe.json python3 scripts/probe_hermes_setup_config_shape.py --report .hades/runtime/hermes-setup-config-shape-probe.json --timeout 30
+run_probe .hades/runtime/hermes-empty-platform-confirmation-probe.json python3 scripts/probe_hermes_empty_platform_confirmation.py --report .hades/runtime/hermes-empty-platform-confirmation-probe.json --timeout 30
+run_probe .hades/runtime/hermes-unconfigured-startup-probe.json python3 scripts/probe_hermes_unconfigured_startup.py --report .hades/runtime/hermes-unconfigured-startup-probe.json --timeout 30
+run_probe .hades/runtime/hermes-unconfigured-input-queue-probe.json python3 scripts/probe_hermes_unconfigured_input_queue.py --report .hades/runtime/hermes-unconfigured-input-queue-probe.json --timeout 30
+run_probe .hades/runtime/hermes-unconfigured-setup-escape-probe.json python3 scripts/probe_hermes_unconfigured_setup_escape.py --report .hades/runtime/hermes-unconfigured-setup-escape-probe.json --timeout 30
+run_probe .hades/runtime/hermes-unconfigured-resolution-probe.json python3 scripts/probe_hermes_unconfigured_resolution.py --report .hades/runtime/hermes-unconfigured-resolution-probe.json --timeout 30 --observation-window 15
+run_probe .hades/runtime/hermes-setup-required-reconciliation-probe.json python3 scripts/probe_hermes_setup_required_reconciliation.py --report .hades/runtime/hermes-setup-required-reconciliation-probe.json --timeout 30 --observation-window 15
+run_probe .hades/runtime/hermes-help-setup-timing-probe.json python3 scripts/probe_hermes_help_setup_timing.py --report .hades/runtime/hermes-help-setup-timing-probe.json --timeout 30 --observation-window 15
+run_probe .hades/runtime/hermes-setup-required-actions-probe.json python3 scripts/probe_hermes_setup_required_actions.py --report .hades/runtime/hermes-setup-required-actions-probe.json --timeout 30 --observation-window 3
+run_probe .hades/runtime/hermes-standalone-setup-probe.json python3 scripts/probe_hermes_standalone_setup.py --report .hades/runtime/hermes-standalone-setup-probe.json --timeout 30
+run_probe .hades/runtime/hermes-standalone-full-setup-probe.json python3 scripts/probe_hermes_standalone_full_setup.py --report .hades/runtime/hermes-standalone-full-setup-probe.json --timeout 90
+run_probe .hades/runtime/hermes-standalone-terminal-platform-probe.json python3 scripts/probe_hermes_standalone_terminal_platform.py --report .hades/runtime/hermes-standalone-terminal-platform-probe.json --timeout 60
+run_probe .hades/runtime/hermes-standalone-tool-configuration-probe.json python3 scripts/probe_hermes_standalone_tool_configuration.py --report .hades/runtime/hermes-standalone-tool-configuration-probe.json --timeout 30
+run_probe .hades/runtime/hermes-tool-configuration-navigation-probe.json python3 scripts/probe_hermes_tool_configuration_navigation.py --report .hades/runtime/hermes-tool-configuration-navigation-probe.json --timeout 30
+run_probe .hades/runtime/hermes-tool-provider-boundary-probe.json python3 scripts/probe_hermes_tool_provider_boundary.py --report .hades/runtime/hermes-tool-provider-boundary-probe.json --timeout 30
+run_probe .hades/runtime/hermes-tool-provider-inventory-probe.json python3 scripts/probe_hermes_tool_provider_inventory.py --report .hades/runtime/hermes-tool-provider-inventory-probe.json --timeout 30 --observation-window 1
+run_probe .hades/runtime/hermes-tool-provider-inventory-interaction-probe.json python3 scripts/probe_hermes_tool_provider_inventory_interaction.py --report .hades/runtime/hermes-tool-provider-inventory-interaction-probe.json --timeout 60
+run_probe .hades/runtime/hermes-tool-provider-inventory-edges-probe.json python3 scripts/probe_hermes_tool_provider_inventory_edges.py --report .hades/runtime/hermes-tool-provider-inventory-edges-probe.json --timeout 60
+run_probe .hades/runtime/hermes-tool-provider-inventory-selection-probe.json python3 scripts/probe_hermes_tool_provider_inventory_selection.py --report .hades/runtime/hermes-tool-provider-inventory-selection-probe.json --timeout 30
+
+# --- timing-sensitive replays (serial) ---
 python3 scripts/check_replay_parity.py replay_osc52_timing_limits replay_osc52_timing_limits --timeout 10
 ./target/debug/replay_osc52_timing_limits --binary target/debug/hades --report .hades/runtime/hades-osc52-timing-limits-replay.json --timeout 10
 python3 scripts/check_replay_parity.py replay_local_provider_timing replay_local_provider_timing --contract tests/fixtures/parity/OBS-0053-hades-stream-timing.json --timeout 8
 ./target/debug/replay_local_provider_timing --binary target/debug/hades --contract tests/fixtures/parity/OBS-0053-hades-stream-timing.json --report .hades/runtime/local-provider-timing-replay.json --timeout 8
-
-# --- replay units (parallel pool) ---
-run_probe_unit() {
-    case "$1" in
-        hermes-tool-inventory)
-            run_probe .hades/runtime/hermes-tool-inventory-probe.json python3 scripts/probe_hermes_tool_inventory.py --report .hades/runtime/hermes-tool-inventory-probe.json --timeout 60
-            ;;
-        hermes-osc52-st-termination)
-            run_probe .hades/runtime/hermes-osc52-st-termination-probe.json python3 scripts/probe_hermes_osc52_st_termination.py --report .hades/runtime/hermes-osc52-st-termination-probe.json --timeout 60
-            ;;
-        hermes-osc52-multiplexer)
-            run_probe .hades/runtime/hermes-osc52-multiplexer-probe.json python3 scripts/probe_hermes_osc52_multiplexer.py --report .hades/runtime/hermes-osc52-multiplexer-probe.json --timeout 30
-            ;;
-        hermes-terminal-palette)
-            run_probe .hades/runtime/hermes-terminal-palette-probe.json python3 scripts/probe_hermes_terminal_palette.py --report .hades/runtime/hermes-terminal-palette-probe.json --timeout 30
-            ;;
-        hermes-slash-commands)
-            run_probe .hades/runtime/hermes-slash-commands-probe.json python3 scripts/probe_hermes_slash_commands.py --report .hades/runtime/hermes-slash-commands-probe.json --timeout 30
-            ;;
-        hermes-help-catalog)
-            run_probe .hades/runtime/hermes-help-catalog-probe.json python3 scripts/probe_hermes_help_catalog.py --report .hades/runtime/hermes-help-catalog-probe.json --timeout 60
-            ;;
-        hermes-help-lifecycle)
-            run_probe .hades/runtime/hermes-help-lifecycle-probe.json python3 scripts/probe_hermes_help_lifecycle.py --report .hades/runtime/hermes-help-lifecycle-probe.json --timeout 60
-            ;;
-        hermes-help-resize)
-            run_probe .hades/runtime/hermes-help-resize-probe.json python3 scripts/probe_hermes_help_resize.py --report .hades/runtime/hermes-help-resize-probe.json --timeout 60
-            ;;
-        hermes-model-picker)
-            run_probe .hades/runtime/hermes-model-picker-probe.json python3 scripts/probe_hermes_model_picker.py --report .hades/runtime/hermes-model-picker-probe.json --timeout 30
-            ;;
-        hermes-model-picker-selection)
-            run_probe .hades/runtime/hermes-model-picker-selection-probe.json python3 scripts/probe_hermes_model_picker_selection.py --report .hades/runtime/hermes-model-picker-selection-probe.json --timeout 30
-            ;;
-        hermes-distinct-model-selection)
-            run_probe .hades/runtime/hermes-distinct-model-selection-probe.json python3 scripts/probe_hermes_distinct_model_selection.py --report .hades/runtime/hermes-distinct-model-selection-probe.json --timeout 60
-            ;;
-        hermes-setup-wizard)
-            run_probe .hades/runtime/hermes-setup-wizard-probe.json python3 scripts/probe_hermes_setup_wizard.py --report .hades/runtime/hermes-setup-wizard-probe.json --timeout 60
-            ;;
-        hermes-full-setup)
-            run_probe .hades/runtime/hermes-full-setup-probe.json python3 scripts/probe_hermes_full_setup.py --report .hades/runtime/hermes-full-setup-probe.json --timeout 30
-            ;;
-        hermes-full-setup-provider)
-            run_probe .hades/runtime/hermes-full-setup-provider-probe.json python3 scripts/probe_hermes_full_setup_provider.py --report .hades/runtime/hermes-full-setup-provider-probe.json --timeout 30
-            ;;
-        hermes-full-setup-provider-selection)
-            run_probe .hades/runtime/hermes-full-setup-provider-selection-probe.json python3 scripts/probe_hermes_full_setup_provider_selection.py --report .hades/runtime/hermes-full-setup-provider-selection-probe.json --timeout 30
-            ;;
-        hermes-full-setup-model-default)
-            run_probe .hades/runtime/hermes-full-setup-model-default-probe.json python3 scripts/probe_hermes_full_setup_model_default.py --report .hades/runtime/hermes-full-setup-model-default-probe.json --timeout 30
-            ;;
-        hermes-local-provider-stream)
-            run_probe .hades/runtime/hermes-local-provider-stream-probe.json python3 scripts/probe_hermes_local_provider_stream.py --report .hades/runtime/hermes-local-provider-stream-probe.json --timeout 30
-            ;;
-        hermes-multi-turn-provider)
-            run_probe .hades/runtime/hermes-multi-turn-provider-probe.json python3 scripts/probe_hermes_multi_turn_provider.py --report .hades/runtime/hermes-multi-turn-provider-probe.json --timeout 30
-            ;;
-        hermes-tool-schema-semantics)
-            run_probe .hades/runtime/hermes-tool-schema-semantics-probe.json python3 scripts/probe_hermes_tool_schema_semantics.py --report .hades/runtime/hermes-tool-schema-semantics-probe.json --timeout 30
-            ;;
-        hermes-tool-call-handoff)
-            run_probe .hades/runtime/hermes-tool-call-handoff-probe.json python3 scripts/probe_hermes_tool_call_handoff.py --report .hades/runtime/hermes-tool-call-handoff-probe.json --timeout 30 --observation-window 0.2
-            ;;
-        hermes-tool-completion-handoff)
-            run_probe .hades/runtime/hermes-tool-completion-handoff-probe.json python3 scripts/probe_hermes_tool_completion_handoff.py --report .hades/runtime/hermes-tool-completion-handoff-probe.json --timeout 90 --observation-window 4
-            ;;
-        hermes-clarify-question-surface)
-            run_probe .hades/runtime/hermes-clarify-question-surface-probe.json python3 scripts/probe_hermes_clarify_question_surface.py --report .hades/runtime/hermes-clarify-question-surface-probe.json --timeout 90 --observation-window 3
-            ;;
-        hermes-provider-errors)
-            run_probe .hades/runtime/hermes-provider-errors-probe.json python3 scripts/probe_hermes_provider_errors.py --report .hades/runtime/hermes-provider-errors-probe.json --timeout 30
-            ;;
-        hermes-provider-setup-persistence)
-            run_probe .hades/runtime/hermes-provider-setup-persistence-probe.json python3 scripts/probe_hermes_provider_setup_persistence.py --report .hades/runtime/hermes-provider-setup-persistence-probe.json --timeout 30
-            ;;
-        hermes-setup-config-shape)
-            run_probe .hades/runtime/hermes-setup-config-shape-probe.json python3 scripts/probe_hermes_setup_config_shape.py --report .hades/runtime/hermes-setup-config-shape-probe.json --timeout 30
-            ;;
-        hermes-empty-platform-confirmation)
-            run_probe .hades/runtime/hermes-empty-platform-confirmation-probe.json python3 scripts/probe_hermes_empty_platform_confirmation.py --report .hades/runtime/hermes-empty-platform-confirmation-probe.json --timeout 30
-            ;;
-        hermes-unconfigured-startup)
-            run_probe .hades/runtime/hermes-unconfigured-startup-probe.json python3 scripts/probe_hermes_unconfigured_startup.py --report .hades/runtime/hermes-unconfigured-startup-probe.json --timeout 30
-            ;;
-        hermes-unconfigured-input-queue)
-            run_probe .hades/runtime/hermes-unconfigured-input-queue-probe.json python3 scripts/probe_hermes_unconfigured_input_queue.py --report .hades/runtime/hermes-unconfigured-input-queue-probe.json --timeout 30
-            ;;
-        hermes-unconfigured-setup-escape)
-            run_probe .hades/runtime/hermes-unconfigured-setup-escape-probe.json python3 scripts/probe_hermes_unconfigured_setup_escape.py --report .hades/runtime/hermes-unconfigured-setup-escape-probe.json --timeout 30
-            ;;
-        hermes-unconfigured-resolution)
-            run_probe .hades/runtime/hermes-unconfigured-resolution-probe.json python3 scripts/probe_hermes_unconfigured_resolution.py --report .hades/runtime/hermes-unconfigured-resolution-probe.json --timeout 30 --observation-window 15
-            ;;
-        hermes-setup-required-reconciliation)
-            run_probe .hades/runtime/hermes-setup-required-reconciliation-probe.json python3 scripts/probe_hermes_setup_required_reconciliation.py --report .hades/runtime/hermes-setup-required-reconciliation-probe.json --timeout 30 --observation-window 15
-            ;;
-        hermes-help-setup-timing)
-            run_probe .hades/runtime/hermes-help-setup-timing-probe.json python3 scripts/probe_hermes_help_setup_timing.py --report .hades/runtime/hermes-help-setup-timing-probe.json --timeout 30 --observation-window 15
-            ;;
-        hermes-setup-required-actions)
-            run_probe .hades/runtime/hermes-setup-required-actions-probe.json python3 scripts/probe_hermes_setup_required_actions.py --report .hades/runtime/hermes-setup-required-actions-probe.json --timeout 30 --observation-window 3
-            ;;
-        hermes-standalone-setup)
-            run_probe .hades/runtime/hermes-standalone-setup-probe.json python3 scripts/probe_hermes_standalone_setup.py --report .hades/runtime/hermes-standalone-setup-probe.json --timeout 30
-            ;;
-        hermes-standalone-full-setup)
-            run_probe .hades/runtime/hermes-standalone-full-setup-probe.json python3 scripts/probe_hermes_standalone_full_setup.py --report .hades/runtime/hermes-standalone-full-setup-probe.json --timeout 90
-            ;;
-        hermes-standalone-terminal-platform)
-            run_probe .hades/runtime/hermes-standalone-terminal-platform-probe.json python3 scripts/probe_hermes_standalone_terminal_platform.py --report .hades/runtime/hermes-standalone-terminal-platform-probe.json --timeout 60
-            ;;
-        hermes-standalone-tool-configuration)
-            run_probe .hades/runtime/hermes-standalone-tool-configuration-probe.json python3 scripts/probe_hermes_standalone_tool_configuration.py --report .hades/runtime/hermes-standalone-tool-configuration-probe.json --timeout 30
-            ;;
-        hermes-tool-configuration-navigation)
-            run_probe .hades/runtime/hermes-tool-configuration-navigation-probe.json python3 scripts/probe_hermes_tool_configuration_navigation.py --report .hades/runtime/hermes-tool-configuration-navigation-probe.json --timeout 30
-            ;;
-        hermes-tool-provider-boundary)
-            run_probe .hades/runtime/hermes-tool-provider-boundary-probe.json python3 scripts/probe_hermes_tool_provider_boundary.py --report .hades/runtime/hermes-tool-provider-boundary-probe.json --timeout 30
-            ;;
-        hermes-tool-provider-inventory)
-            run_probe .hades/runtime/hermes-tool-provider-inventory-probe.json python3 scripts/probe_hermes_tool_provider_inventory.py --report .hades/runtime/hermes-tool-provider-inventory-probe.json --timeout 30 --observation-window 1
-            ;;
-        hermes-tool-provider-inventory-interaction)
-            run_probe .hades/runtime/hermes-tool-provider-inventory-interaction-probe.json python3 scripts/probe_hermes_tool_provider_inventory_interaction.py --report .hades/runtime/hermes-tool-provider-inventory-interaction-probe.json --timeout 60
-            ;;
-        hermes-tool-provider-inventory-edges)
-            run_probe .hades/runtime/hermes-tool-provider-inventory-edges-probe.json python3 scripts/probe_hermes_tool_provider_inventory_edges.py --report .hades/runtime/hermes-tool-provider-inventory-edges-probe.json --timeout 60
-            ;;
-        hermes-tool-provider-inventory-selection)
-            run_probe .hades/runtime/hermes-tool-provider-inventory-selection-probe.json python3 scripts/probe_hermes_tool_provider_inventory_selection.py --report .hades/runtime/hermes-tool-provider-inventory-selection-probe.json --timeout 30
-            ;;
-        *)
-            echo "[verify] unknown probe unit: $1" >&2
-            return 1
-            ;;
-    esac
-}
-export -f run_probe_unit
-export -f run_probe
-_probe_units=$(nproc 2>/dev/null || echo 4)
-[ "$_probe_units" -gt 6 ] && _probe_units=6
-printf '%s\n' "hermes-tool-inventory" "hermes-osc52-st-termination" "hermes-osc52-multiplexer" "hermes-terminal-palette" "hermes-slash-commands" "hermes-help-catalog" "hermes-help-lifecycle" "hermes-help-resize" "hermes-model-picker" "hermes-model-picker-selection" "hermes-distinct-model-selection" "hermes-setup-wizard" "hermes-full-setup" "hermes-full-setup-provider" "hermes-full-setup-provider-selection" "hermes-full-setup-model-default" "hermes-local-provider-stream" "hermes-multi-turn-provider" "hermes-tool-schema-semantics" "hermes-tool-call-handoff" "hermes-tool-completion-handoff" "hermes-clarify-question-surface" "hermes-provider-errors" "hermes-provider-setup-persistence" "hermes-setup-config-shape" "hermes-empty-platform-confirmation" "hermes-unconfigured-startup" "hermes-unconfigured-input-queue" "hermes-unconfigured-setup-escape" "hermes-unconfigured-resolution" "hermes-setup-required-reconciliation" "hermes-help-setup-timing" "hermes-setup-required-actions" "hermes-standalone-setup" "hermes-standalone-full-setup" "hermes-standalone-terminal-platform" "hermes-standalone-tool-configuration" "hermes-tool-configuration-navigation" "hermes-tool-provider-boundary" "hermes-tool-provider-inventory" "hermes-tool-provider-inventory-interaction" "hermes-tool-provider-inventory-edges" "hermes-tool-provider-inventory-selection" | xargs -P "$_probe_units" -I{} bash -c 'run_probe_unit "$@"' _ {}
 
 # --- replay units (parallel pool) ---
 run_replay_unit() {
