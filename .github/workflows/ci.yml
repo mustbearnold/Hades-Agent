@@ -10,13 +10,33 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    # Full gate: cold cargo build + reference provisioning (npm + uv +
+    # ink build) + ~40 replay units. 60 minutes is generous headroom.
+    timeout-minutes: 60
     steps:
       - name: Check out repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
       - name: Install pinned Rust toolchain
         run: rustup toolchain install 1.97.1 --profile minimal
+
+      - name: Prime cargo cache for offline builds
+        # verify.sh builds with --offline/--locked; a fresh runner has no
+        # registry cache, so fetch the locked dependency set first.
+        run: cargo fetch --locked
+
+      - name: Install uv
+        # prepare_hermes_reference.sh needs uv to sync the reference's
+        # Python environment.
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Provision pinned Hermes reference
+        # The tool-inventory probe measures the live reference TUI and
+        # fails the gate when the pinned checkout is absent. The reference
+        # is the public hermes-agent repo at the pinned commit.
+        run: bash scripts/prepare_hermes_reference.sh
 
       - name: Run complete repository gate
         run: bash scripts/verify.sh
