@@ -40,6 +40,7 @@ use hades_provider::{
     CancellationToken, ChatMessage, ChatRequest, LocalOpenAiTransport, StreamEvent, TransportError,
     hermes_tool_inventory,
 };
+use hades_tools::{Sandbox, ToolCallRecord};
 use hades_tui::{draw, draw_standalone_setup, snapshot, standalone_tool_provider_action_status};
 use ratatui::{Terminal, backend::CrosstermBackend};
 use signal_hook::{consts::SIGINT, flag};
@@ -48,6 +49,15 @@ const DEFAULT_PROVIDER_MODEL: &str = "palette-model";
 const PROVIDER_BASE_URL_ENV: &str = "HADES_PROVIDER_BASE_URL";
 const PROVIDER_MODEL_ENV: &str = "HADES_MODEL";
 const PROVIDER_API_KEY_ENV: &str = "HADES_PROVIDER_API_KEY";
+/// Explicit sandbox root for tool execution (spec 011 R2/R4). When unset,
+/// every process gets a fresh probe-owned temp-dir root; tools never touch
+/// the real user environment.
+const SANDBOX_ENV: &str = "HADES_SANDBOX";
+/// Hard safety ceiling on follow-up tool hops. OBS-0120 observed two hops
+/// then plain-completion termination; this bound only guarantees the loop
+/// can never run unbounded (spec 011 R5), it is never the observed
+/// termination path.
+const MAX_TOOL_HOPS: usize = 16;
 const LOCAL_PROVIDER_CONFIG_FILE: &str = "hades-local-provider.conf";
 const STANDALONE_SETUP_STATE_FILE: &str = "hades-setup-boundary.conf";
 const STANDALONE_SETUP_STATE_CONTENT: &str = "# Hades Agent setup boundary (Hades-owned, non-secret)\n\
@@ -905,13 +915,29 @@ fn start_provider(app: &mut App, provider_runtime: &mut Option<ProviderRuntime>)
             return;
         }
     };
+    // Every tool executes against the explicit sandbox root (spec 011 R2):
+    // `HADES_SANDBOX` when set, otherwise a fresh probe-owned temp-dir root
+    // for this process. Side effects never touch the real user environment.
+    let sandbox_root = env::var_os(SANDBOX_ENV)
+        .map(PathBuf::from)
+        .unwrap_or_else(|| env::temp_dir().join(format!("hades-sandbox-{}", process::id())));
+    if let Err(error) = fs::create_dir_all(&sandbox_root) {
+        app.handle(InputEvent::Provider(ProviderEvent::Failed(format!(
+            "sandbox root {} could not be created: {error}",
+            sandbox_root.display()
+        ))));
+        return;
+    }
+    let sandbox = Sandbox::new(sandbox_root);
     let model = provider_request_model(app, &config.model);
     let request =
         ChatRequest::new(model, provider_request_messages(app), hermes_tool_inventory().to_vec());
     let cancellation = CancellationToken::new();
     let worker_cancellation = cancellation.clone();
     let (sender, receiver) = mpsc::channel();
-    thread::spawn(move || run_provider_worker(transport, request, sender, worker_cancellation));
+    thread::spawn(move || {
+        run_provider_worker(transport, request, sender, worker_cancellation, sandbox)
+    });
     *provider_runtime = Some(ProviderRuntime { events: receiver, cancellation });
 }
 
@@ -943,17 +969,106 @@ fn run_provider_worker(
     request: ChatRequest,
     sender: Sender<ProviderEvent>,
     cancellation: CancellationToken,
+    sandbox: Sandbox,
 ) {
     if sender.send(ProviderEvent::Started).is_err() {
         return;
     }
+    let Some(first) = stream_turn(&transport, &request, &sender, &cancellation) else {
+        return;
+    };
+    if first.tool_calls.is_empty() {
+        return;
+    }
+
+    // Multi-hop follow-up loop with the observed OBS-0120 semantics: after a
+    // tool result, the follow-up request carries the `tool` role messages in
+    // the observed shape; if the follow-up response itself contains tool
+    // calls the loop continues; termination is the follow-up stream that
+    // carries no tool calls (plain completion). The loop is bounded by
+    // MAX_TOOL_HOPS so it can never run unbounded (spec 011 R5).
+    let mut messages = request.messages.clone();
+    let tools = request.tools.clone();
+    let mut assistant = first.assistant.clone();
+    let mut pending = first.tool_calls;
+    let mut hop = 0_usize;
+    loop {
+        hop += 1;
+        if hop > MAX_TOOL_HOPS {
+            let _ = sender.send(ProviderEvent::Failed(format!(
+                "tool loop exceeded the {MAX_TOOL_HOPS}-hop safety bound"
+            )));
+            return;
+        }
+        // Execute the pending tool calls against the sandbox. Every call gets
+        // a result message (typed results for the observed slice, Hades-owned
+        // error results otherwise), so the loop always feeds back.
+        let mut wire_calls = Vec::new();
+        let mut results = Vec::new();
+        for call in &pending {
+            let Some(name) = call.name.clone() else { continue };
+            let id = call.id.clone().unwrap_or_else(|| format!("call_hades_{}", call.index));
+            wire_calls.push(serde_json::json!({
+                "id": id,
+                "type": "function",
+                "function": {
+                    "name": name,
+                    "arguments": call.arguments,
+                }
+            }));
+            let record = ToolCallRecord::new(name, id.clone(), call.arguments.clone());
+            let content = match sandbox.execute(&record) {
+                Ok(result) => result.content(),
+                Err(error) => error.result_content(),
+            };
+            results.push((id, content));
+        }
+        if wire_calls.is_empty() {
+            return;
+        }
+        messages.push(ChatMessage::new("assistant", &assistant).with_tool_calls(wire_calls));
+        for (id, content) in &results {
+            messages.push(ChatMessage::new("tool", content).with_tool_call_id(id));
+        }
+        let follow_up = ChatRequest {
+            model: request.model.clone(),
+            messages: messages.clone(),
+            tools: tools.clone(),
+            max_tokens: request.max_tokens,
+            include_usage: request.include_usage,
+        };
+        if sender.send(ProviderEvent::Started).is_err() {
+            return;
+        }
+        let Some(next) = stream_turn(&transport, &follow_up, &sender, &cancellation) else {
+            return;
+        };
+        if next.tool_calls.is_empty() {
+            // Observed termination: the follow-up stream carried no tool
+            // calls — plain completion. Never loop past this point.
+            return;
+        }
+        assistant = next.assistant;
+        pending = next.tool_calls;
+    }
+}
+
+/// One accumulated stream: open the request, drain it into provider events,
+/// and return the assistant text plus any tool calls it requested.
+fn stream_turn(
+    transport: &LocalOpenAiTransport,
+    request: &ChatRequest,
+    sender: &Sender<ProviderEvent>,
+    cancellation: &CancellationToken,
+) -> Option<StreamedTurn> {
     let mut tool_calls: Vec<AccumulatedToolCall> = Vec::new();
-    let mut stream = match transport.open_stream(&request, &cancellation) {
+    let mut assistant = String::new();
+    let mut stream = match transport.open_stream(request, cancellation) {
         Ok(stream) => stream,
-        Err(TransportError::Cancelled) => return,
+        Err(TransportError::Cancelled) => return None,
         Err(error) => {
             let _ = sender.send(ProviderEvent::Failed(error.to_string()));
-            return;
+            return None;
         }
     };
     loop {
@@ -963,66 +1078,31 @@ fn run_provider_worker(
                 if let StreamEvent::ToolCallDelta(delta) = &event {
                     accumulate_tool_call(&mut tool_calls, delta);
                 }
+                if let StreamEvent::TextDelta(text) = &event {
+                    assistant.push_str(text);
+                }
                 if sender.send(translate_stream_event(event)).is_err() {
-                    return;
+                    return None;
                 }
                 if is_done {
                     break;
                 }
             }
-            Ok(None) => return,
-            Err(TransportError::Cancelled) => return,
+            Ok(None) => return None,
+            Err(TransportError::Cancelled) => return None,
             Err(error) => {
                 let _ = sender.send(ProviderEvent::Failed(error.to_string()));
-                return;
+                return None;
             }
         }
     }
-    if tool_calls.is_empty() {
-        return;
-    }
-    // Bounded one-hop follow-up with the observed OBS-0114 request shape:
-    // the assistant tool-call message and a Hades-owned tool result message.
-    let Some(follow_up) = tool_result_follow_up(&request, &tool_calls) else {
-        return;
-    };
-    if sender.send(ProviderEvent::Started).is_err() {
-        return;
-    }
-    let mut stream = match transport.open_stream(&follow_up, &cancellation) {
-        Ok(stream) => stream,
-        Err(TransportError::Cancelled) => return,
-        Err(error) => {
-            let _ = sender.send(ProviderEvent::Failed(error.to_string()));
-            return;
-        }
-    };
-    let mut follow_up_tool_calls: Vec<AccumulatedToolCall> = Vec::new();
-    loop {
-        match stream.next_event() {
-            Ok(Some(event)) => {
-                let is_done = event == StreamEvent::Done;
-                if let StreamEvent::ToolCallDelta(delta) = &event {
-                    accumulate_tool_call(&mut follow_up_tool_calls, delta);
-                }
-                if sender.send(translate_stream_event(event)).is_err() {
-                    return;
-                }
-                if is_done {
-                    break;
-                }
-            }
-            Ok(None) => return,
-            Err(TransportError::Cancelled) => return,
-            Err(error) => {
-                let _ = sender.send(ProviderEvent::Failed(error.to_string()));
-                return;
-            }
-        }
-    }
-    // Never loop: a second tool-call response is recorded and the worker
-    // stops. Follow-up tool calls are intentionally not re-sent.
-    let _ = follow_up_tool_calls;
+    Some(StreamedTurn { assistant, tool_calls })
+}
+
+/// One drained stream: the assistant text plus the tool calls it requested.
+struct StreamedTurn {
+    assistant: String,
+    tool_calls: Vec<AccumulatedToolCall>,
 }
 
 /// Per-index argument fragments accumulated while a stream is running.
@@ -1068,52 +1148,6 @@ fn accumulate_tool_call(
                 .collect(),
         });
     }
-}
-
-/// Hades-owned tool result marker. The observed Hermes result content is
-/// unknown, so this is explicit Hades behavior, not a parity claim.
-const TOOL_RESULT_MARKER: &str =
-    "Tool call completed without execution. Hades does not execute tools.";
-
-/// Build the bounded tool-result follow-up request with the observed OBS-0114
-/// message shape: system/user history, an assistant tool-call message, and a
-/// `tool` role result message. Returns None when a call lacks a name.
-fn tool_result_follow_up(
-    request: &ChatRequest,
-    tool_calls: &[AccumulatedToolCall],
-) -> Option<ChatRequest> {
-    let mut messages = request.messages.clone();
-    let wire_calls = tool_calls
-        .iter()
-        .filter_map(|call| {
-            let name = call.name.clone()?;
-            let id = call.id.clone().unwrap_or_else(|| format!("call_hades_{}", call.index));
-            Some(serde_json::json!({
-                "id": id,
-                "type": "function",
-                "function": {
-                    "name": name,
-                    "arguments": call.arguments,
-                }
-            }))
-        })
-        .collect::<Vec<_>>();
-    if wire_calls.is_empty() {
-        return None;
-    }
-    messages.push(ChatMessage::new("assistant", "").with_tool_calls(wire_calls));
-    for call in tool_calls {
-        if let Some(id) = call.id.clone() {
-            messages.push(ChatMessage::new("tool", TOOL_RESULT_MARKER).with_tool_call_id(id));
-        }
-    }
-    Some(ChatRequest {
-        model: request.model.clone(),
-        messages,
-        tools: request.tools.clone(),
-        max_tokens: request.max_tokens,
-        include_usage: request.include_usage,
-    })
 }
 
 fn translate_stream_event(event: StreamEvent) -> ProviderEvent {

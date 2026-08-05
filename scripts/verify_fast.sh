@@ -94,6 +94,7 @@ python3 scripts/replay_configured_help_resize.py --binary target/debug/hades --r
 python3 scripts/replay_provider_recovery.py --binary target/debug/hades --report .hades/runtime/provider-recovery-replay.json --timeout 8
 python3 scripts/replay_conversation_context.py --binary target/debug/hades --report .hades/runtime/conversation-context-replay.json --timeout 8
 python3 scripts/replay_tool_call_deltas.py --binary target/debug/hades --report .hades/runtime/tool-call-deltas-replay.json --timeout 8
+python3 scripts/replay_tool_execution.py --binary target/debug/hades --report .hades/runtime/tool-execution-replay.json --timeout 8
 python3 scripts/replay_model_selection.py --binary target/debug/hades --report .hades/runtime/model-selection-replay.json --timeout 10
 cargo build --locked --release --package hades-cli
 bash scripts/install_user_launcher.sh

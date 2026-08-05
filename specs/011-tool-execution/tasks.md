@@ -36,9 +36,23 @@ Tick items in order. A task may only be marked done with its evidence named.
       `justfile` recipe `probe-tool-execution` + `validate-reference` lines;
       `scripts/verify.sh` run_probe lines + fixture validation loop;
       parity matrix row updated.
-- [ ] T6. Stage 3: `crates/hades-tools/` executor with the sandbox boundary,
+- [x] T6. Stage 3: `crates/hades-tools/` executor with the sandbox boundary,
       terminal/file/clarify implementations, and the multi-hop follow-up
       loop; unit tests at the typed seam.
+      Evidence: `crates/hades-tools/src/lib.rs` (typed `ToolCallRecord` in,
+      typed `ToolResult` out in the observed message shapes; `Sandbox`
+      confinement incl. symlink-escape rejection; terminal/write_file/
+      read_file/search_files/clarify; first-choice clarify responder; 12 unit
+      tests, byte-exact digests `708054e2`/`497ef28a`/`fb3accfc`/`7336fd6d`);
+      `crates/hades-app/src/lib.rs` (multi-hop busy-state reducer test);
+      `crates/hades-cli/src/main.rs` (`run_provider_worker` multi-hop loop,
+      `HADES_SANDBOX` root, `MAX_TOOL_HOPS` bound);
+      `crates/hades-dev/src/bin/replay_tool_execution.rs` +
+      `scripts/replay_tool_execution.py` (direct-PTY S4 replay: 3 streaming
+      requests, terminal→read_file→plain completion, byte-exact result
+      digests, sandbox `hop.txt` side effect, no fourth request);
+      `scripts/verify.sh` + `scripts/verify_fast.sh` + `justfile`
+      (`replay-tool-execution`).
 - [ ] T7. Stage 4: direct-PTY multi-hop replay + differential parity against
       the reference observations; update parity matrix, README, and task
       evidence.

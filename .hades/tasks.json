@@ -9041,11 +9041,25 @@
         "Add unit tests at the typed seam and a direct-PTY replay proving the loop shape matches the reference observation.",
         "Run the complete no-skip just verify gate before completion."
       ],
-      "attempts": 0,
+      "attempts": 1,
       "depends_on": [
         "HAD-180"
       ],
-      "evidence": [],
+      "evidence": [
+        "crates/hades-tools/src/lib.rs",
+        "crates/hades-tools/Cargo.toml",
+        "crates/hades-app/src/lib.rs",
+        "crates/hades-cli/src/main.rs",
+        "crates/hades-cli/Cargo.toml",
+        "crates/hades-dev/src/bin/replay_tool_execution.rs",
+        "crates/hades-dev/Cargo.toml",
+        "scripts/replay_tool_execution.py",
+        "scripts/verify.sh",
+        "scripts/verify_fast.sh",
+        "justfile",
+        "specs/011-tool-execution/tasks.md",
+        "Cargo.toml"
+      ],
       "id": "HAD-181",
       "lane": "behavior",
       "oracle": [
@@ -9057,9 +9071,30 @@
       "owner_role": "implementer",
       "priority": 78,
       "risk": "medium",
-      "status": "ready",
+      "status": "complete",
       "title": "Implement the hades-tools executor in Rust",
-      "ready_at": "2026-08-05T04:55:56Z"
+      "ready_at": "2026-08-05T04:55:56Z",
+      "claimed_by": "expert-software-engineer",
+      "claimed_at": "2026-08-05T06:24:44Z",
+      "result": {
+        "summary": "Implemented the hades-tools executor (spec 011 Stage 3): typed ToolCallRecord in / typed ToolResult out at the deterministic seam, every tool sandboxed to an explicit HADES_SANDBOX root (default fresh temp-dir; symlink/escape rejected), bounded slice terminal/write_file/read_file/search_files/clarify with byte-exact observed result shapes (45B 708054e2, 133B 497ef28a, 121B fb3accfc, 158B 7336fd6d), and the observed multi-hop follow-up loop (OBS-0120 terminal -> read_file -> plain completion; MAX_TOOL_HOPS bound, never unbounded). 12 crate unit tests + multi-hop reducer test + Python/Rust direct-PTY replays (3 streaming requests, byte-exact result digests, sandbox side effect, no fourth request) wired into justfile, verify.sh and verify_fast.sh.",
+        "completed_at": "2026-08-05T06:24:44Z",
+        "evidence": [
+          "crates/hades-tools/src/lib.rs",
+          "crates/hades-tools/Cargo.toml",
+          "crates/hades-app/src/lib.rs",
+          "crates/hades-cli/src/main.rs",
+          "crates/hades-cli/Cargo.toml",
+          "crates/hades-dev/src/bin/replay_tool_execution.rs",
+          "crates/hades-dev/Cargo.toml",
+          "scripts/replay_tool_execution.py",
+          "scripts/verify.sh",
+          "scripts/verify_fast.sh",
+          "justfile",
+          "specs/011-tool-execution/tasks.md",
+          "Cargo.toml"
+        ]
+      }
     },
     {
       "acceptance": [
@@ -9083,9 +9118,10 @@
       "owner_role": "verifier",
       "priority": 77,
       "risk": "medium",
-      "status": "queued",
-      "title": "Parity-verify the multi-hop tool loop"
+      "status": "ready",
+      "title": "Parity-verify the multi-hop tool loop",
+      "ready_at": "2026-08-05T06:24:44Z"
     }
   ],
-  "updated_at": "2026-08-05T04:55:56Z"
+  "updated_at": "2026-08-05T06:24:44Z"
 }

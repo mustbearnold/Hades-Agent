@@ -455,6 +455,7 @@ dependencies = [
  "hades-app",
  "hades-core",
  "hades-provider",
+ "hades-tools",
  "hades-tui",
  "ratatui",
  "rustix",
@@ -473,6 +474,7 @@ dependencies = [
 name = "hades-dev"
 version = "0.1.0"
 dependencies = [
+ "hades-tools",
  "rustix",
  "serde",
  "serde_json",
@@ -482,6 +484,15 @@ dependencies = [
 
 [[package]]
 name = "hades-provider"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "sha2",
+]
+
+[[package]]
+name = "hades-tools"
 version = "0.1.0"
 dependencies = [
  "serde",

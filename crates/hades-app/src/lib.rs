@@ -177,6 +177,14 @@ pub struct App {
     completed_turns: Vec<CompletedTurn>,
     active_turn: Option<ActiveTurn>,
     selected_model: Option<String>,
+    /// Whether the current provider stream carried tool-call deltas.
+    ///
+    /// Survives the per-stream [`ActiveTurn`] take so a multi-hop follow-up
+    /// loop (OBS-0120: terminal → read_file → plain completion) keeps the
+    /// turn in the typed busy state until a stream completes without tool
+    /// calls. Reset on [`ProviderEvent::Started`] (each stream) and on
+    /// failure/cancellation/interrupt.
+    stream_had_tool_calls: bool,
 }
 
 impl App {
@@ -199,6 +207,7 @@ impl App {
             completed_turns: Vec::new(),
             active_turn: None,
             selected_model: None,
+            stream_had_tool_calls: false,
         }
     }
 
@@ -296,6 +305,7 @@ impl App {
 
         match event {
             ProviderEvent::Started => {
+                self.stream_had_tool_calls = false;
                 self.state.status = "Provider started.".to_owned();
             }
             ProviderEvent::TextDelta(text) => {
@@ -319,6 +329,7 @@ impl App {
                 self.state.status = "Receiving response.".to_owned();
             }
             ProviderEvent::ToolCallDelta(delta) => {
+                self.stream_had_tool_calls = true;
                 if let Some(turn) = &mut self.active_turn {
                     let call = turn.tool_calls.iter_mut().find(|call| call.index == delta.index);
                     if let Some(call) = call {
@@ -342,8 +353,7 @@ impl App {
                 }
             }
             ProviderEvent::Completed => {
-                let had_tool_calls =
-                    self.active_turn.as_ref().is_some_and(|turn| !turn.tool_calls.is_empty());
+                let had_tool_calls = self.stream_had_tool_calls;
                 if let Some(turn) = self.active_turn.take() {
                     let tool_calls = turn
                         .tool_calls
@@ -374,6 +384,7 @@ impl App {
                 }
             }
             ProviderEvent::Failed(message) => {
+                self.stream_had_tool_calls = false;
                 self.active_turn = None;
                 self.state.turn = TurnState::Ready;
                 self.state.status = if message.is_empty() {
@@ -384,6 +395,7 @@ impl App {
                 self.state.notice = Some(Notice::ProviderError { message });
             }
             ProviderEvent::Cancelled => {
+                self.stream_had_tool_calls = false;
                 self.active_turn = None;
                 self.state.turn = TurnState::Ready;
                 self.state.status = "Provider cancelled.".to_owned();
@@ -653,6 +665,7 @@ impl App {
     fn interrupt(&mut self) -> DispatchOutcome {
         self.clear_notice();
         self.clear_completion();
+        self.stream_had_tool_calls = false;
         self.active_turn = None;
         self.state.turn = TurnState::Ready;
         self.state.status = "Interrupted.".to_owned();
@@ -1038,6 +1051,44 @@ mod tests {
         assert_eq!(tool_calls[1].argument_length, 2);
 
         // The follow-up stream (no new tool calls) returns to ready.
+        app.handle(InputEvent::Provider(ProviderEvent::Started));
+        app.handle(InputEvent::Provider(ProviderEvent::TextDelta(
+            "Synthetic completion.".to_owned(),
+        )));
+        app.handle(InputEvent::Provider(ProviderEvent::Completed));
+        assert_eq!(app.state().turn, TurnState::Ready);
+        assert_eq!(app.state().status, "Response complete.");
+    }
+
+    #[test]
+    fn multi_hop_follow_ups_stay_busy_until_a_plain_completion() {
+        // OBS-0120 loop semantics: terminal -> read_file -> plain completion.
+        // Every stream that carries tool calls keeps the typed busy state;
+        // only the stream without tool calls returns to ready.
+        let mut app = App::new();
+        app.submit_editor_draft("hello".to_owned());
+        app.handle(InputEvent::Provider(ProviderEvent::Started));
+        app.handle(InputEvent::Provider(ProviderEvent::ToolCallDelta(ToolCallDelta {
+            index: 0,
+            id: Some("call-a".to_owned()),
+            name: Some("terminal".to_owned()),
+            arguments: Some("{\"command\":\"...\"}".to_owned()),
+        })));
+        app.handle(InputEvent::Provider(ProviderEvent::Completed));
+        assert_eq!(app.state().turn, TurnState::Busy);
+
+        // Hop 2: the follow-up stream itself requests another tool.
+        app.handle(InputEvent::Provider(ProviderEvent::Started));
+        app.handle(InputEvent::Provider(ProviderEvent::ToolCallDelta(ToolCallDelta {
+            index: 0,
+            id: Some("call-b".to_owned()),
+            name: Some("read_file".to_owned()),
+            arguments: Some("{\"path\":\"...\"}".to_owned()),
+        })));
+        app.handle(InputEvent::Provider(ProviderEvent::Completed));
+        assert_eq!(app.state().turn, TurnState::Busy);
+
+        // Hop 3: plain completion terminates the loop.
         app.handle(InputEvent::Provider(ProviderEvent::Started));
         app.handle(InputEvent::Provider(ProviderEvent::TextDelta(
             "Synthetic completion.".to_owned(),

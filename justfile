@@ -460,6 +460,12 @@ replay-tool-call-deltas:
     python3 scripts/check_replay_parity.py replay_tool_call_deltas replay_tool_call_deltas --timeout 8
     ./target/debug/replay_tool_call_deltas --binary target/debug/hades --report .hades/runtime/tool-call-deltas-replay.json --timeout 8
 
+replay-tool-execution:
+    cargo build --locked --package hades-cli
+    cargo build --offline --package hades-dev --bin replay_tool_execution
+    python3 scripts/check_replay_parity.py replay_tool_execution replay_tool_execution --timeout 8
+    ./target/debug/replay_tool_execution --binary target/debug/hades --report .hades/runtime/tool-execution-replay.json --timeout 8
+
 replay-local-provider-timing:
     cargo build --locked --package hades-cli
     cargo build --offline --package hades-dev --bin replay_local_provider_timing

@@ -336,6 +336,10 @@ run_replay_unit() {
             python3 scripts/check_replay_parity.py replay_tool_call_deltas replay_tool_call_deltas --timeout 8
             ./target/debug/replay_tool_call_deltas --binary target/debug/hades --report .hades/runtime/tool-call-deltas-replay.json --timeout 8
             ;;
+        replay_tool_execution)
+            python3 scripts/check_replay_parity.py replay_tool_execution replay_tool_execution --timeout 8
+            ./target/debug/replay_tool_execution --binary target/debug/hades --report .hades/runtime/tool-execution-replay.json --timeout 8
+            ;;
         replay_model_selection)
             python3 scripts/check_replay_parity.py replay_model_selection replay_model_selection --timeout 10
             ./target/debug/replay_model_selection --binary target/debug/hades --report .hades/runtime/model-selection-replay.json --timeout 10
@@ -434,7 +438,7 @@ run_replay_unit() {
 export -f run_replay_unit
 _replay_units=$(nproc 2>/dev/null || echo 4)
 [ "$_replay_units" -gt 8 ] && _replay_units=8
-printf '%s\n' "replay_cli_launch" "replay_unconfigured_startup" "replay_unconfigured_input" "replay_unconfigured_help" "replay_setup_required_actions" "replay_standalone_setup" "replay_standalone_full_setup" "replay_standalone_terminal_platform" "replay_standalone_empty_platform_confirmation" "replay_standalone_tool_provider_boundary" "replay_standalone_tool_provider_inventory" "replay_standalone_tool_provider_inventory_navigation" "replay_standalone_tool_provider_inventory_selection" "replay_vertical_slice" "replay_configured_surfaces" "replay_configured_help" "replay_configured_help_lifecycle" "replay_configured_help_resize" "replay_provider_recovery" "replay_conversation_context" "replay_tool_call_deltas" "replay_model_selection" "replay_fresh_shell_launch" "replay_installed_model_selection" "differential_replay" "replay_composer" "replay_completion" "replay_model_picker" "replay_setup_wizard" "replay_setup_provider_menu" "replay_setup_provider_model_prompt" "replay_setup_terminal_backend" "replay_paste" "replay_editor" "replay_editor_outcomes" "replay_modified_enter" "replay_clipboard" "replay_clipboard_text" "replay_osc52_clipboard" "replay_terminal_palette" "replay_history" "replay_local_provider" | xargs -P "$_replay_units" -I{} bash -c 'run_replay_unit "$@"' _ {}
+printf '%s\n' "replay_cli_launch" "replay_unconfigured_startup" "replay_unconfigured_input" "replay_unconfigured_help" "replay_setup_required_actions" "replay_standalone_setup" "replay_standalone_full_setup" "replay_standalone_terminal_platform" "replay_standalone_empty_platform_confirmation" "replay_standalone_tool_provider_boundary" "replay_standalone_tool_provider_inventory" "replay_standalone_tool_provider_inventory_navigation" "replay_standalone_tool_provider_inventory_selection" "replay_vertical_slice" "replay_configured_surfaces" "replay_configured_help" "replay_configured_help_lifecycle" "replay_configured_help_resize" "replay_provider_recovery" "replay_conversation_context" "replay_tool_call_deltas" "replay_tool_execution" "replay_model_selection" "replay_fresh_shell_launch" "replay_installed_model_selection" "differential_replay" "replay_composer" "replay_completion" "replay_model_picker" "replay_setup_wizard" "replay_setup_provider_menu" "replay_setup_provider_model_prompt" "replay_setup_terminal_backend" "replay_paste" "replay_editor" "replay_editor_outcomes" "replay_modified_enter" "replay_clipboard" "replay_clipboard_text" "replay_osc52_clipboard" "replay_terminal_palette" "replay_history" "replay_local_provider" | xargs -P "$_replay_units" -I{} bash -c 'run_replay_unit "$@"' _ {}
 
 git diff --check
 

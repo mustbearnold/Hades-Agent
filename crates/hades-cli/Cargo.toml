@@ -15,6 +15,7 @@ crossterm.workspace = true
 hades-app = { path = "../hades-app" }
 hades-core = { path = "../hades-core" }
 hades-provider = { path = "../hades-provider" }
+hades-tools = { path = "../hades-tools" }
 hades-tui = { path = "../hades-tui" }
 ratatui.workspace = true
 serde_json.workspace = true
